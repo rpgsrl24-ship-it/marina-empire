@@ -79,6 +79,17 @@ button:hover:not(:disabled){border-color:#e1bd77;transform:translateY(-1px)}butt
 #map .panel h2{color:#f5dbab}
 #map .pin{z-index:8}
 @media(max-width:850px){#map .grid{grid-template-columns:1fr}#mapDisplay.geo-ready{height:57vh;min-height:430px}#map .visual-banner{height:92px}.map-info-bar button{flex:1}}
+</style><style id="me-satellite-v12">
+#mapDisplay.geo-ready{height:min(75vh,780px)!important;min-height:470px!important;border-radius:10px!important;border:2px solid #d7b171!important;background:#032137!important}
+#mapDisplay.geo-ready .leaflet-tile{filter:saturate(1.28) contrast(1.12) brightness(.93)!important}
+#map .visual-banner{display:none!important}
+#map .grid{grid-template-columns:minmax(0,2.5fr) minmax(245px,.78fr)!important}
+#map .grid>.panel:first-child{padding:8px!important;background:#041727!important}
+#map .grid>.panel:first-child>h2{font-size:19px;margin:6px 0 13px;color:#f3d294}
+.me-marker{width:40px!important;height:40px!important;font-size:24px!important;background:linear-gradient(145deg,#0f5294,#001e37)!important;border:2px solid #ffe094!important;box-shadow:0 0 0 3px #051c39cc,0 0 18px #efba61bb!important}
+.me-port-name{font-size:13px!important;letter-spacing:.02em!important;color:#fff1c4!important}
+.leaflet-container{font-family:system-ui,sans-serif!important}
+@media(max-width:900px){#map .grid{grid-template-columns:1fr!important}#mapDisplay.geo-ready{height:65vh!important;min-height:420px!important}}
 </style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">GIOCA ORA</button><button id="help">COME SI GIOCA</button><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
@@ -101,7 +112,7 @@ let liveMap=null,liveLayers=null,liveYacht=null;
 let selectedHarbor="rose";function selectHarbor(id){selectedHarbor=id;const p=port(id);$("selectedPortName").textContent=p.name;notice("Porto selezionato: "+p.name);if(liveMap&&harborGPS[id])liveMap.panTo(harborGPS[id]);}
 
 function yachtLatLng(){const a=harborGPS[state.port],b=state.trip?harborGPS[state.trip.dest]:a;if(!state.trip)return a;const t=Math.min(1,Math.max(0,1-(state.trip.until-Date.now())/(state.trip.sec*1000)));return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];}
-function renderGeographicMap(){if(!window.L||!state.name)return false;const target=$("mapDisplay");if(!liveMap){target.innerHTML="";target.classList.add("geo-ready");liveMap=L.map(target,{scrollWheelZoom:false,zoomControl:true}).setView([43.9,13.7],6);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"&copy; OpenStreetMap contributors"}).addTo(liveMap);liveLayers=L.layerGroup().addTo(liveMap);}liveLayers.clearLayers();
+function renderGeographicMap(){if(!window.L||!state.name)return false;const target=$("mapDisplay");if(!liveMap){target.innerHTML="";target.classList.add("geo-ready");liveMap=L.map(target,{scrollWheelZoom:false,zoomControl:true}).setView([42.1,12.7],5);L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:"Tiles © Esri — World Imagery"}).addTo(liveMap);liveLayers=L.layerGroup().addTo(liveMap);}liveLayers.clearLayers();
 for(const p of ports){const element=document.createElement("span");element.className="me-marker"+(state.port===p.id?" active":"");element.textContent="⚓";const mark=L.marker(harborGPS[p.id],{icon:L.divIcon({className:"",html:element.outerHTML,iconSize:[34,34],iconAnchor:[17,17]})}).addTo(liveLayers);mark.bindTooltip(p.name,{direction:"top",offset:[0,-18],className:"me-port-name"});mark.on("click",()=>selectHarbor(p.id));}
 if(state.trip)L.polyline([harborGPS[state.port],harborGPS[state.trip.dest]],{color:"#f2ca81",weight:3,dashArray:"7,8"}).addTo(liveLayers);
 liveYacht=L.marker(yachtLatLng(),{icon:L.divIcon({className:"me-vessel",html:"🛥️",iconSize:[38,38],iconAnchor:[19,19]})}).addTo(liveLayers);
