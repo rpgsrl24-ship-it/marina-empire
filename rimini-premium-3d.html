@@ -7,8 +7,8 @@ const sea=new THREE.Mesh(new THREE.PlaneGeometry(650,650,80,80),new THREE.MeshPh
 // Entire scene rebuilt as a coherent coast and enclosed marina, not floating objects.
 function landPolygon(points,m,height=.08){const shape=new THREE.Shape();shape.moveTo(points[0][0],points[0][1]);for(const p of points.slice(1))shape.lineTo(p[0],p[1]);shape.closePath();const geo=new THREE.ShapeGeometry(shape);geo.rotateX(Math.PI/2);const mesh=new THREE.Mesh(geo,m);mesh.position.y=height;scene.add(mesh);return mesh}
 const coast=mat(0xd6c7a7),grass=mat(0x547f54),road=mat(0x777b78),rock=mat(0x9e9d91);
-landPolygon([[-95,54],[-85,69],[-40,90],[25,94],[90,86],[150,70],[165,-115],[88,-115],[84,-52],[109,-29],[115,18],[89,50],[60,69],[31,73],[5,71],[-30,64],[-60,54]],coast);
-landPolygon([[-98,-81],[-84,-89],[-43,-92],[25,-87],[78,-79],[100,-90],[165,-115],[-105,-115]],sand);
+
+
 line([[-81,42],[-78,12],[-65,-26],[-51,-54],[-40,-67],[-7,-65],[22,-56],[51,-50],[79,-43]],6,rock);
 line([[-81,42],[-55,44],[-29,50],[-5,58],[18,61],[32,60]],5,rock);
 line([[57,58],[66,49],[86,40],[104,29],[110,16],[105,-11],[95,-32],[79,-43]],5,rock);
@@ -16,7 +16,7 @@ line([[-44,-74],[-5,-73],[30,-64],[62,-57],[91,-48]],10,road);
 line([[-44,-70],[-5,-69],[30,-60],[62,-53],[91,-44]],3,quay);
 disc(18,110,-39,road);disc(13,110,-39,city);disc(9,110,-39,mat(0xb98a72));
 
-for(let i=0;i<35;i++){const x=5+(i%10)*9,z=-94-Math.floor(i/10)*7;const u=new THREE.Mesh(new THREE.ConeGeometry(1.6,.8,8),mat(i%3===0?0xf4ede0:i%3===1?0xe49e78:0xf3c46e));u.position.set(x,.8,z);scene.add(u)}
+
 
 // Waterfront shops and restaurants sit along the commercial promenade.
 const facade=mat(0xf0e5d1),wood=mat(0x8a6345),awn=mat(0x1e6175);
