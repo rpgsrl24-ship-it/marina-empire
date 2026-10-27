@@ -15,9 +15,9 @@ line([[57,58],[66,49],[86,40],[104,29],[110,16],[105,-11],[95,-32],[79,-43]],5,r
 line([[-44,-74],[-5,-73],[30,-64],[62,-57],[91,-48]],10,road);
 line([[-44,-70],[-5,-69],[30,-60],[62,-53],[91,-44]],3,quay);
 disc(18,110,-39,road);disc(13,110,-39,city);disc(9,110,-39,mat(0xb98a72));
-for(let i=0;i<10;i++){const x=84+(i%5)*16,z=43+Math.floor(i/5)*17;box(12,8+(i%3)*3,12,x,4+(i%3)*1.5,z,white);box(13,.4,13,x,8.2+(i%3)*3,z,glass)}
+
 for(let i=0;i<35;i++){const x=5+(i%10)*9,z=-94-Math.floor(i/10)*7;const u=new THREE.Mesh(new THREE.ConeGeometry(1.6,.8,8),mat(i%3===0?0xf4ede0:i%3===1?0xe49e78:0xf3c46e));u.position.set(x,.8,z);scene.add(u)}
-for(let i=0;i<14;i++){const x=86+(i%7)*10,z=-76-Math.floor(i/7)*9;const t=new THREE.Mesh(new THREE.ConeGeometry(2,6,6),grass);t.position.set(x,3,z);scene.add(t)}
+
 // Waterfront shops and restaurants sit along the commercial promenade.
 const facade=mat(0xf0e5d1),wood=mat(0x8a6345),awn=mat(0x1e6175);
 for(let i=0;i<8;i++){
