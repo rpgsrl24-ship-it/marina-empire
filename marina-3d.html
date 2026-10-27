@@ -1,7 +1,7 @@
 <!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Marina Empire | Darsena 3D</title><style>*{box-sizing:border-box}body{margin:0;background:#071b2b;color:#f7e8cb;font:15px system-ui}header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#071b2bed;border-bottom:1px solid #b99258;gap:12px;flex-wrap:wrap}h1{font:700 clamp(21px,4vw,33px) Georgia;color:#e6c17d;margin:0}a,button{border:1px solid #d7b16e;background:#143b4e;color:#ffe6b7;padding:10px 14px;border-radius:8px;cursor:pointer;text-decoration:none}main{position:relative;height:calc(100dvh - 88px);min-height:430px}canvas{display:block;width:100%;height:100%}aside{position:absolute;top:15px;left:15px;background:#061c2de8;border:1px solid #b99258;border-radius:12px;padding:15px;max-width:min(320px,85vw);pointer-events:auto}aside p{color:#c4d6db;font-size:13px}#details{margin-top:10px;line-height:1.5}.selected{color:#ffd47b}#hint{position:absolute;bottom:15px;left:15px;background:#071d2bd9;border-radius:9px;padding:10px;font-size:12px}#loading{position:absolute;inset:0;display:grid;place-items:center;background:#071b2b;z-index:5}#loading.hide{display:none}@media(max-width:600px){main{height:calc(100dvh - 120px)}aside{padding:10px;top:8px;left:8px}}</style><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script></head><body><header><div><h1>MARINA EMPIRE</h1><small id="marinaTitle">Darsena 3D · prototipo interattivo</small></div><a href="./?v=27">← TORNA AL GIOCO</a></header><main id="scene"><div id="loading">Caricamento darsena 3D…</div><aside><b>⚓ <span id="name">Isola delle Rose</span></b><p>Seleziona un posto barca nella scena 3D. Trascina per ruotare la visuale, usa la rotella per ingrandire.</p><div id="details">Pontili A e B · 12 ormeggi base</div></aside><div id="hint">Prototipo gestionale 3D · contratti e ampliamenti salvati localmente · non rappresenta la marina reale</div></main><script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-const marina=(new URLSearchParams(location.search).get("marina")||"rose").toLowerCase();const isRose=marina==="rose";const names={rose:"Isola delle Rose",rimini:"Marina di Rimini",cervia:"Marina di Cervia",ancona:"Marina Dorica",lignano:"Marina Punta Faro",bari:"Porto di Bari"};document.getElementById("name").textContent=names[marina]||"Marina Empire";document.getElementById("marinaTitle").textContent=(names[marina]||"Darsena")+" · vista 3D interattiva";
+const marina=(new URLSearchParams(location.search).get("marina")||"rose").toLowerCase();const isRose=marina==="rose";const names={rose:"Isola delle Rose",rimini:"Marina di Rimini",cervia:"Marina di Cervia",ancona:"Marina Dorica",lignano:"Marina Punta Faro",bari:"Porto di Bari"};document.getElementById("name").textContent=names[marina]||"Marina Empire";document.getElementById("marinaTitle").textContent=(names[marina]||"Darsena")+" · "+(marina==="rimini"?"Settore iniziale · 4 posti operativi":"vista 3D interattiva");
 const host=document.getElementById("scene"),scene=new THREE.Scene();scene.background=new THREE.Color(0x89b3ca);scene.fog=new THREE.Fog(0x89b3ca,165,400);
 const camera=new THREE.PerspectiveCamera(55,1,.1,650);camera.position.set(30,38,46);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;host.prepend(renderer.domElement);
@@ -37,9 +37,27 @@ if(marina==="rimini"){
  quayPath([[-31,-28],[-35,-13],[-33,8],[-25,24],[-9,31],[10,30],[23,23],[29,8]],3.8);
  quayPath([[29,8],[31,-4],[27,-14],[20,-21]],3.3);
  quayPath([[31,-4],[42,-7],[48,-16]],2.5);
- box(3,.55,21,-9,.25,4,dock);
- box(2.6,.5,14,7,.25,12,dock);
+ // Only one compact pier is active at game start. Other sectors are reserved for growth.
  const promenade=mat(0xc9b596);
+ const quayStone=mat(0xb4b2a5),mark=mat(0xe4d4a5);
+ // Southern harbor canal and the narrow access into the marina.
+ quayPath([[33,-38],[33,-26],[29,-15],[29,-7]],3.6,quayStone);
+ quayPath([[47,-38],[47,-22],[43,-10]],3.2,quayStone);
+ // Perimeter promenade and visitor reception on land.
+ box(11,.6,6,-24,.55,-20,promenade);
+ box(8,2.4,5,-25,1.85,-22,building);
+ box(9,.35,6,-25,3.25,-22,roof);
+ box(7,.4,4,-12,.55,-22,promenade);
+ // Shore power / water pedestals for the four starting berths.
+ for(let i=0;i<4;i++){const z=-11+i*6.5;box(.5,1,.5,-12,.95,z,mark)}
+ // Future pier locations are marked but are not yet operational.
+ const future=mat(0x328b95,.65);
+ for(let i=0;i<3;i++){const z=5+i*12;const outline=box(1,.05,8,5+i*5,-.04,z,future);outline.castShadow=false}
+ // Small fueling point close to the access channel.
+ box(5,.45,7,24,.4,-14,quayStone);
+ box(1.3,1.8,1.3,24,1.5,-14,mat(0x176c83));
+ const entrance=box(1.4,3,1.4,35,1.5,-27,mat(0x1c8766));
+ const lamp=new THREE.Mesh(new THREE.SphereGeometry(.6,12,8),new THREE.MeshStandardMaterial({color:0x7cf5ba,emissive:0x21ba74,emissiveIntensity:1.2}));lamp.position.set(35,3.3,-27);scene.add(lamp);
  for(let i=0;i<8;i++){const t=i/7,x=-27+48*t,z=24+7*Math.sin(Math.PI*t);box(2,.55,3,x,.4,z,promenade)}
  camera.position.set(55,61,65);controls.target.set(0,0,3);controls.update();
 }
@@ -74,7 +92,7 @@ if(!isRose)addExpansionButton("↕ AMPLIA IN LUNGHEZZA · 6.500 CREDITI","length
 if(!isRose)addExpansionButton("↔ AMPLIA IN LARGHEZZA · 9.000 CREDITI","width");
 updateExpansionStatus();
 document.querySelector("aside p").textContent="Seleziona ormeggi, attività commerciali o cartelloni. Ruota la vista trascinando e usa lo zoom.";
-document.getElementById("details").innerHTML=(isRose?"MARINA RPG YACHT · PROPRIETÀ NON IN VENDITA · SVILUPPO COMPLETO · ":"")+totalBerths()+" ormeggi · attività e cartelloni selezionabili";
+document.getElementById("details").innerHTML=(isRose?"MARINA RPG YACHT · PROPRIETÀ NON IN VENDITA · SVILUPPO COMPLETO · ":marina==="rimini"?"SETTORE A ATTIVO · Altri settori da sbloccare · ":"")+totalBerths()+" ormeggi · attività e cartelloni selezionabili";
 const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();let selected=null;
 renderer.domElement.addEventListener("click",e=>{const rect=renderer.domElement.getBoundingClientRect();mouse.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);ray.setFromCamera(mouse,camera);const hit=ray.intersectObjects([...berths,...interactive])[0];if(!hit)return;const assetHit=assets.find(a=>a.id===hit.object.userData.id);if(assetHit){selectedAsset(assetHit);return}if(selected)selected.material.color.set(0x39c4b4);selected=hit.object;selected.material.color.set(0xffd26e);const slot=selected.userData.slot||selected.userData.id;const booked=saved.bookings[slot];document.getElementById("details").innerHTML='<span class="selected">Posto '+slot+'</span><p>'+(booked?"Occupato nella tua demo":"Disponibile nella tua demo")+' · Tariffa 120 crediti per soggiorno</p><button id="toggleBerth">'+(booked?"LIBERA ORMEGGIO":"PRENOTA ORMEGGIO")+'</button>';document.getElementById("toggleBerth").onclick=()=>{if(saved.bookings[slot]){delete saved.bookings[slot]}else{if(!charge(120))return;saved.bookings[slot]=Date.now()}save();details("Posto "+slot+": "+(saved.bookings[slot]?"prenotazione locale registrata":"ora disponibile")+". Nessuna prenotazione reale o condivisa.")}});
 function resize(){const w=host.clientWidth,h=host.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}new ResizeObserver(resize).observe(host);resize();document.getElementById("loading").classList.add("hide");renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});
