@@ -9,12 +9,12 @@ const controls=new OrbitControls(camera,renderer.domElement);controls.target.set
 scene.add(new THREE.HemisphereLight(0xe7f5ff,0x426070,2.4));const sun=new THREE.DirectionalLight(0xffe1a1,2.8);sun.position.set(-24,55,12);sun.castShadow=true;scene.add(sun);
 const mat=(color,roughness=.7)=>new THREE.MeshStandardMaterial({color,roughness,metalness:roughness<.3?.35:0});const water=mat(0x067a98,.22),dock=mat(0xb8a47c),concrete=mat(0xb9c4c5),building=mat(0xf5e9d5),roof=mat(0x294e62),white=mat(0xf5f7f4),glass=mat(0x174d66,.12),gold=mat(0xd4a852),green=mat(0x5aa675);
 function box(w,h,d,x,y,z,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
+const berths=[];
 const sea=new THREE.Mesh(new THREE.PlaneGeometry(450,450),water);sea.rotation.x=-Math.PI/2;sea.position.y=-.13;scene.add(sea);
 if(marina!=="rimini"){box(isRose?105:marina==="rimini"?38:58,.7,11,0,.15,-21,concrete);box(18,.4,6,-15,.6,-13,concrete);box(12,5,7,-17,3.1,-21,building);box(13,.5,8,-17,5.9,-21,roof);box(7,3,6,4,2,-21,building);box(8,.5,7,4,3.8,-21,roof);
 for(let i=0;i<7;i++){box(.3,2,.3,-21+i*6,1.5,-15,gold)}
 for(let side=0;side<2;side++){const x=side===0?-12:12;box(3,.55,38,x,.22,4,dock);for(let i=0;i<6;i++){const z=-11+i*6.5;const finger=box(9,.3,.75,x+(side===0?-5:5),.3,z,dock);const slot=(side===0?"A":"B")+"-"+String(i+1).padStart(2,"0");const spot=box(5,.12,3,x+(side===0?-7:7),.03,z+2,mat(0x39c4b4,.35));spot.userData.slot=slot;berths.push(spot);box(.25,1,.25,x+(side===0?-10:10),.7,z,gold)}}
 }
-const berths=[];
 function yacht(x,z,scale=1){const hullShape=new THREE.Shape();hullShape.moveTo(-1.6,-3.8);hullShape.lineTo(-1.6,2.2);hullShape.quadraticCurveTo(-1.2,4.5,0,4.8);hullShape.quadraticCurveTo(1.2,4.5,1.6,2.2);hullShape.lineTo(1.6,-3.8);hullShape.quadraticCurveTo(0,-4.4,-1.6,-3.8);const geo=new THREE.ExtrudeGeometry(hullShape,{depth:.7,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.12,bevelThickness:.12});geo.rotateX(-Math.PI/2);const hull=new THREE.Mesh(geo,white);hull.position.set(x,.55,z);hull.scale.setScalar(scale);hull.castShadow=true;scene.add(hull);box(2.6*scale,.28,6.6*scale,x,1.27*scale,z,mat(0xc6b79b));box(2.15*scale,1.05,3.8*scale,x,1.95*scale,z-.9*scale,white);box(2.3*scale,.47,3.25*scale,x,2.55*scale,z-1.1*scale,glass);box(2.45*scale,.15,4*scale,x,2.88*scale,z-1.15*scale,white);box(1.75*scale,.35,2.4*scale,x,3.16*scale,z-1.45*scale,glass);box(.08,2,.08,x,4.25*scale,z-2*scale,gold);for(const side of [-1,1])for(let j=0;j<3;j++)box(.13,.2,.65,x+side*1.12*scale,1.75*scale,z+(j-1)*1.2*scale,glass);return hull}
 // Yacht aligned parallel to the berths, bow facing the fairway (+Z).
 // Each vessel sits inside a berth bay, not across a pontoon.
