@@ -41,7 +41,7 @@ for(let i=0;i<pierSpecs.length;i++){const p=pierSpecs[i],group=new THREE.Group()
 // Animated civilian traffic is independent of marina ownership or unlocks.
 // Traffic follows a dedicated open-water lane, stops at a berth, then departs.
 const traffic=[];
-const channel=[[42,69],[43,57],[48,46],[53,32],[56,15],[56,0],[53,-15],[48,-28],[43,-37]];
+const channel=[[42,69],[42,61],[44,53],[46,44],[48,35],[50,26]];
 function makeTrafficBoat(i){
  const g=new THREE.Group();scene.add(g);
  const hull=new THREE.Mesh(new THREE.CapsuleGeometry(1.15,4.2,4,8),white);hull.rotation.x=Math.PI/2;hull.position.y=.6;g.add(hull);
