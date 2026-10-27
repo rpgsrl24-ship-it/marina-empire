@@ -18,6 +18,22 @@ disc(18,110,-39,road);disc(13,110,-39,city);disc(9,110,-39,mat(0xb98a72));
 for(let i=0;i<10;i++){const x=84+(i%5)*16,z=43+Math.floor(i/5)*17;box(12,8+(i%3)*3,12,x,4+(i%3)*1.5,z,white);box(13,.4,13,x,8.2+(i%3)*3,z,glass)}
 for(let i=0;i<35;i++){const x=5+(i%10)*9,z=-94-Math.floor(i/10)*7;const u=new THREE.Mesh(new THREE.ConeGeometry(1.6,.8,8),mat(i%3===0?0xf4ede0:i%3===1?0xe49e78:0xf3c46e));u.position.set(x,.8,z);scene.add(u)}
 for(let i=0;i<14;i++){const x=86+(i%7)*10,z=-76-Math.floor(i/7)*9;const t=new THREE.Mesh(new THREE.ConeGeometry(2,6,6),grass);t.position.set(x,3,z);scene.add(t)}
+// Waterfront shops and restaurants sit along the commercial promenade.
+const facade=mat(0xf0e5d1),wood=mat(0x8a6345),awn=mat(0x1e6175);
+for(let i=0;i<8;i++){
+ const x=-31+i*14,z=-82+i*2.7;
+ box(11,5,8,x,2.7,z,facade);
+ box(12,.65,9,x,5.5,z,wood);
+ box(9,.25,3,x,3.4,z-5,awn);
+ for(let k=-1;k<=1;k++)box(1.7,2.2,.16,x+k*2.9,2,z-4.05,glass);
+}
+const stoneWall=mat(0xaba9a1),edge=mat(0xe8ddd0);
+for(const pts of [
+ [[-81,42],[-78,12],[-65,-26],[-51,-54],[-40,-67],[-7,-65],[22,-56],[51,-50],[79,-43]],
+ [[-81,42],[-55,44],[-29,50],[-5,58],[18,61],[32,60]],
+ [[57,58],[66,49],[86,40],[104,29],[110,16],[105,-11],[95,-32],[79,-43]]
+]){line(pts,6,stoneWall);for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],d=Math.hypot(b[0]-a[0],b[1]-a[1]);for(let n=0;n<Math.floor(d/7);n++){const t=(n+.5)/(Math.floor(d/7)||1);box(.35,.8,.35,a[0]+(b[0]-a[0])*t,1.1,a[1]+(b[1]-a[1])*t,edge)}}}
+
 const docks=[],targets=[];const pierSpecs=[{x:30,z:-57,a:-.75,len:59},{x:-65,z:-47,a:-.42,len:66},{x:-46,z:-51,a:-.42,len:66},{x:-27,z:-54,a:-.42,len:64},{x:46,z:4,a:.54,len:34},{x:75,z:-24,a:.75,len:25}];
 function yacht(parent,x,z,size=.75){const g=new THREE.Group();g.position.set(x,.45,z);parent.add(g);const hull=box(2.6*size,.75,7*size,0,.25,0,white,g);const bow=new THREE.Mesh(new THREE.ConeGeometry(1.35*size,2.8*size,4),white);bow.rotation.x=Math.PI/2;bow.position.set(0,.25,4*size);g.add(bow);box(2*size,.75,3*size,0,.9,-.7*size,white,g);box(1.7*size,.35,2*size,0,1.4,-.8*size,glass,g)}
 for(let i=0;i<pierSpecs.length;i++){const p=pierSpecs[i],group=new THREE.Group();group.position.set(p.x,0,p.z);group.rotation.y=p.a;scene.add(group);const main=box(2.6,.5,p.len,0,.2,p.len/2,i===0?pierMat:inactive,group);const places=[];for(let j=0;j<6;j++){const z=5+j*(p.len-10)/5;for(const side of [-1,1]){box(5,.22,.65,side*3,.25,z,i===0?pierMat:inactive,group);const spot=box(3.5,.1,3,side*5,.03,z+1.6,slotMat,group);spot.userData={pier:i,number:j*2+(side===1?2:1)};targets.push(spot);places.push(spot);if(i===0&&j<2)yacht(group,side*5,z+1.6,.62+j*.07)}}docks.push({main,places,group})}
