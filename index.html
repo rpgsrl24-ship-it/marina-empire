@@ -284,4 +284,13 @@ setTimeout(()=>map.invalidateSize(),150)}
 setMode();
 const nav=document.querySelectorAll('[data-tab],.nav button');nav.forEach(b=>b.addEventListener("click",()=>{if(!target.classList.contains("hide")&&map)setTimeout(()=>map.invalidateSize(),200)}));
 })();
-</script></body></html>
+</script><script id="marina-panel-repair-v26">
+(function(){
+const list=document.getElementById("marinaList");if(!list)return;
+const entries=[["rose","Isola delle Rose"],["rimini","Marina di Rimini"],["cervia","Marina di Cervia"],["ancona","Marina Dorica"],["lignano","Marina Punta Faro"],["bari","Porto di Bari"]];
+function ensureCards(){if(list.children.length)return;list.innerHTML=entries.map(([id,name])=>'<article class="item marina-fallback-card" data-marina-card="'+id+'"><h3>⚓ '+name+'</h3><p>Darsena disponibile nel gioco · 6 ormeggi dimostrativi</p><div class="marina-actions"><button type="button" data-marina-return="'+id+'">VEDI SULLA MAPPA</button><button type="button" data-marina-info="'+id+'" class="gold">VISUALIZZA ORMEGGI</button></div><div class="marina-fallback-berths hide" id="marina-berths-'+id+'"><b>Posti barca A-01 — A-06</b><p>Per prenotazioni e gestione è necessario il caricamento completo della partita.</p></div></article>').join("")}
+document.addEventListener("click",e=>{const nav=e.target.closest('[data-tab="marinas"]');if(nav)setTimeout(ensureCards,80);const back=e.target.closest("[data-marina-return]");if(back){const tab=document.querySelector('[data-tab="map"]');if(tab)tab.click()}const info=e.target.closest("[data-marina-info]");if(info){document.getElementById("marina-berths-"+info.dataset.marinaInfo)?.classList.toggle("hide")}});
+window.addEventListener("load",()=>setTimeout(ensureCards,300));
+const obs=new MutationObserver(()=>{if(!document.getElementById("marinas").classList.contains("hide"))ensureCards()});obs.observe(document.getElementById("marinas"),{attributes:true,attributeFilter:["class"]});
+})();
+</script><style id="marina-panel-repair-css-v26">#marinaList{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px;margin-top:18px}#marinaList>.item{margin:0!important}#marinaList .marina-actions{display:flex;gap:8px;flex-wrap:wrap}#marinaList .marina-actions button{flex:1;min-width:135px}#marinaList .marina-fallback-berths{margin-top:15px;border-top:1px solid #8eacb5;padding-top:12px}</style></body></html>
