@@ -1,0 +1,212 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Marina Empire — Marine italiane Deluxe 3D</title><style>*{box-sizing:border-box}body{margin:0;background:#081e2b;color:#ecf4f5;font:14px system-ui}header{display:flex;align-items:center;gap:18px;padding:13px 20px;background:#082738;border-bottom:1px solid #416171;flex-wrap:wrap}header strong{font-size:21px;color:#f6d394;letter-spacing:2px}select,button{border:1px solid #668a9c;border-radius:8px;padding:10px;background:#154b60;color:#fff;font:inherit;cursor:pointer}button:hover{background:#236d80}button:disabled{opacity:.45;cursor:default}#cash{margin-left:auto;color:#ffd58b;font-weight:700}#stage{height:calc(100dvh - 69px);position:relative;overflow:hidden}aside{position:absolute;top:14px;left:14px;width:270px;max-height:calc(100% - 30px);overflow:auto;padding:17px;border:1px solid #78909a;background:#092a3aef;border-radius:12px}h2{margin:0 0 5px}p{line-height:1.5;color:#b8d5df}.stat{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #ffffff25}.stat b{color:#ffd58b}aside button{width:100%;text-align:left;margin-top:9px}#build{background:#9a6b28}#tip{position:absolute;right:14px;bottom:14px;background:#062433db;padding:9px 12px;border-radius:8px}#message{color:#f7d69b;min-height:50px}canvas{display:block}@media(max-width:650px){aside{width:205px;padding:10px;font-size:12px}header{padding:8px}header strong{font-size:15px}#stage{height:calc(100dvh - 110px)}#tip{font-size:10px}}</style><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script></head><body><header><strong>MARINA EMPIRE</strong><label for="marina">Marina:</label><select id="marina"></select><span id="cash"></span></header><div id="stage"><aside><h2 id="name"></h2><p id="region"></p><div class="stat">Pontili sbloccati <b id="piers"></b></div><div class="stat">Posti disponibili <b id="active"></b></div><div class="stat">Capacità finale <b id="total"></b></div><div class="stat">Posti occupati <b id="occupied"></b></div><div class="stat">Posti maxi yacht (anche banchine laterali) <b id="maxi"></b></div><div class="stat">Maxi yacht ormeggiati <b id="maxiOccupied"></b></div><div class="stat">Pontili già presenti <b id="planned"></b></div><button id="build">🔓 Sblocca pontile</button><button id="arrive">⛵ Assegna un ormeggio</button><button id="maxiArrive">🛥️ Ormeggia maxi yacht</button><button id="depart">↗ Libera un ormeggio</button><button id="overview">◎ Vista panoramica</button><button id="reset">↺ Ricomincia questa marina</button><p id="message">Ogni marina ha una città e un porto già completi: tutti i pontili sono visibili. Parti con un pontile attivo e sblocca gli altri con i crediti. Tutte le marine hanno negozi, ristoranti, yacht club e posti maxi yacht, anche lungo le banchine laterali interne. Gli scogli rimangono esterni.</p></aside><div id="tip">Mouse: ruota · Destro: sposta · Rotellina: zoom</div></div><script type="module">
+import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const DATA=[{"id": "rimini", "name": "Marina di Rimini", "region": "Emilia-Romagna", "capacity": 650, "piers": 18, "shape": "canale", "seed": 11}, {"id": "ravenna", "name": "Marina di Ravenna", "region": "Emilia-Romagna", "capacity": 1100, "piers": 28, "shape": "laguna", "seed": 204}, {"id": "ancona", "name": "Marina Dorica — Ancona", "region": "Marche", "capacity": 1000, "piers": 26, "shape": "golfo", "seed": 397}, {"id": "pescara", "name": "Marina di Pescara", "region": "Abruzzo", "capacity": 650, "piers": 18, "shape": "canale", "seed": 590}, {"id": "brindisi", "name": "Marina di Brindisi", "region": "Puglia", "capacity": 600, "piers": 17, "shape": "insenatura", "seed": 783}, {"id": "salerno", "name": "Marina d’Arechi — Salerno", "region": "Campania", "capacity": 1000, "piers": 26, "shape": "mezzaluna", "seed": 976}, {"id": "nettuno", "name": "Marina di Nettuno", "region": "Lazio", "capacity": 900, "piers": 24, "shape": "golfo", "seed": 1169}, {"id": "scarlino", "name": "Marina di Scarlino", "region": "Toscana", "capacity": 950, "piers": 25, "shape": "laguna", "seed": 1362}, {"id": "loano", "name": "Marina di Loano", "region": "Liguria", "capacity": 1000, "piers": 26, "shape": "mezzaluna", "seed": 1555}, {"id": "portocervo", "name": "Marina di Porto Cervo", "region": "Sardegna", "capacity": 900, "piers": 24, "shape": "insenatura", "seed": 1748}, {"id": "capodorlando", "name": "Marina di Capo d’Orlando", "region": "Sicilia", "capacity": 850, "piers": 23, "shape": "golfo", "seed": 1941}];
+const $=id=>document.getElementById(id);for(const d of DATA){let o=document.createElement('option');o.value=d.id;o.textContent=d.name;$('marina').append(o)}
+const stage=$('stage'),scene=new THREE.Scene();scene.background=new THREE.Color(0x9cc9d9);scene.fog=new THREE.Fog(0x9cc9d9,1100,2700);
+const camera=new THREE.PerspectiveCamera(48,1,.1,3500),renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.35;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;stage.prepend(renderer.domElement);const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.maxPolarAngle=1.48;orbit.maxDistance=2400;orbit.minDistance=15;scene.add(new THREE.HemisphereLight(0xf2faff,0x3a5c62,2.5));const sun=new THREE.DirectionalLight(0xffe9c8,2.7);sun.position.set(-260,400,200);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-1100;sun.shadow.camera.right=1100;sun.shadow.camera.top=1100;sun.shadow.camera.bottom=-1100;scene.add(sun);
+const mat=(c,r=.8)=>new THREE.MeshStandardMaterial({color:c,roughness:r});const concrete=mat(0xc8c8bd),rock=mat(0x858b84),rock2=mat(0xa7a59a),wood=mat(0xb39b75),grass=mat(0x6c936b),asphalt=mat(0x64767a),roof=mat(0x9c776c),wall=mat(0xe3d7c4),glass=mat(0x357083,.2),white=mat(0xf8f7f2,.3),dark=mat(0x274759),sand=mat(0xd3c5a0),water=new THREE.MeshPhysicalMaterial({color:0x117b96,roughness:.24,metalness:.22,clearcoat:1});let group=new THREE.Group();scene.add(group);let slots=[],pierGroups=[],current=null,progress=null,boats=[];const maxiQuota=d=>Math.max(6,Math.round(d.capacity/75));const rng=(n)=>{let s=n+1;return()=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return s/4294967296}};
+function cube(w,h,d,m,x,y,z,parent=group){let a=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);a.position.set(x,y,z);a.castShadow=true;a.receiveShadow=true;parent.add(a);return a}
+function cyl(r,h,m,x,y,z,parent=group){let a=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,9),m);a.position.set(x,y,z);a.castShadow=true;parent.add(a);return a}
+function beam(x1,z1,x2,z2,w,h,m){let len=Math.hypot(x2-x1,z2-z1),a=cube(w,h,len,m,(x1+x2)/2,h/2,(z1+z2)/2);a.rotation.y=Math.atan2(x2-x1,z2-z1);return a}
+function yacht(x,z,heading,scale=1){
+ let g=new THREE.Group();group.add(g);g.position.set(x,.95,z);g.rotation.y=heading;
+ const hullMat=mat(0xf8f9f6,.22),trim=mat(0x17374b,.3),teak=mat(0xb38b5d,.72),chrome=mat(0xd7e4e8,.18),windowMat=mat(0x1c5368,.16);
+ // Tapered bow and layered superstructure; yacht points along local negative Z.
+ let outline=[[-1.65,3.7],[-1.8,2.1],[-1.9,-1.9],[-1.35,-4.2],[0,-5.6],[1.35,-4.2],[1.9,-1.9],[1.8,2.1],[1.65,3.7]];
+ let shape=new THREE.Shape();shape.moveTo(outline[0][0]*scale,outline[0][1]*scale);for(let q=1;q<outline.length;q++)shape.lineTo(outline[q][0]*scale,outline[q][1]*scale);shape.closePath();
+ let geo=new THREE.ExtrudeGeometry(shape,{depth:1.4*scale,bevelEnabled:true,bevelThickness:.18*scale,bevelSize:.19*scale,bevelSegments:2});geo.rotateX(Math.PI/2);let hull=new THREE.Mesh(geo,hullMat);hull.position.y=1.05*scale;hull.castShadow=true;g.add(hull);
+ cube(3.35*scale,.13,7.5*scale,teak,0,1.42*scale,.3*scale,g);
+ cube(2.8*scale,1.25*scale,4.0*scale,windowMat,0,2.28*scale,.5*scale,g);
+ cube(3.1*scale,.27*scale,4.4*scale,hullMat,0,3.05*scale,.5*scale,g);
+ cube(2.0*scale,1.02*scale,2.2*scale,windowMat,0,3.55*scale,1.25*scale,g);
+ cube(2.4*scale,.2*scale,2.6*scale,hullMat,0,4.2*scale,1.25*scale,g);
+ for(let side of [-1,1]){cube(.08*scale,.12*scale,7.5*scale,chrome,side*1.62*scale,1.9*scale,0,g);for(let i=0;i<8;i++)cyl(.035*scale,.65*scale,chrome,side*1.62*scale,1.65*scale,(i-3.5)*.92*scale,g);cube(.12*scale,.18*scale,4*scale,trim,side*1.75*scale,.85*scale,0,g)}
+ cube(2.6*scale,.12*scale,1.5*scale,teak,0,1.55*scale,-3.4*scale,g);
+ cyl(.07*scale,1.8*scale,chrome,0,5.1*scale,1.3*scale,g);
+ let radar=cube(1.5*scale,.12*scale,.25*scale,chrome,0,6.0*scale,1.3*scale,g);
+ return g
+}
+function load(){let key='marina-empire-phase1-'+current.id;try{progress=JSON.parse(localStorage.getItem(key))}catch{}if(!progress||typeof progress!=='object')progress={built:1,occupied:[],credits:30000};progress.built=Math.max(1,Math.min(current.piers,progress.built||1));progress.occupied=(progress.occupied||[]).filter(Number.isInteger);save()}
+function save(){localStorage.setItem('marina-empire-phase1-'+current.id,JSON.stringify(progress))}
+function rebuild(){group.clear();slots=[];pierGroups=[];boats=[];let d=current,p=d.piers,max=d.capacity,scale=Math.sqrt(max/650),W=Math.max(530,Math.ceil(max/p/2)*14+180),H=p*23+85,random=rng(d.seed);let waterPlane=new THREE.Mesh(new THREE.PlaneGeometry(W*4,H*4),water);waterPlane.rotation.x=-Math.PI/2;waterPlane.position.y=-.9;group.add(waterPlane);
+// Shore is on the LEFT of the marina, never behind the harbor.
+let landWidth=W*1.9;cube(landWidth,2.2,H*2.35,grass,-W*1.2,0,0);cube(W*.22,2.3,H*1.2,concrete,-W*.32,0,0);
+// Shoreline, coastal promenade, beach and organically scattered rock formations.
+let coastalX=-W*.255;cube(7,.32,H*1.45,concrete,coastalX,1.35,0);
+// No boulders on the inner quay: the protected harbor remains navigable.
+let beachZ=H*.68;cube(W*.35,.3,H*.12,sand,-W*.35,1.3,beachZ);
+for(let k=0;k<12;k++){let x=-W*.48+random()*W*.25,z=beachZ+(random()-.5)*H*.09;cyl(.18,3.5,wood,x,3.1,z);let crown=new THREE.Mesh(new THREE.IcosahedronGeometry(2.4,1),grass);crown.position.set(x,5.8,z);group.add(crown)}
+// Varied harbor edges: every geometry has different breakwater bends.
+let curve=d.shape==='mezzaluna'?.28:d.shape==='insenatura'?.19:d.shape==='laguna'?.09:d.shape==='canale'?.02:.15;
+let topZ=-H*.48,bottomZ=H*.48,west=-W*.19,east=W*.65;
+let wallPoints=[[west,topZ],[W*.12,topZ-H*curve],[W*.45,topZ-H*curve*.7],[east,topZ+H*.1],[east+W*curve*.25,0],[east,bottomZ-H*.1],[W*.4,bottomZ+H*curve*.45],[W*.14,bottomZ+H*curve],[west,bottomZ]];
+// Seaward entrance is open at the middle of the eastern wall.
+for(let i=1;i<wallPoints.length;i++){
+ if(i===5)continue; // open navigable entrance
+ let a=wallPoints[i-1],b=wallPoints[i];
+ beam(a[0],a[1],b[0],b[1],5,2.6,concrete);
+ let len=Math.hypot(b[0]-a[0],b[1]-a[1]);
+ // Offset boulders to the OUTSIDE of the polygon, away from the harbor basin.
+ let dx=(b[0]-a[0])/len,dz=(b[1]-a[1])/len;
+ let nx=dz,nz=-dx; // outward normal: rock revetment is on the SEA side of the clockwise perimeter
+ for(let j=0;j<Math.floor(len/5);j++){
+  let t=(j+.5)/(len/5),x=a[0]+(b[0]-a[0])*t,z=a[1]+(b[1]-a[1])*t;
+  let offset=4+random()*2.4;
+  let boulder=new THREE.Mesh(new THREE.DodecahedronGeometry(1.4+random()*1.7),random()>.5?rock:rock2);
+  boulder.position.set(x+nx*offset,.15,z+nz*offset);
+  boulder.scale.set(1.35,.65,1.05);boulder.rotation.set(random()*2,random()*6,random()*2);group.add(boulder);
+ }
+}
+// Each pier has a dedicated fairway. Space is scaled with the full berth target.
+let margin=H*.13,usable=H-2*margin,step=usable/p,perPier=Math.floor(max/p),remainder=max%p;
+for(let i=0;i<p;i++){let count=perPier+(i<remainder?1:0),z=-usable/2+step*(i+.5),pier=new THREE.Group();group.add(pier);pierGroups.push(pier);let x0=west+9,x1=east-W*.21;let length=x1-x0;cube(length,1.05,Math.min(3.8,step*.22),wood,(x0+x1)/2,1.15,z,pier);cube(6,1.5,Math.min(5,step*.35),concrete,x0,1,z,pier);for(let k=0;k<count;k++){let x=x0+9+(Math.floor(k/2)+.5)*(length-20)/Math.ceil(count/2);let side=k%2===0?1:-1;slots.push({pier:i,x,z:z+side*step*.26,heading:0,id:slots.length,maxi:false});if(k%4===0)cyl(.3,1.8,dark,x,.9,z,pier)}pier.visible=true; if(i>=progress.built){pier.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.color.multiplyScalar(.62)}})}}
+// Maxi-yacht quay: dedicated, highlighted berths at the seaward end of selected piers.
+// Each maxi berth replaces one standard berth; never increases total capacity.
+const maxiCount=maxiQuota(d);
+const maxiMat=mat(0x28b9ce,.34),maxiTrim=mat(0xf1d59b,.38);
+function berthLabel(message,x,z){
+ const c=document.createElement('canvas');c.width=512;c.height=128;
+ const ctx=c.getContext('2d');ctx.fillStyle='rgba(6,45,60,.94)';ctx.fillRect(0,0,512,128);
+ ctx.strokeStyle='#46e4f3';ctx.lineWidth=7;ctx.strokeRect(4,4,504,120);
+ ctx.fillStyle='#fff';ctx.font='bold 43px sans-serif';ctx.textAlign='center';ctx.fillText(message,256,78);
+ const t=new THREE.CanvasTexture(c);const m=new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false});
+ const sprite=new THREE.Sprite(m);sprite.position.set(x,8,z);sprite.scale.set(25,6.25,1);group.add(sprite);
+}
+const maxiSlots=[];
+// Reserve part of the maxi-yacht quota for the INNER faces of the north/south
+// lateral quays. The rocks remain on the SEA side of the breakwaters.
+const sideCount=Math.max(2,Math.round(maxiCount*.45));
+const endCount=maxiCount-sideCount;
+const lateralNorth=Math.ceil(sideCount/2),lateralSouth=sideCount-lateralNorth;
+function decorateMaxi(berth,parent,sideQuay=false){
+ const berthLength=sideQuay?20:14;
+ const berthWidth=sideQuay?9:Math.max(5,step*.25);
+ cube(berthLength,.1,berthWidth,maxiMat,berth.x,.25,berth.z,parent);
+ cube(berthLength+.5,.17,.45,maxiTrim,berth.x,.36,berth.z+berthWidth/2,parent);
+ cube(berthLength+.5,.17,.45,maxiTrim,berth.x,.36,berth.z-berthWidth/2,parent);
+ cyl(.65,1.6,dark,berth.x-berthLength/2,1.5,berth.z,parent);
+ maxiSlots.push(berth);
+}
+// Maxi yachts at the seaward ends of selected piers.
+for(let i=0;i<endCount;i++){
+ const pierIndex=Math.min(p-1,Math.floor((i+.5)*p/endCount));
+ const candidates=slots.filter(s=>s.pier===pierIndex&&!s.maxi);
+ const berth=candidates[candidates.length-1];if(!berth)continue;
+ berth.maxi=true;berth.x=east-W*.235;
+ berth.z=-usable/2+step*(pierIndex+.5)+(i%2===0?1:-1)*step*.29;
+ berth.heading=Math.PI/2;
+ decorateMaxi(berth,pierGroups[pierIndex]);
+}
+// Lateral quay berths replace ordinary slots rather than increasing capacity.
+// Keep them beyond the first/last pier so there is a clear maneuvering lane.
+for(let side of [-1,1]){
+ const n=side<0?lateralNorth:lateralSouth;
+ for(let i=0;i<n;i++){
+  const pierIndex=Math.min(p-1,Math.floor((i+.5)*p/n));
+  const candidates=slots.filter(s=>s.pier===pierIndex&&!s.maxi);
+  const berth=candidates[0];if(!berth)continue;
+  const start=west+W*.16,end=east-W*.18;
+  berth.maxi=true;berth.lateral=true;
+  berth.x=start+(i+.5)*(end-start)/n;
+  berth.z=side*(H*.48-17);
+  berth.heading=side<0?0:Math.PI;
+  // Lateral quay is already built; its berth remains locked until the
+  // associated pier is unlocked, exactly like other maxi-yacht berths.
+  const pg=pierGroups[pierIndex];
+  decorateMaxi(berth,pg,true);
+  cube(21,1.3,3,concrete,berth.x,1.2,side*(H*.48-6),pg);
+ }
+}
+// Labels are placed in the water adjacent to each dedicated berth.
+for(let i=0;i<maxiSlots.length;i+=Math.max(1,Math.ceil(maxiSlots.length/7))){
+ const b=maxiSlots[i];berthLabel(b.lateral?'MAXI LATERALE':'MAXI YACHT',b.x,b.z);
+}
+// Realistic marina finishing: floating fingers, cleats, dock lights, fenders and lifebuoys.
+const steel=mat(0x7f929a,.32),fender=mat(0x202f38,.84),safety=mat(0xf16b35,.46),rope=mat(0xe4d7b4,.86);
+for(let i=0;i<p;i++){
+ const pg=pierGroups[i],z=-usable/2+step*(i+.5),x0=west+9,x1=east-W*.21,len=x1-x0;
+ for(let k=0;k<Math.floor(len/13);k++){
+  let x=x0+9+k*13;
+  for(let side of [-1,1]){
+   let finger=cube(1.45,.65,Math.max(3.5,step*.18),wood,x,.95,z+side*Math.min(step*.14,4.6),pg);
+   cube(.28,.45,.45,steel,x,1.55,z+side*1.5,pg);
+   if(k%3===0)cyl(.32,.75,fender,x,.75,z+side*2.3,pg);
+  }
+  if(k%3===0){cyl(.16,2.7,steel,x,2.4,z,pg);let lamp=new THREE.Mesh(new THREE.SphereGeometry(.37,8,6),white);lamp.position.set(x,3.9,z);pg.add(lamp)}
+ }
+ if(i>=progress.built){pg.traverse(o=>{if(o.isMesh&&o.material){o.material=o.material.clone();o.material.color.multiplyScalar(.8)}})}
+}
+// No inner rocks or straight rock bands: stones belong exclusively outside the breakwaters.
+// Waterfront details: palms, benches, bollards and colorful parked vehicles.
+for(let k=0;k<34;k++){
+ let z=-H*.5+k*H/34,x=coastalX-13;
+ cyl(.35,5.8,wood,x,4.1,z);
+ let canopy=new THREE.Mesh(new THREE.IcosahedronGeometry(3.0,1),mat(0x3c8258));canopy.position.set(x,8,z);canopy.castShadow=true;group.add(canopy);
+ if(k%3===0){cube(3,.3,.8,wood,x-5,1.8,z);cyl(.5,1.3,dark,x+6,2,z)}
+}
+// Seafront commercial district, already operating regardless of pontoon unlocks.
+const shopFront=mat(0xe8d6ba),awning=mat(0x257e8c),luxury=mat(0xd6c5a1);
+for(let j=0;j<10;j++){
+ let z=-H*.40+j*H*.082,x=-W*.29;
+ cube(17,6.5,Math.max(8,H*.065),shopFront,x,4.5,z);
+ cube(18,.7,Math.max(9,H*.067),awning,x,8,z);
+ cube(15,3,.15,glass,x+1,4.2,z+Math.max(8,H*.065)/2+.1);
+ cube(4,.15,3,awning,x+6,6.2,z+Math.max(8,H*.065)/2+1.5);
+}
+// Waterfront restaurants, marina office, service station and yacht club.
+for(let j=0;j<4;j++){
+ let z=-H*.33+j*H*.20;
+ cube(21,9,14,j===0?luxury:wall,-W*.38,6.5,z);
+ cube(22,.9,15,roof,-W*.38,11.4,z);
+ cube(18,4,.2,glass,-W*.38,5.4,z+7.2);
+}
+// Fully developed city is present from day one: only piers are progressively constructed.
+let cityLeft=-W*2.02,cityRight=-W*.44,cityLength=cityRight-cityLeft;
+const palette=[mat(0xe7d9c6),mat(0xf2e8d8),mat(0xc6d1d1),mat(0xe8c9ae),mat(0xd2d5cb),mat(0xe9e1cb)];
+const roofs=[mat(0xb56d5a),mat(0x888e92),mat(0xb7a18d),mat(0x8b6b62)];
+function tree(x,z,r=2){cyl(.27,r*2.2,wood,x,1+r*1.1,z);let crown=new THREE.Mesh(new THREE.IcosahedronGeometry(r,1),grass);crown.position.set(x,1+r*2.45,z);crown.castShadow=true;group.add(crown)}
+function house(x,z,w,d,h,style){cube(w,h,d,palette[style%palette.length],x,1.15+h/2,z);cube(w+.65,.6,d+.65,roofs[style%roofs.length],x,1.15+h+.3,z);for(let side of [-1,1])for(let row=0;row<Math.min(5,Math.floor(h/3));row++)for(let col=0;col<Math.min(4,Math.floor(w/3.5));col++){let xx=x-w*.35+col*w*.23,yy=3+row*3;cube(1.2,1.35,.08,glass,xx,yy,z+side*(d/2+.055))}cube(1.4,2.3,.13,dark,x,2.2,z+d/2+.11)}
+// Roads and sidewalks define a real urban street grid, not a narrow strip.
+for(let i=0;i<9;i++){let x=cityLeft+(i+.5)*cityLength/9;cube(6,.17,H*2.15,asphalt,x,1.23,0);cube(.5,.21,H*2.15,concrete,x-3.5,1.3,0);cube(.5,.21,H*2.15,concrete,x+3.5,1.3,0)}
+for(let j=0;j<11;j++){let z=-H*1.01+j*H*.202;cube(cityLength,.17,6,asphalt,(cityLeft+cityRight)/2,1.24,z);cube(cityLength,.19,.55,concrete,(cityLeft+cityRight)/2,1.3,z+3.5)}
+// Different neighborhoods, civic buildings, shops, hotels and offices.
+for(let i=0;i<9;i++)for(let j=0;j<10;j++){let x=cityLeft+(i+.5)*cityLength/9,z=-H*.92+(j+.5)*H*.202;
+if((i===2&&j>=3&&j<=5)||(i===5&&j>=6&&j<=7)||(i===7&&j<=2))continue;
+let w=Math.min(cityLength/9-11,12+random()*11),d=Math.min(H*.202-10,11+random()*10),h=(i>4&&j<5?10:5)+random()*(i>4?22:10);house(x+(random()-.5)*3,z,w,d,h,i*3+j)}
+// Central piazza, fountain, market kiosks and shaded benches.
+let plazaX=cityLeft+cityLength*2.5/9,plazaZ=-H*.92+4.5*H*.202;cube(cityLength*.31,.27,H*.59,concrete,plazaX,1.35,plazaZ);cyl(8,.55,white,plazaX,1.85,plazaZ);cyl(5,.24,water,plazaX,2.2,plazaZ);cyl(1.2,3,white,plazaX,3.5,plazaZ);
+for(let k=0;k<14;k++){let a=k*Math.PI*2/14;tree(plazaX+Math.cos(a)*Math.min(20,cityLength*.12),plazaZ+Math.sin(a)*Math.min(23,H*.22),1.6)}
+// Public park with a pond, paths and playground.
+let parkX=cityLeft+cityLength*5.5/9,parkZ=-H*.92+7*H*.202;cube(cityLength*.19,.25,H*.34,mat(0x619c63),parkX,1.36,parkZ);cyl(8,.12,water,parkX+5,1.54,parkZ);for(let k=0;k<26;k++)tree(parkX+(random()-.5)*cityLength*.17,parkZ+(random()-.5)*H*.3,1+random()*1.6);
+// Hospital, school, police station and fire station, built before any pier expansion.
+let civicX=cityLeft+cityLength*7.5/9;house(civicX,-H*.7,21,17,14,1);cube(3,.3,11,white,civicX,16,-H*.7);cube(11,.3,3,white,civicX,16,-H*.7);
+house(civicX,-H*.45,25,18,9,2);cube(17,.2,12,asphalt,civicX+3,1.43,-H*.22);house(civicX,H*.35,19,15,10,3);house(civicX,H*.52,18,16,9,4);
+// Shops and a seafront hotel next to the main marina.
+for(let k=0;k<7;k++){let z=-H*.42+k*H*.135;house(-W*.49,z,15,12,7+k%3*2,k)}house(-W*.59,-H*.65,28,23,23,2);
+// Industrial port yard, warehouse and blue gantry crane.
+let yardX=-W*.38,yardZ=-H*.71;cube(W*.26,.4,H*.19,concrete,yardX,1.5,yardZ);house(yardX-W*.065,yardZ,26,18,10,3);
+const crane=mat(0x2765a2);for(let xx of [-9,9])for(let zz of [-8,8])cube(1.4,15,1.4,crane,yardX+xx,9.4,yardZ+zz);cube(21,1.5,1.8,crane,yardX,17.5,yardZ-8);cube(21,1.5,1.8,crane,yardX,17.5,yardZ+8);
+// A complete airport district on the inland edge, with runway, taxiway, terminal, hangars and aircraft.
+let airportX=cityLeft+cityLength*.24,airportZ=H*.78;
+cube(cityLength*.47,.34,H*.35,mat(0x758d70),airportX,1.45,airportZ);
+cube(cityLength*.42,.22,H*.105,asphalt,airportX,1.68,airportZ+H*.065);
+for(let k=0;k<17;k++)cube(3,.04,.65,white,airportX-cityLength*.19+k*cityLength*.024,1.81,airportZ+H*.065);
+cube(cityLength*.32,.19,H*.055,asphalt,airportX,1.7,airportZ-H*.065);
+house(airportX-cityLength*.13,airportZ-H*.13,30,15,10,2);
+for(let k=0;k<3;k++)house(airportX+cityLength*.04+k*23,airportZ-H*.13,18,18,9,k+1);
+cyl(2.2,18,concrete,airportX-cityLength*.2,11.2,airportZ-H*.12);cube(8,3,8,glass,airportX-cityLength*.2,21.7,airportZ-H*.12);
+function plane(x,z){let g=new THREE.Group();group.add(g);g.position.set(x,2,z);cube(2.8,1.6,13,white,0,0,0,g);cube(16,.3,2.7,white,0,.25,0,g);cube(5,.3,3.5,white,0,.6,5,g);cube(2,.35,2.5,dark,0,1,-4.5,g);cube(.6,3,1.3,white,0,1.6,5,g)}for(let k=0;k<3;k++)plane(airportX-cityLength*.1+k*24,airportZ-H*.045);
+// Cars, street lights and palm-lined promenade make the city visually inhabited.
+let carColors=[mat(0xd5e1e8),mat(0xb6473e),mat(0x334b63),mat(0xd1bb87)];
+for(let k=0;k<95;k++){let ix=Math.floor(random()*9),j=Math.floor(random()*11),x=cityLeft+(ix+.5)*cityLength/9+(random()-.5)*2,z=-H*1.01+j*H*.202+(random()-.5)*3;let car=cube(2.1,1.1,4.3,carColors[k%4],x,2,z);car.rotation.y=k%2?0:Math.PI/2}
+for(let k=0;k<75;k++){let x=cityLeft+random()*cityLength,z=-H+random()*H*2;tree(x,z,1+random()*1.3)}
+for(let k=0;k<22;k++){let z=-H*.58+k*H*.055;cyl(.18,5,dark,coastalX-2,3.8,z);let bulb=new THREE.Mesh(new THREE.SphereGeometry(.5,8,6),white);bulb.position.set(coastalX-2,6.5,z);group.add(bulb)}
+// Dry dock and buildings are on solid harbor land.
+for(let k=0;k<9;k++){let z=-H*.47+k*H*.11;cube(12,5,8,wall,west-10,4.2,z);cube(13,.7,9,roof,west-10,7.1,z)}
+// Tutti i pontili sono fisicamente presenti; le barche possono occupare solo quelli sbloccati.
+progress.occupied=progress.occupied.filter(id=>id>=0&&id<slots.length&&slots[id].pier<progress.built);for(let id of progress.occupied){let s=slots[id];boats.push(yacht(s.x,s.z,s.heading,s.maxi?1.65:Math.max(.55,Math.min(1.2,step/11))))}save();camera.position.set(W*.48,H*1.6,H*1.7);orbit.target.set(-W*.15,0,0);orbit.update();update()}
+function update(){let available=slots.filter(s=>s.pier<progress.built).length;$('name').textContent=current.name;$('region').textContent=current.region+' · '+current.shape+' · pontili già costruiti';$('piers').textContent=progress.built+' / '+current.piers;$('active').textContent=available;$('total').textContent=current.capacity;$('occupied').textContent=progress.occupied.length;$('maxi').textContent=slots.filter(s=>s.maxi).length;$('maxiOccupied').textContent=progress.occupied.filter(id=>slots[id]?.maxi).length;$('planned').textContent=current.piers;$('cash').textContent=progress.credits.toLocaleString('it-IT')+' crediti';$('maxiArrive').disabled=!slots.some(s=>s.maxi&&s.pier<progress.built&&!progress.occupied.includes(s.id));$('build').disabled=progress.built>=current.piers;$('build').textContent=progress.built>=current.piers?'Tutti i pontili costruiti':'🔓 Sblocca pontile (2.000 crediti)'}
+function setMarina(id){current=DATA.find(x=>x.id===id)||DATA[0];$('marina').value=current.id;load();rebuild();$('message').textContent='Marina interamente costruita: '+current.piers+' pontili già visibili. Parti con un pontile sbloccato e attiva progressivamente fino a '+current.capacity+' posti.'}
+$('marina').onchange=e=>setMarina(e.target.value);$('build').onclick=()=>{if(progress.credits<2000)return $('message').textContent='Crediti insufficienti.';if(progress.built>=current.piers)return;progress.credits-=2000;progress.built++;save();rebuild();$('message').textContent='Pontile '+progress.built+' sbloccato: gli ormeggi sono ora utilizzabili.'};$('arrive').onclick=()=>{let s=slots.find(s=>s.pier<progress.built&&!progress.occupied.includes(s.id));if(!s)return $('message').textContent='Nessun posto libero.';progress.occupied.push(s.id);save();boats.push(yacht(s.x,s.z,s.heading,s.maxi?1.65:1));update();$('message').textContent='Barca assegnata al posto '+(s.id+1)+'. Animazione di arrivo ancora da sviluppare.'};$('maxiArrive').onclick=()=>{let s=slots.find(s=>s.maxi&&s.pier<progress.built&&!progress.occupied.includes(s.id));if(!s)return $('message').textContent='Sblocca un pontile con ormeggio maxi yacht libero.';progress.occupied.push(s.id);save();boats.push(yacht(s.x,s.z,s.heading,1.65));update();$('message').textContent='Maxi yacht assegnato al posto dedicato '+(s.id+1)+'.';};$('depart').onclick=()=>{let id=progress.occupied.pop();if(id===undefined)return;$('message').textContent='Ormeggio liberato.';save();rebuild()};$('overview').onclick=()=>{let s=Math.sqrt(current.capacity/650);camera.position.set(170*s,420*s,450*s);orbit.target.set(-60*s,0,0);orbit.update()};$('reset').onclick=()=>{if(confirm('Ripristinare questa marina?')){localStorage.removeItem('marina-empire-phase1-'+current.id);setMarina(current.id)}};
+function resize(){let w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}window.addEventListener('resize',resize);setMarina(new URLSearchParams(location.search).get('marina')||DATA[0].id);resize();function animate(){requestAnimationFrame(animate);orbit.update();renderer.render(scene,camera)}animate();
+</script></div></body></html>
