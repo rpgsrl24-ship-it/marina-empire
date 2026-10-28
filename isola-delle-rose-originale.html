@@ -1,0 +1,698 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Marina Empire — Isola delle Rose — 3D Yacht Deluxe</title><style>*{box-sizing:border-box}body{margin:0;background:#071d2b;color:#eaf4f7;font:14px system-ui,Arial}header{height:62px;background:linear-gradient(105deg,#071e30,#103b51);display:flex;align-items:center;gap:25px;padding:0 23px;border-bottom:1px solid #31596c}header strong{font-size:22px;letter-spacing:2px}header small{color:#9ebbc9}header .wallet{margin-left:auto;color:#f7d58c;font-weight:700}main{height:calc(100dvh - 62px);position:relative;overflow:hidden}canvas{display:block}aside{position:absolute;top:16px;left:16px;width:260px;max-height:calc(100% - 32px);overflow:auto;background:linear-gradient(155deg,#082a3df0,#0b3448ed);border:1px solid #527d91;border-radius:13px;padding:17px;backdrop-filter:blur(10px);box-shadow:0 12px 45px #0008}h2{margin:0 0 7px;font-size:19px}.sub{color:#9ec4d1;font-size:12px;margin-bottom:13px}.stat{display:flex;justify-content:space-between;border-bottom:1px solid #ffffff20;padding:8px 0}.stat b{color:#ffda92}button{display:block;width:100%;text-align:left;border:1px solid #568ca1;background:#14536a;color:#fff;padding:10px 11px;border-radius:8px;margin-top:9px;cursor:pointer;font:inherit}button:hover{background:#206e85}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:#a87728;border-color:#e4ba6e;color:#fff}.status{font-size:12px;line-height:1.5;color:#c1e2ed;margin:12px 0 0}.controls{position:absolute;right:15px;top:16px;background:#092a3de6;padding:10px;border:1px solid #527d91;border-radius:12px;width:145px}.controls button{margin-top:5px;font-size:12px}.tip{position:absolute;bottom:14px;right:14px;padding:9px 12px;background:#06283bdc;border-radius:8px;font-size:12px}.brand{color:#f4c979}.stat b{font-variant-numeric:tabular-nums}.controls button:focus-visible,aside button:focus-visible{outline:2px solid #ffd68b}.badge3d{position:absolute;bottom:15px;left:16px;padding:8px 12px;border:1px solid #8fb8c077;border-radius:9px;background:#082a3dc9;color:#e2f7fc;font-size:11px;letter-spacing:.06em;pointer-events:none}#toast{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:#082a3df0;padding:12px 18px;border-radius:8px;pointer-events:none;opacity:0;transition:opacity .25s;max-width:55vw;text-align:center}@media(max-width:680px){header{padding:0 12px}header strong{font-size:16px}header small{display:none}aside{width:205px;padding:10px;top:8px;left:8px;font-size:12px}.controls{right:8px;top:8px;width:105px;padding:6px}.controls button{font-size:11px;padding:7px}.tip{font-size:10px;bottom:7px;right:7px}}header{box-shadow:0 3px 25px #0006}header strong{color:#f6e7c6}aside{border-color:#ad8a52aa;background:linear-gradient(160deg,#061c2cf5,#0b3447ed)}.controls{border-color:#ad8a52aa}.primary{background:linear-gradient(110deg,#ad7d2c,#8b5d21)}.stat b{color:#f8c978}button{transition:background .18s,transform .18s}button:active{transform:scale(.98)}.fleet-tag{position:absolute;pointer-events:none;transform:translate(-50%,-50%);padding:5px 8px;border-radius:5px;background:#061e30db;color:#f5d08b;border:1px solid #d5a85b9e;font-size:10px;font-weight:800;letter-spacing:.08em;white-space:nowrap;box-shadow:0 3px 12px #0009}@media(max-width:680px){.fleet-tag{font-size:8px;padding:3px 5px}} </style><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}</script></head><body><header><strong>MARINA <span class="brand">EMPIRE</span></strong><small>ISOLA DELLE ROSE · MARINA PRIVATA · 40 PONTILI · 1.500 ORMEGGI · ROTTE IN VERIFICA · CITTÀ LATERALE</small><span class="wallet" id="credits">25.000 crediti</span></header><main id="stage"><aside><h2>⚓ Isola delle Rose</h2><div class="sub">PROPRIETÀ RPG · MARINA PRIVATA · SVILUPPO COMPLETO</div><div class="stat">⚓ Pontili costruiti <b id="piers">40 / 40</b></div><div class="stat">📐 Posti complessivi <b id="capacity">0</b></div><div class="stat">🛟 Posti liberi <b id="free">12</b></div><div class="stat">🛥 Yacht ospiti <b id="moored">0</b></div><div class="stat">↗ In manovra <b id="moving">0</b></div><button class="primary" id="arrival">⛵ Fai arrivare uno yacht</button><button id="departure">↗ Fai partire uno yacht</button><button id="transferSmall">⇄ Centrale → Darsena commerciale</button><button id="transferLarge">⇄ Commerciale → Darsena centrale</button><button id="charter">★ Missione charter (+650)</button><button id="unlock">✓ Isola completamente sviluppata</button><button id="owned">♛ Flotta privata RPG Yacht</button><button id="services">⚙ Servizi e attività dell’isola</button><button id="reset">↺ Ripristina partita</button><p class="status" id="status">Isola delle Rose: marina RPG con bacino centrale per yacht grandi e bacino esterno per barche piccole, con corsie di navigazione tra i pontili.</p></aside><div class="controls"><button class="primary" id="goCentral">⚓ Darsena centrale</button><button class="primary" id="goCommercial">⛵ Darsena commerciale</button><button id="goOverview">◎ Vista entrambe</button><button id="view">Vista dall'alto</button><button id="orbit">Vista 3D</button><button id="zoom">Zoom yacht</button><button id="routes">Mostra rotte</button></div><div class="tip">Mouse sinistro: ruota · Destro: sposta · Rotellina: zoom · Tasti 1 / 2 / 3: cambia darsena</div><div class="badge3d">● LIVE 3D · GRANDI / PICCOLE · 1.500 POSTI</div><div id="toast"></div></main><script type="module">
+import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const $=id=>document.getElementById(id),stage=$('stage'),scene=new THREE.Scene();scene.background=new THREE.Color(0x1c6a89);scene.fog=new THREE.FogExp2(0x1c6a89,.00012);
+const camera=new THREE.PerspectiveCamera(43,1,.1,3500);camera.position.set(830,750,900);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.45));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;stage.prepend(renderer.domElement);
+const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(490,0,-60);orbit.enableDamping=true;orbit.minDistance=32;orbit.maxDistance=2200;orbit.maxPolarAngle=1.48;scene.add(new THREE.HemisphereLight(0xe9f8ff,0x456676,2.25));const sun=new THREE.DirectionalLight(0xffe6c1,3.3);sun.position.set(-120,170,90);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-.0002;sun.shadow.normalBias=.025;sun.shadow.camera.left=-220;sun.shadow.camera.right=220;sun.shadow.camera.top=220;sun.shadow.camera.bottom=-220;scene.add(sun);
+const material=(color,roughness=.75,metalness=.02)=>new THREE.MeshStandardMaterial({color,roughness,metalness});const stone=material(0xbcc1b8),quay=material(0xd4d2c5),deck=material(0x8c7860),trim=material(0x424d52),roof=material(0x85999d),glass=material(0x244c63,.15,.4),sand=material(0xd2b997),grass=material(0x60865a),white=material(0xf2f3ee,.23,.12),hullDark=material(0x1c3f52,.32,.22),rail=material(0xc8d2d3,.23,.65),wood=material(0xa9875b),gold=material(0xc8a66a),waterMat=new THREE.MeshPhysicalMaterial({color:0x0b617b,metalness:.18,roughness:.24,clearcoat:1,clearcoatRoughness:.09,transparent:true,opacity:.98});
+function mesh(geo,mat,parent=scene,x=0,y=0,z=0){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}function box(w,h,d,mat,parent=scene,x=0,y=0,z=0){return mesh(new THREE.BoxGeometry(w,h,d),mat,parent,x,y,z)}function cylinder(r1,r2,h,mat,parent,x,y,z){return mesh(new THREE.CylinderGeometry(r1,r2,h,10),mat,parent,x,y,z)}function beam(a,b,width,height,mat){const len=Math.hypot(b[0]-a[0],b[1]-a[1]),m=box(width,height,len,mat,scene,(a[0]+b[0])/2,height/2,(a[1]+b[1])/2);m.rotation.y=Math.atan2(b[0]-a[0],b[1]-a[1]);return m}function path(pts,w,h,mat){for(let i=1;i<pts.length;i++)beam(pts[i-1],pts[i],w,h,mat)}
+const wg=new THREE.PlaneGeometry(2400,1600,110,90),base=Float32Array.from(wg.attributes.position.array),sea=mesh(wg,waterMat);sea.rotation.x=-Math.PI/2;sea.position.set(400,-.65,0);sea.receiveShadow=true;
+// Rectangular game-map tile: deep sea with a submerged stone shelf and a unified shoreside landscape.
+const seabed=material(0x164956,.96),coastalRock=material(0x777b74,.98),coastalRockLight=material(0xa0a297,.97),deepSea=material(0x10354a,.87);
+box(2400,.7,1600,deepSea,scene,400,-2.1,0);
+// Seaward rock armor is physically modeled in 3D, not a flat texture.
+const rockGeo=new THREE.DodecahedronGeometry(1,0),rockA=new THREE.InstancedMesh(rockGeo,coastalRock,1900),rockB=new THREE.InstancedMesh(rockGeo,coastalRockLight,850);
+rockA.castShadow=rockB.castShadow=true;rockA.receiveShadow=rockB.receiveShadow=true;
+const dummy=new THREE.Object3D();let seed=18477;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+function armorAlong(points,outerSide,spread=13){for(let j=1;j<points.length;j++){const a=points[j-1],b=points[j],dx=b[0]-a[0],dz=b[1]-a[1],length=Math.hypot(dx,dz),nx=-dz/length,nz=dx/length;for(let d=0;d<length;d+=1.65){for(let layer=0;layer<3;layer++){const t=Math.min(1,(d+rand()*1.4)/length),offset=outerSide*(5+layer*spread/3+rand()*4);const x=a[0]+dx*t+nx*offset,z=a[1]+dz*t+nz*offset;const radius=1.4+rand()*2.5;dummy.position.set(x, -.15+rand()*.5,z);dummy.rotation.set(rand()*3,rand()*6,rand()*3);dummy.scale.set(radius, .65+rand()*1.2,radius*(.7+rand()*.5));dummy.updateMatrix();const meshTarget=rand()>.38?rockA:rockB;const index=meshTarget.userData.count||0;if(index<meshTarget.count){meshTarget.setMatrixAt(index,dummy.matrix);meshTarget.userData.count=index+1}}}}}
+// Breakwaters: authentic concrete geometry, no colored guide lines.
+const left=[[-111,65],[-106,28],[-95,-18],[-81,-58],[-48,-88],[30,-88],[92,-72]],northLeft=[[-111,65],[-69,87],[-23,101],[19,104]],northRight=[[54,104],[88,109],[130,88],[157,49],[158,-3],[140,-49],[92,-72]];path(left,8,2.6,stone);path(northLeft,8,2.6,stone);path(northRight,8,2.6,stone);armorAlong(left,-1);armorAlong(northLeft,1);armorAlong(northRight,1);
+for(const rocks of [rockA,rockB]){const n=rocks.userData.count||0;rocks.count=n;rocks.instanceMatrix.needsUpdate=true;scene.add(rocks)}
+// Waterline foam along the exposed sea defenses.
+const surfMat=new THREE.MeshBasicMaterial({color:0xe5f6f2,transparent:true,opacity:.35,depthWrite:false});
+for(const coast of [northLeft,northRight])for(let i=1;i<coast.length;i++){const a=coast[i-1],b=coast[i],len=Math.hypot(b[0]-a[0],b[1]-a[1]);for(let k=0;k<len;k+=6){const t=k/len,x=a[0]+(b[0]-a[0])*t,z=a[1]+(b[1]-a[1])*t;const dx=b[0]-a[0],dz=b[1]-a[1],side=coast===northRight?1:1,nx=-dz/len,nz=dx/len;const f=mesh(new THREE.CircleGeometry(1.2+rand()*1.8,12),surfMat,scene,x+nx*side*(9+rand()*4),-.46,z+nz*side*(9+rand()*4));f.rotation.x=-Math.PI/2;f.scale.set(1.9,.55,1)}}
+
+for(const p of [left,northLeft,northRight])for(let i=0;i<p.length;i++){cylinder(1.6,1.7,3.2,quay,scene,p[i][0],1.6,p[i][1]);}
+// Detailed harbor promenade, sea defenses and nautical fixtures.
+const asphalt=material(0x717e7b),bollardMat=material(0x2e454e,.45,.4),warmLight=new THREE.MeshBasicMaterial({color:0xffd9a0}),foam=new THREE.MeshBasicMaterial({color:0xc6e7e7,transparent:true,opacity:.24,depthWrite:false});
+for(const coast of [left,northLeft,northRight])for(let j=1;j<coast.length;j++){
+ const a=coast[j-1],b=coast[j],dx=b[0]-a[0],dz=b[1]-a[1],length=Math.hypot(dx,dz),steps=Math.max(1,Math.floor(length/13));
+ for(let k=1;k<steps;k++){
+  const f=k/steps,x=a[0]+dx*f,z=a[1]+dz*f;
+  cylinder(.35,.42,.58,bollardMat,scene,x,3.03,z);
+  if(k%2===0){cylinder(.14,.2,3.2,bollardMat,scene,x,4.6,z);const lamp=mesh(new THREE.SphereGeometry(.4,10,8),warmLight,scene,x,6.3,z);lamp.castShadow=false}
+ }
+}
+// A single continuous shoreside landmass follows the inside of the harbor wall.
+// The buildings, harbor office, promenade and pier access all stand on this apron.
+const pavement=material(0xbab4a7),plaster=material(0xe4ddd0),warmWall=material(0xd5c6ae),tileRoof=material(0x8b7770),awning=material(0xf0e6d5),treeTrunk=material(0x705743),foliage=material(0x467c58),stripe=material(0xf1eee1);
+const shoreOutline=[[-122,-143],[166,-143],[166,-72],[140,-72],[105,-86],[50,-101],[-12,-101],[-75,-101],[-122,-73]];
+const shoreShape=new THREE.Shape();shoreOutline.forEach(([x,z],i)=>i?shoreShape.lineTo(x,-z):shoreShape.moveTo(x,-z));shoreShape.closePath();
+const shoreGeometry=new THREE.ExtrudeGeometry(shoreShape,{depth:.62,bevelEnabled:false,curveSegments:1});
+const shore=mesh(shoreGeometry,pavement);shore.rotation.x=-Math.PI/2;shore.position.y=2.4;shore.castShadow=false;shore.receiveShadow=true;
+// Solid, continuous terrain beneath EVERY shoreside facility, including the rear
+// boatyard, hotel, pool, helipad, workshops and dry-storage racks at z=-175.
+// The old shoreline ended at z=-143 and left these facilities visually floating.
+const foundationSide=material(0x97978b,.93),pavingDetail=material(0xc9c5b7,.94);
+const rearFoundation=box(288,3.25,51,foundationSide,scene,22,-.53,-165.5);
+rearFoundation.castShadow=false;rearFoundation.receiveShadow=true; // upper face y=1.095
+const rearPavement=box(288,.16,51,pavement,scene,22,2.99,-165.5);
+rearPavement.castShadow=false;rearPavement.receiveShadow=true; // upper face y=3.07
+// Overlap the original promenade to make the two ground sections continuous.
+const joinApron=box(288,.15,10,pavement,scene,22,3.00,-142.5);
+joinApron.castShadow=false;joinApron.receiveShadow=true;
+// Finished edges, paving joints and service paths, without covering the basin.
+for(let x=-115;x<=158;x+=16){
+ const joint=box(.11,.015,42,pavingDetail,scene,x,3.081,-168);
+ joint.castShadow=false;
+}
+for(const z of [-149,-171,-187]){
+ const joint=box(283,.015,.12,pavingDetail,scene,22,3.083,z);
+ joint.castShadow=false;
+}
+// The waterside fuel station has its own load-bearing quay and a land connection.
+const fuelFoundation=box(25,3.0,14,foundationSide,scene,140,.72,-71);
+fuelFoundation.castShadow=false;
+const fuelSurface=box(25,.15,14,pavement,scene,140,2.27,-71);
+fuelSurface.castShadow=false;
+const fuelAccess=box(5,.28,37,quay,scene,145,2.5,-92);
+fuelAccess.castShadow=false;
+// One uninterrupted promenade, not a row of detached floating platforms.
+for(let i=0;i<8;i++){
+ const x=-88+i*29,h=6+(i%3)*1.7;
+ box(19,h,12,i%3===0?warmWall:plaster,scene,x,3.02+h/2,-115);
+ box(20,.7,13,tileRoof,scene,x,3.4+h,-115);
+ for(let k=-1;k<=1;k++){
+  box(4,2.7,.16,glass,scene,x+k*5.2,4.5,-108.92);
+  box(4.3,.2,1.65,awning,scene,x+k*5.2,6.1,-108.1);
+ }
+ for(const side of [-1,1]){
+  box(2.6,.25,.7,wood,scene,x+side*7.8,3.18,-99.5);
+  box(.22,.8,.22,trim,scene,x+side*8.6,2.79,-99.5);
+ }
+ if(i%2===0){cylinder(.28,.35,3.7,treeTrunk,scene,x+12,4.8,-130);mesh(new THREE.SphereGeometry(2.4,12,9),foliage,scene,x+12,7.2,-130)}
+}
+const navy=material(0x173c53,.28,.3),ivory=material(0xfaf8f0,.22,.08),tinted=material(0x153b50,.12,.45),chrome=material(0xbccdd4,.2,.8),teak=material(0x9c7850,.68),accent=material(0x27657c,.28,.3),cushion=material(0xdedbd2,.8),black=material(0x15242e,.4);
+function yacht(parent,scale=1,color=white){
+ const g=new THREE.Group();parent.add(g);
+ // Smooth, tapered multi-deck motor yacht with genuine 3D surfaces.
+ const hullShape=new THREE.Shape();hullShape.moveTo(-1.68,-5.65);
+ hullShape.bezierCurveTo(-2.04,-4.1,-2.12,-.5,-1.7,3.5);
+ hullShape.bezierCurveTo(-1.44,5.1,-.48,6.28,0,6.5);
+ hullShape.bezierCurveTo(.48,6.28,1.44,5.1,1.7,3.5);
+ hullShape.bezierCurveTo(2.12,-.5,2.04,-4.1,1.68,-5.65);hullShape.closePath();
+ const hull=mesh(new THREE.ExtrudeGeometry(hullShape,{depth:1.25,bevelEnabled:true,bevelSize:.13,bevelThickness:.14,bevelSegments:3,curveSegments:28}),color,g);
+ hull.rotation.x=-Math.PI/2;hull.position.y=.72;
+ const stripe=material(color===hullDark?0xc7c8c5:0x203d50,.26,.25);
+ for(const side of [-1,1]){
+  // Continuous hull accent and inset panoramic glazing.
+  box(.065,.12,8.9,stripe,g,side*1.78,.88,-.35);
+  for(let j=0;j<6;j++){
+   const z=-3.65+j*1.24, w=j>3?.37:.43;
+   const pane=mesh(new THREE.SphereGeometry(.23,12,8),tinted,g,side*(1.78+(j>3?-.06:0)),1.32,z);
+   pane.scale.set(.16,.73,w/.23);
+  }
+ }
+ // Sculpted bow deck with teak inlays and padded sun loungers.
+ const bowDeck=new THREE.Shape();bowDeck.moveTo(-1.45,1.45);bowDeck.quadraticCurveTo(-1.3,5.05,0,5.95);bowDeck.quadraticCurveTo(1.3,5.05,1.45,1.45);bowDeck.closePath();
+ const bow=mesh(new THREE.ShapeGeometry(bowDeck,24),ivory,g,0,1.98,0);bow.rotation.x=-Math.PI/2;
+ for(const side of [-1,1]){
+  box(.79,.085,2.05,cushion,g,side*.55,2.04,3.12);
+  box(.73,.06,1.1,teak,g,side*.55,2.03,4.68);
+ }
+ // Main saloon has a tapered silhouette, not a stack of rectangular blocks.
+ function loft(zFront,zBack,widthFront,widthBack,y0,y1,m){
+  const pts=[[-widthBack/2,y0,zBack],[widthBack/2,y0,zBack],[widthFront/2,y0,zFront],[-widthFront/2,y0,zFront],[-widthBack*.43,y1,zBack],[widthBack*.43,y1,zBack],[widthFront*.43,y1,zFront],[-widthFront*.43,y1,zFront]];
+  const faces=[0,1,2,0,2,3,4,6,5,4,7,6,0,4,5,0,5,1,1,5,6,1,6,2,2,6,7,2,7,3,3,7,4,3,4,0];
+  const geo=new THREE.BufferGeometry(),vertices=[];for(const f of faces)vertices.push(...pts[f]);geo.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));geo.computeVertexNormals();return mesh(geo,m,g)
+ }
+ loft(1.65,-3.8,2.35,2.85,1.72,2.7,ivory);
+ for(const side of [-1,1]){
+  // Sloped, dark wraparound windows and stainless rub rails.
+  const win=box(.07,.65,3.75,tinted,g,side*1.27,2.24,-1.02);win.rotation.z=side*.12;
+  box(.055,.06,4.6,chrome,g,side*1.44,1.76,-.85);
+ }
+ loft(1.03,-2.75,1.8,2.32,2.72,3.23,ivory);
+ box(2.1,.08,3.55,teak,g,0,3.27,-.7);
+ box(1.78,.15,1.08,cushion,g,0,3.41,-1.68);
+ const windscreen=box(1.95,.52,.07,tinted,g,0,2.35,1.65);windscreen.rotation.x=-.19;
+ // Open aft cockpit, stern steps, bathing platform.
+ box(3.05,.12,2.45,teak,g,0,1.92,-4.35);
+ box(2.7,.12,.9,ivory,g,0,1.62,-5.3);
+ box(3.55,.16,1.15,teak,g,0,.97,-6.05);
+ for(const side of [-1,1]){
+  box(.25,.35,1.75,ivory,g,side*1.47,1.97,-4.22);
+  for(let j=0;j<9;j++)cylinder(.028,.028,.65,chrome,g,side*1.62,2.0,-4.55+j*1.18);
+  box(.045,.045,10.0,chrome,g,side*1.62,2.35,.05);
+ }
+ // Radar arch, GPS dome, antennas, navigation lights and fenders.
+ cylinder(.055,.055,1.6,chrome,g,0,4.12,-1.45);
+ box(1.08,.13,.32,ivory,g,0,4.89,-1.45);
+ const dome=mesh(new THREE.SphereGeometry(.33,16,12),ivory,g,0,4.36,-1.85);dome.scale.y=.55;
+ for(const side of [-1,1]){
+  const nav=mesh(new THREE.SphereGeometry(.12,10,8),material(side<0?0xbd2c2a:0x2b9a64,.4),g,side*1.4,2.62,1.15);
+  for(let j=0;j<3;j++){const f=mesh(new THREE.CapsuleGeometry(.13,.38,4,8),ivory,g,side*1.79,1.18,-3.3+j*2.1);f.rotation.z=.13*side}
+ }
+ // Tender and skylights on the sun deck.
+ box(.7,.15,1.1,ivory,g,0,3.43,.3);
+ box(.56,.045,.85,tinted,g,0,3.54,.3);
+ g.scale.setScalar(scale);return g
+}
+
+// Working waterfront: dry storage cradles, parking, planters and a small waterfront kiosk.
+const steelBlue=material(0x2e7399,.42,.35),roadMark=material(0xece8db,.9),rubber=material(0x242a2e,.94),parkPaint=[material(0xd6d7d4),material(0x344d5a),material(0xa7a9a7)];
+for(let i=0;i<12;i++){
+ const x=-104+i*21;
+ box(9,.04,.22,roadMark,scene,x,3.07,-135);
+ // Parking spaces are marked here; detailed correctly-scaled cars are created below.
+}
+for(let i=0;i<11;i++){
+ const x=-109+i*25;
+ cylinder(.28,.34,3.5,treeTrunk,scene,x,4.8,-103);
+ for(let k=0;k<6;k++){const frond=mesh(new THREE.ConeGeometry(1.2,4.6,6),foliage,scene,x+Math.cos(k*Math.PI/3)*1.4,8.1,-103+Math.sin(k*Math.PI/3)*1.4);frond.rotation.z=Math.PI/2-k*.16}
+}
+// Dry dock and repair equipment on the solid service apron.
+for(let i=0;i<3;i++){
+ const x=-90+i*13;
+ box(4,.4,8,steelBlue,scene,x,3.3,-126);
+ const dry=yacht(scene,.62+i*.025,i%2?ivory:white);dry.position.set(x,3.5,-126);dry.rotation.y=Math.PI/2;
+}
+// Harbor kiosk on shore, with a roof canopy and outdoor tables.
+box(9,3.8,7,warmWall,scene,76,5,-124);box(11,.55,9,wood,scene,76,7.2,-124);
+for(let i=0;i<4;i++){const x=66+i*6;cylinder(.55,.65,1,wood,scene,x,3.6,-105);cylinder(2.2,2.2,.15,awning,scene,x,6.6,-105);cylinder(.1,.1,2.4,trim,scene,x,5.3,-105)}
+// Harbour master's office shares the same waterfront plaza.
+box(19,8,13,plaster,scene,113,7.05,-115);
+box(20,.75,14,tileRoof,scene,113,11.4,-115);
+box(7,5,7,glass,scene,113,14,-115);
+box(8,.45,8,awning,scene,113,16.8,-115);
+for(let i=-1;i<=1;i++)box(3.2,3,.18,glass,scene,113+i*4.8,6.9,-108.42);
+// Continuous quay edge, access ramps and realistic mooring infrastructure.
+for(let i=0;i<7;i++){
+ const x=[-91,-62,-33,-4,25,54,83][i];
+ const bridge=box(4.6,.35,13,quay,scene,x,2.1,-86.0);bridge.rotation.x=-.12;
+ for(const side of [-1,1]){
+  cylinder(.27,.32,.65,trim,scene,x+side*2.7,3.15,-94);
+  cylinder(.15,.18,3.4,trim,scene,x+side*3,4.65,-97);
+  mesh(new THREE.SphereGeometry(.4,10,8),warmLight,scene,x+side*3,6.35,-97).castShadow=false;
+ }
+}
+// ISOLA DELLE ROSE: connected marina facilities, all built as 3D geometry on the island apron.
+const asphaltService=material(0x777c79),paint=material(0xe9e4d6),orange=material(0xe6a445),poolBlue=material(0x2bafc1,.19),solar=material(0x183a51,.25,.45),plant=material(0x39704a),rope=material(0xc6b18b),red=material(0xbd4534),blue=material(0x367ea1);
+// Continuous shore road and pedestrian paving.
+box(255,.12,9,asphaltService,scene,7,3.15,-135);
+for(let x=-111;x<134;x+=11)box(4,.025,.2,paint,scene,x,3.24,-135);
+// Dry storage boatyard: yachts on stands, concrete hardstand, travel lift and workshop.
+box(67,.18,28,asphaltService,scene,-76,3.15,-155);
+for(let i=0;i<5;i++){const g=yacht(scene,.42+(i%2)*.05);g.position.set(-102+i*12,4.4,-155);g.rotation.y=Math.PI/2;for(const d of [-2,2])box(.5,2,.5,trim,scene,-102+i*12+d,4,-155)}
+for(const x of [-112,-66]){box(1.1,13,1.1,blue,scene,x,9.5,-167);box(1.1,13,1.1,blue,scene,x,9.5,-144)}
+box(48,1.1,1.1,blue,scene,-89,16.1,-155);
+for(const x of [-103,-75])box(.15,8,.15,trim,scene,x,11.3,-155);
+// Chandlery and maintenance sheds.
+box(24,6.4,14,plaster,scene,-23,6.45,-154);box(26,.7,16,roof,scene,-23,9.9,-154);
+for(let x=-31;x<=-15;x+=8)box(5.5,4.5,.16,glass,scene,x,5.8,-146.9);
+// Refueling station on quay, accessible from water.
+box(19,.65,9,quay,scene,140,2.55,-71);
+for(let x=133;x<=147;x+=7){box(1.4,2.1,1.15,white,scene,x,4,-71);box(.7,.3,.1,black,scene,x,4.5,-70.35)}
+box(21,.45,11,awning,scene,140,6.5,-71);
+for(let x of [131,149])for(let z of [-75,-67])cylinder(.28,.28,3.8,trim,scene,x,4.5,z);
+// Waterfront kiosk with terrace and umbrellas.
+box(15,4.1,10,warmWall,scene,63,5.4,-155);box(16,.5,11,roof,scene,63,7.7,-155);
+for(let i=0;i<4;i++){const x=43+i*8;cylinder(.15,.15,3,trim,scene,x,4.8,-151);mesh(new THREE.ConeGeometry(3.3,1.2,9),i%2?white:orange,scene,x,6.6,-151);cylinder(.7,.7,.7,wood,scene,x,3.8,-151)}
+// Reception / boutique hotel with solar roofs and terraces.
+for(let i=0;i<3;i++){const x=14+i*28;box(20,8,14,plaster,scene,x,7.1,-158);box(21,.5,15,roof,scene,x,11.35,-158);for(let k=-1;k<=1;k++){box(4.4,3,.12,glass,scene,x+k*5.4,7.2,-150.92);box(4.8,.16,2.5,wood,scene,x+k*5.4,8.8,-149.4)}for(let k=-1;k<=1;k++)box(4,.07,3,solar,scene,x+k*5.5,11.68,-159)}
+// Outdoor restaurant and swimming pool.
+box(24,.15,15,wood,scene,103,3.3,-156);box(12,.13,6,poolBlue,scene,103,3.48,-155);
+for(let i=0;i<4;i++){const x=91+i*7;cylinder(.12,.12,2.8,trim,scene,x,4.7,-165);mesh(new THREE.ConeGeometry(2.2,.9,10),white,scene,x,6.3,-165)}
+// Heliport, service vehicles and navigation tower.
+box(19,.25,19,asphaltService,scene,143,3.4,-153);const hRing=mesh(new THREE.RingGeometry(6,6.7,40),paint,scene,143,3.57,-153);hRing.rotation.x=-Math.PI/2;
+box(1,.04,7,paint,scene,143,3.59,-153);box(6,.04,1,paint,scene,143,3.59,-153);
+for(let i=0;i<10;i++){const x=-105+i*25;cylinder(.22,.22,3.8,trim,scene,x,5.15,-139);mesh(new THREE.SphereGeometry(.38,10,8),warmLight,scene,x,7.1,-139)}
+// Coastguard lookout and lighthouse on outer breakwater.
+cylinder(2.4,3.4,11,plaster,scene,151,8,58);cylinder(2.9,2.9,.8,red,scene,151,14,58);
+mesh(new THREE.ConeGeometry(3.2,2,12),red,scene,151,16,58);
+// Small service craft at the dry dock and lifebuoys on the main promenade.
+for(let i=0;i<8;i++){const x=-103+i*30;const ring=mesh(new THREE.TorusGeometry(.55,.15,8,18),orange,scene,x,3.7,-100);ring.rotation.y=Math.PI/2}
+
+// Premium coastal landscaping and resort details: real meshes, no baked-in photograph.
+const palmBark=material(0x7a6447),palmLeaf=material(0x346c42),hedge=material(0x446b42),carPaint=[material(0xe9e9e4,.3),material(0x273c4a,.3),material(0xb6b8b3,.35),material(0x8a3434,.35)],carGlass=material(0x183b50,.17,.42);
+function palm(x,z,scale=1){const g=new THREE.Group();g.position.set(x,3.1,z);g.scale.setScalar(scale);scene.add(g);cylinder(.25,.42,6.8,palmBark,g,0,3.4,0);for(let i=0;i<9;i++){const a=i*Math.PI*2/9;const leaf=mesh(new THREE.ConeGeometry(.6,6.5,4),palmLeaf,g,Math.sin(a)*2.5,7.1,Math.cos(a)*2.5);leaf.rotation.z=Math.sin(a)*.95;leaf.rotation.x=-Math.cos(a)*.95}return g}
+function car(x,z,paintMat,angle=0){const g=new THREE.Group();g.position.set(x,3.4,z);g.rotation.y=angle;scene.add(g);box(2.0,.85,4.45,paintMat,g,0,.65,0);box(1.78,.85,2.3,carGlass,g,0,1.25,-.25);for(const xx of [-.99,.99])for(const zz of [-1.45,1.45]){const w=cylinder(.52,.52,.3,trim,g,xx,.42,zz);w.rotation.z=Math.PI/2}return g}
+for(let i=0;i<13;i++){const x=-111+i*21;palm(x,-126,.7+(i%3)*.13);if(i%2===0)car(x+6,-136,carPaint[i%4],0)}
+for(let i=0;i<6;i++){const x=-105+i*27;box(8,.32,1.25,hedge,scene,x,3.5,-122);for(let j=0;j<3;j++)mesh(new THREE.SphereGeometry(.9,8,7),hedge,scene,x-2.8+j*2.8,4.1,-122)}
+// Beach lounge and curved shoreline terrace inside the protected island corner.
+const beachSand=material(0xdcc79b),sunbed=material(0xf4e8d1),parasols=[material(0xe7d4b5),material(0xc6a66b),material(0xf5f1e8)];
+const beach=mesh(new THREE.CircleGeometry(19,48),beachSand,scene,-107,2.95,-89);beach.rotation.x=-Math.PI/2;beach.scale.set(1,.7,1);
+for(let i=0;i<10;i++){const x=-120+(i%5)*5.8,z=-92+Math.floor(i/5)*6;box(1.4,.3,3.1,sunbed,scene,x,3.25,z);cylinder(.09,.09,2.7,trim,scene,x+2,4.4,z);const shade=mesh(new THREE.ConeGeometry(2.25,.9,12),parasols[i%3],scene,x+2,5.9,z);shade.castShadow=true}
+// Luxury waterfront terrace, restaurant tables and glass railings.
+for(let i=0;i<12;i++){const x=8+i*10.5,z=-105;cylinder(.18,.18,2.1,trim,scene,x,4.1,z);const top=cylinder(1.2,1.2,.16,wood,scene,x,5.25,z);top.castShadow=false;for(let j=0;j<3;j++){const a=j*2*Math.PI/3;box(.9,.5,.9,wood,scene,x+Math.sin(a)*2,3.55,z+Math.cos(a)*2)}}
+// A second service yard with tender boats on dry storage racks.
+for(let i=0;i<6;i++){const x=-106+i*13;const g=yacht(scene,.68+(i%2)*.035);g.position.set(x,5,-175);g.rotation.y=Math.PI/2;for(const off of [-2.7,2.7])box(.45,2,.45,trim,scene,x+off,3.85,-175)}
+// Water-side marker posts and safe floating mooring edges.
+for(let i=0;i<8;i++){const x=-98+i*29;const post=cylinder(.16,.16,2.2,trim,scene,x,2.6,-94);post.castShadow=false;mesh(new THREE.SphereGeometry(.3,10,8),warmLight,scene,x,3.85,-94)}
+// Buoys mark the navigable harbor entrance without obstructing the gate.
+for(const [x,z,c] of [[24,119,0xe54f3b],[64,119,0x31bf80],[22,90,0xe54f3b],[63,90,0x31bf80]]){
+ const buoy=new THREE.Group();scene.add(buoy);buoy.position.set(x,.05,z);
+ const buoyMat=material(c,.5);cylinder(.85,1.05,1.1,buoyMat,buoy,0,.55,0);
+ cylinder(.09,.09,1.15,trim,buoy,0,1.6,0);
+ mesh(new THREE.SphereGeometry(.2,8,8),warmLight,buoy,0,2.25,0);
+}
+// Access walkways for the seaward and starboard piers: all connected to the island walls.
+// The navigable harbor gate between x=19 and x=54 stays unobstructed.
+const serviceDeck=material(0x9e896b,.67),serviceEdge=material(0xd7d3c7,.82);
+function accessBridge(a,b,w=4){beam(a,b,w,1.2,serviceEdge);const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);const top=box(w+.15,.18,len,serviceDeck,scene,(a[0]+b[0])/2,1.31,(a[1]+b[1])/2);top.rotation.y=Math.atan2(dx,dz)}
+accessBridge([-91,75],[-19,75],5);
+accessBridge([81,75],[127,75],5);
+accessBridge([127,75],[139,35],5);
+// Harbor control tower on the unified shoreside promenade.
+const towerBase=material(0xdad9d2,.7),towerGlass=material(0x153d54,.16,.55),towerTop=material(0x53646c,.38);
+cylinder(3.1,4.2,19,towerBase,scene,126,12,-121);
+cylinder(6.8,6.8,5,towerGlass,scene,126,23.6,-121);
+cylinder(7.5,7.5,.8,towerTop,scene,126,26.5,-121);
+for(let i=0;i<12;i++){const a=i*Math.PI/6;cylinder(.15,.15,2.6,chrome,scene,126+6.4*Math.cos(a),27.8,-121+6.4*Math.sin(a))}
+cylinder(.12,.12,5,chrome,scene,126,29.2,-121);
+mesh(new THREE.SphereGeometry(.55,12,10),warmLight,scene,126,32,-121);
+// Marina services: fuel pontoons and repair slips attached to the promenade.
+const fuelBlue=material(0x1c5d80,.34),fuelWhite=material(0xe5e8e4,.5);
+for(let i=0;i<3;i++){const x=102+i*10;box(3.2,1.3,2.3,fuelBlue,scene,x,3.85,-94);box(3.5,.2,2.6,fuelWhite,scene,x,4.6,-94);cylinder(.09,.09,2.1,chrome,scene,x+1.4,5.6,-94)}
+// Berth layout is preserved: new piers appear in their preplanned positions.
+const specs=[
+{x:-91,z:-81,angle:0,len:70},{x:-62,z:-81,angle:0,len:70},{x:-33,z:-81,angle:0,len:70},
+{x:-4,z:-81,angle:0,len:70},{x:25,z:-81,angle:0,len:70},{x:54,z:-81,angle:0,len:70},
+{x:83,z:-81,angle:0,len:70},
+{x:-70,z:75,angle:Math.PI,len:36},{x:-42,z:75,angle:Math.PI,len:36},
+{x:-14,z:75,angle:Math.PI,len:36},{x:84,z:75,angle:Math.PI,len:36},
+{x:113,z:65,angle:Math.PI,len:32},{x:139,z:35,angle:Math.PI,len:25},
+// Seven additional side-wall pontoons. The access heads start at the lateral quay,
+// and project inward without crossing the rock revetment or the main fairway.
+{x:-128,z:-56,angle:Math.PI/2,len:26},{x:-128,z:-27,angle:Math.PI/2,len:26},
+{x:-128,z:2,angle:Math.PI/2,len:26},{x:-128,z:31,angle:Math.PI/2,len:26},
+{x:149,z:-49,angle:-Math.PI/2,len:28},{x:149,z:-15,angle:-Math.PI/2,len:28},
+{x:149,z:19,angle:-Math.PI/2,len:28}];const groups=[],slots=[],slotMap=new Map(),boats=new Map(),moving=[];const freeMat=new THREE.MeshBasicMaterial({color:0x9fd3bd,transparent:true,opacity:.035,depthWrite:false}),busyMat=new THREE.MeshBasicMaterial({color:0xe3b96f,transparent:true,opacity:.16,depthWrite:false});
+for(let i=0;i<specs.length;i++){const p=specs[i],g=new THREE.Group();g.position.set(p.x,0,p.z);g.rotation.y=p.angle;scene.add(g);box(4.5,1.2,p.len,deck,g,0,.8,p.len/2);box(4.8,.15,p.len,wood,g,0,1.45,p.len/2);for(let z=5;z<p.len;z+=13){cylinder(.18,.18,1.4,trim,g,-2.2,2,z);cylinder(.18,.18,1.4,trim,g,2.2,2,z);for(const side of [-1,1]){const light=cylinder(.26,.26,.4,gold,g,side*2.2,2.75,z);light.castShadow=false}}const pairs=Math.max(1,Math.floor((p.len-14)/14));for(let j=0;j<pairs;j++)for(const side of [-1,1]){const z=9+j*14,id=`${i+1}-${j*2+(side===1?2:1)}`;const hit=box(6.8,.07,11.2,freeMat,g,side*9.3,-.27,z);hit.userData.id=id;hit.userData.pier=i;slots.push(hit);slotMap.set(id,hit);const finger=box(6.1,.3,1.15,wood,g,side*5.5,1.06,z+5.8);finger.castShadow=true;const cleat=box(.52,.16,.19,chrome,g,side*2.4,1.62,z);cleat.castShadow=false}groups.push(g)}
+// NEW REAL 3D EXPANSION: second, larger harbor basin physically connected to the original island.
+// Twenty long piers provide 1,418 additional interactive berths; the original twenty retain 82.
+const annexGround=material(0xc6c0b1),annexRoad=material(0x737d7d),annexPlant=material(0x4d7956);
+box(755,3.1,62,annexGround,scene,665,1.1,-378);
+box(755,.16,12,annexRoad,scene,665,2.78,-393);
+// A continuous quay bridge joins the existing service apron to the new harbor.
+box(170,2.5,32,annexGround,scene,225,1.15,-136);
+box(34,2.5,255,annexGround,scene,310,1.15,-249);
+box(34,.14,255,annexRoad,scene,310,2.47,-249);
+// Sea-facing protections, with differently angled segments and varied rock armor.
+const annexWall=[[390,370],[414,370],[520,378],[648,369],[782,382],[922,358],[1010,327],[1038,240],[1038,65],[1034,-105],[1014,-295]];
+path(annexWall,10,3.5,stone);armorAlong(annexWall,1,16);
+// The entrance remains open at the northwestern side of the second basin.
+for(let i=0;i<20;i++){
+ const x=345+i*33.7, pairs=i===19?44:35, len=14*pairs+14;
+ const p={x,z:-339,angle:0,len};specs.push(p);
+ const g=new THREE.Group();g.position.set(x,0,-339);scene.add(g);
+ box(4.5,1.2,len,deck,g,0,.8,len/2);box(4.8,.15,len,wood,g,0,1.45,len/2);
+ // Structural piles, lights and safety ladders are visible in 3D.
+ for(let j=8;j<len;j+=28){for(const side of [-1,1]){
+  cylinder(.23,.26,3.6,trim,g,side*2.05,.1,j);
+  cylinder(.14,.14,1.5,rail,g,side*2.05,2.15,j);
+  mesh(new THREE.SphereGeometry(.26,8,6),gold,g,side*2.05,2.98,j);
+ }}
+ for(let j=0;j<pairs;j++)for(const side of [-1,1]){
+  const z=9+j*14,id=`${i+21}-${j*2+(side===1?2:1)}`;
+  const hit=box(6.8,.07,11.2,freeMat,g,side*9.3,-.27,z);
+  hit.userData.id=id;hit.userData.pier=i+20;slots.push(hit);slotMap.set(id,hit);
+  box(6.1,.3,1.15,wood,g,side*5.5,1.06,z+5.8);
+ }
+ groups.push(g);
+}
+// New services along the extended quay; physically placed on solid land.
+for(let i=0;i<14;i++){
+ const x=355+i*46;
+ box(20,1.1,16,quay,scene,x,3.4,-375);
+ box(15,5+(i%3)*2,11,i%3===0?plaster:warmWall,scene,x,6.5+(i%3),-376);
+ box(17,.7,13,roof,scene,x,10+(i%3)*2,-376);
+ for(let j=0;j<3;j++)box(1.7,1.6,.15,glass,scene,x-5+j*5,7,-369.95);
+ if(i%2===0){cylinder(.6,.7,4,treeTrunk,scene,x+17,5,-389);mesh(new THREE.SphereGeometry(3.6,9,7),foliage,scene,x+17,8,-389)}
+}
+// CONTINENTAL BACKDROP: solid mainland beyond the service buildings.
+// Kept behind the northern quay, so it does not cover any navigable water.
+const mainlandSoil=material(0x9b977f,.98),mainlandGrass=material(0x688457,.98),mainlandAsphalt=material(0x666f6d,.96);
+box(1410,7,380,mainlandSoil,scene,390,-1.9,-620);
+box(1410,.35,375,mainlandGrass,scene,390,1.78,-620);
+box(1400,.18,18,mainlandAsphalt,scene,390,2.08,-466);
+box(1400,.18,16,mainlandAsphalt,scene,390,2.08,-560);
+for(let i=0;i<48;i++){
+ const x=-265+i*29.3,z=-515-(i%4)*29;
+ box(13,7+(i%5)*2.2,12,i%3===0?warmWall:plaster,scene,x,5.5+(i%5)*1.1,z);
+ box(15,.65,14,roof,scene,x,9.3+(i%5)*2.2,z);
+ if(i%2===0){cylinder(.55,.7,4,treeTrunk,scene,x+10,4.1,z+9);mesh(new THREE.SphereGeometry(3.3,8,6),foliage,scene,x+10,7.1,z+9)}
+}
+// SIDEWAYS CITY: coastline runs alongside the central marina, not behind it.
+const citySide = new THREE.Group();
+citySide.name = 'Citta e aeroporto affiancati alla darsena centrale';
+citySide.rotation.y = Math.PI / 2;
+citySide.position.set(170,0,390);
+scene.add(citySide);
+// CITY CONNECTION: a real 3D urban district alongside the waterfront, connected by roads.
+// Everything is behind the service quay; no building or road intersects the harbor water.
+const cityRoad=material(0x414c52,.93),cityWalk=material(0xb7b4a6),cityPark=material(0x537d50),cityFacade=[material(0xd6c5ad),material(0xe5d6be),material(0xbcc8c6),material(0xd3c9bf),material(0xe0c9a8)],cityRoof=[material(0x985e48),material(0x687b85),material(0x8c8178)];
+const cityGlass=material(0x315a70,.19,.22),linePaint=material(0xece7ce),treeGreen=material(0x427447);
+// Coastal avenue and two perpendicular connections into the existing port road.
+box(1410,.22,22,cityRoad,citySide,390,2.27,-424);
+for(const x of [-135,255,645,1035]){
+ box(15,.22,260,cityRoad,citySide,x,2.27,-558);
+ for(let z=-676;z<=-430;z+=20)box(.35,.025,6,linePaint,citySide,x,2.405,z);
+}
+for(let x=-275;x<1060;x+=25)box(9,.025,.34,linePaint,citySide,x,2.41,-424);
+// Mixed residential, retail and office blocks, varied heights and footprints.
+let cityCount=0;
+for(let row=0;row<5;row++)for(let col=0;col<27;col++){
+ const x=-235+col*48+(row%2)*8,z=-493-row*48;
+ if([-135,255,645,1035].some(roadX=>Math.abs(x-roadX)<21))continue;
+ if((col+row*3)%11===0){
+  box(31,.16,27,cityPark,citySide,x,2.42,z);
+  for(let t=0;t<4;t++){const xx=x-10+(t%2)*20,zz=z-8+Math.floor(t/2)*16;cylinder(.35,.47,4,treeTrunk,citySide,xx,5,zz);mesh(new THREE.SphereGeometry(3.5,8,7),treeGreen,citySide,xx,8,zz)}
+  continue;
+ }
+ const w=21+(col%3)*5,d=18+(row%3)*5,h=9+((col*7+row*11)%7)*3.8;
+ const facade=cityFacade[(col+row)%cityFacade.length];
+ box(w,h,d,facade,citySide,x,2.5+h/2,z);
+ box(w+1.5,1,d+1.5,cityRoof[(col+2*row)%3],citySide,x,3+h,z);
+ // Rows of actual 3D windows, no image sprites.
+ for(let floor=0;floor<Math.floor((h-3)/4);floor++)for(let k=-1;k<=1;k++){
+  const yy=6+floor*4.0;
+  box(2.2,2.2,.14,cityGlass,citySide,x+k*(w/3.8),yy,z+d/2+.09);
+  box(2.2,2.2,.14,cityGlass,citySide,x+k*(w/3.8),yy,z-d/2-.09);
+ }
+ cityCount++;
+}
+// Promenade and gateway that visibly connect the port to the town.
+box(1400,.2,7,cityWalk,citySide,390,2.4,-407);
+for(let x=-230;x<=1050;x+=35){
+ cylinder(.21,.27,5.5,trim,citySide,x,5.2,-410);
+ mesh(new THREE.SphereGeometry(.55,8,6),gold,citySide,x,8,-410);
+}
+console.info('Distretto urbano collegato alla marina: '+cityCount+' edifici 3D.');
+
+// FULL CITY DISTRICT: fill the previously empty rectangular mainland beside the central marina.
+// All assets are real Three.js meshes and remain north of the harbor shoreline.
+const cityExtra=new THREE.Group();cityExtra.name='Citta completa - quartieri e servizi';citySide.add(cityExtra);
+const mWall=[material(0xe7d7bd),material(0xc8c4b9),material(0xb4c6bf),material(0xd8b69a),material(0xd0d6d4)];
+const mRoof=material(0x69727a),mRoad=material(0x424c53),mSide=material(0xbdbbb1),mGrass=material(0x4e8051),mMark=material(0xe8e3d2),mSport=material(0x3c887c),mBlue=material(0x348db3),mRed=material(0xa45142),mDark=material(0x29383c);
+// Complete the back half of the mainland rectangle; leave all harbor water clear.
+box(1410,.32,115,mGrass,cityExtra,390,2.01,-752);
+for(const z of [-715,-778]){box(1400,.17,12,mRoad,cityExtra,390,2.38,z);for(let x=-288;x<1070;x+=25)box(8,.025,.26,mMark,cityExtra,x,2.49,z)}
+for(const x of [-295,-135,55,255,455,645,845,1035,1080]){
+ box(10,.18,360,mRoad,cityExtra,x,2.39,-630);
+ for(let z=-794;z<-466;z+=24)box(.22,.028,6,mMark,cityExtra,x,2.5,z);
+}
+// City square with fountain, benches and planters.
+box(112,.19,88,mSide,cityExtra,735,2.52,-635);
+cylinder(10,10,1.1,stone,cityExtra,735,3.15,-635);
+cylinder(7.5,7.5,.2,mBlue,cityExtra,735,3.78,-635);
+for(let i=0;i<8;i++){const a=i*Math.PI/4;const x=735+43*Math.cos(a),z=-635+30*Math.sin(a);box(7,.65,2,wood,cityExtra,x,3.1,z)}
+// Shopping street: distinct low storefronts and awnings.
+for(let i=0;i<13;i++){
+ const x=-245+i*35,z=-743,w=23,h=8+(i%3)*2;
+ box(w,h,20,mWall[i%5],cityExtra,x,2.7+h/2,z);
+ box(w+1,.55,21,mRoof,cityExtra,x,3+h,z);
+ box(16,3,.18,cityGlass,cityExtra,x,5.4,z+10.13);
+ box(17,.35,4,i%2?mRed:mBlue,cityExtra,x,7.2,z+12);
+}
+// School campus with sports field and internal courtyard.
+box(94,.24,94,mGrass,cityExtra,440,2.6,-629);
+box(54,12,22,mWall[0],cityExtra,420,8.8,-655);
+box(55,.7,23,mRoof,cityExtra,420,15.1,-655);
+box(35,.1,52,mSport,cityExtra,462,2.82,-619);
+box(34,.03,.3,mMark,cityExtra,462,2.9,-619);
+box(.3,.03,50,mMark,cityExtra,462,2.9,-619);
+// Hospital and ambulance entrance.
+box(76,16,34,mWall[4],cityExtra,910,10.5,-632);
+box(78,.7,36,mRoof,cityExtra,910,18.8,-632);
+box(12,.25,3,mRed,cityExtra,910,19.2,-632);
+box(3,.25,12,mRed,cityExtra,910,19.25,-632);
+box(19,3,.2,cityGlass,cityExtra,910,5,-614.8);
+// Stadium / public park and sports courts in the western district.
+box(110,.25,90,mGrass,cityExtra,-220,2.6,-630);
+box(65,.12,40,mSport,cityExtra,-220,2.8,-630);
+for(const zz of [-650,-610])box(65,.05,.28,mMark,cityExtra,-220,2.9,zz);
+for(const xx of [-252,-188])box(.28,.05,40,mMark,cityExtra,xx,2.9,-630);
+// Urban buildings in remaining back rows; reserved spaces for landmarks and roads.
+let extraBuildings=0;
+for(let row=0;row<2;row++)for(let col=0;col<29;col++){
+ const x=-260+col*46,z=-740-row*50;
+ if([-295,-135,55,255,455,645,845,1035,1080].some(v=>Math.abs(x-v)<18))continue;
+ if(row===0 && col<13)continue; // shopping street
+ if((col+row*7)%9===0){
+  box(25,.2,25,mGrass,cityExtra,x,2.61,z);
+  cylinder(.38,.48,5,treeTrunk,cityExtra,x,5.3,z);
+  mesh(new THREE.SphereGeometry(3.5,8,7),treeGreen,cityExtra,x,8,z);
+  continue;
+ }
+ const w=20+(col%3)*4,d=18+(row%2)*5,h=10+((col*3+row*5)%7)*3;
+ box(w,h,d,mWall[(col+row)%5],cityExtra,x,2.7+h/2,z);
+ box(w+1,.65,d+1,mRoof,cityExtra,x,3+h,z);
+ for(let floor=0;floor<Math.floor(h/4);floor++)for(const dx of [-w*.25,w*.25])
+  box(2.5,2.1,.15,cityGlass,cityExtra,x+dx,6+floor*4,z+d/2+.09);
+ extraBuildings++;
+}
+// Bus station, parking and actual scale vehicles.
+box(115,.12,45,mRoad,cityExtra,105,2.6,-630);
+for(let i=0;i<13;i++){
+ const x=52+i*8;
+ box(.2,.04,15,mMark,cityExtra,x,2.7,-630);
+ if(i%2===0)car(x+3,-633,[white,mRed,mBlue][i%3],Math.PI/2);
+}
+box(31,.3,6,mSide,cityExtra,95,3,-608);
+box(31,.25,9,mRoof,cityExtra,95,7,-608);
+for(const xx of [81,109])cylinder(.24,.24,4,mDark,cityExtra,xx,5,-608);
+// Continuous street trees and streetlights along the rear avenue.
+for(let x=-260;x<1060;x+=42){
+ cylinder(.3,.42,4.6,treeTrunk,cityExtra,x,4.9,-704);
+ mesh(new THREE.SphereGeometry(3.3,8,7),treeGreen,cityExtra,x,8,-704);
+ cylinder(.15,.2,6,mDark,cityExtra,x+12,5.6,-704);
+ mesh(new THREE.SphereGeometry(.48,8,6),gold,cityExtra,x+12,8.7,-704);
+}
+console.info('Citta completata: piazza, negozi, scuola, ospedale, impianti sportivi, parcheggi, autobus, parchi e '+extraBuildings+' nuovi edifici.');
+
+
+// COMPLETE COASTAL REGION: one continuous mainland occupies the entire inland side
+// of the visible scene; the opposite side remains open sea. Airport and city are 3D.
+const region=new THREE.Group();region.name='Entroterra completo con aeroporto e citta';citySide.add(region);
+const regionEarth=material(0x9b987b),regionGreen=material(0x71915a),regionRoad=material(0x52575c),regionConcrete=material(0xaeb4b0),regionWhite=material(0xe8e6dc),regionRoof=material(0x77848c),regionGlass=material(0x44718a),regionOrange=material(0xc4a37c);
+// Coastline starts just behind the harbor waterfront, without covering the basins.
+box(1880,5,1150,regionEarth,region,385,-2.1,-1000);
+box(1880,.3,1150,regionGreen,region,385,.57,-1000);
+// A perimeter boulevard joins the waterfront city to the inland districts.
+for(const z of [-775,-1050,-1390]){
+ box(1820,.14,18,regionRoad,region,385,.86,z);
+ for(let x=-510;x<1260;x+=34)box(11,.03,.28,regionWhite,region,x,.96,z);
+}
+for(const x of [-475,-155,225,605,990,1240])box(16,.14,1110,regionRoad,region,x,.9,-1000);
+// Airport on the west side: runway, taxiway, apron, hangars, terminal and aircraft.
+box(630,.35,460,regionConcrete,region,-240,.99,-1130);
+box(550,.07,55,regionRoad,region,-260,1.22,-1210);
+for(let x=-505;x<0;x+=48)box(22,.035,1.6,regionWhite,region,x,1.28,-1210);
+for(const x of [-530,0])for(const z of [-1235,-1185])mesh(new THREE.SphereGeometry(1.7,8,6),gold,region,x,1.55,z);
+box(490,.07,18,regionRoad,region,-245,1.26,-1130);
+box(200,.18,105,regionConcrete,region,-330,1.28,-995);
+box(145,15,36,regionGlass,region,-375,9.1,-955);
+box(150,1.4,40,regionRoof,region,-375,17,-955);
+box(28,35,28,regionConcrete,region,-235,18.5,-966);
+cylinder(13,13,5,regionGlass,region,-235,38,-966);
+box(105,23,70,regionOrange,region,-70,12.5,-955);
+box(107,1.3,73,regionRoof,region,-70,24.5,-955);
+for(const x of [-80,-10]){
+ // Parked aircraft, built from solid meshes rather than sprites.
+ const plane=new THREE.Group();plane.position.set(x,2,-1035);region.add(plane);
+ box(5,3,42,regionWhite,plane,0,3,0);
+ box(38,.9,6,regionWhite,plane,0,4,-3);
+ box(15,.7,4,regionWhite,plane,0,5,15);
+ box(1.2,8,5,regionWhite,plane,0,8,17);
+ box(4,.6,5,regionGlass,plane,0,4,-19);
+}
+// Dense but varied residential and commercial districts on the eastern side.
+for(let r=0;r<11;r++)for(let c=0;c<19;c++){
+ const x=280+c*49+(r%2)*8,z=-812-r*49;
+ if(x>1210||Math.abs(x-605)<16||Math.abs(x-990)<16||r===5)continue;
+ if((r*7+c)%9===0){
+  box(30,.18,31,regionGreen,region,x,1.1,z);
+  for(let k=0;k<3;k++){
+   const tx=x-9+k*9;
+   cylinder(.5,.6,6,treeTrunk,region,tx,4,z+7);
+   mesh(new THREE.SphereGeometry(4,8,7),foliage,region,tx,9,z+7);
+  }
+  continue;
+ }
+ const w=24+(c%3)*5,d=22+(r%3)*4,h=12+((r*11+c*5)%8)*4;
+ const wall=[plaster,warmWall,regionOrange,regionConcrete][(r+c)%4];
+ box(w,h,d,wall,region,x,1.3+h/2,z);
+ box(w+1,.8,d+1,regionRoof,region,x,1.7+h,z);
+ for(let floor=0;floor<Math.floor(h/5);floor++)for(let k=-1;k<=1;k++){
+  box(2.6,2.7,.14,regionGlass,region,x+k*w/3.7,5+floor*5,z+d/2+.1);
+ }
+}
+// Civic landmarks and a sports complex within the extended urban fabric.
+box(105,.25,85,regionConcrete,region,1120,1.2,-860);
+box(75,20,50,plaster,region,1120,11.5,-865);
+box(78,1,52,regionRoof,region,1120,22,-865);
+box(125,.25,95,regionGreen,region,1120,1.2,-1260);
+box(96,.12,55,material(0x347e61),region,1120,1.45,-1260);
+for(const zz of [-1284,-1236])box(96,.04,.4,regionWhite,region,1120,1.55,zz);
+// Coastline edge and access roads keep the harbor visibly attached to the city.
+box(1810,.2,12,regionRoad,region,385,1.1,-432);
+for(const x of [-155,225,605,990])box(15,.17,360,regionRoad,region,x,1.05,-610);
+console.info('Scenario costiero esteso: aeroporto 3D, quartieri, strade, parchi, servizi e mare aperto.');
+
+const actualBerths=slots.length;
+console.assert(actualBerths===1500,`Capacita inattesa: ${actualBerths}`);
+const key='marina-empire-isola-rose-layout-v6-1500';let state;try{state=JSON.parse(localStorage.getItem(key))}catch{}state=state||{credits:125800,active:9,booked:['1-1','1-4','1-7','1-10','2-2','2-5','2-9','3-2','3-7','4-4','4-10','5-1','5-6','6-3','6-8','7-4','8-2','9-3','2-11','3-10','4-1','5-12','6-11','7-9','8-5','9-8'],lastCharter:0};state.active=specs.length;const occupied=new Set((state.booked||[]).filter(x=>slotMap.has(x)));const reserved=new Set();function save(){state.booked=[...occupied];localStorage.setItem(key,JSON.stringify(state))}function say(t){$('status').textContent=t;$('toast').textContent=t;$('toast').style.opacity='1';clearTimeout(say.timer);say.timer=setTimeout(()=>$('toast').style.opacity='0',3200)}function slotPosition(id){const m=slotMap.get(id),v=new THREE.Vector3();m.getWorldPosition(v);v.y=.15;return v}function addMoored(id){if(boats.has(id))return;const g=yacht(scene,Number(id.split('-')[0])>=21?.34+(Number(id.split('-')[1])%3)*.02:.65+(Number(id.split('-')[1])%3)*.07);g.position.copy(slotPosition(id));g.rotation.y=slotMap.get(id).parent.rotation.y+Math.PI/2;boats.set(id,g)}function update(){groups.forEach((g,i)=>g.visible=i<state.active);for(const h of slots)h.material=occupied.has(h.userData.id)?busyMat:freeMat;$('credits').textContent=state.credits.toLocaleString('it-IT')+' crediti';$('piers').textContent=state.active+' / '+specs.length;$('capacity').textContent=slots.filter(h=>h.parent.visible).length;$('free').textContent=slots.filter(h=>h.parent.visible&&!occupied.has(h.userData.id)&&!reserved.has(h.userData.id)).length;$('moored').textContent=boats.size;$('moving').textContent=moving.length;$('unlock').disabled=state.active===specs.length;const next=specs[state.active];$('unlock').textContent=next?'＋ Costruisci pontile '+(state.active+1)+' (4.000)':'Tutti i pontili costruiti'}
+for(const id of occupied)addMoored(id);update();console.info('Marina Empire: '+specs.length+' pontili, '+slots.length+' posti barca dimensionati alla lunghezza.');
+// Maxi yacht privati, di proprieta della marina: modelli 3D indipendenti.
+// RPG Yacht: a genuine texture on both sides of the 3D hull, not a floating name tag.
+const logoCanvas=document.createElement('canvas');logoCanvas.width=512;logoCanvas.height=160;
+const logoCtx=logoCanvas.getContext('2d');logoCtx.clearRect(0,0,512,160);
+logoCtx.fillStyle='#173d58';logoCtx.fillRect(0,0,512,160);
+logoCtx.strokeStyle='#d9b56d';logoCtx.lineWidth=7;logoCtx.strokeRect(7,7,498,146);
+logoCtx.fillStyle='#f7e6c3';logoCtx.font='bold 86px Arial';logoCtx.textAlign='center';logoCtx.fillText('RPG',256,109);
+const logoTexture=new THREE.CanvasTexture(logoCanvas);logoTexture.colorSpace=THREE.SRGBColorSpace;
+const logoMaterial=new THREE.MeshBasicMaterial({map:logoTexture,transparent:true,side:THREE.DoubleSide,depthWrite:false});
+function brandYacht(ship){for(const side of [-1,1]){const plaque=new THREE.Mesh(new THREE.PlaneGeometry(2.15,.67),logoMaterial);plaque.position.set(side*1.85,1.07,-.4);plaque.rotation.y=side*Math.PI/2;ship.add(plaque)} }
+const privateFleet=[];
+for(const [i,x,z,scale] of [[0,-91,34,1.13],[1,111,27,1.38],[2,112,52,1.2]]){
+ const ship=yacht(scene,scale,i===1?white:hullDark);ship.position.set(x,.25,z);ship.rotation.y=Math.PI/2;
+ brandYacht(ship);privateFleet.push(ship);
+}
+
+// Navigation aids at the actual breakwater entrance and buoyed channel.
+const navRed=material(0xb43c30,.42),navGreen=material(0x29865e,.42),beaconWhite=new THREE.MeshBasicMaterial({color:0xfff0c1});
+for(const [x,z,c] of [[19,104,navGreen],[54,104,navRed]]){
+ cylinder(2.25,2.5,1.2,quay,scene,x,3.1,z);
+ cylinder(.58,.85,4.4,c,scene,x,5.7,z);
+ cylinder(.9,.9,.32,beaconWhite,scene,x,8.08,z);
+ mesh(new THREE.ConeGeometry(1.05,1.4,10),c,scene,x,8.95,z);
+}
+for(const [x,z,c] of [[28,77,navGreen],[48,77,navRed],[28,60,navGreen],[48,60,navRed]]){
+ cylinder(.48,.65,1.1,c,scene,x,.3,z);
+ mesh(new THREE.SphereGeometry(.3,12,8),beaconWhite,scene,x,1.03,z);
+}
+// Rotta nel varco reale fra le due dighe: ingresso x=37, poi canale centrale.
+// Le traslazioni laterali avvengono davanti alle teste dei pontili (z=58),
+// quindi nessuna traiettoria attraversa il muro perimetrale o i pontili.
+const harborGate=new THREE.Vector3(37,.15,111),harborChannel=new THREE.Vector3(37,.15,83);
+const centralSea=new THREE.Vector3(37,.15,165);
+// The commercial basin opens to the WEST of its protective breakwater.
+// The previous route at x=345,z=420 crossed the southern rock wall.
+const commercialSea=new THREE.Vector3(260,.15,405);
+const commercialGate=new THREE.Vector3(280,.15,343);
+const commercialTurning=new THREE.Vector3(300,.15,315);
+const outerSea=new THREE.Vector3(190,.15,315);
+function point(x,z){return new THREE.Vector3(x,.15,z)}
+function dedupeRoute(nodes){return nodes.filter((v,i)=>i===0||v.distanceTo(nodes[i-1])>.05)}
+function outsideRoute(fromCommercial){const nodes=[centralSea,point(185,185),point(240,265),commercialSea];return (fromCommercial?[...nodes].reverse():nodes).map(v=>v.clone())}
+// Navigation grid: pier footprints and the outer rock wall are hard obstacles.
+// Each route is computed against the actual THREE.js pontoon transforms.
+function pierCollision(x,z,margin=4){
+ for(const p of specs){
+  const dx=x-p.x,dz=z-p.z,c=Math.cos(p.angle),si=Math.sin(p.angle);
+  const localX=dx*c-dz*si,localZ=dx*si+dz*c;
+  if(Math.abs(localX)<12.5+margin&&localZ>-margin&&localZ<p.len+margin)return true;
+ }
+ return false;
+}
+function insideCentral(x,z){
+ // Safe navigation polygon: interior turning basin with opening at x=19..54.
+ if(z>105)return x>15&&x<60;
+ if(z>82)return x>15&&x<60;
+ return x>-111&&x<137&&z>-68&&z<100;
+}
+function insideCommercial(x,z){return x>300&&x<1020&&z>-343&&z<319}
+function safeWater(x,z,commercial){
+ if(commercial){
+  if(x<315)return x>250&&z>295&&z<410;
+  return insideCommercial(x,z)&&!pierCollision(x,z,3);
+ }
+ return insideCentral(x,z)&&!pierCollision(x,z,3);
+}
+function gridRoute(start,end,commercial){
+ const step=commercial?6:4;
+ const minX=commercial?252:-115,maxX=commercial?1020:142;
+ const minZ=commercial?-344:-70,maxZ=commercial?412:107;
+ const W=Math.ceil((maxX-minX)/step)+1,H=Math.ceil((maxZ-minZ)/step)+1;
+ const index=(x,z)=>z*W+x,coord=k=>[k%W,Math.floor(k/W)];
+ const cell=v=>[Math.max(0,Math.min(W-1,Math.round((v.x-minX)/step))),Math.max(0,Math.min(H-1,Math.round((v.z-minZ)/step)))];
+ const [sx,sz]=cell(start),[ex,ez]=cell(end),first=index(sx,sz),goal=index(ex,ez);
+ const open=[first],g=new Float64Array(W*H).fill(Infinity),prev=new Int32Array(W*H).fill(-1),closed=new Uint8Array(W*H);g[first]=0;
+ const h=k=>{const [x,z]=coord(k);return Math.hypot(x-ex,z-ez)};
+ while(open.length){let best=0,bestScore=Infinity;for(let i=0;i<open.length;i++){const score=g[open[i]]+h(open[i]);if(score<bestScore){bestScore=score;best=i}}
+  const k=open.splice(best,1)[0];if(k===goal)break;if(closed[k])continue;closed[k]=1;
+  const [x,z]=coord(k);
+  for(const [ox,oz] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+ox,nz=z+oz;if(nx<0||nx>=W||nz<0||nz>=H)continue;const nk=index(nx,nz),wx=minX+nx*step,wz=minZ+nz*step;
+   if(closed[nk]||(!safeWater(wx,wz,commercial)&&nk!==goal))continue;
+   const ng=g[k]+1;if(ng<g[nk]){g[nk]=ng;prev[nk]=k;if(!open.includes(nk))open.push(nk)}
+  }
+ }
+ if(prev[goal]===-1)return null;
+ const cells=[];for(let k=goal;k!==-1;k=prev[k])cells.push(k);cells.reverse();
+ const nodes=[start.clone()];let lastDirection='';for(let i=1;i<cells.length-1;i++){const [ax,az]=coord(cells[i-1]),[bx,bz]=coord(cells[i]),direction=`${bx-ax},${bz-az}`;if(lastDirection&&direction!==lastDirection)nodes.push(point(minX+ax*step,minZ+az*step));lastDirection=direction}
+ nodes.push(end.clone());return dedupeRoute(nodes);
+}
+function sailingRoute(id){
+ const dest=slotPosition(id),pier=Number(id.split('-')[0]),hit=slotMap.get(id),side=hit.position.x>0?1:-1;
+ if(pier>=21){
+  const center=345+(pier-21)*33.7,laneX=center+side*16.85;
+  const staging=point(laneX,307),alongside=point(laneX,dest.z);
+  const path=gridRoute(commercialTurning,staging,true);
+  if(!path){console.warn('Commercial route blocked',id);return null}
+  return dedupeRoute([commercialSea.clone(),commercialGate.clone(),...path,alongside,dest]);
+ }
+ // Plan a collision-free path through the original central harbor.
+ const approach=point(dest.x+side*14,dest.z);
+ const path=gridRoute(harborChannel,approach,false);
+ if(!path){console.warn('Central route blocked',id);return null}
+ return dedupeRoute([centralSea.clone(),harborGate.clone(),...path,dest]);
+}
+// Optional visible guide lines make route inspection possible in the real scene.
+const routeGuides=new THREE.Group();scene.add(routeGuides);
+function showRouteGuide(points){
+ while(routeGuides.children.length){const obj=routeGuides.children[0];routeGuides.remove(obj);obj.geometry.dispose();obj.material.dispose()}
+ const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points.map(p=>point(p.x,p.z))),
+  new THREE.LineBasicMaterial({color:0x5ef1b0,transparent:true,opacity:.9,depthTest:false}));
+ line.position.y=1.6;routeGuides.add(line);
+ for(const v of points){const marker=new THREE.Mesh(new THREE.SphereGeometry(1.5,8,6),new THREE.MeshBasicMaterial({color:0xffd16d,depthTest:false}));marker.position.set(v.x,2,v.z);routeGuides.add(marker)}
+ routeGuides.visible=routeGuideEnabled;
+}
+let routeGuideEnabled=false;
+// Transfers are true 3D movements: boats depart a berth, travel through the
+// corresponding harbor gate, cross the sea and enter the other basin.
+function transferBetween(fromCommercial){
+ const source=[...boats.keys()].find(id=>(Number(id.split('-')[0])>=21)===fromCommercial&&!reserved.has(id));
+ if(!source)return say('Non ci sono imbarcazioni disponibili in questa darsena.');
+ const target=slots.find(h=>(Number(h.userData.id.split('-')[0])>=21)!==fromCommercial&&!occupied.has(h.userData.id)&&!reserved.has(h.userData.id));
+ if(!target)return say('Nessun posto libero nella darsena di destinazione.');
+ const dest=target.userData.id,boat=boats.get(source);
+ const sourceRoute=sailingRoute(source),enter=sailingRoute(dest);if(!sourceRoute||!enter){say("Trasferimento non disponibile: corsia ostruita.");return}const leave=[...sourceRoute].reverse();
+ const crossing=outsideRoute(fromCommercial);
+ // Remove the duplicate gate/sea endpoints to keep the journey smooth.
+ const points=dedupeRoute([...leave,...crossing,...enter]);showRouteGuide(points);
+ boats.delete(source);reserved.add(source);reserved.add(dest);
+ const lengths=[];let total=0;
+ for(let i=1;i<points.length;i++){total+=points[i].distanceTo(points[i-1]);lengths.push(total)}
+ moving.push({id:dest,source,boat,points,lengths,total,arrival:true,transfer:true,t:0,duration:Math.max(35,total/12)});
+ update();say('Trasferimento in navigazione tra le due darsene: rotta esterna attraverso gli ingressi.');
+}
+$('routes').onclick=()=>{routeGuideEnabled=!routeGuideEnabled;routeGuides.visible=routeGuideEnabled;$('routes').textContent=routeGuideEnabled?'Nascondi rotte':'Mostra rotte';say(routeGuideEnabled?'Rotta verde: percorso effettivo della barca. Punti gialli: manovre.':'Visualizzazione delle rotte disattivata.');};
+$('transferSmall').onclick=()=>transferBetween(false);
+$('transferLarge').onclick=()=>transferBetween(true);
+function sail(id,arrival){const route=sailingRoute(id);if(!route){say("Ormeggio non raggiungibile: nessuna corsia sicura.");return false}const points=arrival?route:[...route].reverse();showRouteGuide(points);let boat;if(arrival){boat=yacht(scene,Number(id.split('-')[0])>=21?.36:.7);boat.position.copy(points[0])}else{boat=boats.get(id);if(!boat)return false;boats.delete(id)}const lengths=[];let total=0;for(let i=1;i<points.length;i++){total+=points[i].distanceTo(points[i-1]);lengths.push(total)}moving.push({id,boat,points,lengths,total,arrival,t:0,duration:Math.max(22,total/8)});update();return true} 
+$('arrival').onclick=()=>{const h=slots.find(x=>x.parent.visible&&!occupied.has(x.userData.id)&&!reserved.has(x.userData.id));if(!h)return say('Tutti gli ormeggi disponibili sono occupati.');const id=h.userData.id;reserved.add(id);sail(id,true);update();say('Yacht in arrivo all’ormeggio '+id)};
+$('departure').onclick=()=>{const id=[...boats.keys()].find(x=>!reserved.has(x));if(!id)return say('Nessuno yacht ormeggiato disponibile.');reserved.add(id);sail(id,false);update();say('Yacht '+id+' in partenza dalla darsena')};
+$('charter').onclick=()=>{const now=Date.now();if(now-(state.lastCharter||0)<30000)return say('Prossimo charter tra '+Math.ceil((30000-(now-state.lastCharter))/1000)+' secondi.');state.lastCharter=now;state.credits+=650;save();update();say('Charter completato: +650 crediti!')};
+$('unlock').onclick=()=>{if(state.active===specs.length)return;if(state.credits<4000)return say('Crediti insufficienti.');state.credits-=4000;state.active++;save();update();say('Pontile '+state.active+' costruito nella posizione prevista, con ormeggi dimensionati alla sua lunghezza!')};$('owned').onclick=()=>{camera.position.set(50,75,95);orbit.target.set(15,0,-20);orbit.update();say('Flotta privata: 3 maxi yacht con logo RPG sulle fiancate, senza nomi.')};$('services').onclick=()=>say('Servizi attivi: cantiere, rimessaggio a secco, travel lift, officina, carburante, chiosco, ristorante, hotel, piscina, eliporto, capitaneria e faro.');$('reset').onclick=()=>{if(confirm('Vuoi cancellare i progressi della partita?')){localStorage.removeItem(key);location.reload()}};
+// Camera travel is real 3D movement: both camera position and OrbitControls target move together.
+const cameraViews={
+ central:{target:[12,0,-12],position:[205,180,240]},
+ commercial:{target:[685,0,-90],position:[1030,390,470]},
+ overview:{target:[485,0,-75],position:[1120,940,1180]}
+};
+let cameraTravel=null;
+function goToMarina(name){const v=cameraViews[name];if(!v)return;
+ cameraTravel={startPos:camera.position.clone(),startTarget:orbit.target.clone(),endPos:new THREE.Vector3(...v.position),endTarget:new THREE.Vector3(...v.target),elapsed:0,duration:1.25};
+ say(name==='central'?'Visuale sulla darsena centrale: yacht grandi.':name==='commercial'?'Visuale sulla darsena commerciale: barche piccole.':'Panoramica completa delle due darsene.');
+}
+$('goCentral').onclick=()=>goToMarina('central');
+$('goCommercial').onclick=()=>goToMarina('commercial');
+$('goOverview').onclick=()=>goToMarina('overview');
+$('view').onclick=()=>{cameraTravel=null;camera.position.set(550,1150,350);orbit.target.set(500,0,-80);orbit.update()};
+$('orbit').onclick=()=>goToMarina('overview');
+$('zoom').onclick=()=>goToMarina('central');
+window.addEventListener('keydown',e=>{if(e.target instanceof HTMLElement&&['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;if(e.key==='1')goToMarina('central');if(e.key==='2')goToMarina('commercial');if(e.key==='3')goToMarina('overview')});
+
+const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();let down=null;renderer.domElement.addEventListener('pointerdown',e=>down={x:e.clientX,y:e.clientY});renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>6)return;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);const hit=ray.intersectObjects(slots).find(h=>h.object.parent.visible);if(!hit)return;const id=hit.object.userData.id;if(occupied.has(id)){if(reserved.has(id))return say('Attendi la fine della manovra.');occupied.delete(id);const b=boats.get(id);if(b){scene.remove(b);boats.delete(id)}say('Ormeggio '+id+' liberato.')}else{if(reserved.has(id))return say('Ormeggio riservato a uno yacht in manovra.');if(state.credits<120)return say('Crediti insufficienti.');state.credits-=120;occupied.add(id);addMoored(id);say('Ormeggio '+id+' assegnato · 120 crediti')}save();update()});
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}new ResizeObserver(resize).observe(stage);resize();let prev=performance.now(),normals=0;renderer.setAnimationLoop(()=>{const now=performance.now(),t=now*.001,dt=Math.min((now-prev)*.001,.05);prev=now;const a=wg.attributes.position;for(let i=0;i<a.count;i++){const j=i*3,x=base[j],y=base[j+1];a.array[j+2]=.21*Math.sin(x*.13+t*.68)*Math.cos(y*.15+t*.47)+.09*Math.sin(x*.37+y*.23+t)}a.needsUpdate=true;if(++normals%8===0)wg.computeVertexNormals();for(let i=moving.length-1;i>=0;i--){const m=moving[i];m.t=Math.min(1,m.t+dt/m.duration);const u=m.t*m.t*(3-2*m.t),distance=u*m.total;let k=0;while(k<m.lengths.length-1&&distance>m.lengths[k])k++;const start=k?m.lengths[k-1]:0,segLen=Math.max(.001,m.lengths[k]-start),f=Math.min(1,(distance-start)/segLen);const a=m.points[k],b=m.points[k+1];m.boat.position.lerpVectors(a,b,f);m.boat.position.y=.15+Math.sin(t*2)*.03;const dir=b.clone().sub(a);if(dir.lengthSq()>.001)m.boat.rotation.y=Math.atan2(dir.x,dir.z);if(m.t===1){moving.splice(i,1);reserved.delete(m.id);if(m.arrival){if(m.transfer){occupied.delete(m.source);reserved.delete(m.source)}occupied.add(m.id);save();m.boat.position.copy(slotPosition(m.id));m.boat.rotation.y=slotMap.get(m.id).parent.rotation.y+Math.PI/2;boats.set(m.id,m.boat)}else{occupied.delete(m.id);save();scene.remove(m.boat)}update()}}if(cameraTravel){const c=cameraTravel;c.elapsed=Math.min(c.duration,c.elapsed+dt);const f=c.elapsed/c.duration,sm=f*f*(3-2*f);camera.position.lerpVectors(c.startPos,c.endPos,sm);orbit.target.lerpVectors(c.startTarget,c.endTarget,sm);if(f>=1)cameraTravel=null;}orbit.update();renderer.render(scene,camera)});
+</script></body></html>
