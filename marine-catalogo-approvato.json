@@ -56,7 +56,9 @@
         "rose:P39",
         "rose:P40"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "rose",
+      "scene_id": "rose"
     },
     {
       "id": "rimini",
@@ -87,7 +89,9 @@
         "rimini:P17",
         "rimini:P18"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "rimini",
+      "scene_id": "rimini"
     },
     {
       "id": "ravenna",
@@ -128,7 +132,9 @@
         "ravenna:P27",
         "ravenna:P28"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "ravenna",
+      "scene_id": "ravenna"
     },
     {
       "id": "ancona",
@@ -167,7 +173,9 @@
         "ancona:P25",
         "ancona:P26"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "ancona",
+      "scene_id": "ancona"
     },
     {
       "id": "pescara",
@@ -198,7 +206,9 @@
         "pescara:P17",
         "pescara:P18"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "pescara",
+      "scene_id": "pescara"
     },
     {
       "id": "brindisi",
@@ -228,7 +238,9 @@
         "brindisi:P16",
         "brindisi:P17"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "brindisi",
+      "scene_id": "brindisi"
     },
     {
       "id": "salerno",
@@ -267,7 +279,9 @@
         "salerno:P25",
         "salerno:P26"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "salerno",
+      "scene_id": "salerno"
     },
     {
       "id": "nettuno",
@@ -304,7 +318,9 @@
         "nettuno:P23",
         "nettuno:P24"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "nettuno",
+      "scene_id": "nettuno"
     },
     {
       "id": "scarlino",
@@ -342,7 +358,9 @@
         "scarlino:P24",
         "scarlino:P25"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "scarlino",
+      "scene_id": "scarlino"
     },
     {
       "id": "loano",
@@ -381,7 +399,9 @@
         "loano:P25",
         "loano:P26"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "loano",
+      "scene_id": "loano"
     },
     {
       "id": "portocervo",
@@ -390,35 +410,37 @@
       "piers": 24,
       "berths": 900,
       "scene": "marine-deluxe-originali.html?marina=portocervo",
-      "pier_id_pattern": "portocervo:P{NN}",
-      "berth_id_pattern": "portocervo:P{NN}:B{NNN}",
+      "pier_id_pattern": "porto_cervo:P{NN}",
+      "berth_id_pattern": "porto_cervo:P{NN}:B{NNN}",
       "pier_ids": [
-        "portocervo:P01",
-        "portocervo:P02",
-        "portocervo:P03",
-        "portocervo:P04",
-        "portocervo:P05",
-        "portocervo:P06",
-        "portocervo:P07",
-        "portocervo:P08",
-        "portocervo:P09",
-        "portocervo:P10",
-        "portocervo:P11",
-        "portocervo:P12",
-        "portocervo:P13",
-        "portocervo:P14",
-        "portocervo:P15",
-        "portocervo:P16",
-        "portocervo:P17",
-        "portocervo:P18",
-        "portocervo:P19",
-        "portocervo:P20",
-        "portocervo:P21",
-        "portocervo:P22",
-        "portocervo:P23",
-        "portocervo:P24"
+        "porto_cervo:P01",
+        "porto_cervo:P02",
+        "porto_cervo:P03",
+        "porto_cervo:P04",
+        "porto_cervo:P05",
+        "porto_cervo:P06",
+        "porto_cervo:P07",
+        "porto_cervo:P08",
+        "porto_cervo:P09",
+        "porto_cervo:P10",
+        "porto_cervo:P11",
+        "porto_cervo:P12",
+        "porto_cervo:P13",
+        "porto_cervo:P14",
+        "porto_cervo:P15",
+        "porto_cervo:P16",
+        "porto_cervo:P17",
+        "porto_cervo:P18",
+        "porto_cervo:P19",
+        "porto_cervo:P20",
+        "porto_cervo:P21",
+        "porto_cervo:P22",
+        "porto_cervo:P23",
+        "porto_cervo:P24"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "porto_cervo",
+      "scene_id": "portocervo"
     },
     {
       "id": "capodorlando",
@@ -427,34 +449,37 @@
       "piers": 23,
       "berths": 850,
       "scene": "marine-deluxe-originali.html?marina=capodorlando",
-      "pier_id_pattern": "capodorlando:P{NN}",
-      "berth_id_pattern": "capodorlando:P{NN}:B{NNN}",
+      "pier_id_pattern": "capo_orlando:P{NN}",
+      "berth_id_pattern": "capo_orlando:P{NN}:B{NNN}",
       "pier_ids": [
-        "capodorlando:P01",
-        "capodorlando:P02",
-        "capodorlando:P03",
-        "capodorlando:P04",
-        "capodorlando:P05",
-        "capodorlando:P06",
-        "capodorlando:P07",
-        "capodorlando:P08",
-        "capodorlando:P09",
-        "capodorlando:P10",
-        "capodorlando:P11",
-        "capodorlando:P12",
-        "capodorlando:P13",
-        "capodorlando:P14",
-        "capodorlando:P15",
-        "capodorlando:P16",
-        "capodorlando:P17",
-        "capodorlando:P18",
-        "capodorlando:P19",
-        "capodorlando:P20",
-        "capodorlando:P21",
-        "capodorlando:P22",
-        "capodorlando:P23"
+        "capo_orlando:P01",
+        "capo_orlando:P02",
+        "capo_orlando:P03",
+        "capo_orlando:P04",
+        "capo_orlando:P05",
+        "capo_orlando:P06",
+        "capo_orlando:P07",
+        "capo_orlando:P08",
+        "capo_orlando:P09",
+        "capo_orlando:P10",
+        "capo_orlando:P11",
+        "capo_orlando:P12",
+        "capo_orlando:P13",
+        "capo_orlando:P14",
+        "capo_orlando:P15",
+        "capo_orlando:P16",
+        "capo_orlando:P17",
+        "capo_orlando:P18",
+        "capo_orlando:P19",
+        "capo_orlando:P20",
+        "capo_orlando:P21",
+        "capo_orlando:P22",
+        "capo_orlando:P23"
       ],
-      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti."
+      "allocation_note": "Il numero di posti per singolo pontile richiede conferma dal modello originale; non assegnare automaticamente posti inesistenti.",
+      "database_id": "capo_orlando",
+      "scene_id": "capodorlando"
     }
-  ]
+  ],
+  "database_id_note": "The 3D scene uses capodorlando/portocervo; Supabase catalog uses capo_orlando/porto_cervo. Use database_id for SQL and scene_id for URLs."
 }
