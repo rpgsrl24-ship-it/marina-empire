@@ -364,8 +364,8 @@ $("selectedPortMissions").onclick=()=>{showTab("missions");notice("Missioni disp
 $("help").onclick=()=>alert("COME SI GIOCA\n\n1. Inserisci il nome del comandante e premi GIOCA ORA.\n2. Apri MISSIONI e scegli un charter compatibile con il tuo yacht.\n3. Durante la navigazione controlla rotta, carburante e tempo di arrivo.\n4. Usa le monete guadagnate per comprare yacht e marine.\n5. Nella sezione MARINE puoi prenotare gli ormeggi virtuali.\n6. Dal PROFILO salva la partita localmente o accedi al salvataggio online beta.\n\nNessun acquisto reale: economia e mare sono simulati.");
 $("menu").onclick=()=>{$("welcome").classList.remove("hide");$("playerName").value=state.name};
 $("chooseMission").onclick=()=>showTab("missions");
-$("refuel").onclick=()=>{let q=Math.max(0,Math.min(100,boat(state.boat).tank-state.fuel)),cost=q*3;if(q<=0)return notice("Serbatoio pieno");if(state.coins<cost)return notice("Monete insufficienti");state.coins-=cost;state.fuel+=q;render()};
-$("repair").onclick=()=>{if(state.coins<1000)return notice("Monete insufficienti");state.coins-=1000;state.condition=Math.min(100,state.condition+15);render()};
+$("refuel").onclick=()=>{let q=Math.max(0,Math.min(100,boat(state.boat).tank-state.fuel)),cost=q*3;if(q<=0)return notice("Serbatoio pieno");if(state.coins<cost)return notice("Monete insufficienti");state.coins-=cost;state.fuel+=q;persist();render()};
+$("repair").onclick=()=>{if(state.coins<1000)return notice("Monete insufficienti");state.coins-=1000;state.condition=Math.min(100,state.condition+15);persist();render()};
 $("save").onclick=()=>{persist();notice("Partita salvata")};
 $("reset").onclick=()=>{if(confirm("Cancellare questa partita?")){state=fresh();persist();$("playerName").value="";$("welcome").classList.remove("hide");showTab("map")}};
 $("navigation").onclick=e=>{let b=e.target.closest("[data-tab]");if(b){e.preventDefault();showTab(b.dataset.tab)}};
