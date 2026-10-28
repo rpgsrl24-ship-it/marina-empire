@@ -282,7 +282,7 @@ const stop=trip.legs[trip.legIndex+1],next=trip.legs[trip.legIndex+2],tank=boat(
 state.port=stop;trip.legIndex++;const needed=Math.ceil(seaMiles(stop,next)*.85),reserve=Math.ceil(tank*.15);
 const fill=Math.max(0,needed+reserve-state.fuel),price=fill*3;
 if(needed+reserve>tank||state.coins<price){state.trip=null;persist();render();$("voyageCinema")?.classList.add("hide");notice("Sosta a "+port(stop).name+": rifornimento non disponibile");return;}
-state.coins-=price;state.fuel+=fill-needed;trip.origin=stop;trip.sec=trip.legSeconds;trip.until=Date.now()+trip.sec*1000;
+state.coins-=price;state.fuel+=fill-needed;trip.origin=stop;trip.sec=trip.legSeconds;trip.until=(Number(trip.until)||Date.now())+trip.sec*1000;
 persist();render();notice("Rifornimento a "+port(stop).name+": "+fill+" L");voyageHeartbeat();return;
 }
 const m=missions.find(x=>x.id===trip.id)||trip.mission;if(m){if(!state.completed.includes(m.id))state.completed.push(m.id);state.coins+=m.reward;state.prestige+=m.prestige;state.voyages=(state.voyages||0)+1;awardCareerMilestones();state.earnings=(state.earnings||0)+m.reward;state.port=m.dest;state.condition=Math.max(0,state.condition-3);}state.trip=null;const cinema=$("voyageCinema");if(cinema)cinema.classList.add("hide");persist();try{render();showTab("map")}catch(e){console.error("Schermata dopo arrivo:",e)}notice(m?"Missione completata: +"+money(m.reward)+" crediti!":"Navigazione terminata.");}
