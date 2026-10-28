@@ -185,9 +185,10 @@ button:hover:not(:disabled){border-color:#e1bd77;transform:translateY(-1px)}butt
 <div id="toast" class="hide" role="status"></div>
 <script>
 "use strict";
-const TEST_MODE=true; // Beta testing: every browser reload begins as a new player. Disable for public launch.
+const TEST_MODE=true; // Beta: progress persists across reloads; reset is explicit only.
 const KEY=TEST_MODE?"marina_empire_beta_test_session":"marina_empire_beta_2026_v1";
-if(TEST_MODE){try{const nav=performance.getEntriesByType("navigation")[0];const freshVisit=!sessionStorage.getItem("marina_empire_beta_started")||nav?.type==="reload";if(freshVisit){localStorage.removeItem(KEY);for(const key of Object.keys(localStorage)){if(key.startsWith("marina-empire-phase1-"))localStorage.removeItem(key)}sessionStorage.setItem("marina_empire_beta_started","1")}}catch(e){}}
+// For testers only: append ?reset=1 to explicitly start a new local beta session.
+if(TEST_MODE&&new URLSearchParams(location.search).get("reset")==="1"){try{localStorage.removeItem(KEY);for(const key of Object.keys(localStorage)){if(key.startsWith("marina-empire-phase1-"))localStorage.removeItem(key)}sessionStorage.removeItem("marina_empire_beta_started");history.replaceState(null,"",location.pathname+location.hash)}catch(e){}}
 const $=id=>document.getElementById(id);
 const ports=[{id:"rose",name:"Isola delle Rose",x:66,y:36},{id:"rimini",name:"Rimini",x:67,y:32},{id:"ancona",name:"Ancona",x:74,y:48},{id:"lignano",name:"Lignano",x:63,y:19},{id:"cervia",name:"Cervia",x:66,y:29},{id:"bari",name:"Bari",x:83,y:73},{id:"ravenna",name:"Marina di Ravenna",x:65,y:27},{id:"pescara",name:"Marina di Pescara",x:76,y:56},{id:"brindisi",name:"Marina di Brindisi",x:88,y:81},{id:"salerno",name:"Marina d’Arechi — Salerno",x:64,y:80},{id:"nettuno",name:"Marina di Nettuno",x:57,y:67},{id:"scarlino",name:"Marina di Scarlino",x:48,y:56},{id:"loano",name:"Marina di Loano",x:31,y:32},{id:"portocervo",name:"Marina di Porto Cervo",x:39,y:69},{id:"capodorlando",name:"Marina di Capo d’Orlando",x:62,y:91}];
 const boats=[{id:"voyager",name:"RPG Scuola 8",price:0,tank:400},{id:"open",name:"Open 7",price:18000,tank:300},{id:"yacht",name:"Yacht 12",price:65000,tank:550},{id:"luna",name:"Luna 08",price:240000,tank:900}];
