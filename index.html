@@ -239,9 +239,16 @@ else if(!isAdA&&!isAdB){
  // Porto Cervo is east of Sardinia: keep the Ligurian approach offshore and east of Corsica.
  if(a==="portocervo"||b==="portocervo"){
    const other=a==="portocervo"?b:a;
-   const sardiniaApproach=[[41.55,10.25],[42.15,10.35],[42.65,10.35],[43.15,10.25],[43.65,9.85]]; // Eastern offshore side of Corsica; do not cut across the island
-   const otherExit=coastalExit[other],north=other==="loano";
-   const via=north?[...sardiniaApproach,[44.0,9.3]]:other==="scarlino"?[[41.55,10.15],[42.2,10.1],[42.65,10.35]]:chain(coastalExit.portocervo,otherExit,tyrrhenianSpine);
+   // Offshore points EAST of Corsica (roughly 9.5E to 9.8E) and north of Sardinia.
+   // The Loano approach must go east of Cap Corse, not over Corsican land.
+   const eastCorsica=[[41.35,9.85],[41.8,9.95],[42.35,10.0],[42.85,9.95],[43.35,9.9],[43.75,9.9]];
+   let via;
+   if(other==="loano")via=[...eastCorsica,[44.05,9.55],[44.13,9.0]];
+   else if(other==="scarlino")via=[[41.35,9.85],[41.7,10.1],[42.15,10.25],[42.55,10.35]];
+   else if(other==="nettuno")via=[[41.35,9.85],[41.35,10.5],[41.45,11.3],[41.45,12.0]];
+   else if(other==="salerno")via=[[41.35,9.85],[40.85,10.15],[40.3,11.1],[40.05,12.35],[40.0,13.6]];
+   else if(other==="capodorlando")via=[[41.35,9.85],[40.4,10.0],[39.4,11.3],[38.55,12.8],[38.25,14.1]];
+   else via=chain(coastalExit.portocervo,coastalExit[other],tyrrhenianSpine);
    mid=a==="portocervo"?via:via.slice().reverse();
  }else mid=chain(A,B,tyrrhenianSpine);
 }
