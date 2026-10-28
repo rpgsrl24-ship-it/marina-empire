@@ -47,3 +47,9 @@ Non trasferire crediti o autorizzare sblocchi dal solo localStorage. Non esporre
 
 ### Nota tecnica
 Le scene approvate contengono ancora progressi in `localStorage`. I saldi mostrati non sono sincronizzati con un database condiviso; non presentarli come crediti spendibili reali.
+
+### Migliorie di navigazione — 28 ottobre 2026
+- [x] Aggiunto pulsante discreto «Torna alla cartina» in entrambe le scene 3D originali, compatibile con schermi piccoli.
+- [x] Il selettore delle marine 3D ora reindirizza sempre Isola delle Rose alla scena originale confermata.
+- [x] Conservati i file grafici approvati, senza modificare geometria, pontili o edifici.
+- [ ] Verifica manuale su browser reale e smartphone ancora necessaria.
