@@ -224,7 +224,21 @@ const seaCorridors={otranto:[39.65,19.25],ionian:[37.55,17.5],messinaSouth:[37.9
 const adriaticPorts=new Set(["rose","rimini","ancona","lignano","cervia","bari","ravenna","pescara","brindisi"]);
 const tyrrhenianPorts=new Set(["salerno","nettuno","scarlino","loano","portocervo","capodorlando"]);
 function straightNm(x,y){const lat=(x[0]+y[0])/2*Math.PI/180;return Math.round(Math.hypot((x[0]-y[0])*60,(x[1]-y[1])*60*Math.cos(lat))*1.12)}
-function seaWaypoints(a,b){if((adriaticPorts.has(a)&&tyrrhenianPorts.has(b))||(tyrrhenianPorts.has(a)&&adriaticPorts.has(b))){const adriatic=adriaticPorts.has(a),via=[seaCorridors.otranto,seaCorridors.ionian,seaCorridors.messinaSouth,seaCorridors.messinaNorth,seaCorridors.tyrrhenian];return adriatic?via:via.slice().reverse()}return []}
+// Approximate offshore corridors for the GAME ONLY; not certified nautical routes.
+const coastalExit={lignano:[45.56,13.35],ravenna:[44.47,12.49],cervia:[44.24,12.57],rimini:[44.06,12.78],ancona:[43.61,13.77],rose:[43.7,14.5],pescara:[42.46,14.48],bari:[41.15,17.18],brindisi:[40.68,18.17],loano:[44.07,8.14],scarlino:[42.82,10.65],nettuno:[41.42,12.55],salerno:[40.52,14.78],portocervo:[41.19,9.75],capodorlando:[38.19,14.59]};
+const adriaticSpine=[[45.42,13.65],[44.65,13.30],[43.9,13.35],[43.15,14.2],[42.45,14.7],[41.7,16.2],[40.8,18.5],[39.65,19.25]];
+const tyrrhenianSpine=[[44.0,8.0],[43.4,9.65],[42.7,10.4],[41.9,11.6],[41.25,12.75],[40.5,13.6],[39.4,13.9],[38.33,15.65]];
+function seaWaypoints(a,b){
+const A=coastalExit[a],B=coastalExit[b];if(!A||!B)return [];
+const isAdA=adriaticPorts.has(a),isAdB=adriaticPorts.has(b);
+const nearest=(p,arr)=>arr.reduce((best,v,i)=>straightNm(p,v)<straightNm(p,arr[best])?i:best,0);
+const chain=(p,q,spine)=>{const i=nearest(p,spine),j=nearest(q,spine);return i<=j?spine.slice(i,j+1):spine.slice(j,i+1).reverse()};
+let mid=[];
+if(isAdA&&isAdB)mid=chain(A,B,adriaticSpine);
+else if(!isAdA&&!isAdB)mid=chain(A,B,tyrrhenianSpine);
+else {const ad=isAdA?A:B,ty=isAdA?B:A;const cross=[...chain(ad,seaCorridors.otranto,adriaticSpine),seaCorridors.ionian,seaCorridors.messinaSouth,seaCorridors.messinaNorth,...chain(seaCorridors.messinaNorth,ty,tyrrhenianSpine)];mid=isAdA?cross:cross.reverse()}
+return [A,...mid,B];
+}
 function seaMiles(a,b){const x=harborGPS[a],y=harborGPS[b];if(!x||!y)return 0;const points=[x,...seaWaypoints(a,b),y];return points.slice(1).reduce((n,p,i)=>n+straightNm(points[i],p),0)}
 function planSeaTrip(from,to,tank){const direct=seaMiles(from,to),capacity=Math.max(1,tank),reserve=Math.ceil(capacity*.15),usable=capacity-reserve,portsAvailable=ports.map(p=>p.id);let current=from,remaining=direct,stops=[],visited=new Set([from]);while(seaMiles(current,to)>usable&&stops.length<portsAvailable.length){const options=portsAvailable.filter(id=>id!==to&&!visited.has(id)&&seaMiles(current,id)<=usable&&seaMiles(id,to)<seaMiles(current,to)).sort((a,b)=>seaMiles(a,to)-seaMiles(b,to));if(!options.length)return {possible:false,distance:direct,stops,reason:"Autonomia insufficiente anche con le marine disponibili"};current=options[0];visited.add(current);stops.push(current)}if(seaMiles(current,to)>usable)return {possible:false,distance:direct,stops,reason:"Nessuna rotta raggiungibile"};const legs=[from,...stops,to];const distance=legs.slice(1).reduce((sum,id,i)=>sum+seaMiles(legs[i],id),0);return {possible:true,distance,stops,legs,fuel:Math.ceil(distance*.85),reserve,refuelCost:stops.length*150};}
 function availableMissions(){const here=state.port||"rose";const intro=here==="rimini"&&(state.voyages||0)===0&&!state.completed.includes("INTRO_RIMINI_CERVIA")?[{id:"INTRO_RIMINI_CERVIA",name:"PRIMA MISSIONE · Trasferimento Rimini - Cervia",dest:"cervia",boat:"voyager",reward:500,cost:0,fuel:Math.ceil(seaMiles("rimini","cervia")*.85),prestige:50,sec:25,plan:planSeaTrip("rimini","cervia",boat("voyager").tank)}]:[];return [...intro,...ports.filter(p=>p.id!==here).map(p=>{const plan=planSeaTrip(here,p.id,boat("voyager").tank);const fuel=plan.fuel||Math.ceil(seaMiles(here,p.id)*.85);return {id:"R_"+here+"_"+p.id,name:"Viaggio verso "+p.name,dest:p.id,boat:"voyager",reward:Math.max(1200,Math.round(plan.distance*28)),cost:Math.max(250,Math.round(plan.distance*7))+plan.refuelCost,fuel,prestige:Math.max(15,Math.round(plan.distance*.4)),sec:Math.max(25,Math.min(120,Math.round(plan.distance*.55))),plan}})]}
