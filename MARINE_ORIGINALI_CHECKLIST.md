@@ -53,3 +53,10 @@ Le scene approvate contengono ancora progressi in `localStorage`. I saldi mostra
 - [x] Il selettore delle marine 3D ora reindirizza sempre Isola delle Rose alla scena originale confermata.
 - [x] Conservati i file grafici approvati, senza modificare geometria, pontili o edifici.
 - [ ] Verifica manuale su browser reale e smartphone ancora necessaria.
+
+### Audit database Supabase — 28 ottobre 2026
+- [x] Verificato il catalogo reale: 12 marine, 295 record pontile, capacità 11.100 posti.
+- [x] Rilevata e documentata la differenza di identificativi tra scene e database: `capodorlando` → `capo_orlando`; `portocervo` → `porto_cervo`.
+- [x] Aggiornato `marine-catalogo-approvato.json` con `scene_id` e `database_id` distinti per evitare prenotazioni sul porto sbagliato.
+- [ ] Il vecchio `berth_bookings` è ancora limitato a 6 marine e 6 posti per marina: non usarlo per vendere o prenotare i 11.100 posti.
+- [ ] Confermare distribuzione dei posti per pontile confrontando geometrie 3D e tabella `marina_docks` prima di pubblicare le prenotazioni.
