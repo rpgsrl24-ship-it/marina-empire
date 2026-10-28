@@ -338,7 +338,7 @@ if(Array.isArray(trip.legs)&&trip.legIndex<trip.legs.length-2){
 const stop=trip.legs[trip.legIndex+1],next=trip.legs[trip.legIndex+2],tank=boat(trip.mission.boat).tank;
 const needed=Math.ceil(seaMiles(stop,next)*.85),reserve=Math.ceil(tank*.15);
 const fill=Math.max(0,needed+reserve-state.fuel),price=fill*3;
-if(needed+reserve>tank||state.coins<price){state.trip=null;persist();render();$("voyageCinema")?.classList.add("hide");notice("Sosta a "+port(stop).name+": rifornimento non disponibile");return;}
+if(needed+reserve>tank||state.coins<price){state.port=stop;state.trip=null;persist();render();$("voyageCinema")?.classList.add("hide");notice("Viaggio interrotto a "+port(stop).name+": rifornimento non disponibile. La barca resta nella marina raggiunta.");return;}
 state.coins-=price;state.fuel+=fill-needed;state.port=stop;trip.legIndex++;trip.origin=stop;trip.sec=trip.legSeconds;trip.until=(Number(trip.until)||Date.now())+trip.sec*1000;
 persist();render();notice("Rifornimento a "+port(stop).name+": "+fill+" L");voyageHeartbeat();return;
 }
@@ -349,7 +349,7 @@ function launch(id){if(!state.setupComplete&&(state.voyages||0)===0&&!state.comp
 if(state.condition<30)return notice("Manutenzione necessaria");
 const plan=planSeaTrip(state.port,m.dest,boat(m.boat).tank);
 if(!plan.possible||!Array.isArray(plan.legs)||plan.legs.length<2||!Number.isFinite(plan.distance))return notice(plan.reason||"Rotta non disponibile");
-const tank=boat(m.boat).tank,reserve=Math.ceil(tank*.15),first=Math.ceil(seaMiles(plan.legs[0],plan.legs[1])*.85);
+const tank=boat(m.boat).tank,reserve=Math.ceil(tank*.15),first=Math.ceil(seaMiles(plan.legs[0],plan.legs[1])*.85);if(state.fuel>tank)state.fuel=tank;
 if(first+reserve>tank)return notice("Autonomia insufficiente");
 if(state.fuel<first+reserve)return notice("Carburante insufficiente: riserva 15%");
 if(state.coins<m.cost)return notice("Crediti insufficienti");
