@@ -256,8 +256,34 @@ else {const ad=isAdA?A:B,ty=isAdA?B:A;const cross=[...chain(ad,seaCorridors.otra
 return [A,...mid,B];
 }
 function seaMiles(a,b){const x=harborGPS[a],y=harborGPS[b];if(!x||!y)return 0;const points=[x,...seaWaypoints(a,b),y];return points.slice(1).reduce((n,p,i)=>n+straightNm(points[i],p),0)}
-function planSeaTrip(from,to,tank){const direct=seaMiles(from,to),capacity=Math.max(1,tank),reserve=Math.ceil(capacity*.15),usable=capacity-reserve,portsAvailable=ports.map(p=>p.id);let current=from,remaining=direct,stops=[],visited=new Set([from]);while(seaMiles(current,to)>usable&&stops.length<portsAvailable.length){const options=portsAvailable.filter(id=>id!==to&&!visited.has(id)&&seaMiles(current,id)<=usable&&seaMiles(id,to)<seaMiles(current,to)).sort((a,b)=>seaMiles(a,to)-seaMiles(b,to));if(!options.length)return {possible:false,distance:direct,stops,reason:"Autonomia insufficiente anche con le marine disponibili"};current=options[0];visited.add(current);stops.push(current)}if(seaMiles(current,to)>usable)return {possible:false,distance:direct,stops,reason:"Nessuna rotta raggiungibile"};const legs=[from,...stops,to];const distance=legs.slice(1).reduce((sum,id,i)=>sum+seaMiles(legs[i],id),0);return {possible:true,distance,stops,legs,fuel:Math.ceil(distance*.85),reserve,refuelCost:stops.length*150};}
-function availableMissions(){const here=state.port||"rose";const intro=here==="rimini"&&(state.voyages||0)===0&&!state.completed.includes("INTRO_RIMINI_CERVIA")?[{id:"INTRO_RIMINI_CERVIA",name:"PRIMA MISSIONE · Trasferimento Rimini - Cervia",dest:"cervia",boat:"voyager",reward:500,cost:0,fuel:Math.ceil(seaMiles("rimini","cervia")*.85),prestige:50,sec:25,plan:planSeaTrip("rimini","cervia",boat("voyager").tank)}]:[];return [...intro,...ports.filter(p=>p.id!==here).map(p=>{const plan=planSeaTrip(here,p.id,boat("voyager").tank);const fuel=plan.fuel||Math.ceil(seaMiles(here,p.id)*.85);return {id:"R_"+here+"_"+p.id,name:"Viaggio verso "+p.name,dest:p.id,boat:"voyager",reward:Math.max(1200,Math.round(plan.distance*28)),cost:Math.max(250,Math.round(plan.distance*7))+plan.refuelCost,fuel,prestige:Math.max(15,Math.round(plan.distance*.4)),sec:Math.max(25,Math.min(120,Math.round(plan.distance*.55))),plan}})]}
+function planSeaTrip(from,to,tank){
+ const capacity=Math.max(1,Number(tank)||1),reserve=Math.ceil(capacity*.15),usable=(capacity-reserve)/.85;
+ if(!harborGPS[from]||!harborGPS[to]||from===to)return {possible:false,distance:0,stops:[],reason:"Marina di partenza o destinazione non valida"};
+ // Dijkstra on the available marinas: minimize actual simulated sea miles, with
+ // each leg respecting fuel consumption and the mandatory 15% reserve.
+ const ids=ports.map(p=>p.id),dist=Object.fromEntries(ids.map(id=>[id,Infinity])),prev={},visited=new Set();
+ dist[from]=0;
+ while(visited.size<ids.length){
+   const current=ids.filter(id=>!visited.has(id)).sort((x,y)=>dist[x]-dist[y])[0];
+   if(!current||!Number.isFinite(dist[current]))break;
+   if(current===to)break;
+   visited.add(current);
+   for(const next of ids){
+     if(next===current||visited.has(next))continue;
+     const miles=seaMiles(current,next);
+     if(!Number.isFinite(miles)||miles<=0||Math.ceil(miles*.85)+reserve>capacity)continue;
+     const cost=dist[current]+miles;
+     if(cost<dist[next]){dist[next]=cost;prev[next]=current}
+   }
+ }
+ if(!Number.isFinite(dist[to]))return {possible:false,distance:seaMiles(from,to),stops:[],reason:"Nessuna combinazione di marine raggiungibile con il serbatoio e la riserva del 15%"};
+ const legs=[to];let cursor=to;
+ while(cursor!==from&&legs.length<=ids.length){cursor=prev[cursor];if(!cursor)break;legs.unshift(cursor)}
+ if(legs[0]!==from)return {possible:false,distance:0,stops:[],reason:"Impossibile costruire la rotta"};
+ const stops=legs.slice(1,-1),distance=legs.slice(1).reduce((sum,id,i)=>sum+seaMiles(legs[i],id),0);
+ return {possible:true,distance,stops,legs,fuel:legs.slice(1).reduce((sum,id,i)=>sum+Math.ceil(seaMiles(legs[i],id)*.85),0),reserve,refuelCost:0};
+}
+function availableMissions(){const here=state.port||"rose";const intro=here==="rimini"&&(state.voyages||0)===0&&!state.completed.includes("INTRO_RIMINI_CERVIA")?[{id:"INTRO_RIMINI_CERVIA",name:"PRIMA MISSIONE · Trasferimento Rimini - Cervia",dest:"cervia",boat:"voyager",reward:500,cost:0,fuel:Math.ceil(seaMiles("rimini","cervia")*.85),prestige:50,sec:25,plan:planSeaTrip("rimini","cervia",boat("voyager").tank)}]:[];return [...intro,...ports.filter(p=>p.id!==here).map(p=>{const plan=planSeaTrip(here,p.id,boat("voyager").tank);const fuel=plan.fuel||Math.ceil(seaMiles(here,p.id)*.85);return {id:"R_"+here+"_"+p.id,name:"Viaggio verso "+p.name,dest:p.id,boat:"voyager",reward:Math.max(1200,Math.round(plan.distance*28)),cost:Math.max(250,Math.round(plan.distance*7)),fuel,prestige:Math.max(15,Math.round(plan.distance*.4)),sec:Math.max(25,Math.min(120,Math.round(plan.distance*.55))),plan}})]}
 function findAvailableMission(id){return availableMissions().find(m=>m.id===id)||missions.find(m=>m.id===id&&m.origin===state.port&&m.dest!==state.port)}
 const fresh=()=>({name:"",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],trip:null,marinas:{},reservations:[],voyages:0,earnings:0,voyageSerial:0,settledVoyages:[]});
 let state=fresh(),timer=null;
