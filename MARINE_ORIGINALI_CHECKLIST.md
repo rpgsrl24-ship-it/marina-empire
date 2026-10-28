@@ -60,3 +60,10 @@ Le scene approvate contengono ancora progressi in `localStorage`. I saldi mostra
 - [x] Aggiornato `marine-catalogo-approvato.json` con `scene_id` e `database_id` distinti per evitare prenotazioni sul porto sbagliato.
 - [ ] Il vecchio `berth_bookings` è ancora limitato a 6 marine e 6 posti per marina: non usarlo per vendere o prenotare i 11.100 posti.
 - [ ] Confermare distribuzione dei posti per pontile confrontando geometrie 3D e tabella `marina_docks` prima di pubblicare le prenotazioni.
+
+### Missioni charter beta — 28 ottobre 2026
+- [x] Aggiunte alle 11 marine italiane due missioni demo: charter standard (+450 crediti) e charter di lusso (+1.200 crediti).
+- [x] Richiesto yacht ormeggiato e pontile sbloccato; per charter di lusso richiesto maxi yacht.
+- [x] Imposto intervallo minimo di 90 secondi tra missioni e conteggio missioni nel salvataggio locale.
+- [ ] La ricompensa è dimostrativa e salvata solo nel browser; per economia condivisa implementare verifica server-side e anti-abuso.
+- [ ] Provare missioni manualmente su desktop e mobile.
