@@ -187,7 +187,7 @@ button:hover:not(:disabled){border-color:#e1bd77;transform:translateY(-1px)}butt
 "use strict";
 const TEST_MODE=true; // Beta testing: every browser reload begins as a new player. Disable for public launch.
 const KEY=TEST_MODE?"marina_empire_beta_test_session":"marina_empire_beta_2026_v1";
-if(TEST_MODE){try{localStorage.removeItem(KEY);for(const key of Object.keys(localStorage)){if(key.startsWith("marina-empire-phase1-"))localStorage.removeItem(key)}}catch(e){}}
+if(TEST_MODE){try{const nav=performance.getEntriesByType("navigation")[0];const freshVisit=!sessionStorage.getItem("marina_empire_beta_started")||nav?.type==="reload";if(freshVisit){localStorage.removeItem(KEY);for(const key of Object.keys(localStorage)){if(key.startsWith("marina-empire-phase1-"))localStorage.removeItem(key)}sessionStorage.setItem("marina_empire_beta_started","1")}}catch(e){}}
 const $=id=>document.getElementById(id);
 const ports=[{id:"rose",name:"Isola delle Rose",x:66,y:36},{id:"rimini",name:"Rimini",x:67,y:32},{id:"ancona",name:"Ancona",x:74,y:48},{id:"lignano",name:"Lignano",x:63,y:19},{id:"cervia",name:"Cervia",x:66,y:29},{id:"bari",name:"Bari",x:83,y:73}];
 const boats=[{id:"voyager",name:"RPG Scuola 8",price:0,tank:400},{id:"open",name:"Open 7",price:18000,tank:300},{id:"yacht",name:"Yacht 12",price:65000,tank:550},{id:"luna",name:"Luna 08",price:240000,tank:900}];
