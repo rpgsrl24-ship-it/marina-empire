@@ -27,3 +27,23 @@ Il repository ispezionato non dimostra ancora dove siano conservati tutti i file
 
 ## Regola di sicurezza
 Non trasferire crediti o autorizzare sblocchi dal solo localStorage. Non esporre chiavi segrete Supabase nel frontend.
+
+## Aggiornamento operativo — 28 ottobre 2026
+
+### Recupero e conservazione delle scene
+- [x] Recuperato e pubblicato il file originale delle 11 marine italiane: `marine-deluxe-originali.html`.
+- [x] Recuperato e pubblicato senza alterazioni il file originale approvato dell'Isola delle Rose: `isola-delle-rose-originale.html` (confronto byte per byte con upload effettuato).
+- [x] Corretti i collegamenti di Isola delle Rose dalla mappa illustrata e da quella interattiva; corretti i vecchi collegamenti da `marine-deluxe-originali.html?marina=rose`.
+- [x] Creato `marine-catalogo-approvato.json` con 12 scene di destinazione, 295 identificativi stabili di pontile e capienza totale 11.100.
+- [ ] Validare con prove reali da desktop e smartphone il percorso mappa → ciascuna marina → ritorno alla mappa.
+
+### Prossime attività senza alterare la grafica
+- [ ] Mappare la geometria di ogni pontile e assegnare i singoli ID posto barca senza inventare capacità per pontile.
+- [ ] Separare stato locale dimostrativo e stato persistente autenticato; evitare crediti doppi tra homepage e scene 3D.
+- [ ] Collegare il catalogo ai record Supabase con migrazione verificata e controlli RLS.
+- [ ] Implementare RPC server-side per sblocchi e prenotazioni, con controllo saldo e conflitti; solo allora abilitare transazioni vere.
+- [ ] Integrare charter, charter di lusso, missioni e navigazione realistica senza ridisegnare le scene approvate.
+- [ ] Eseguire test end-to-end con due account e dispositivi diversi.
+
+### Nota tecnica
+Le scene approvate contengono ancora progressi in `localStorage`. I saldi mostrati non sono sincronizzati con un database condiviso; non presentarli come crediti spendibili reali.
