@@ -239,7 +239,7 @@ else if(!isAdA&&!isAdB){
  // Porto Cervo is east of Sardinia: keep the Ligurian approach offshore and east of Corsica.
  if(a==="portocervo"||b==="portocervo"){
    const other=a==="portocervo"?b:a;
-   const sardiniaApproach=[[41.55,10.15],[42.2,10.1],[42.95,9.9],[43.65,9.65]];
+   const sardiniaApproach=[[41.55,10.25],[42.15,10.35],[42.65,10.35],[43.15,10.25],[43.65,9.85]]; // Eastern offshore side of Corsica; do not cut across the island
    const otherExit=coastalExit[other],north=other==="loano";
    const via=north?[...sardiniaApproach,[44.0,9.3]]:other==="scarlino"?[[41.55,10.15],[42.2,10.1],[42.65,10.35]]:chain(coastalExit.portocervo,otherExit,tyrrhenianSpine);
    mid=a==="portocervo"?via:via.slice().reverse();
