@@ -235,7 +235,16 @@ const nearest=(p,arr)=>arr.reduce((best,v,i)=>straightNm(p,v)<straightNm(p,arr[b
 const chain=(p,q,spine)=>{const i=nearest(p,spine),j=nearest(q,spine);return i<=j?spine.slice(i,j+1):spine.slice(j,i+1).reverse()};
 let mid=[];
 if(isAdA&&isAdB)mid=chain(A,B,adriaticSpine);
-else if(!isAdA&&!isAdB)mid=chain(A,B,tyrrhenianSpine);
+else if(!isAdA&&!isAdB){
+ // Porto Cervo is east of Sardinia: keep the Ligurian approach offshore and east of Corsica.
+ if(a==="portocervo"||b==="portocervo"){
+   const other=a==="portocervo"?b:a;
+   const sardiniaApproach=[[41.55,10.15],[42.2,10.1],[42.95,9.9],[43.65,9.65]];
+   const otherExit=coastalExit[other],north=other==="loano";
+   const via=north?[...sardiniaApproach,[44.0,9.3]]:other==="scarlino"?[[41.55,10.15],[42.2,10.1],[42.65,10.35]]:chain(coastalExit.portocervo,otherExit,tyrrhenianSpine);
+   mid=a==="portocervo"?via:via.slice().reverse();
+ }else mid=chain(A,B,tyrrhenianSpine);
+}
 else {const ad=isAdA?A:B,ty=isAdA?B:A;const cross=[...chain(ad,seaCorridors.otranto,adriaticSpine),seaCorridors.ionian,seaCorridors.messinaSouth,seaCorridors.messinaNorth,...chain(seaCorridors.messinaNorth,ty,tyrrhenianSpine)];mid=isAdA?cross:cross.reverse()}
 return [A,...mid,B];
 }
