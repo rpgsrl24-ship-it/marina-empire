@@ -1,0 +1,18 @@
+/* Visual direction: Marina Empire approved cinematic renders */
+#home .home-lead{background-image:linear-gradient(90deg,#031320d9 0%,#0313207a 40%,#03132015 82%),linear-gradient(0deg,#031320d9,transparent 48%),url('https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=2000&q=90')!important;background-position:center!important;background-size:cover!important;min-height:620px!important}
+#home .empire-home-map{width:320px!important;max-width:39%!important;background:linear-gradient(150deg,#041b2aee,#051725f5)!important;border-color:#efc679!important;box-shadow:0 16px 50px #000b!important}
+#home .empire-home-map iframe{height:265px!important}
+#home .home-overlay{bottom:38px!important;left:32px!important}
+#home .home-overlay h1{font-size:clamp(44px,5vw,77px)!important;font-weight:400!important;line-height:1.05!important;text-shadow:0 4px 20px #000b!important}
+#home .home-overlay p{font-size:19px!important;color:#f8e9c8!important}
+#home .empire-home-menu{border-color:#e2b76a99!important;box-shadow:0 12px 34px #0008!important}
+#home .empire-home-menu button:first-child{background:linear-gradient(100deg,#c28e4255,#d9b46911)!important;color:#ffe5a7!important;box-shadow:inset 3px 0 #e5bf76}
+#home .home-cards .item{min-height:240px!important;border-color:#d9ae67!important;box-shadow:0 10px 27px #0008!important}
+#home .home-cards .item:nth-child(1){background-image:url('https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=800&q=90')!important}
+#home .home-cards .item:nth-child(2){background-image:url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=90')!important}
+#home .home-cards .item:nth-child(3){background-image:url('https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=90')!important}
+#home .home-cards .item:nth-child(4){background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=90')!important}
+#home .home-cards .item:nth-child(5){background-image:url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90')!important}
+#home .home-cards .item:before{background:linear-gradient(0deg,#03121e 0%,#03121ec9 32%,transparent 90%)!important}
+#home .home-cards h3{font:22px Georgia,serif!important;color:#ffe3a6!important}
+@media(max-width:740px){#home .home-lead{min-height:610px!important}#home .empire-home-map{max-width:none!important;width:auto!important}#home .empire-home-map iframe{height:150px!important}#home .home-overlay{left:17px!important;bottom:25px!important}#home .home-cards .item{min-height:205px!important}}
