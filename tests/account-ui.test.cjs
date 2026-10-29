@@ -6,6 +6,7 @@ for(const [label,pattern] of [
  ['mobile account navigation',/data-mobile-tab="profile"><span>👤<\/span>ACCOUNT<\/button>/],
  ['cloud account heading',/<h3>ACCOUNT E SALVATAGGI ONLINE<\/h3>/],
  ['cloud login action',/id="cloudLogin"/],
+ ['accurate cloud login instructions',/Le due operazioni sono manuali/],
  ['cloud upload action',/id="cloudUpload"/],
  ['cloud download action',/id="cloudDownload"/],
  ['backup restore action',/restoreCloudButton\.addEventListener\("click",restoreCloudBackup\)/]
