@@ -635,4 +635,4 @@ const obs=new MutationObserver(()=>{if(!document.getElementById("marinas").class
  window.addEventListener('resize',activeTab);
  activeTab();
 })();
-</script></body></html>
+</script><script id="marina-empire-deep-links-v1">(function(){const valid=new Set(["home","map","fleet","marinas","missions","office","profile","headquarters"]);const requested=new URLSearchParams(location.search).get("page");if(!valid.has(requested))return;function openRequested(){const btn=document.querySelector('[data-tab="'+requested+'"]');if(btn){btn.click();return}if(typeof showTab==="function")showTab(requested)}if(document.readyState==="complete")setTimeout(openRequested,180);else window.addEventListener("load",()=>setTimeout(openRequested,180),{once:true})})();</script></body></html>
