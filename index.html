@@ -223,8 +223,8 @@ button:hover:not(:disabled){border-color:#e1bd77;transform:translateY(-1px)}butt
  .mobile-game-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:7px 2px;min-height:56px;border:0;border-radius:10px;background:transparent;color:#d7e3e9;font-size:10px;font-weight:800;letter-spacing:.3px}
  .mobile-game-nav button span{font-size:23px;line-height:26px}
  .mobile-game-nav button.on{background:#234457;color:#ffe2a6;box-shadow:inset 0 0 0 1px #a98b54}
- #betaTestInfo{display:none}
- #officeDashboard,#marinaCommunity{display:none}
+ #betaTestInfo{display:block}
+ #officeDashboard{display:none}
  .shell>.stats{margin-bottom:10px}
 }
 </style></head><body>
@@ -559,10 +559,22 @@ const obs=new MutationObserver(()=>{if(!document.getElementById("marinas").class
 })();
 </script><style id="marina-panel-repair-css-v26">#marinaList{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px;margin-top:18px}#marinaList>.item{margin:0!important}#marinaList .marina-actions{display:flex;gap:8px;flex-wrap:wrap}#marinaList .marina-actions button{flex:1;min-width:135px}#marinaList .marina-fallback-berths{margin-top:15px;border-top:1px solid #8eacb5;padding-top:12px}</style><script defer src="./route-planner.js"></script><script id="me-simple-mobile-nav-controller">
 (function(){
- const tabs=document.querySelectorAll("[data-mobile-tab]");
- function activate(){const current=document.querySelector(".screen:not(.hide)")?.id;const selected=current==="office"?"missions":current==="map"?"missions":current;tabs.forEach(b=>b.classList.toggle("on",b.dataset.mobileTab===selected))}
- document.addEventListener("click",e=>{const btn=e.target.closest("[data-mobile-tab]");if(!btn)return;const id=btn.dataset.mobileTab;const target=id==="missions"&&!window.matchMedia("(max-width:740px)").matches?"missions":id;const other=document.querySelector('[data-tab="'+target+'"]');if(other)other.click();else{const el=document.getElementById(target);if(el){document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("hide",x!==el));document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x.dataset.tab===target));window.scrollTo(0,0)}}requestAnimationFrame(activate)});
- new MutationObserver(activate).observe(document.body,{subtree:true,attributes:true,attributeFilter:["class"]});
- activate();
+ const tabs=[...document.querySelectorAll('[data-mobile-tab]')];
+ function activeTab(){
+  const current=document.querySelector('.screen:not(.hide)')?.id;
+  const selected=current==='office'||current==='map'?'missions':current;
+  tabs.forEach(b=>{const on=b.dataset.mobileTab===selected;b.classList.toggle('on',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+ }
+ tabs.forEach(btn=>btn.addEventListener('click',()=>{
+  const id=btn.dataset.mobileTab;
+  const initialSetup=typeof state!=='undefined'&&state.name&&!state.setupComplete&&!state.trip;
+  if(id==='missions'&&initialSetup){showTab('office');return}
+  if(id==='missions'&&typeof state!=='undefined'&&state.trip){showTab('map');return}
+  if(typeof showTab==='function')showTab(id);
+  activeTab();
+ }));
+ document.querySelectorAll('.screen').forEach(screen=>new MutationObserver(activeTab).observe(screen,{attributes:true,attributeFilter:['class']}));
+ window.addEventListener('resize',activeTab);
+ activeTab();
 })();
 </script></body></html>
