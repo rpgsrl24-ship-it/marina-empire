@@ -26,3 +26,4 @@ jobs:
           node tests/mission-arrival.test.cjs
           node tests/cloud-backup.test.cjs
           node tests/cloud-load.test.cjs
+          node tests/account-ui.test.cjs
