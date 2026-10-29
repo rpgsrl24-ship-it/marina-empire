@@ -239,12 +239,36 @@ let cinemaYacht=null,cinemaMode="",cinemaStart=0,cinemaSlot=null;
 let cinemaProgress=0,cinemaWidth=530,cinemaHeight=500;
 function cinematicMarina(mode){if(!slots.length)return;cinemaMode=mode==="arrival"?"arrival":"departure";cinemaProgress=0;cinemaStart=performance.now();cinemaSlot=slots.find(v=>v.pier<progress.built&&!progress.occupied.includes(v.id))||slots[0];if(cinemaYacht)group.remove(cinemaYacht);cinemaYacht=yacht(cinemaSlot.x,cinemaSlot.z,cinemaSlot.heading,cinemaSlot.maxi?1.5:1);orbit.enabled=false;}
 window.addEventListener("message",e=>{if(e.origin!==location.origin||!e.data||e.data.type!=="marina-empire-cinema")return;if(e.data.marina&&e.data.marina!==current.id)setMarina(e.data.marina);if(e.data.phase!==cinemaMode||!cinemaYacht)cinematicMarina(e.data.phase);if(Number.isFinite(e.data.progress))cinemaProgress=Math.max(0,Math.min(1,e.data.progress));});
-function updateCinema(){if(!cinemaYacht||!cinemaSlot)return;const p=cinemaProgress||Math.min(1,(performance.now()-cinemaStart)/7500),t=p*p*(3-2*p),f=cinemaMode==="departure"?t:1-t;
-const slot=cinemaSlot,entranceX=Math.max(530,Math.ceil(current.capacity/current.piers/2)*14+180)*.8;
-const path=[[slot.x,slot.z],[slot.x+18,slot.z],[slot.x+27,0],[entranceX,0],[entranceX+65,0]];
-const dist=path.slice(1).map((v,i)=>Math.hypot(v[0]-path[i][0],v[1]-path[i][1]));const total=dist.reduce((a,b)=>a+b,0);let left=f*total,point=path[0],heading=0;
-for(let i=0;i<dist.length;i++){const d=dist[i];if(left<=d||i===dist.length-1){const u=d?Math.min(1,left/d):0;point=[path[i][0]+(path[i+1][0]-path[i][0])*u,path[i][1]+(path[i+1][1]-path[i][1])*u];heading=Math.atan2(path[i+1][0]-path[i][0],path[i+1][1]-path[i][1]);break}left-=d}
-cinemaYacht.position.set(point[0],.95,point[1]);cinemaYacht.rotation.y=heading;
-const target=cinemaYacht.position;orbit.target.lerp(new THREE.Vector3(target.x,1,target.z),.09);camera.position.lerp(new THREE.Vector3(target.x-24,24,target.z+35),.08);camera.lookAt(orbit.target);}
+function updateCinema(){
+ if(!cinemaYacht||!cinemaSlot)return;
+ const p=Number.isFinite(cinemaProgress)?Math.max(0,Math.min(1,cinemaProgress)):Math.min(1,(performance.now()-cinemaStart)/7500);
+ const smooth=p*p*(3-2*p),forward=cinemaMode==="departure"?smooth:1-smooth;
+ const slot=cinemaSlot;
+ // Marina geometry is procedural: this is a visual maneuver, not a real pilotage track.
+ const W=Math.max(530,Math.ceil(current.capacity/current.piers/2)*14+180);
+ const gateX=W*.8,channelZ=0;
+ const clearance=slot.z>=0?10:-10;
+ const knots=[
+  new THREE.Vector3(slot.x,.95,slot.z),
+  new THREE.Vector3(slot.x+12,.95,slot.z+clearance),
+  new THREE.Vector3(Math.max(slot.x+24,gateX*.45),.95,channelZ+clearance*.55),
+  new THREE.Vector3(gateX,.95,channelZ),
+  new THREE.Vector3(gateX+65,.95,channelZ)
+ ];
+ const curve=new THREE.CatmullRomCurve3(knots,false,"centripetal",.4);
+ const position=curve.getPoint(forward);
+ const tangent=curve.getTangent(forward).normalize();
+ const direction=cinemaMode==="departure"?tangent:tangent.clone().negate();
+ cinemaYacht.position.copy(position);
+ // Yacht model bow points along negative local Z.
+ cinemaYacht.rotation.y=Math.atan2(-direction.x,-direction.z);
+ const focus=new THREE.Vector3(position.x,2,position.z);
+ orbit.target.lerp(focus,.075);
+ const behind=direction.clone().multiplyScalar(-32);
+ const desired=new THREE.Vector3(position.x+behind.x,22,position.z+behind.z);
+ camera.position.lerp(desired,.06);
+ camera.lookAt(orbit.target);
+}
+
 function resize(){let w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}window.addEventListener('resize',resize);setMarina(new URLSearchParams(location.search).get('marina')||DATA[0].id);resize();function animate(){requestAnimationFrame(animate);if(cinemaYacht)updateCinema();else orbit.update();renderer.render(scene,camera)}animate();
 </script></div></body></html>
