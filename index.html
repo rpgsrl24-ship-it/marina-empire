@@ -718,4 +718,16 @@ html body .shell>#navigation.nav>button.on{background:#b78b4d33!important;color:
 html body #welcome.overlay{background:linear-gradient(90deg,#031420b8,#03142055 45%,#031420b8),linear-gradient(0deg,#031420c9,#03142015 60%),url("./anteprima/assets/render-2026/hero-yacht.jpg") center center/cover no-repeat!important}
 html body #welcome .welcome{background:linear-gradient(155deg,#061b2be8,#031320ee)!important;border:1px solid #d8b777!important;box-shadow:0 25px 75px #0009!important;border-radius:19px!important;backdrop-filter:blur(8px)}
 @media(max-width:740px){html body #welcome.overlay{background-position:55% center!important}html body #welcome .welcome{max-width:96vw!important}}
-</style></body></html>
+</style><style id="me-mobile-map-fix-v37">
+@media(max-width:899px){
+#map,#map .grid,#map .panel{min-width:0!important}
+#map .grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important}
+#map #interactiveMapDisplay{display:block!important;position:relative!important;width:100%!important;max-width:100%!important;height:440px!important;min-height:360px!important;overflow:hidden!important;visibility:visible!important;opacity:1!important;border:1px solid #d3ac67!important;border-radius:12px!important;background:#092c3b!important}
+#map #interactiveMapDisplay .leaflet-container{width:100%!important;height:100%!important}
+#map .map-info-bar{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
+#home .hero{min-height:660px!important}
+#home .hero .luxury-mini-map{display:block!important;visibility:visible!important;opacity:1!important;z-index:2!important;top:12px!important;left:12px!important;right:12px!important;width:auto!important;max-width:none!important}
+#home .hero .luxury-mini-map iframe{height:155px!important;display:block!important}
+#home .hero-copy{z-index:1!important;bottom:17px!important}
+}
+</style><script id="me-mobile-map-resize-v37">(function(){function refresh(){if(window.innerWidth>899)return;window.dispatchEvent(new Event("resize"));setTimeout(()=>window.dispatchEvent(new Event("resize")),350)}document.addEventListener("click",function(e){if(e.target.closest('[data-tab="map"],#homeNavigate'))setTimeout(refresh,100)});window.addEventListener("orientationchange",()=>setTimeout(refresh,350));})();</script></body></html>
