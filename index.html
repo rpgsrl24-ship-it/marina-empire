@@ -242,10 +242,10 @@ button:hover:not(:disabled){border-color:#e1bd77;transform:translateY(-1px)}butt
 <div id="toast" class="hide" role="status"></div>
 <script>
 "use strict";
-const TEST_MODE=true; // Beta: progress persists across reloads; reset is explicit only.
-let KEY=TEST_MODE?"marina_empire_beta_test_session":"marina_empire_beta_2026_v1";
+const TEST_MODE=true; // Beta test: isolated browser save namespace.
+let KEY=TEST_MODE?"marina_empire_private_test_2026_10_29":"marina_empire_beta_2026_v1";
 const ME_BASE_SAVE_KEY=KEY;
-window.meSelectLocalAccount=function(uid){const next=uid?"marina_empire_user_"+uid:ME_BASE_SAVE_KEY;if(next===KEY)return;KEY=next;try{const raw=localStorage.getItem(KEY);const data=raw?JSON.parse(raw):null;state=data&&typeof data.name==="string"&&Array.isArray(data.owned)&&Array.isArray(data.completed)?{...fresh(),...data}:fresh();$("playerName").value=state.name||"";$("welcome").classList.toggle("hide",!!state.name);render();if(state.name)showTab("office");}catch(e){state=fresh();$("playerName").value="";$("welcome").classList.remove("hide");render();}};
+window.meSelectLocalAccount=function(uid){const next=uid?"marina_empire_private_test_user_"+uid:ME_BASE_SAVE_KEY;if(next===KEY)return;KEY=next;try{const raw=localStorage.getItem(KEY);const data=raw?JSON.parse(raw):null;state=data&&typeof data.name==="string"&&Array.isArray(data.owned)&&Array.isArray(data.completed)?{...fresh(),...data}:fresh();$("playerName").value=state.name||"";$("welcome").classList.toggle("hide",!!state.name);render();if(state.name)showTab("office");}catch(e){state=fresh();$("playerName").value="";$("welcome").classList.remove("hide");render();}};
 // For testers only: append ?reset=1 to explicitly start a new local beta session.
 if(TEST_MODE&&new URLSearchParams(location.search).get("reset")==="1"){try{localStorage.removeItem(KEY);for(const key of Object.keys(localStorage)){if(key.startsWith("marina-empire-phase1-"))localStorage.removeItem(key)}sessionStorage.removeItem("marina_empire_beta_started");history.replaceState(null,"",location.pathname+location.hash)}catch(e){}}
 const $=id=>document.getElementById(id);
