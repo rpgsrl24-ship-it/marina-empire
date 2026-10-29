@@ -1,0 +1,29 @@
+name: Marina Empire mission regression
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'tests/**'
+      - '.github/workflows/mission-regression.yml'
+  push:
+    branches:
+      - 'dev/mission-regression-2026-10-29'
+    paths:
+      - 'index.html'
+      - 'tests/**'
+      - '.github/workflows/mission-regression.yml'
+jobs:
+  mission-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check mission navigation contracts
+        run: |
+          node tests/mission-contract.test.cjs
+          node tests/mission-arrival.test.cjs
+          node tests/cloud-backup.test.cjs
+          node tests/cloud-load.test.cjs
+          node tests/account-ui.test.cjs
