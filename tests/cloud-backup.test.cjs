@@ -10,7 +10,7 @@ function run({backup,accepted=true}){
  let state={name:'Cloud',owned:[],completed:[],coins:50,fuel:10};
  const messages=[];let writes=0;let reverseBackup=null;
  const fields={playerName:{value:''},welcome:{classList:{add(){}}}};
- const ctx={JSON,localStorage:{getItem(){return backup===null?null:JSON.stringify(backup)},setItem(k,v){reverseBackup={key:k,value:JSON.parse(v)}}},validState:s=>!!s&&typeof s.name==='string'&&Array.isArray(s.owned),confirm:()=>accepted,fresh:()=>({name:'New',owned:[],completed:[],coins:0,fuel:0}),persist:()=>{writes++},el:k=>fields[k],showTab:()=>{},render:()=>{},tick:()=>{},status:s=>messages.push(s)};
+ const ctx={JSON,localStorage:{getItem(){return backup===null?null:JSON.stringify(backup)},setItem(k,v){reverseBackup={key:k,value:JSON.parse(v)}}},safeSnapshot:()=>JSON.parse(JSON.stringify(state)),Date,validState:s=>!!s&&typeof s.name==='string'&&Array.isArray(s.owned),confirm:()=>accepted,fresh:()=>({name:'New',owned:[],completed:[],coins:0,fuel:0}),persist:()=>{writes++},el:k=>fields[k],showTab:()=>{},render:()=>{},tick:()=>{},status:s=>messages.push(s)};
  Object.defineProperty(ctx,'state',{get:()=>state,set:v=>{state=v}});
  vm.runInNewContext(source+';restoreCloudBackup();',ctx);
  return {state,writes,messages,fields,reverseBackup};
