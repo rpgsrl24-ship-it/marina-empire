@@ -21,4 +21,6 @@ jobs:
         with:
           node-version: '22'
       - name: Check mission navigation contracts
-        run: node tests/mission-contract.test.cjs
+        run: |
+          node tests/mission-contract.test.cjs
+          node tests/mission-arrival.test.cjs
