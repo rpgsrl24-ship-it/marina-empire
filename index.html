@@ -522,7 +522,10 @@ function betaDiagnostics(){
  const check=(label,fn)=>{try{checks.push({label,ok:!!fn()})}catch(e){checks.push({label,ok:false})}};
  check("Rotta Rimini - Cervia",()=>{const p=planSeaTrip("rimini","cervia",boat("voyager").tank);return p.possible&&p.legs[0]==="rimini"&&p.legs[p.legs.length-1]==="cervia"&&p.distance>0});
  check("Marina e yacht iniziali",()=>ports.some(p=>p.id==="rimini")&&boats.some(b=>b.id==="voyager"&&b.tank>=300));
- check("Missioni disponibili",()=>availableMissions().length>0);
+ check("Catalogo missioni",()=>Array.isArray(missions)&&missions.length>0&&missions.some(m=>ports.some(p=>p.id===m.dest)&&boats.some(b=>b.id===m.boat)));
+ check("Rotte senza spostare la partita",()=>{const a=planSeaTrip("rimini","cervia",boat("voyager").tank),b=planSeaTrip("rimini","cervia",boat("voyager").tank);return a.possible&&b.possible&&JSON.stringify(a.legs)===JSON.stringify(b.legs)});
+ check("Calcolo carburante e riserva",()=>{const tank=boat("voyager").tank,dist=seaMiles("rimini","cervia"),need=Math.ceil(dist*.85),reserve=Math.ceil(tank*.15);return Number.isFinite(dist)&&dist>0&&need>0&&reserve>0&&reserve<tank&&need+reserve<=tank});
+ check("Viaggio salvato leggibile",()=>{const raw=localStorage.getItem(KEY);if(!raw)return true;const saved=JSON.parse(raw);return !!saved&&typeof saved==="object"&&(!saved.trip||(saved.trip.dest&&Number.isFinite(Number(saved.trip.until))))});
  check("Interfaccia e pulsanti",()=>["play","missionList","setupDashboard","interactiveMapDisplay","homeMediterraneanMap","voyageCinema","voyageRouteMap"].every(id=>!!$(id)));
  check("Menu mobile completo",()=>["home","map","missions","fleet"].every(id=>!!document.querySelector('[data-mobile-tab="'+id+'"]'))&&!!$("meMobileMoreToggle")&&!!$("meMobileMore"));
  check("Missione e simulazione",()=>typeof launch==="function"&&typeof finishVoyage==="function"&&typeof voyageHeartbeat==="function"&&typeof planSeaTrip==="function");
