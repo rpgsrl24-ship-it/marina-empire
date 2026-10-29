@@ -19,6 +19,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Checkout beta test
+        uses: actions/checkout@v4
+        with:
+          ref: beta/private-test-2026-10-29
+          path: beta-test
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
