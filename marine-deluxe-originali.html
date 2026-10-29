@@ -52,7 +52,7 @@ function rpgHarborBillboard(x,z){
  sign.position.set(x,10.5,z+.42);group.add(sign);
  const back=sign.clone();back.rotation.y=Math.PI;back.position.z=z-.42;group.add(back);
 }
-function rebuild(){group.clear();slots=[];pierGroups=[];boats=[];let d=current,p=d.piers,max=d.capacity,scale=Math.sqrt(max/650),W=Math.max(530,Math.ceil(max/p/2)*14+180),H=p*23+85,random=rng(d.seed);let waterPlane=new THREE.Mesh(new THREE.PlaneGeometry(W*4,H*4),water);waterPlane.rotation.x=-Math.PI/2;waterPlane.position.y=-.9;group.add(waterPlane);
+function rebuild(){cinemaYacht=null;cinemaSlot=null;cinemaMode="";orbit.enabled=true;group.clear();slots=[];pierGroups=[];boats=[];let d=current,p=d.piers,max=d.capacity,scale=Math.sqrt(max/650),W=Math.max(530,Math.ceil(max/p/2)*14+180),H=p*23+85,random=rng(d.seed);let waterPlane=new THREE.Mesh(new THREE.PlaneGeometry(W*4,H*4),water);waterPlane.rotation.x=-Math.PI/2;waterPlane.position.y=-.9;group.add(waterPlane);
 // Shore is on the LEFT of the marina, never behind the harbor.
 let landWidth=W*1.9;cube(landWidth,2.2,H*2.35,grass,-W*1.2,0,0);cube(W*.22,2.3,H*1.2,concrete,-W*.32,0,0);
 // Shoreline, coastal promenade, beach and organically scattered rock formations.
@@ -238,7 +238,7 @@ $('marina').onchange=e=>setMarina(e.target.value);$('build').onclick=()=>{if(pro
 let cinemaYacht=null,cinemaMode="",cinemaStart=0,cinemaSlot=null;
 let cinemaProgress=0,cinemaWidth=530,cinemaHeight=500;
 function cinematicMarina(mode){if(!slots.length)return;cinemaMode=mode==="arrival"?"arrival":"departure";cinemaProgress=0;cinemaStart=performance.now();cinemaSlot=slots.find(v=>v.pier<progress.built&&!progress.occupied.includes(v.id))||slots[0];if(cinemaYacht)group.remove(cinemaYacht);cinemaYacht=yacht(cinemaSlot.x,cinemaSlot.z,cinemaSlot.heading,cinemaSlot.maxi?1.5:1);orbit.enabled=false;}
-window.addEventListener("message",e=>{if(e.origin!==location.origin||!e.data||e.data.type!=="marina-empire-cinema")return;if(e.data.marina&&e.data.marina!==current.id)setMarina(e.data.marina);if(e.data.phase!==cinemaMode||!cinemaYacht)cinematicMarina(e.data.phase);if(Number.isFinite(e.data.progress))cinemaProgress=Math.max(0,Math.min(1,e.data.progress));});
+window.addEventListener("message",e=>{if(e.origin!==location.origin||!e.data||e.data.type!=="marina-empire-cinema")return;if(e.data.marina&&e.data.marina!==current.id)setMarina(e.data.marina);if(e.data.phase!=="arrival"&&e.data.phase!=="departure")return;if(e.data.phase!==cinemaMode||!cinemaYacht)cinematicMarina(e.data.phase);if(Number.isFinite(e.data.progress))cinemaProgress=Math.max(0,Math.min(1,e.data.progress));});
 function updateCinema(){
  if(!cinemaYacht||!cinemaSlot)return;
  const p=Number.isFinite(cinemaProgress)?Math.max(0,Math.min(1,cinemaProgress)):Math.min(1,(performance.now()-cinemaStart)/7500);
