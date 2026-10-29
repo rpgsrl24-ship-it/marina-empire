@@ -1,0 +1,24 @@
+{
+  "id": "./",
+  "name": "Marina Empire - RPG Yacht",
+  "short_name": "Marina Empire",
+  "description": "Simulatore nautico e gestione di marine italiane",
+  "lang": "it",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#071c2a",
+  "theme_color": "#081d2a",
+  "categories": [
+    "games",
+    "entertainment"
+  ],
+  "icons": [
+    {
+      "src": "./app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
