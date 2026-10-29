@@ -523,7 +523,11 @@ function betaDiagnostics(){
  check("Rotta Rimini - Cervia",()=>{const p=planSeaTrip("rimini","cervia",boat("voyager").tank);return p.possible&&p.legs[0]==="rimini"&&p.legs[p.legs.length-1]==="cervia"&&p.distance>0});
  check("Marina e yacht iniziali",()=>ports.some(p=>p.id==="rimini")&&boats.some(b=>b.id==="voyager"&&b.tank>=300));
  check("Missioni disponibili",()=>availableMissions().length>0);
- check("Interfaccia e pulsanti",()=>["play","missionList","setupDashboard","mapDisplay"].every(id=>!!$(id)));
+ check("Interfaccia e pulsanti",()=>["play","missionList","setupDashboard","interactiveMapDisplay","homeMediterraneanMap","voyageCinema","voyageRouteMap"].every(id=>!!$(id)));
+ check("Menu mobile completo",()=>["home","map","missions","fleet"].every(id=>!!document.querySelector('[data-mobile-tab="'+id+'"]'))&&!!$("meMobileMoreToggle")&&!!$("meMobileMore"));
+ check("Missione e simulazione",()=>typeof launch==="function"&&typeof finishVoyage==="function"&&typeof voyageHeartbeat==="function"&&typeof planSeaTrip==="function");
+ check("Protezione ricompense duplicate",()=>Array.isArray(state.settledVoyages)||state.settledVoyages==null);
+ check("Stato partita coerente",()=>Number.isFinite(Number(state.coins))&&Number(state.coins)>=0&&Number.isFinite(Number(state.fuel))&&Number(state.fuel)>=0&&Array.isArray(state.owned)&&Array.isArray(state.completed));
  check("Salvataggio locale",()=>{const k="marina_empire_diagnostic_temp";localStorage.setItem(k,"ok");const ok=localStorage.getItem(k)==="ok";localStorage.removeItem(k);return ok});
  const passed=checks.filter(x=>x.ok).length;
  const summary=checks.map(x=>(x.ok?"OK":"ERRORE")+" - "+x.label).join("\n");
