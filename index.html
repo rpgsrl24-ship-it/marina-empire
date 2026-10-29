@@ -528,6 +528,40 @@ function start(){
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
 })();
 </script>
+<style id="me-beta-help-style">
+#meBetaHelp{position:fixed;right:12px;bottom:82px;z-index:2000;background:#d8b56f;color:#09212e;border:2px solid #071723;border-radius:24px;padding:10px 14px;font:700 13px system-ui;box-shadow:0 5px 18px #0007;cursor:pointer}
+#meBetaPanel{position:fixed;right:12px;bottom:132px;z-index:2001;width:min(360px,calc(100vw - 24px));max-height:65vh;overflow:auto;background:#102a39;color:#f6f1e6;border:1px solid #d8b56f;border-radius:16px;padding:20px;box-sizing:border-box;box-shadow:0 8px 30px #000a;font:15px system-ui}
+#meBetaPanel[hidden]{display:none!important}#meBetaPanel h3{color:#e5c27e;margin:0 0 10px}#meBetaPanel button{padding:9px 13px;margin:4px;border-radius:8px;background:#d8b56f;color:#09212e;font-weight:700;border:0;cursor:pointer}#meBetaPanel textarea{width:100%;min-height:90px;box-sizing:border-box;background:#071723;color:white;border:1px solid #77909b;border-radius:8px;padding:9px;font:inherit}
+@media(min-width:800px){#meBetaHelp{bottom:18px}#meBetaPanel{bottom:70px}}
+</style>
+<button id="meBetaHelp" type="button" aria-controls="meBetaPanel" aria-expanded="false">❔ AIUTO / BETA</button>
+<section id="meBetaPanel" hidden aria-label="Aiuto e feedback Marina Empire">
+<h3>⚓ Marina Empire · Beta</h3>
+<p><b>Come si gioca:</b> crea il comandante, scegli yacht e marina, seleziona una missione e naviga verso la destinazione. Completa la rotta per ricevere crediti virtuali.</p>
+<p><b>Salvataggi:</b> la partita resta sul dispositivo; per ritrovarla su altri dispositivi usa il salvataggio cloud dal Profilo.</p>
+<p><b>Installa sul telefono:</b> su Android usa il menu del browser → Aggiungi a schermata Home; su iPhone usa Condividi → Aggiungi alla schermata Home.</p>
+<label for="meBetaFeedback"><b>Hai trovato un problema o hai un'idea?</b></label>
+<textarea id="meBetaFeedback" maxlength="1200" placeholder="Raccontaci cosa è successo, su quale telefono e in quale marina..."></textarea>
+<div><button id="meBetaSend" type="button">INVIA SEGNALAZIONE</button><button id="meBetaClose" type="button">CHIUDI</button></div>
+<p style="font-size:12px;color:#b8c8ce">L'invio apre la tua app email con il messaggio già compilato. Nessun dato viene inviato automaticamente.</p>
+</section>
+<script id="me-beta-help-v1">
+(function(){
+"use strict";
+const trigger=document.getElementById("meBetaHelp"),panel=document.getElementById("meBetaPanel");
+if(!trigger||!panel)return;
+function toggle(open){panel.hidden=!open;trigger.setAttribute("aria-expanded",String(open));}
+trigger.addEventListener("click",()=>toggle(panel.hidden));
+document.getElementById("meBetaClose").addEventListener("click",()=>toggle(false));
+document.getElementById("meBetaSend").addEventListener("click",()=>{
+ const message=document.getElementById("meBetaFeedback").value.trim();
+ if(message.length<8){alert("Descrivi il problema o il suggerimento con almeno 8 caratteri.");return;}
+ const subject="Marina Empire beta - segnalazione";
+ const body="Segnalazione:\n"+message+"\n\nPagina: "+location.href.split("?")[0]+"\nDispositivo: "+navigator.userAgent;
+ location.href="mailto:info@floatmarine.it?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+});
+})();
+</script>
 <script id="me-cloud-sync-v1">
 (function(){
 "use strict";
