@@ -17,11 +17,14 @@ rpgAdCtx.fillText('NELLE NOSTRE MARINE',512,330);
 rpgAdCtx.fillStyle='#e8c47e';rpgAdCtx.font='bold 37px Arial';rpgAdCtx.fillText('PUBBLICITÀ SOLO CON RPG YACHT',512,424);
 const rpgAdTexture=new THREE.CanvasTexture(rpgAdCanvas);rpgAdTexture.colorSpace=THREE.SRGBColorSpace;
 const rpgAdMat=new THREE.MeshBasicMaterial({map:rpgAdTexture,side:THREE.DoubleSide});
-const rpgAdGroup=new THREE.Group();rpgAdGroup.position.set(14,0,57);
+const rpgAdGroup=new THREE.Group();rpgAdGroup.position.set(16,3.1,-111);
 const rpgAdFace=new THREE.Mesh(new THREE.PlaneGeometry(18,9),rpgAdMat);rpgAdFace.position.y=11;rpgAdGroup.add(rpgAdFace);
 const rpgAdPostMat=material(0x62747a,.7,.5);
 for(const x of [-6,6]){const post=new THREE.Mesh(new THREE.CylinderGeometry(.38,.45,13,10),rpgAdPostMat);post.position.set(x,6.5,-.3);rpgAdGroup.add(post)}
-rpgAdGroup.rotation.y=.25;scene.add(rpgAdGroup);
+rpgAdGroup.rotation.y=0;scene.add(rpgAdGroup);
+// Additional roadside placements, all on the solid shoreside promenade.
+const rpgAdFaces=[rpgAdFace];
+for(const [x,z,angle] of [[-77,-111,0],[112,-113,0]]){const g=rpgAdGroup.clone(true);g.position.set(x,3.1,z);g.rotation.y=angle;scene.add(g);g.traverse(child=>{if(child.isMesh&&child.geometry.type==='PlaneGeometry'){child.material=rpgAdMat;rpgAdFaces.push(child)}})}
 // Campaigns are read from a public, reviewed JSON file. Only HTTPS websites and same-origin creative assets are accepted.
 let rpgAdTarget='https://rpgyacht.com/';
 const rpgAdRay=new THREE.Raycaster(),rpgAdPointer=new THREE.Vector2();
@@ -44,7 +47,7 @@ renderer.domElement.addEventListener('pointerup',event=>{
  const rect=renderer.domElement.getBoundingClientRect();
  rpgAdPointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);
  rpgAdRay.setFromCamera(rpgAdPointer,camera);
- if(!rpgAdRay.intersectObject(rpgAdFace,false).length)return;
+ if(!rpgAdRay.intersectObjects(rpgAdFaces,false).length)return;
  // A visible, user-initiated confirmation prevents accidental external navigation.
  if(window.confirm('Aprire il sito web dello sponsor in una nuova scheda?'))window.open(rpgAdTarget,'_blank','noopener,noreferrer');
 });
