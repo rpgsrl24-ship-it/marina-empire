@@ -6,6 +6,22 @@ const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(490,0
 const material=(color,roughness=.75,metalness=.02)=>new THREE.MeshStandardMaterial({color,roughness,metalness});const stone=material(0xbcc1b8),quay=material(0xd4d2c5),deck=material(0x8c7860),trim=material(0x424d52),roof=material(0x85999d),glass=material(0x244c63,.15,.4),sand=material(0xd2b997),grass=material(0x60865a),white=material(0xf2f3ee,.23,.12),hullDark=material(0x1c3f52,.32,.22),rail=material(0xc8d2d3,.23,.65),wood=material(0xa9875b),gold=material(0xc8a66a),waterMat=new THREE.MeshPhysicalMaterial({color:0x0b617b,metalness:.18,roughness:.24,clearcoat:1,clearcoatRoughness:.09,transparent:true,opacity:.98});
 function mesh(geo,mat,parent=scene,x=0,y=0,z=0){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}function box(w,h,d,mat,parent=scene,x=0,y=0,z=0){return mesh(new THREE.BoxGeometry(w,h,d),mat,parent,x,y,z)}function cylinder(r1,r2,h,mat,parent,x,y,z){return mesh(new THREE.CylinderGeometry(r1,r2,h,10),mat,parent,x,y,z)}function beam(a,b,width,height,mat){const len=Math.hypot(b[0]-a[0],b[1]-a[1]),m=box(width,height,len,mat,scene,(a[0]+b[0])/2,height/2,(a[1]+b[1])/2);m.rotation.y=Math.atan2(b[0]-a[0],b[1]-a[1]);return m}function path(pts,w,h,mat){for(let i=1;i<pts.length;i++)beam(pts[i-1],pts[i],w,h,mat)}
 const wg=new THREE.PlaneGeometry(2400,1600,110,90),base=Float32Array.from(wg.attributes.position.array),sea=mesh(wg,waterMat);sea.rotation.x=-Math.PI/2;sea.position.set(400,-.65,0);sea.receiveShadow=true;
+// RPG Yacht commercial advertising: 3D demonstration billboard, no paid third-party ads loaded.
+const rpgAdCanvas=document.createElement('canvas');rpgAdCanvas.width=1024;rpgAdCanvas.height=512;
+const rpgAdCtx=rpgAdCanvas.getContext('2d');
+rpgAdCtx.fillStyle='#092538';rpgAdCtx.fillRect(0,0,1024,512);
+rpgAdCtx.strokeStyle='#d8b976';rpgAdCtx.lineWidth=22;rpgAdCtx.strokeRect(16,16,992,480);
+rpgAdCtx.textAlign='center';rpgAdCtx.fillStyle='#f0d99e';rpgAdCtx.font='bold 48px Arial';rpgAdCtx.fillText('MARINA EMPIRE',512,112);
+rpgAdCtx.fillStyle='#ffffff';rpgAdCtx.font='bold 79px Arial';rpgAdCtx.fillText('IL TUO BRAND',512,240);
+rpgAdCtx.fillText('NELLE NOSTRE MARINE',512,330);
+rpgAdCtx.fillStyle='#e8c47e';rpgAdCtx.font='bold 37px Arial';rpgAdCtx.fillText('PUBBLICITÀ SOLO CON RPG YACHT',512,424);
+const rpgAdTexture=new THREE.CanvasTexture(rpgAdCanvas);rpgAdTexture.colorSpace=THREE.SRGBColorSpace;
+const rpgAdMat=new THREE.MeshBasicMaterial({map:rpgAdTexture,side:THREE.DoubleSide});
+const rpgAdGroup=new THREE.Group();rpgAdGroup.position.set(14,0,57);
+const rpgAdFace=new THREE.Mesh(new THREE.PlaneGeometry(18,9),rpgAdMat);rpgAdFace.position.y=11;rpgAdGroup.add(rpgAdFace);
+const rpgAdPostMat=material(0x62747a,.7,.5);
+for(const x of [-6,6]){const post=new THREE.Mesh(new THREE.CylinderGeometry(.38,.45,13,10),rpgAdPostMat);post.position.set(x,6.5,-.3);rpgAdGroup.add(post)}
+rpgAdGroup.rotation.y=.25;scene.add(rpgAdGroup);
 // Rectangular game-map tile: deep sea with a submerged stone shelf and a unified shoreside landscape.
 const seabed=material(0x164956,.96),coastalRock=material(0x777b74,.98),coastalRockLight=material(0xa0a297,.97),deepSea=material(0x10354a,.87);
 box(2400,.7,1600,deepSea,scene,400,-2.1,0);
