@@ -28,6 +28,30 @@ for(const [x,z,angle] of [[-77,-111,0],[112,-113,0]]){const g=rpgAdGroup.clone(t
 // Campaigns are read from a public, reviewed JSON file. Only HTTPS websites and same-origin creative assets are accepted.
 let rpgAdTarget='https://rpgyacht.com/';
 const rpgAdRay=new THREE.Raycaster(),rpgAdPointer=new THREE.Vector2();
+// Approved image campaigns may also replace the header's two demo banners.
+async function loadApprovedHeaderSponsors(){
+ try{
+  const response=await fetch('./advertising/campaigns.json',{cache:'no-store'});
+  if(!response.ok)return;
+  const data=await response.json(),now=Date.now();
+  const items=(Array.isArray(data.campaigns)?data.campaigns:[]).filter(x=>x&&x.slot==='isola-rose-header'&&x.status==='active'&&Date.parse(x.start+'T00:00:00Z')<=now&&Date.parse(x.end+'T23:59:59Z')>=now);
+  if(!items.length)return;
+  const track=document.getElementById('sponsor-banner-track');
+  if(!track)return;
+  const fragment=document.createDocumentFragment();
+  for(const item of items){
+   const website=approvedAdUrl(item.website),image=item.image;
+   if(!website||typeof image!=='string'||!image.startsWith('./advertising/assets/')||image.includes('..',2)||!['png','jpg','jpeg','webp','svg'].includes(image.split('.').pop().toLowerCase()))continue;
+   const link=document.createElement('a');link.className='sponsor-banner sponsor-banner-image';link.href=website;link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label','Visita sponsor');
+   const img=document.createElement('img');img.src=image;img.alt='Banner sponsor';img.loading='lazy';link.append(img);fragment.append(link);
+  }
+  if(!fragment.children.length)return;
+  track.replaceChildren(fragment);
+  const original=[...track.children];for(const item of original){const copy=item.cloneNode(true);copy.tabIndex=-1;copy.setAttribute('aria-hidden','true');track.append(copy)}
+ }catch(e){console.info('Banner RPG Yacht predefiniti attivi')}
+}
+loadApprovedHeaderSponsors();
+
 function approvedAdUrl(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password?u.href:null}catch{return null}}
 async function loadRpgAdCampaign(){
  try{
