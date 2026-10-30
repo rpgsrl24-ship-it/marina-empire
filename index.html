@@ -460,6 +460,27 @@ button:hover:not(:disabled){border-color:#e1bd77;transform:translateY(-1px)}butt
 #map #cinemaSea.me-helm-gps #voyageRouteMap{left:0!important;bottom:0!important;width:100%!important;height:100%!important}
 }
 @media(prefers-reduced-motion:reduce){#map #cinemaSea.me-helm-active #meHelmWindow .me-helm-horizon{animation:none!important}}
+</style><style id="me-navigation-single-screen-v6">
+/* While sailing, only one unified cockpit/GPS is displayed. Keep secondary map initialized but invisible. */
+#map:has(#voyageCinema:not(.hide)) #interactiveMapDisplay,
+#map:has(#voyageCinema:not(.hide)) #satelliteMapStatus,
+#map:has(#voyageCinema:not(.hide)) .map-info-bar,
+#map:has(#voyageCinema:not(.hide)) .map-info-bar + p,
+#map:has(#voyageCinema:not(.hide)) .panel:first-child > .panel,
+#map:has(#voyageCinema:not(.hide)) .panel:first-child > a[href*="marine-deluxe"]{display:none!important}
+#map:has(#voyageCinema:not(.hide))>.grid{display:block!important}
+#map:has(#voyageCinema:not(.hide))>.grid>.panel:first-child{width:100%!important;max-width:none!important;min-width:0!important}
+#map:has(#voyageCinema:not(.hide))>.grid>.panel:last-child{display:none!important}
+#map:has(#voyageCinema:not(.hide)) #voyageCinema{margin:0!important;width:100%!important}
+#map:has(#voyageCinema:not(.hide)) #cinemaSea.me-helm-active:not(.hide){height:clamp(620px,78svh,920px)!important;min-height:620px!important}
+#map:has(#voyageCinema:not(.hide)) #voyageCinema~#interactiveMapDisplay{display:none!important}
+#map:has(#voyageCinema:not(.hide)) #cinemaRadio{font-size:12px!important}
+#map:has(#voyageCinema:not(.hide)) #cinemaDock:not(.hide){height:clamp(420px,68svh,780px)!important}
+@media(max-width:740px){
+#map:has(#voyageCinema:not(.hide))>.grid>.panel:first-child{padding:4px!important;margin:0!important}
+#map:has(#voyageCinema:not(.hide)) #cinemaSea.me-helm-active:not(.hide){height:clamp(570px,82svh,760px)!important;min-height:570px!important}
+#map:has(#voyageCinema:not(.hide)) #voyageCinema{border-radius:10px!important}
+}
 </style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">GIOCA ORA</button><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><nav class="nav" id="navigation" aria-label="Sezioni del gioco"><button data-tab="home" class="on">🏠 HOME</button><button data-tab="office">⚓ DIREZIONE</button><button data-tab="map">🗺️ NAVIGAZIONE</button><button data-tab="missions">🎯 MISSIONI</button><button data-tab="fleet">🛥️ FLOTTA</button><button data-tab="marinas">⚓ MARINE</button><button data-tab="profile">👤 COMANDANTE / ACCOUNT</button><button data-tab="headquarters">🏝️ ISOLA DELLE ROSE</button></nav><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA TEST CLIENTI</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
