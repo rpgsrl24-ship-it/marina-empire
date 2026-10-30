@@ -1,0 +1,84 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Marina Empire | Stress Test Economia</title><style>:root{color-scheme:dark;font-family:system-ui,Arial;background:#071827;color:#edf4fa}body{margin:0}main{max-width:1080px;margin:auto;padding:32px 18px}h1{color:#dfbd7d}p{color:#b6c8d6;line-height:1.55}.panel{background:#11293c;border:1px solid #38546a;border-radius:15px;padding:20px;margin:18px 0}label{display:grid;gap:6px;min-width:190px;flex:1}.controls{display:flex;flex-wrap:wrap;gap:15px}input,select,button{padding:10px;border:1px solid #5a7388;border-radius:8px;background:#0a1e2e;color:white;font-size:15px}button{background:#cda963;color:#081827;font-weight:700;cursor:pointer}table{width:100%;border-collapse:collapse}th,td{padding:10px 8px;border-bottom:1px solid #3b5365;text-align:right}th:first-child,td:first-child{text-align:left}th{color:#dfbd7d}.scroll{overflow-x:auto}.warning{border-left:3px solid #d9b976;padding-left:12px}.good{color:#a3e5b8}.bad{color:#ffaaa6}a{color:#e9c887}</style></head><body><main><small style="color:#dfbd7d;letter-spacing:2px">MARINA EMPIRE · ECONOMIC STRESS LAB V0.1</small><h1>Stress test economico e recupero finanziario</h1><p>100 carriere simulate per ciascuno di tre scenari, per 365 giorni. Ogni carriera è deterministica e riproducibile. Tutti gli importi sono <b>crediti virtuali ipotetici</b>, non euro e non dati di giocatori reali.</p><section class="panel"><div class="controls"><label>Missioni giornaliere<input id="missions" type="number" min="0" max="15" value="3"></label><label>Margine per missione<input id="missionNet" type="number" min="0" max="10000" step="100" value="2500"></label><label>Riserva minima per investire<input id="reserve" type="number" min="0" max="500000" step="10000" value="30000"></label><label>Probabilità guasto mensile (%)<input id="breakdown" type="number" min="0" max="80" value="12"></label><label>Politica di difficoltà<select id="recovery"><option value="none">Nessun aiuto</option><option value="pause" selected>Sospensione costi opzionali</option><option value="restructure">Ristrutturazione con credito di emergenza</option></select></label></div><p>La simulazione compra Open 7 (80.000), Cruiser 12 (350.000), servizio portuale (180.000), poi marina (5 milioni) solo quando la liquidità supera prezzo più riserva. Per la marina è previsto un anticipo del 40% e un prestito al 6% per 15 anni. I costi delle attività continuano anche senza clienti.</p><button id="run">ESEGUI 300 CARRIERE</button></section><section class="panel"><h2>Risultati per scenario</h2><div class="scroll"><table><thead><tr><th>Scenario</th><th>Liquidità mediana</th><th>In crisi</th><th>Open 7</th><th>Cruiser</th><th>Servizio</th><th>Marina</th><th>Salvataggi</th></tr></thead><tbody id="results"></tbody></table></div><p class="warning">La quota di carriere in crisi misura i casi con almeno un giorno di liquidità negativa. Non equivale a fallimento o insolvenza legale. Le percentuali sono simulazioni, non previsioni sugli utenti.</p></section><section class="panel"><h2>Verifiche automatiche</h2><div class="scroll"><table><tbody id="checks"></tbody></table></div><p>Controlli su riproducibilità, vincoli di acquisto, saldo e prestiti. Questi test non collaudano ancora il backend, i salvataggi o gli acquisti reali.</p></section><p><a href="./simulatore-economico.html">Torna al laboratorio economico</a> · <a href="./">Torna al gioco</a></p></main><script>
+const $=id=>document.getElementById(id);
+const clamp=(id,min,max)=>{const v=Number($(id).value);return Number.isFinite(v)?Math.min(max,Math.max(min,v)):min};
+const format=n=>new Intl.NumberFormat('it-IT',{maximumFractionDigits:0}).format(n);
+const products=[{name:'Open 7',price:80000,rev:0,cost:6500},{name:'Cruiser 12',price:350000,rev:0,cost:28000},{name:'Servizio portuale',price:180000,rev:1500,cost:16000},{name:'Marina',price:5000000,rev:17000,cost:12500}];
+const presets=[{name:'Prudente',demand:.30,mission:.75,damage:1.4},{name:'Base',demand:.55,mission:1,damage:1},{name:'Favorevole',demand:.8,mission:1.2,damage:.7}];
+function simulate(seed,scenario,settings){
+ let state=seed>>>0;
+ const rand=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296};
+ let cash=10000,debt=0,emergencyDebt=0,assets=[],crisis=false,rescues=0,netSources=0,netSinks=0,invested=0,borrowed=0,repaid=0,interestPaid=0;
+ let firstPurchase=[];
+ for(let day=1;day<=365;day++){
+   const seasonal=(day>=120&&day<=270)?1.35:.65;
+   const missionIncome=settings.missions*settings.missionNet*scenario.mission*(.8+.4*rand());
+   cash+=missionIncome;netSources+=missionIncome;
+   const living=1000;cash-=living;netSinks+=living;
+   for(const a of assets){
+     let rev=0,opCost=a.cost/365;
+     if(a.name==='Open 7')rev=850*scenario.demand*seasonal;
+     if(a.name==='Cruiser 12')rev=3200*scenario.demand*seasonal;
+     if(a.name==='Servizio portuale')rev=a.rev*scenario.demand*seasonal;
+     if(a.name==='Marina')rev=a.rev*scenario.demand*seasonal;
+     cash+=rev-opCost;netSources+=rev;netSinks+=opCost;
+   }
+   if(day%30===0&&assets.length&&rand()<settings.breakdown*scenario.damage){
+     const damage=12000+Math.floor(rand()*18000);
+     cash-=damage;netSinks+=damage;
+   }
+   if(debt>0){
+     const dailyInterest=debt*.06/365;
+     const annualPay=3000000*.06/(1-Math.pow(1.06,-15));
+     const payment=Math.min(debt+dailyInterest,annualPay/365);
+     debt=Math.max(0,debt-(payment-dailyInterest));
+     interestPaid+=dailyInterest;repaid+=payment-dailyInterest;
+     cash-=payment;netSinks+=payment;
+   }
+   if(emergencyDebt>0&&cash>100000){
+     const payment=Math.min(emergencyDebt,(cash-100000)*.2);
+     emergencyDebt-=payment;cash-=payment;repaid+=payment;netSinks+=payment;
+   }
+   if(cash<0){
+     crisis=true;
+     if(settings.recovery==='pause'){
+       // Un piccolo intervento operativo una tantum: sospensione spese discrezionali future,
+       // rappresentata da riduzione dei costi di vita per il resto della simulazione.
+       // Nessun accredito fittizio di crediti.
+       if(!settings._paused){settings._paused=true;rescues++;}
+     }
+     if(settings.recovery==='restructure'&&emergencyDebt===0&&rescues<1){
+       const loan=Math.min(100000,Math.max(0,50000-cash));
+       cash+=loan;emergencyDebt+=loan;borrowed+=loan;rescues++;
+     }
+   }
+   if(settings._paused&&day<365){const saving=300;cash+=saving;netSinks-=saving;}
+   const next=products[assets.length];
+   if(next&&cash>=settings.reserve+(next.name==='Marina'?next.price*.4:next.price)){
+     const price=next.name==='Marina'?next.price*.4:next.price;
+     cash-=price;invested+=price;assets.push(next);firstPurchase.push(day);
+     if(next.name==='Marina'){debt+=next.price*.6;borrowed+=next.price*.6;}
+   }
+ }
+ return {cash,debt,emergencyDebt,assets:assets.length,crisis,rescues,netSources,netSinks,invested,borrowed,repaid,interestPaid,firstPurchase};
+}
+function run(){
+ const settings={missions:clamp('missions',0,15),missionNet:clamp('missionNet',0,10000),reserve:clamp('reserve',0,500000),breakdown:clamp('breakdown',0,80)/100,recovery:$('recovery').value};
+ const data=presets.map((p,idx)=>Array.from({length:100},(_,i)=>simulate(i+1+idx*10000,p,{...settings})));
+ $('results').innerHTML=data.map((runs,i)=>{
+  const sorted=runs.map(r=>r.cash).sort((a,b)=>a-b),median=(sorted[49]+sorted[50])/2;
+  const pct=fn=>Math.round(runs.filter(fn).length);
+  return '<tr><td>'+presets[i].name+'</td><td>'+format(median)+'</td><td>'+pct(r=>r.crisis)+'%</td><td>'+pct(r=>r.assets>=1)+'%</td><td>'+pct(r=>r.assets>=2)+'%</td><td>'+pct(r=>r.assets>=3)+'%</td><td>'+pct(r=>r.assets>=4)+'%</td><td>'+runs.reduce((sum,r)=>sum+r.rescues,0)+'</td></tr>';
+ }).join('');
+ const a=simulate(42,presets[1],{...settings}),b=simulate(42,presets[1],{...settings});
+ const tests=[
+ ['Stesso seed produce stesso risultato',JSON.stringify(a)===JSON.stringify(b)],
+ ['Numero attività entro catalogo',data.flat().every(x=>x.assets>=0&&x.assets<=4)],
+ ['Debito mai negativo',data.flat().every(x=>x.debt>=-1e-6&&x.emergencyDebt>=-1e-6)],
+ ['Acquisti progressivi e non duplicati',data.flat().every(x=>x.firstPurchase.length===x.assets&&x.firstPurchase.every((d,i,arr)=>i===0||d>=arr[i-1]))],
+ ['Bilancio di cassa quadrato',data.flat().every(x=>Math.abs(x.cash-(10000+x.netSources-x.netSinks-x.invested+x.borrowed))<.1)],
+ ['Scenario nessun aiuto non genera salvataggi',settings.recovery!=='none'||data.flat().every(x=>x.rescues===0)]
+ ];
+ $('checks').innerHTML=tests.map(([name,ok])=>'<tr><td>'+name+'</td><td class="'+(ok?'good':'bad')+'">'+(ok?'SUPERATO':'DA CORREGGERE')+'</td></tr>').join('');
+}
+$('run').addEventListener('click',run);run();
+</script></body></html>
