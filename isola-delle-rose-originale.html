@@ -33,7 +33,7 @@ async function loadRpgAdCampaign(){
   const data=await response.json(),item=Array.isArray(data.campaigns)?data.campaigns.find(x=>x&&x.slot==='isola-rose-main'&&x.status==='active'&&Date.parse(x.start+'T00:00:00Z')<=Date.now()&&Date.parse(x.end+'T23:59:59Z')>=Date.now()):null;
   if(!item)return;
   const url=approvedAdUrl(item.website);
-  if(!url||typeof item.image!=='string'||!/^\\.\\/advertising\\/assets\\/[a-zA-Z0-9_-]+\\.(png|jpg|jpeg|webp)$/.test(item.image))return;
+  if(!url||typeof item.image!=='string'||!item.image.startsWith('./advertising/assets/')||!['png','jpg','jpeg','webp'].includes(item.image.split('.').pop().toLowerCase())||item.image.includes('..',2)||item.image.includes('?')||item.image.includes('#'))return;
   const loader=new THREE.TextureLoader();
   loader.load(item.image,texture=>{texture.colorSpace=THREE.SRGBColorSpace;rpgAdMat.map=texture;rpgAdMat.needsUpdate=true;rpgAdTarget=url},undefined,()=>{});
  }catch(e){console.info('RPG Yacht: cartellone predefinito attivo')}
