@@ -378,6 +378,23 @@ button:hover:not(:disabled){border-color:#e1bd77;transform:translateY(-1px)}butt
 }
 @media(max-width:360px){.stats .me-resource-stat{font-size:10px;padding:7px!important}.stats .me-resource-stat button{font-size:10px}}
 
+</style>
+<style id="me-mobile-voyage-focus-v2">
+@media(max-width:740px){
+#map:has(#voyageCinema:not(.hide))>.grid{display:flex!important;flex-direction:column!important;gap:7px!important}
+#map:has(#voyageCinema:not(.hide))>.grid>.panel{width:100%!important;min-width:0!important}
+#map #voyageCinema:not(.hide){width:100%!important;max-width:100%!important;border-radius:10px!important}
+#map #cinemaSea:not(.hide){height:clamp(450px,76svh,820px)!important;min-height:450px!important;overflow:hidden}
+#map #cinemaDock:not(.hide){height:clamp(330px,55svh,620px)!important}
+#map #voyageRouteMap{height:100%!important;width:100%!important;min-height:450px!important;z-index:1}
+#map #meHelmControls{z-index:650!important;max-width:100%;flex-wrap:wrap;gap:5px}
+#map #meHelmControls button{min-height:40px;touch-action:manipulation}
+#map #cinemaSea .leaflet-control-zoom{margin-top:70px!important}
+#map #cinemaSea>div:last-child:not(#voyageRouteMap){pointer-events:none;max-width:58%!important;font-size:9px!important;padding:5px 7px!important}
+#map #cinemaRadio{padding:7px 9px!important}
+#map #cinemaStatus{font-size:12px!important}
+}
+@media(max-width:380px){#map #cinemaSea:not(.hide){height:72svh!important;min-height:400px!important}#map #voyageRouteMap{min-height:400px!important}}
 </style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">GIOCA ORA</button><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><nav class="nav" id="navigation" aria-label="Sezioni del gioco"><button data-tab="home" class="on">🏠 HOME</button><button data-tab="office">⚓ DIREZIONE</button><button data-tab="map">🗺️ NAVIGAZIONE</button><button data-tab="missions">🎯 MISSIONI</button><button data-tab="fleet">🛥️ FLOTTA</button><button data-tab="marinas">⚓ MARINE</button><button data-tab="profile">👤 COMANDANTE / ACCOUNT</button><button data-tab="headquarters">🏝️ ISOLA DELLE ROSE</button></nav><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA TEST CLIENTI</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
