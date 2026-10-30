@@ -22,6 +22,33 @@ const rpgAdFace=new THREE.Mesh(new THREE.PlaneGeometry(18,9),rpgAdMat);rpgAdFace
 const rpgAdPostMat=material(0x62747a,.7,.5);
 for(const x of [-6,6]){const post=new THREE.Mesh(new THREE.CylinderGeometry(.38,.45,13,10),rpgAdPostMat);post.position.set(x,6.5,-.3);rpgAdGroup.add(post)}
 rpgAdGroup.rotation.y=.25;scene.add(rpgAdGroup);
+// Campaigns are read from a public, reviewed JSON file. Only HTTPS websites and same-origin creative assets are accepted.
+let rpgAdTarget='https://rpgyacht.com/';
+const rpgAdRay=new THREE.Raycaster(),rpgAdPointer=new THREE.Vector2();
+function approvedAdUrl(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password?u.href:null}catch{return null}}
+async function loadRpgAdCampaign(){
+ try{
+  const response=await fetch('./advertising/campaigns.json',{cache:'no-store'});
+  if(!response.ok)return;
+  const data=await response.json(),item=Array.isArray(data.campaigns)?data.campaigns.find(x=>x&&x.slot==='isola-rose-main'&&x.status==='active'&&Date.parse(x.start+'T00:00:00Z')<=Date.now()&&Date.parse(x.end+'T23:59:59Z')>=Date.now()):null;
+  if(!item)return;
+  const url=approvedAdUrl(item.website);
+  if(!url||typeof item.image!=='string'||!/^\\.\\/advertising\\/assets\\/[a-zA-Z0-9_-]+\\.(png|jpg|jpeg|webp)$/.test(item.image))return;
+  const loader=new THREE.TextureLoader();
+  loader.load(item.image,texture=>{texture.colorSpace=THREE.SRGBColorSpace;rpgAdMat.map=texture;rpgAdMat.needsUpdate=true;rpgAdTarget=url},undefined,()=>{});
+ }catch(e){console.info('RPG Yacht: cartellone predefinito attivo')}
+}
+loadRpgAdCampaign();
+renderer.domElement.addEventListener('pointerup',event=>{
+ if(!down||Math.hypot(event.clientX-down.x,event.clientY-down.y)>6)return;
+ const rect=renderer.domElement.getBoundingClientRect();
+ rpgAdPointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);
+ rpgAdRay.setFromCamera(rpgAdPointer,camera);
+ if(!rpgAdRay.intersectObject(rpgAdFace,false).length)return;
+ // A visible, user-initiated confirmation prevents accidental external navigation.
+ if(window.confirm('Aprire il sito web dello sponsor in una nuova scheda?'))window.open(rpgAdTarget,'_blank','noopener,noreferrer');
+});
+
 // Rectangular game-map tile: deep sea with a submerged stone shelf and a unified shoreside landscape.
 const seabed=material(0x164956,.96),coastalRock=material(0x777b74,.98),coastalRockLight=material(0xa0a297,.97),deepSea=material(0x10354a,.87);
 box(2400,.7,1600,deepSea,scene,400,-2.1,0);
