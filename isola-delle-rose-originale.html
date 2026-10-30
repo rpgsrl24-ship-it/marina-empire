@@ -34,7 +34,7 @@ async function loadApprovedHeaderSponsors(){
   const response=await fetch('./advertising/campaigns.json',{cache:'no-store'});
   if(!response.ok)return;
   const data=await response.json(),now=Date.now();
-  const items=(Array.isArray(data.campaigns)?data.campaigns:[]).filter(x=>x&&x.slot==='isola-rose-header'&&x.status==='active'&&Date.parse(x.start+'T00:00:00Z')<=now&&Date.parse(x.end+'T23:59:59Z')>=now);
+  const items=(Array.isArray(data.campaigns)?data.campaigns:[]).filter(x=>x&&(x.slot==='isola-rose-header'||x.slot==='all-marinas')&&x.status==='active'&&Date.parse(x.start+'T00:00:00Z')<=now&&Date.parse(x.end+'T23:59:59Z')>=now);
   if(!items.length)return;
   const track=document.getElementById('sponsor-banner-track');
   if(!track)return;
@@ -57,7 +57,7 @@ async function loadRpgAdCampaign(){
  try{
   const response=await fetch('./advertising/campaigns.json',{cache:'no-store'});
   if(!response.ok)return;
-  const data=await response.json(),item=Array.isArray(data.campaigns)?data.campaigns.find(x=>x&&x.slot==='isola-rose-main'&&x.status==='active'&&Date.parse(x.start+'T00:00:00Z')<=Date.now()&&Date.parse(x.end+'T23:59:59Z')>=Date.now()):null;
+  const data=await response.json(),item=Array.isArray(data.campaigns)?data.campaigns.find(x=>x&&(x.slot==='isola-rose-main'||x.slot==='all-marinas')&&x.status==='active'&&Date.parse(x.start+'T00:00:00Z')<=Date.now()&&Date.parse(x.end+'T23:59:59Z')>=Date.now()):null;
   if(!item)return;
   const url=approvedAdUrl(item.website);
   if(!url||typeof item.image!=='string'||!item.image.startsWith('./advertising/assets/')||!['png','jpg','jpeg','webp'].includes(item.image.split('.').pop().toLowerCase())||item.image.includes('..',2)||item.image.includes('?')||item.image.includes('#'))return;
