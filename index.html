@@ -843,6 +843,7 @@ function betaDiagnostics(){
  const check=(label,fn)=>{try{checks.push({label,ok:!!fn()})}catch(e){checks.push({label,ok:false})}};
  check("Rotta Rimini - Cervia",()=>{const p=planSeaTrip("rimini","cervia",boat("voyager").tank);return p.possible&&p.legs[0]==="rimini"&&p.legs[p.legs.length-1]==="cervia"&&p.distance>0});
  check("Marina e yacht iniziali",()=>ports.some(p=>p.id==="rimini")&&boats.some(b=>b.id==="voyager"&&b.tank>=300));
+ check("Navigazione menu principale",()=>["home","map","missions","fleet"].every(id=>!!document.getElementById(id))&&document.querySelectorAll("[data-tab]").length>=4);
  check("Pulsanti GPS e plancia accessibili",()=>["meHelmView","meHelmGps"].every(id=>{const el=$(id);return !!el&&el.tagName==="BUTTON"&&el.getAttribute("type")==="button"&&["true","false"].includes(el.getAttribute("aria-pressed"))}));
  check("Elementi essenziali della console",()=>["cinemaSea","meHelmWindow","meHelmView","meHelmGps","voyageRouteMap","cinemaPercent","cinemaStatus"].every(id=>!!$(id)));
  check("Catalogo missioni",()=>Array.isArray(missions)&&missions.length>0&&missions.some(m=>ports.some(p=>p.id===m.dest)&&boats.some(b=>b.id===m.boat)));
