@@ -24,8 +24,9 @@ assert(html.includes('function finishVoyage()'),'Voyage completion handler missi
 assert(html.includes('if(!state.trip){const guide=$("meArrivalGuide")'),'Idle voyage guide reset missing');
 assert(html.includes('const cinema=$("voyageCinema");if(cinema)cinema.classList.add("hide")'),'Idle helm cleanup missing');
 assert(html.includes('if(id==="profile"&&!window.meRegisteredPlayer'),'Guest account navigation missing');
-
-assert(html.includes('if(id==="profile"&&!window.meRegisteredPlayer'),'Registration focus missing');
+assert(html.includes('function marinaPortfolioSummary()'),'Marina portfolio accounting missing');
+assert(html.includes('function careerOpportunityHtml()'),'Career progression panel missing');
+assert(html.includes('function renderCareer()'),'Career dashboard missing');
 for(const id of ['cloudEmail','voyageArrivalNotice','missionList','officeMissions']){
   const occurrences=[...html.matchAll(new RegExp('\\bid=["\\x27]'+id+'["\\x27]','g'))].length;
   assert.equal(occurrences,1,'Expected one element with id='+id+', found '+occurrences);
