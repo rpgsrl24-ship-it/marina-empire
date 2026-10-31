@@ -1344,4 +1344,12 @@ document.getElementById('map')&&new MutationObserver(sync).observe(document.getE
 @keyframes meWakeFlow{from{transform:translateY(-35%)}to{transform:translateY(15%)}}
 @media(prefers-reduced-motion:reduce){.me-wake:before,.me-wake:after{animation:none!important}}
 @media(max-width:740px){#meHelmWindow .me-wake{width:44%;opacity:0}#map.me-voyage-running #meHelmWindow .me-wake{opacity:.45}}
-</style><script id="me-wake-v47">(()=>{const helm=document.getElementById('meHelmWindow');if(!helm||helm.querySelector('.me-wake'))return;const wake=document.createElement('div');wake.className='me-wake';wake.setAttribute('aria-hidden','true');helm.appendChild(wake)})();</script></body></html>
+</style><script id="me-wake-v47">(()=>{const helm=document.getElementById('meHelmWindow');if(!helm||helm.querySelector('.me-wake'))return;const wake=document.createElement('div');wake.className='me-wake';wake.setAttribute('aria-hidden','true');helm.appendChild(wake)})();</script><style id="me-helm-atmosphere-v48">
+/* Subtle atmospheric shimmer, only when the yacht is underway. */
+#meHelmWindow .me-sea-glint{position:absolute;inset:28% 0 0;z-index:1;pointer-events:none;opacity:0;overflow:hidden;transition:opacity 1.5s}
+#map.me-voyage-running #meHelmWindow .me-sea-glint{opacity:.45}
+.me-sea-glint:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(105deg,transparent 0 54px,rgba(228,250,255,.12) 57px,transparent 61px,transparent 112px);mask-image:linear-gradient(180deg,transparent 5%,#000 48%,transparent 95%);animation:meGlintDrift 16s ease-in-out infinite alternate}
+@keyframes meGlintDrift{from{transform:translateX(-8%)}to{transform:translateX(8%)}}
+@media(prefers-reduced-motion:reduce){.me-sea-glint:before{animation:none!important}}
+@media(max-width:740px){#map.me-voyage-running #meHelmWindow .me-sea-glint{opacity:.24}}
+</style><script id="me-helm-atmosphere-v48">(()=>{const helm=document.getElementById('meHelmWindow');if(!helm||helm.querySelector('.me-sea-glint'))return;const el=document.createElement('div');el.className='me-sea-glint';el.setAttribute('aria-hidden','true');helm.appendChild(el)})();</script></body></html>
