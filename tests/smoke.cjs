@@ -7,7 +7,7 @@ const scripts=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
   .filter(m=>!/(?:\bsrc\s*=|\btype\s*=\s*["'](?:application\/json|importmap))/i.test(m[1]));
 assert(scripts.length>0,'No inline game scripts found');
 for(let i=0;i<scripts.length;i++)new vm.Script(scripts[i][2],{filename:'index.html:inline-script-'+(i+1)});
-for(const match of html.matchAll(/<script\\b[^>]*\\bsrc=["'](\\.\\/[^"']+\\.js)["'][^>]*><\\/script>/gi)){
+for(const match of html.matchAll(/<script\b[^>]*\bsrc=["'](\.\/[^"']+\.js)["'][^>]*><\/script>/gi)){
   const path=match[1].slice(2);
   assert(fs.existsSync(path),'Missing local script: '+path);
   new vm.Script(fs.readFileSync(path,'utf8'),{filename:path});
