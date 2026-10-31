@@ -15,7 +15,7 @@ function run(alreadySettled=false){
  let saved=null;
  const sandbox={state,ports:[{id:'rimini',name:'Rimini'},{id:'cervia',name:'Cervia'}],missions:[mission],
    $:()=>null,persist:()=>{saved=JSON.parse(JSON.stringify(state))},render:()=>{},showTab:()=>{},notice:()=>{},money:String,
-   awardCareerMilestones:()=>{},console};
+   awardCareerMilestones:()=>{},window:{MarinaEmpireTraffic:{track:()=>{}}},console};
  vm.createContext(sandbox);vm.runInContext(code+';finishVoyage();',sandbox);
  assert.equal(state.port,'cervia','la barca deve arrivare a Cervia');
  assert.equal(state.trip,null,'viaggio concluso');
