@@ -2,6 +2,11 @@ name: Marina Empire smoke tests
 on:
   push:
     branches: [main]
+    paths:
+      - 'index.html'
+      - 'route-planner.js'
+      - 'tests/**'
+      - '.github/workflows/smoke.yml'
   pull_request:
   workflow_dispatch:
 permissions:
