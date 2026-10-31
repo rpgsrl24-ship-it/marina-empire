@@ -818,7 +818,7 @@ if(Array.isArray(trip.legs)&&trip.legIndex<trip.legs.length-2){
 const stop=trip.legs[trip.legIndex+1],next=trip.legs[trip.legIndex+2],tank=boat((trip.mission||{}).boat||state.boat).tank;
 const needed=Math.ceil(seaMiles(stop,next)*.85),reserve=Math.ceil(tank*.15);
 const fill=Math.max(0,needed+reserve-state.fuel),price=fill*3;
-if(needed+reserve>tank||state.coins<price){state.port=stop;state.lastDockedBridge={origin:trip.origin||stop,destination:stop,at:Date.now(),interrupted:true};state.trip=null;persist();render();showTab("map");voyageHeartbeat();notice("Viaggio interrotto a "+port(stop).name+": rifornimento non disponibile. Lo yacht resta ormeggiato e la plancia rimane visibile.");return;}
+if(needed+reserve>tank||state.coins<price){state.port=stop;state.lastDockedBridge={origin:trip.origin||stop,destination:stop,at:Date.now(),interrupted:true};state.trip=null;persist();render();showTab("map");voyageHeartbeat();notice("Sosta tecnica a "+port(stop).name+": rifornimento automatico non disponibile. La missione e interrotta; controlla il carburante e scegli una nuova missione dalla marina attuale.");return;}
 state.coins-=price;state.fuel+=fill-needed;state.port=stop;trip.legIndex++;trip.origin=stop;trip.sec=Math.max(10,Number.isFinite(Number(trip.legSeconds))&&Number(trip.legSeconds)>0?Number(trip.legSeconds):25);trip.until=Date.now()+trip.sec*1000;
 persist();render();notice("Rifornimento a "+port(stop).name+": "+fill+" L");voyageHeartbeat();return;
 }
