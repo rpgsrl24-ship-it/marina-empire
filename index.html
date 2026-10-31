@@ -798,8 +798,8 @@ if(state.fuel<first+reserve)return notice("Carburante insufficiente: riserva 15%
 if(state.coins<m.cost)return notice("Crediti insufficienti");
 const estimatedStops=plan.legs.slice(1,-1);let simulatedFuel=state.fuel-first,estimatedRefuel=0;for(let i=1;i<plan.legs.length-1;i++){const needed=Math.ceil(seaMiles(plan.legs[i],plan.legs[i+1])*.85);if(needed+reserve>tank)return notice("La tratta "+port(plan.legs[i]).name+" → "+port(plan.legs[i+1]).name+" supera la capacità del serbatoio");const fill=Math.max(0,needed+reserve-simulatedFuel);estimatedRefuel+=fill*3;simulatedFuel+=fill-needed;}if(state.coins<m.cost+estimatedRefuel)return notice("Crediti insufficienti per missione e rifornimenti previsti: "+money(m.cost+estimatedRefuel));
 state.coins-=m.cost;state.fuel-=first;state.boat=m.boat;
-const legSeconds=Math.max(10,Math.ceil(m.sec/(plan.legs.length-1)));
-state.voyageSerial=(Number(state.voyageSerial)||0)+1;state.trip={voyageId:state.voyageSerial,id:m.id,origin:state.port,dest:m.dest,legs:plan.legs,legIndex:0,legSeconds,sec:legSeconds,mission:m,until:Date.now()+legSeconds*1000};
+const missionDuration=Number(m.sec);const legSeconds=Math.max(10,Math.ceil((Number.isFinite(missionDuration)&&missionDuration>0?missionDuration:60)/(plan.legs.length-1)));
+state.voyageSerial=Math.max(0,Number.isSafeInteger(Number(state.voyageSerial))?Number(state.voyageSerial):0)+1;state.trip={voyageId:state.voyageSerial,id:m.id,origin:state.port,dest:m.dest,legs:plan.legs,legIndex:0,legSeconds,sec:legSeconds,mission:m,until:Date.now()+legSeconds*1000};
 persist();showTab("map");render();voyageHeartbeat();}
 function betaDiagnostics(){
  const checks=[];
