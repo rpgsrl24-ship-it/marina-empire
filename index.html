@@ -826,12 +826,12 @@ const m=trip.mission||missions.find(x=>x.id===trip.id);const settledIds=Array.is
 // Legacy tick delegates to the single authoritative voyage heartbeat.
 function tick(){clearTimeout(timer);voyageHeartbeat()}
 function launch(id){if(state.trip)return notice("Un viaggio è già in corso: completa la navigazione prima di partire di nuovo.");if(!window.meRegisteredPlayer&&(Number(state.voyages)||0)>=1){showTab("profile");return notice("Hai completato la missione di prova. Registrati gratuitamente o accedi per continuare, senza obbligo di acquisto.")}if(!state.setupComplete&&(state.voyages||0)===0&&!state.completed.length){showTab("office");document.getElementById("setupDashboard")?.scrollIntoView({behavior:"smooth",block:"center"});return notice("Conferma prima barca e marina nella Direzione")}const m=findAvailableMission(id);if(!m)return notice("Missione non disponibile dalla darsena attuale");if(m.dest===state.port)return notice("La destinazione coincide con la marina di partenza");if(!state.owned.includes(m.boat))return notice("Imbarcazione richiesta non disponibile");
-if(state.condition<30)return notice("Manutenzione necessaria");if(m.boat!==state.boat)return notice("Seleziona prima lo yacht richiesto nella flotta");
+if(state.condition<30)return notice("Manutenzione necessaria: ripara lo yacht dalla Direzione prima di partire.");if(m.boat!==state.boat)return notice("Seleziona prima lo yacht richiesto nella flotta");
 const plan=planSeaTrip(state.port,m.dest,boat(m.boat).tank);
 if(!plan.possible||!Array.isArray(plan.legs)||plan.legs.length<2||!Number.isFinite(plan.distance))return notice(plan.reason||"Rotta non disponibile");
 const tank=boat(m.boat).tank,reserve=Math.ceil(tank*.15),first=Math.ceil(seaMiles(plan.legs[0],plan.legs[1])*.85);if(state.fuel>tank)state.fuel=tank;
 if(first+reserve>tank)return notice("Autonomia insufficiente");
-if(state.fuel<first+reserve)return notice("Carburante insufficiente: riserva 15%");
+if(state.fuel<first+reserve)return notice("Carburante insufficiente: rifornisci lo yacht prima della partenza, mantenendo la riserva del 15%.");
 if(state.coins<m.cost)return notice("Crediti insufficienti");
 const estimatedStops=plan.legs.slice(1,-1);let simulatedFuel=state.fuel-first,estimatedRefuel=0;for(let i=1;i<plan.legs.length-1;i++){const needed=Math.ceil(seaMiles(plan.legs[i],plan.legs[i+1])*.85);if(needed+reserve>tank)return notice("La tratta "+port(plan.legs[i]).name+" → "+port(plan.legs[i+1]).name+" supera la capacità del serbatoio");const fill=Math.max(0,needed+reserve-simulatedFuel);estimatedRefuel+=fill*3;simulatedFuel+=fill-needed;}if(state.coins<m.cost+estimatedRefuel)return notice("Crediti insufficienti per missione e rifornimenti previsti: "+money(m.cost+estimatedRefuel));
 state.coins-=m.cost;state.fuel-=first;state.boat=m.boat;
