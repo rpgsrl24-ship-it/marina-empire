@@ -407,6 +407,24 @@ button:hover:not(:disabled){border-color:#e1bd77;transform:translateY(-1px)}butt
 .shell>.stats>span>span{padding:0!important;border:0!important;background:none!important}
 }
 @media(max-width:370px){.shell>.stats{gap:5px!important;padding:6px!important}.shell>.stats>span{font-size:10px!important}.shell>.stats>span.me-resource-stat button{font-size:10px!important}}
+</style><style id="me-mobile-pages-compact-v49">
+/* Compact mission, fleet and navigation screens on phones; visual-only changes. */
+@media(max-width:740px){
+#missions,#fleet,#map{min-width:0!important;overflow-wrap:anywhere}
+#missions>.me-lux-page-head,#fleet>.me-lux-page-head,#map>.me-lux-page-head{min-height:92px!important;padding:12px 14px!important;margin-bottom:10px!important;background-position:center!important}
+#missions>.me-lux-page-head h1,#fleet>.me-lux-page-head h1,#map>.me-lux-page-head h1{font-size:clamp(21px,6vw,27px)!important;line-height:1.12!important}
+#missions>.me-lux-page-head p,#fleet>.me-lux-page-head p,#map>.me-lux-page-head p{font-size:12px!important;margin:3px 0 0!important}
+#missions .panel,#fleet .panel,#map .panel{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+#missions .panel button,#fleet .panel button,#map .panel button{max-width:100%;white-space:normal;overflow-wrap:anywhere;min-height:42px;touch-action:manipulation}
+#missions .grid,#fleet .grid,#map .grid{min-width:0!important;gap:10px!important}
+#fleet .me-fleet-banner{min-height:230px!important;background-position:center!important}
+#fleet .me-fleet-banner-content{left:14px!important;right:14px!important;bottom:14px!important;max-width:calc(100% - 28px)!important}
+#fleet .me-fleet-banner h2{font-size:clamp(25px,7vw,36px)!important;line-height:1.1!important}
+#map #interactiveMapDisplay{height:clamp(300px,48svh,460px)!important;min-height:300px!important}
+#map #voyageRouteMap{max-width:100%!important}
+#map #voyageCinema{min-width:0!important;max-width:100%!important;overflow:hidden!important}
+#map #cinemaTitle{overflow-wrap:anywhere!important}
+}
 </style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">GIOCA ORA</button><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><nav class="nav" id="navigation" aria-label="Sezioni del gioco"><button data-tab="home" class="on">🏠 HOME</button><button data-tab="office">⚓ DIREZIONE</button><button data-tab="map">🗺️ NAVIGAZIONE</button><button data-tab="missions">🎯 MISSIONI</button><button data-tab="fleet">🛥️ FLOTTA</button><button data-tab="marinas">⚓ MARINE</button><button data-tab="profile">👤 COMANDANTE / ACCOUNT</button><button data-tab="headquarters">🏝️ ISOLA DELLE ROSE</button></nav><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA TEST CLIENTI</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
