@@ -11,7 +11,7 @@ const tests = [
   ['Controllo carburante e riserva', /function missionBudget\(m\)/.test(html) && /fuel<required\+reserve/.test(html)],
   ['Blocco navigazione contemporanea', /state\.trip\)return \{ready:false/.test(html)],
   ['Identificatore viaggio persistente', /voyageSerial/.test(html) && /voyageId:state\.voyageSerial/.test(html)],
-  ['Salvataggio locale esplicito', /localStorage\.setItem\(KEY,JSON\.stringify\(state\)\)/.test(html)],
+  ['Salvataggio locale esplicito e verificato', /const snapshot=JSON\.stringify\(state\)/.test(html) && /localStorage\.setItem\(KEY,snapshot\)/.test(html) && /localStorage\.getItem\(KEY\)!==snapshot/.test(html)],
   ['Diagnostica beta presente', /function betaDiagnostics\(\)/.test(html)],
 ];
 let failures = 0;
