@@ -20,6 +20,11 @@ assert(html.includes('if(id==="office"&&state.setupComplete){renderOfficeMission
 assert(html.includes('if(id==="missions"&&state.setupComplete){renderMissionChoices()}'),'Mission tab refresh missing');
 assert(html.includes('if(!window.meRegisteredPlayer&&(Number(state.voyages)||0)>=1){showTab("profile");'),'Guest mission launch guard missing');
 assert(html.includes('window.meRegisteredPlayer=!!account?.email_confirmed_at'),'Verified account check missing');
+assert(html.includes('function finishVoyage()'),'Voyage completion handler missing');
+assert(html.includes('if(!state.trip){const guide=$("meArrivalGuide")'),'Idle voyage guide reset missing');
+assert(html.includes('const cinema=$("voyageCinema");if(cinema)cinema.classList.add("hide")'),'Idle helm cleanup missing');
+assert(html.includes('if(id==="profile"&&!window.meRegisteredPlayer'),'Guest account navigation missing');
+
 assert(html.includes('if(id==="profile"&&!window.meRegisteredPlayer'),'Registration focus missing');
 for(const id of ['cloudEmail','voyageArrivalNotice','missionList','officeMissions']){
   const occurrences=[...html.matchAll(new RegExp('\\bid=["\\x27]'+id+'["\\x27]','g'))].length;
