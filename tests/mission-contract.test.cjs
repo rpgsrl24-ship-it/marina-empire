@@ -13,6 +13,8 @@ const tests = [
   ['Identificatore viaggio persistente', /voyageSerial/.test(html) && /voyageId:state\.voyageSerial/.test(html)],
   ['Salvataggio locale esplicito e verificato', /const snapshot=JSON\.stringify\(state\)/.test(html) && /localStorage\.setItem\(KEY,snapshot\)/.test(html) && /localStorage\.getItem\(KEY\)!==snapshot/.test(html)],
   ['Diagnostica beta presente', /function betaDiagnostics\(\)/.test(html)],
+  ['Portafoglio marine: ricavi e costi separati', /function marinaPortfolioSummary\(\)/.test(html) && /gross,costs,net:gross-costs/.test(html)],
+  ['Costi operativi marina inclusi nel rendimento', /function fleetDailyIncome\(\)/.test(html) && /berthDailyNet\(id\)-marinaOperatingCosts\(id\)\.total/.test(html)],
 ];
 let failures = 0;
 for (const [label, ok] of tests) { console.log((ok ? 'PASS' : 'FAIL') + ' ' + label); if (!ok) failures++; }
