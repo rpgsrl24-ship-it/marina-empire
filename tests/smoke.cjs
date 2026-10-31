@@ -12,4 +12,13 @@ for(const token of required)assert(html.includes(token),'Missing game element: '
 const gate='!window.meRegisteredPlayer&&(Number(state.voyages)||0)>=1';
 assert(html.includes(gate),'Free guest trial gate missing');
 assert(html.includes('if(id==="office"&&state.setupComplete){renderOfficeMissions()}'),'Office mission refresh missing');
+assert(html.includes('if(id==="missions"&&state.setupComplete){renderMissionChoices()}'),'Mission tab refresh missing');
+assert(html.includes('if(!window.meRegisteredPlayer&&(Number(state.voyages)||0)>=1){showTab("profile");'),'Guest mission launch guard missing');
+assert(html.includes('window.meRegisteredPlayer=!!account?.email_confirmed_at'),'Verified account check missing');
+assert(html.includes('if(id==="profile"&&!window.meRegisteredPlayer'),'Registration focus missing');
+for(const id of ['cloudEmail','voyageArrivalNotice','missionList','officeMissions']){
+  const occurrences=[...html.matchAll(new RegExp('\\bid=["\\x27]'+id+'["\\x27]','g'))].length;
+  assert.equal(occurrences,1,'Expected one element with id='+id+', found '+occurrences);
+}
+
 console.log('PASS: '+scripts.length+' inline scripts parse; '+required.length+' essential elements and guest gate present.');
