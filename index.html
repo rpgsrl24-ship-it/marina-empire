@@ -925,7 +925,7 @@ function earnBerthRentals(){
  const now=Date.now();let total=0,advanced=false;
  for(const [id,m] of Object.entries(state.marinas)){
   if(!m||!Number.isFinite(Number(m.lastReward)))continue;
-  if(!Number.isFinite(Number(m.berthLastReward))){m.berthLastReward=Number(m.lastReward);if(!Number.isFinite(m.berthLastReward))m.berthLastReward=now}
+  if(!Number.isFinite(Number(m.berthLastReward))){m.berthLastReward=Number(m.lastReward);if(!Number.isFinite(m.berthLastReward))m.berthLastReward=now;advanced=true}
   const hours=Math.min(24,Math.floor(Math.max(0,now-Number(m.berthLastReward))/3600000));
   if(!hours)continue;
   total+=Math.floor((berthDailyNet(id)-marinaOperatingCosts(id).total)*hours/24);
