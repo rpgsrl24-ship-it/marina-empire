@@ -632,7 +632,7 @@ else if(!isAdA&&!isAdB){
 else {const ad=isAdA?A:B,ty=isAdA?B:A;const cross=[...chain(ad,seaCorridors.otranto,adriaticSpine),seaCorridors.ionian,seaCorridors.messinaSouth,seaCorridors.messinaNorth,...chain(seaCorridors.messinaNorth,ty,tyrrhenianSpine)];mid=isAdA?cross:cross.reverse()}
 return [A,...mid,B];
 }
-function seaMiles(a,b){const x=harborGPS[a],y=harborGPS[b];if(!x||!y)return 0;const points=[x,...seaWaypoints(a,b),y];return points.slice(1).reduce((n,p,i)=>n+straightNm(points[i],p),0)}
+function seaMiles(a,b){if(!harborGPS[a]||!harborGPS[b])return 0;const points=voyageRoutePoints(a,b);return points.slice(1).reduce((n,p,i)=>n+straightNm(points[i],p),0)}
 function planSeaTrip(from,to,tank){
  const capacity=Math.max(1,Number(tank)||1),reserve=Math.ceil(capacity*.15),usable=(capacity-reserve)/.85;
  if(!harborGPS[from]||!harborGPS[to]||from===to)return {possible:false,distance:0,stops:[],reason:"Marina di partenza o destinazione non valida"};
