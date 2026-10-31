@@ -29,3 +29,10 @@ function run(alreadySettled=false){
 }
 run(false);console.log('PASS Arrivo Rimini-Cervia, premio, salvataggio');
 run(true);console.log('PASS Ripristino posizione senza doppio premio');
+// Verify that a voyage already marked settled cannot pay a second time.
+const settledMission={id:'INTRO_RIMINI_CERVIA',dest:'cervia',reward:500,prestige:50,name:'Rimini-Cervia'};
+const settledState={port:'rimini',coins:10000,prestige:0,voyages:0,earnings:0,condition:100,completed:[],settledVoyages:[],trip:{voyageId:43,id:settledMission.id,origin:'rimini',dest:'cervia',legs:['rimini','cervia'],legIndex:0,mission:settledMission,settled:true}};
+const settledSandbox={state:settledState,ports:[{id:'cervia'}],missions:[settledMission],$:()=>null,persist:()=>{},render:()=>{},showTab:()=>{},notice:()=>{},money:String,awardCareerMilestones:()=>{},window:{MarinaEmpireTraffic:{track:()=>{}}},console};
+vm.createContext(settledSandbox);vm.runInContext(code+';finishVoyage();',settledSandbox);
+assert.equal(settledState.port,'cervia');assert.equal(settledState.trip,null);assert.equal(settledState.coins,10000);assert.equal(settledState.voyages,0);assert.equal(settledState.prestige,0);
+console.log('PASS Viaggio gia liquidato senza doppio premio');
