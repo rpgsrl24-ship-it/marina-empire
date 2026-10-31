@@ -922,17 +922,17 @@ function berthDailyNet(id){
 }
 function earnBerthRentals(){
  if(!state.name||!state.marinas)return 0;
- const now=Date.now();let total=0;
+ const now=Date.now();let total=0,advanced=false;
  for(const [id,m] of Object.entries(state.marinas)){
   if(!m||!Number.isFinite(Number(m.lastReward)))continue;
   if(!Number.isFinite(Number(m.berthLastReward))){m.berthLastReward=Number(m.lastReward);if(!Number.isFinite(m.berthLastReward))m.berthLastReward=now}
   const hours=Math.min(24,Math.floor(Math.max(0,now-Number(m.berthLastReward))/3600000));
   if(!hours)continue;
   total+=Math.floor((berthDailyNet(id)-marinaOperatingCosts(id).total)*hours/24);
-  m.berthLastReward=Number(m.berthLastReward)+hours*3600000;
+  m.berthLastReward=Number(m.berthLastReward)+hours*3600000;advanced=true;
  }
  if(total){state.coins+=total;state.earnings=(Number(state.earnings)||0)+total;state.berthRentalEarnings=(Number(state.berthRentalEarnings)||0)+total}
- persist();return total;
+ if(advanced)persist();return total;
 }
 function earnMarinaIncome(){if(!state.marinas)return;let total=0;const now=Date.now();for(const [id,m] of Object.entries(state.marinas)){if(!m||!Number.isFinite(m.lastReward))continue;const days=Math.min(7,Math.floor(Math.max(0,now-m.lastReward)/86400000));if(days>0){const base=developedMarinaIncome(id);total+=base*days;m.lastReward+=days*86400000;}}if(total){state.coins+=total;state.earnings=(state.earnings||0)+total;persist();notice("Entrate marine: +"+money(total)+" crediti");}}earnMarinaIncome();earnBusinessIncome();earnAutonomousCharters();earnBerthRentals();
 // Keep passive income accruing during long play sessions, not only at page load.
