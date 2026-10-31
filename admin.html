@@ -29,7 +29,7 @@
  const u=await client.auth.getUser();if(u.error||!await authorized(u.data.user))throw Error("Accesso amministratore richiesto");
  const result=await client.from("me_chat_reports").select("id,created_at,marina_id,reported_name,message_excerpt,reason,status").order("created_at",{ascending:false}).limit(50);
  if(result.error)throw result.error;
- status.textContent=(result.data||[]).length+" segnalazioni";
+ const pending=(result.data||[]).filter(item=>item.status==="pending").length;status.textContent=pending+" da esaminare · "+(result.data||[]).length+" segnalazioni recenti";
  for(const item of result.data||[]){
  const card=document.createElement("div");card.className="metric";
  for(const line of [item.reported_name+" · "+item.marina_id,item.message_excerpt,item.reason,item.status]){const p=document.createElement("p");p.textContent=line;card.appendChild(p)}
@@ -42,7 +42,7 @@
  }catch(e){status.textContent="Errore: "+e.message}
 }
 $("moderationRefresh").addEventListener("click",loadModeration);
-async function authorized(user){if(!user)return false;const r=await client.from("me_admin_users").select("user_id").eq("user_id",user.id).maybeSingle();if(r.error)throw r.error;return !!r.data}async function show(){const u=await client.auth.getUser();if(u.error)throw u.error;const user=u.data.user;const ok=await authorized(user);$("login").classList.toggle("hidden",ok);$("dashboard").classList.toggle("hidden",!ok);if(!ok){stopLive();message(user?"Questo account non ha ancora l'autorizzazione amministrativa RPG Yacht.":"Accedi con un account amministratore autorizzato.");return}try{localStorage.setItem("me_admin_analytics_optout_v1","1")}catch(e){}$("identity").textContent="Accesso verificato: "+user.email;startLive();await refresh();await refreshOnline();if(!onlineRefreshTimer)onlineRefreshTimer=setInterval(()=>refreshOnline().catch(console.warn),20000)}let liveChannel=null,liveClient=null,livePeak=0;
+async function authorized(user){if(!user)return false;const r=await client.from("me_admin_users").select("user_id").eq("user_id",user.id).maybeSingle();if(r.error)throw r.error;return !!r.data}async function show(){const u=await client.auth.getUser();if(u.error)throw u.error;const user=u.data.user;const ok=await authorized(user);$("login").classList.toggle("hidden",ok);$("dashboard").classList.toggle("hidden",!ok);if(!ok){stopLive();message(user?"Questo account non ha ancora l'autorizzazione amministrativa RPG Yacht.":"Accedi con un account amministratore autorizzato.");return}try{localStorage.setItem("me_admin_analytics_optout_v1","1")}catch(e){}$("identity").textContent="Accesso verificato: "+user.email;startLive();await refresh();await refreshOnline();await loadModeration();if(!onlineRefreshTimer)onlineRefreshTimer=setInterval(()=>refreshOnline().catch(console.warn),20000)}let liveChannel=null,liveClient=null,livePeak=0;
 function startLive(){
  if(liveChannel)return;
  try{
