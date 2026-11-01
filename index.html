@@ -1416,9 +1416,11 @@ const book=document.getElementById("me-online-book");
 const cancel=document.getElementById("me-online-cancel");
 const slotInput=document.getElementById("me-online-slot");
 let activeBooking=null;
+let availabilityVerified=false;
+let availableSlots=new Set();
 for(let i=1;i<=60;i++){const option=document.createElement("option");option.value=String(i);option.textContent="Posto "+i;slotInput.appendChild(option);}
 let busy=false;
-function setBusy(value){busy=value;book.disabled=value;cancel.disabled=value||!activeBooking;button.disabled=value;select.disabled=value;slotInput.disabled=value;}
+function setBusy(value){busy=value;book.disabled=value||!availabilityVerified||availableSlots.size===0;cancel.disabled=value||!activeBooking;button.disabled=value;select.disabled=value;slotInput.disabled=value;}
 async function getAuthenticatedClient(){
  if(!window.supabase?.createClient)throw Error("Libreria online non disponibile");
  const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
@@ -1438,6 +1440,7 @@ book?.addEventListener("click",async()=>{
  const marina=select.value,slot=Number(slotInput.value);
  if(!valid.has(marina)||!Number.isInteger(slot)||slot<1||slot>60){status.textContent="Seleziona una marina e un posto da 1 a 60.";return;}
  if(busy)return;
+ if(!availabilityVerified||!availableSlots.has(slot)){status.textContent="Aggiorna la disponibilità e scegli un posto libero.";return;}
  setBusy(true);status.textContent="Registrazione della prenotazione online...";
  try{
   const client=await getAuthenticatedClient();
@@ -1471,7 +1474,7 @@ cancel?.addEventListener("click",async()=>{
  }catch(e){status.textContent="Annullamento non riuscito: "+(e.message||"errore temporaneo");}
  finally{setBusy(false);if(refreshAfter)button.click();}
 });
-select.addEventListener("change",()=>{activeBooking=null;cancel.disabled=true;cancel.textContent="VERIFICA PRENOTAZIONE";book.disabled=true;slotInput.disabled=true;for(const option of slotInput.options){option.disabled=false;option.textContent="Posto "+option.value;}status.textContent="Marina cambiata. Premi AGGIORNA DISPONIBILITÀ prima di prenotare online.";});
+select.addEventListener("change",()=>{availabilityVerified=false;availableSlots.clear();activeBooking=null;cancel.disabled=true;cancel.textContent="VERIFICA PRENOTAZIONE";book.disabled=true;slotInput.disabled=true;for(const option of slotInput.options){option.disabled=false;option.textContent="Posto "+option.value;}status.textContent="Marina cambiata. Premi AGGIORNA DISPONIBILITÀ prima di prenotare online.";});
 cancel.disabled=true;
 book.disabled=true;
 slotInput.disabled=true;
@@ -1479,7 +1482,7 @@ button.addEventListener("click",async()=>{
  if(busy)return;
  const marina=select.value;
  if(!valid.has(marina))return;
- setBusy(true);status.textContent="Verifica disponibilità in corso...";
+ availabilityVerified=false;availableSlots.clear();setBusy(true);status.textContent="Verifica disponibilità in corso...";
  try{
   if(!window.supabase||!window.supabase.createClient)throw Error("Libreria online non disponibile");
   const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
@@ -1491,6 +1494,7 @@ button.addEventListener("click",async()=>{
   const numbers=data.map(row=>Number(row.berth_number)).filter(n=>Number.isInteger(n)&&n>=1&&n<=60);
   await refreshMine(client);
   const free=Array.from({length:60},(_,i)=>i+1).filter(n=>!numbers.includes(n));
+  availableSlots=new Set(free);availabilityVerified=true;
   const selectedSlot=Number(slotInput.value);
   for(const option of slotInput.options){const occupied=numbers.includes(Number(option.value));option.disabled=occupied;option.textContent="Posto "+option.value+(occupied?" · OCCUPATO":" · LIBERO");}
   if((numbers.includes(selectedSlot)||!selectedSlot)&&free.length)slotInput.value=String(free[0]);
@@ -1498,8 +1502,8 @@ button.addEventListener("click",async()=>{
   book.disabled=free.length===0;
   slotInput.title=free.length?"Scegli uno dei "+free.length+" posti liberi":"Nessun posto libero";
   status.textContent="Marina "+marina.toUpperCase()+" · "+date+" · occupati "+numbers.length+"/60 · liberi "+free.length+". "+(numbers.length?"Posti occupati: "+numbers.join(", ")+". ":"")+(activeBooking?"La tua prenotazione: posto "+activeBooking.berth_number+". ":"")+"Le prenotazioni della partita restano dimostrative.";
- }catch(e){status.textContent="Disponibilità online non verificabile. Le prenotazioni dimostrative restano separate.";}
- finally{setBusy(false);if(status.textContent.includes("liberi 0."))book.disabled=true;}
+ }catch(e){availabilityVerified=false;availableSlots.clear();status.textContent="Disponibilità online non verificabile. Le prenotazioni dimostrative restano separate.";}
+ finally{setBusy(false);}
 });
 })();
 </script></body></html>
