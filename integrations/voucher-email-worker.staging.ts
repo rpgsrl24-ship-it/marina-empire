@@ -5,6 +5,7 @@
 // Do not deploy until refund handling, stale claim recovery and E2E tests pass.
 import { createClient } from "npm:@supabase/supabase-js@2.95.0";
 import { decryptVoucher } from "./voucher-crypto.ts";
+import { decideRecovery } from "./voucher-recovery-policy.ts";
 const env=(key:string)=>Deno.env.get(key)||"";
 const respond=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers:{"content-type":"application/json","cache-control":"no-store"}});
 Deno.serve(async request=>{
@@ -14,11 +15,16 @@ Deno.serve(async request=>{
  if(required.some(k=>!env(k)))return respond({error:"Server configuration incomplete"},503);
  if(request.headers.get("authorization")!=="Bearer "+env("ME_DELIVERY_WORKER_TOKEN"))return respond({error:"Unauthorized"},401);
  const admin=createClient(env("SUPABASE_URL"),env("SUPABASE_SERVICE_ROLE_KEY"),{auth:{persistSession:false,autoRefreshToken:false}});
- const {data:due,error:lookupError}=await admin.from("me_voucher_delivery_outbox").select("id,woo_order_id,woo_order_item_id,woo_unit_index")
+ const {data:due,error:lookupError}=await admin.from("me_voucher_delivery_outbox").select("id,woo_order_id,woo_order_item_id,woo_unit_index,status,attempts,updated_at,provider_message_id")
   .in("status",["pending","retry"]).lte("next_attempt_at",new Date().toISOString()).lt("attempts",8).order("created_at").limit(10);
  if(lookupError)return respond({error:"Queue unavailable"},503);
  let sent=0,failed=0;
  for(const item of due||[]){
+  const decision=decideRecovery({
+    status:item.status,attempts:item.attempts,
+    updatedAt:item.updated_at,providerMessageId:item.provider_message_id
+  },new Date());
+  if(decision.action!=="retry")continue;
   const {data:claimed,error:claimError}=await admin.rpc("me_claim_voucher_delivery_internal",{p_delivery_id:item.id});
   if(claimError||!claimed?.length)continue;
   const row=claimed[0];
