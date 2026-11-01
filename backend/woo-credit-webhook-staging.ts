@@ -1,3 +1,4 @@
+import { planVerifiedCreditOrder } from "./credit-order-plan-staging.ts";
 // Marina Empire: preparatory WooCommerce webhook validation.
 // NOT a voucher issuer. It never credits accounts or returns voucher codes.
 // Deploy only after configuring server-side secrets and finishing issuance/outbox.
@@ -58,17 +59,20 @@ Deno.serve(async(req:Request)=>{
     const total=Number(line.total);
     return Number.isSafeInteger(line.id) && Number(line.id)>0 &&
       typeof qty==="number" && Number.isSafeInteger(qty) && qty>0 && qty<=100 &&
-      typeof line.total==="string" && /^\\d+\\.\\d{2}$/.test(line.total) &&
+      typeof line.total==="string" && /^\d+\.\d{2}$/.test(line.total) &&
       Number.isFinite(total) && total>0;
   });
   if(!valid) return json({accepted:false,error:"Invalid credit line"},503);
   const recipient=String(order.billing?.email||"").trim();
-  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(recipient) || recipient.length>254)
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient) || recipient.length>254)
     return json({accepted:false,error:"Invalid recipient"},503);
   const totalUnits=creditLines.reduce((sum:{},line:{quantity:number})=>Number(sum)+line.quantity,0);
   if(totalUnits>100) return json({accepted:false,error:"Too many credit units"},503);
-  const eligible=creditLines;
+  let plannedUnits=0;
+  try {
+    plannedUnits=planVerifiedCreditOrder(orderId,recipient,creditLines).length;
+  } catch { return json({accepted:false,error:"Invalid credit issuance plan"},503); }
   // Deliberately fail closed: do not acknowledge successful issuance before
   // atomic voucher creation and encrypted outbox delivery are implemented.
-  return json({accepted:false,eligibleLines:eligible.length,error:"Issuance and delivery not enabled"},503);
+  return json({accepted:false,eligibleLines:creditLines.length,plannedUnits,error:"Issuance and delivery not enabled"},503);
 });
