@@ -28,6 +28,11 @@ const line={orderId:101,itemId:202,unitIndex:0,credits:50000,recipientEmail:'tes
     assert.match(code,/^ME-[A-Z2-9]{8}-[A-Z2-9]{8}-[A-Z2-9]{8}$/);
     const digest=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(code))).toString('hex');
     assert.equal(digest,args.p_code_hash);
+    const wrongKey=new Uint8Array(32);wrongKey.fill(8);
+    const wrongAes=await crypto.subtle.importKey('raw',wrongKey,{name:'AES-GCM'},false,['decrypt']);
+    await assert.rejects(crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(args.p_nonce)},wrongAes,bytes(args.p_ciphertext)));
+    const corrupted=bytes(args.p_ciphertext);corrupted[0]^=1;
+    await assert.rejects(crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(args.p_nonce)},aes,corrupted));
     return {data:'test-voucher-id',error:null};
   });
   assert.equal(issued.voucherId,'test-voucher-id');
