@@ -1458,9 +1458,9 @@ book?.addEventListener("click",async()=>{
   if(otherBookings?.length){status.textContent="Hai già una prenotazione online per oggi in un’altra marina. Annullala prima di prenotare un altro posto.";return;}
   const {data,error}=await client.rpc("reserve_berth",{p_marina_id:marina,p_berth_number:slot,p_booking_date:date});
   if(error){refreshAfter=true;throw Error(error.message||"Posto non disponibile");}
-  status.textContent="Prenotazione online confermata: "+marina.toUpperCase()+" posto "+slot+". Nessuna moneta addebitata.";
-  await refreshMine(client);
   refreshAfter=true;
+  status.textContent="Prenotazione online confermata: "+marina.toUpperCase()+" posto "+slot+". Nessuna moneta addebitata.";
+  try{await refreshMine(client);}catch(e){status.textContent="Prenotazione registrata, ma la lettura del riepilogo non è riuscita. Aggiorna la disponibilità.";}
  }catch(e){status.textContent="Prenotazione non confermata: "+(e.message||"errore temporaneo")+". La disponibilità verrà aggiornata.";if(refreshAfter){availabilityVerified=false;availableSlots.clear();}}
  finally{setBusy(false);if(refreshAfter)button.click();}
 });
@@ -1474,9 +1474,9 @@ cancel?.addEventListener("click",async()=>{
   if(!activeBooking){status.textContent="Non risultano prenotazioni attive in questa marina.";return;}
   const {data,error}=await client.rpc("cancel_berth",{p_booking_id:activeBooking.id});
   if(error||data!==true)throw Error("Cancellazione non confermata");
-  status.textContent="Prenotazione online annullata. Nessuna moneta modificata.";
-  await refreshMine(client);
   refreshAfter=true;
+  status.textContent="Prenotazione online annullata. Nessuna moneta modificata.";
+  try{await refreshMine(client);}catch(e){status.textContent="Prenotazione annullata, ma il riepilogo non è aggiornato. Aggiorna la disponibilità.";}
  }catch(e){status.textContent="Annullamento non riuscito: "+(e.message||"errore temporaneo");}
  finally{setBusy(false);if(refreshAfter)button.click();}
 });
