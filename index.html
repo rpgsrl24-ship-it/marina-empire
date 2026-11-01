@@ -1499,13 +1499,14 @@ button.addEventListener("click",async()=>{
   const date=new Date().toISOString().slice(0,10);
   const {data,error}=await client.rpc("me_berth_availability",{p_marina_id:marina,p_booking_date:date});
   if(error||!Array.isArray(data))throw Error("Servizio temporaneamente non disponibile");
-  const numbers=data.map(row=>Number(row.berth_number)).filter(n=>Number.isInteger(n)&&n>=1&&n<=60);
+  const numbers=[...new Set(data.map(row=>Number(row.berth_number)).filter(n=>Number.isInteger(n)&&n>=1&&n<=60))].sort((a,b)=>a-b);
   await refreshMine(client);
   const free=Array.from({length:60},(_,i)=>i+1).filter(n=>!numbers.includes(n));
   availableSlots=new Set(free);availabilityVerified=true;
   const selectedSlot=Number(slotInput.value);
   for(const option of slotInput.options){const occupied=numbers.includes(Number(option.value));option.disabled=occupied;option.textContent="Posto "+option.value+(occupied?" · OCCUPATO":" · LIBERO");}
   if((numbers.includes(selectedSlot)||!selectedSlot)&&free.length)slotInput.value=String(free[0]);
+  if(!free.length)slotInput.selectedIndex=-1;
   slotInput.disabled=free.length===0;
   book.disabled=free.length===0;
   slotInput.title=free.length?"Scegli uno dei "+free.length+" posti liberi":"Nessun posto libero";
