@@ -47,7 +47,7 @@ jobs:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           for attempt in 1 2 3 4 5; do
-            if curl --fail --location --silent --show-error --max-time 20 "$PAGE_URL" | grep -q 'Marina Empire'; then
+            if curl --fail --location --silent --show-error --max-time 20 "$PAGE_URL" -o /tmp/marina-empire-public.html && grep -Fq 'Array.from({length:7}' /tmp/marina-empire-public.html; then
               echo "Published Marina Empire homepage is reachable"
               exit 0
             fi
