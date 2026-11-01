@@ -4,7 +4,8 @@ const vm=require('node:vm');
 let src=fs.readFileSync('backend/credit-order-plan-staging.ts','utf8');
 src=src.replace(/^export type .*;\s*$/gm,'').replace(/export /g,'')
  .replace(/:Record<string,number>/g,'').replace(/:number/g,'').replace(/:string/g,'')
- .replace(/:VerifiedCreditLine\[\]/g,'').replace(/:VoucherUnit\[\]/g,'');
+ .replace(/:VerifiedCreditLine\[\]/g,'').replace(/:VoucherUnit\[\]/g,'')
+ .replace(/new Set<number>\(\)/g,'new Set()');
 const ctx=vm.createContext({Number,Array,Set,Object,Error});
 vm.runInContext(src,ctx);
 const lines=[{id:11,sku:'ME-CREDITS-50000',quantity:2},{id:12,sku:'ME-CREDITS-120000',quantity:1}];
