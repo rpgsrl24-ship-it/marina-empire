@@ -62,6 +62,11 @@ Deno.serve(async(req:Request)=>{
       Number.isFinite(total) && total>0;
   });
   if(!valid) return json({accepted:false,error:"Invalid credit line"},503);
+  const recipient=String(order.billing?.email||"").trim();
+  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(recipient) || recipient.length>254)
+    return json({accepted:false,error:"Invalid recipient"},503);
+  const totalUnits=creditLines.reduce((sum:{},line:{quantity:number})=>Number(sum)+line.quantity,0);
+  if(totalUnits>100) return json({accepted:false,error:"Too many credit units"},503);
   const eligible=creditLines;
   // Deliberately fail closed: do not acknowledge successful issuance before
   // atomic voucher creation and encrypted outbox delivery are implemented.
