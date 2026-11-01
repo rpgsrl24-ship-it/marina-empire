@@ -41,15 +41,18 @@ Deno.serve(async request=>{
    const {error:writeError}=await admin.from("me_voucher_delivery_outbox").update({
     status:"sent",sent_at:new Date().toISOString(),provider_message_id:String(body.id||""),last_error:null,updated_at:new Date().toISOString()
    }).eq("id",row.id).eq("status","sending");
-   if(writeError)throw new Error("Delivery state write failed");
+   // Provider accepted the email. Never mark retry if the database acknowledgement fails.
+   // Leave status as sending for manual provider reconciliation instead.
+   if(writeError){failed++;continue;}
    sent++;
   }catch{
    const delayMinutes=Math.min(1440,Math.pow(2,Math.min(row.attempts,8))*5);
-   await admin.from("me_voucher_delivery_outbox").update({
+   const {error:retryWriteError}=await admin.from("me_voucher_delivery_outbox").update({
     status:row.attempts>=8?"failed":"retry",
     next_attempt_at:new Date(Date.now()+delayMinutes*60000).toISOString(),
     last_error:"Delivery attempt failed",updated_at:new Date().toISOString()
    }).eq("id",row.id).eq("status","sending");
+   if(retryWriteError){failed++;continue;}
    failed++;
   }
  }
