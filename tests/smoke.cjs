@@ -33,3 +33,7 @@ for(const id of ['cloudEmail','voyageArrivalNotice','missionList','officeMission
 }
 
 console.log('PASS: '+scripts.length+' inline scripts parse; '+required.length+' essential elements and guest gate present.');
+
+// Verify that administrator daily metrics remain available.
+assert(html.includes('Attività giornaliera · oggi e ieri (ora italiana)'),'Missing daily admin report');
+assert(html.includes('timeZone:"Europe/Rome"'),'Missing Italian time zone');
