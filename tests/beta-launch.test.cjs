@@ -27,4 +27,10 @@ expect('Bilancio missione:', 'Missing voyage economy estimate');
 expect('Missioni pronte:', 'Missing mission readiness overview');
 assert(/function launch\(id\)[\s\S]*?window\.meRegisteredPlayer[\s\S]*?showTab\("profile"\)/.test(html), 'Guest must be directed to signup after trial');
 assert(/function renderMissionChoices\(\)[\s\S]*?state\.setupComplete[\s\S]*?CONFIGURA LA PARTITA/.test(html), 'First mission must respect setup gate');
+// Mobile return and save durability are launch-critical.
+expect('document.addEventListener("visibilitychange"', 'Missing mobile background/foreground recovery');
+expect('window.addEventListener("pageshow"', 'Missing mobile page restore handler');
+expect('window.addEventListener("focus"', 'Missing window focus voyage recovery');
+expect('localStorage.getItem(KEY)!==snapshot', 'Missing local save readback verification');
+assert(/function voyageHeartbeat\(\)/.test(html), 'Missing voyage progress recovery');
 console.log('PASS: beta onboarding, mission persistence, duplicate settlement, and public URL contracts');
