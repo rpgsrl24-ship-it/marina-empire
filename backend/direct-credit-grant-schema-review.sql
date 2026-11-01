@@ -11,6 +11,7 @@ create table if not exists me_private.direct_credit_grants(
   primary key(woo_order_id,woo_order_item_id)
 );
 revoke all on schema me_private from public,anon,authenticated;
+-- Grant USAGE and table privileges only to a dedicated trusted backend role after review.
 revoke all on all tables in schema me_private from public,anon,authenticated;
 alter table me_private.direct_credit_grants enable row level security;
 -- The eventual grant RPC must lock by order/item, insert a unique grant,
@@ -36,7 +37,8 @@ create or replace function me_private.grant_paid_order(
 set search_path='' as $$
 declare v_balance bigint; v_inserted integer;
 begin
-  if p_order_id<=0 or p_item_id<=0 or p_credits<=0 or p_credits>20000000
+  if p_order_id is null or p_item_id is null or p_credits is null or
+     p_order_id<=0 or p_item_id<=0 or p_credits<=0 or p_credits>20000000
      or p_user_id is null then raise exception 'Invalid grant'; end if;
   insert into me_private.direct_credit_grants(woo_order_id,woo_order_item_id,user_id,credits)
     values(p_order_id,p_item_id,p_user_id,p_credits)
