@@ -1437,6 +1437,8 @@ book?.addEventListener("click",async()=>{
  try{
   const client=await getAuthenticatedClient();
   const date=new Date().toISOString().slice(0,10);
+  await refreshMine(client);
+  if(activeBooking){status.textContent="Hai già una prenotazione online attiva in questa marina: posto "+activeBooking.berth_number+".";return;}
   const {data,error}=await client.rpc("reserve_berth",{p_marina_id:marina,p_berth_number:slot,p_booking_date:date});
   if(error)throw Error(error.message||"Posto non disponibile");
   status.textContent="Prenotazione online confermata: "+marina.toUpperCase()+" posto "+slot+". Nessuna moneta addebitata.";
