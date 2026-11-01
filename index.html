@@ -1474,7 +1474,9 @@ button.addEventListener("click",async()=>{
   const {data,error}=await client.rpc("me_berth_availability",{p_marina_id:marina,p_booking_date:date});
   if(error||!Array.isArray(data))throw Error("Servizio temporaneamente non disponibile");
   const numbers=data.map(row=>Number(row.berth_number)).filter(n=>Number.isInteger(n)&&n>=1&&n<=60);
-  status.textContent="Posti occupati online per "+marina.toUpperCase()+" ("+date+"): "+(numbers.length?numbers.join(", "):"nessuno registrato")+". Le prenotazioni della partita restano dimostrative.";
+  await refreshMine(client);
+  const free=Array.from({length:60},(_,i)=>i+1).filter(n=>!numbers.includes(n));
+  status.textContent="Marina "+marina.toUpperCase()+" · "+date+" · occupati "+numbers.length+"/60 · liberi "+free.length+". "+(numbers.length?"Posti occupati: "+numbers.join(", ")+". ":"")+(activeBooking?"La tua prenotazione: posto "+activeBooking.berth_number+". ":"")+"Le prenotazioni della partita restano dimostrative.";
  }catch(e){status.textContent="Disponibilità online non verificabile. Le prenotazioni dimostrative restano separate.";}
  finally{button.disabled=false;}
 });
