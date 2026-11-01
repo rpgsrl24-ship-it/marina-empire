@@ -1,0 +1,31 @@
+// Functional staging test: mocked database, no real vouchers or orders.
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const crypto=require('node:crypto').webcrypto;
+function load(path, context) {
+  let src=fs.readFileSync(path,'utf8');
+  src=src.replace(/^import .*;\s*$/gm,'').replace(/^type .*;\s*$/gm,'').replace(/export /g,'');
+  src=src.replace(/: Uint8Array/g,'').replace(/:PaidLine/g,'').replace(/:Rpc/g,'').replace(/: string\[\]/g,'').replace(/:Uint8Array/g,'').replace(/:Record<string,unknown>/g,'').replace(/:unknown/g,'').replace(/:string/g,'');
+  vm.runInContext(src,context,{filename:path});
+}
+const ctx=vm.createContext({crypto,TextEncoder,Uint8Array,Array,Number,Math,Error,RegExp,btoa,console});
+load('backend/voucher-crypto-staging.ts',ctx);
+load('backend/voucher-issuance-staging.ts',ctx);
+const key=new Uint8Array(32);key.fill(7);
+const line={orderId:101,itemId:202,unitIndex:0,credits:50000,recipientEmail:'test@example.org'};
+(async()=>{
+  let calls=0;
+  const issued=await ctx.issuePaidLineStaging(line,key,async(name,args)=>{
+    calls++;assert.equal(name,'me_issue_voucher_with_outbox_internal');
+    assert.equal(args.p_credits,50000);assert.equal(args.p_order_id,101);
+    assert.match(args.p_code_hash,/^[0-9a-f]{64}$/);
+    assert.ok(args.p_ciphertext.length>30);assert.ok(args.p_nonce.length>12);
+    return {data:'test-voucher-id',error:null};
+  });
+  assert.equal(issued.voucherId,'test-voucher-id');
+  assert.equal(calls,1);
+  await assert.rejects(ctx.issuePaidLineStaging({...line,credits:42},key,async()=>{throw Error('unexpected rpc')}),/Invalid paid line/);
+  await assert.rejects(ctx.issuePaidLineStaging(line,key,async()=>({data:null,error:{message:'duplicate key value violates unique constraint'}})),/already issued/);
+  console.log('PASS: voucher staging functional mocks');
+})().catch(e=>{console.error(e);process.exitCode=1});
