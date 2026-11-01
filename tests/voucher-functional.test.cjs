@@ -9,7 +9,7 @@ function load(path, context) {
   src=src.replace(/: Uint8Array/g,'').replace(/:PaidLine/g,'').replace(/:Rpc/g,'').replace(/: string\[\]/g,'').replace(/:Uint8Array/g,'').replace(/:Record<string,unknown>/g,'').replace(/:unknown/g,'').replace(/:string/g,'');
   vm.runInContext(src,context,{filename:path});
 }
-const ctx=vm.createContext({crypto,TextEncoder,Uint8Array,Array,Number,Math,Error,RegExp,btoa,console});
+const ctx=vm.createContext({crypto,TextEncoder,TextDecoder,Uint8Array,Array,Number,Math,Error,RegExp,btoa,console});
 load('backend/voucher-crypto-staging.ts',ctx);
 load('backend/voucher-issuance-staging.ts',ctx);
 const key=new Uint8Array(32);key.fill(7);
@@ -21,6 +21,13 @@ const line={orderId:101,itemId:202,unitIndex:0,credits:50000,recipientEmail:'tes
     assert.equal(args.p_credits,50000);assert.equal(args.p_order_id,101);
     assert.match(args.p_code_hash,/^[0-9a-f]{64}$/);
     assert.ok(args.p_ciphertext.length>30);assert.ok(args.p_nonce.length>12);
+    const bytes=(value)=>Uint8Array.from(Buffer.from(value,'base64'));
+    const aes=await crypto.subtle.importKey('raw',key,{name:'AES-GCM'},false,['decrypt']);
+    const clear=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(args.p_nonce)},aes,bytes(args.p_ciphertext));
+    const code=new TextDecoder().decode(clear);
+    assert.match(code,/^ME-[A-Z2-9]{8}-[A-Z2-9]{8}-[A-Z2-9]{8}$/);
+    const digest=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(code))).toString('hex');
+    assert.equal(digest,args.p_code_hash);
     return {data:'test-voucher-id',error:null};
   });
   assert.equal(issued.voucherId,'test-voucher-id');
