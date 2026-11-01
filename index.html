@@ -1457,11 +1457,11 @@ book?.addEventListener("click",async()=>{
   if(otherError)throw Error("Impossibile verificare le prenotazioni del giorno");
   if(otherBookings?.length){status.textContent="Hai già una prenotazione online per oggi in un’altra marina. Annullala prima di prenotare un altro posto.";return;}
   const {data,error}=await client.rpc("reserve_berth",{p_marina_id:marina,p_berth_number:slot,p_booking_date:date});
-  if(error)throw Error(error.message||"Posto non disponibile");
+  if(error){refreshAfter=true;throw Error(error.message||"Posto non disponibile");}
   status.textContent="Prenotazione online confermata: "+marina.toUpperCase()+" posto "+slot+". Nessuna moneta addebitata.";
   await refreshMine(client);
   refreshAfter=true;
- }catch(e){status.textContent="Prenotazione non confermata: "+(e.message||"errore temporaneo");}
+ }catch(e){status.textContent="Prenotazione non confermata: "+(e.message||"errore temporaneo")+". La disponibilità verrà aggiornata.";if(refreshAfter){availabilityVerified=false;availableSlots.clear();}}
  finally{setBusy(false);if(refreshAfter)button.click();}
 });
 cancel?.addEventListener("click",async()=>{
