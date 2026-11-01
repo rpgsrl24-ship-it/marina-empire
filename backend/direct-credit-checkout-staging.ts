@@ -35,8 +35,12 @@ export function verifyPaidDirectOrder(order:{
     throw new Error("Product mismatch");
   // Coupon discounts are not supported in the initial direct-credit release.
   // Compare integer cents; reject refunds separately before granting credits.
-  if(!/^\d+\.\d{2}$/.test(item.total) ||
-    Number(item.total.replace(".",""))!==product.priceCents*item.quantity)
+  // Woo line_items.total excludes tax. Compare gross cents against the
+  // configured retail price and also validate the Woo order gross total.
+  const cents=(value:string)=>/^\\d+\\.\\d{2}$/.test(value)?Number(value.replace(".","")):NaN;
+  const lineGross=cents(item.total)+cents(item.total_tax??"0.00");
+  if(!Number.isSafeInteger(lineGross)||lineGross!==product.priceCents*item.quantity||
+     cents(order.total??"")!==lineGross)
     throw new Error("Unexpected order amount");
   // Fail closed if the server cannot establish that the paid order has no refunds.
   // A later refund requires a separate reversal/reconciliation workflow.
