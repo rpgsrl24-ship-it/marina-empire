@@ -39,3 +39,4 @@ jobs:
           node tests/voucher-crypto.test.cjs
           node tests/voucher-issuance.test.cjs
           node tests/voucher-functional.test.cjs
+          node tests/credit-order-plan.test.cjs
