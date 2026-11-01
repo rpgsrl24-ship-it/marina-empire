@@ -34,3 +34,4 @@ jobs:
           node tests/cloud-load.test.cjs
           node tests/account-ui.test.cjs
           node tests/mobile-navigation.test.cjs
+          node tests/beta-launch.test.cjs
