@@ -46,10 +46,15 @@ Deno.serve(async(req:Request)=>{
   const response=await fetch(url,{headers:{authorization:"Basic "+auth,accept:"application/json"}});
   if(!response.ok) return json({error:"Order verification unavailable"},503);
   const order=await response.json();
-  if(Number(order.id)!==orderId || !["processing","completed"].includes(order.status) || order.currency!=="EUR")
+  if(Number(order.id)!==orderId || !["processing","completed"].includes(order.status) || !order.date_paid || order.currency!=="EUR")
     return json({accepted:false,reason:"Order not eligible"},200);
-  const eligible=(order.line_items||[]).filter((line:{sku?:string,quantity?:number})=>
-    Object.hasOwn(packages,line.sku||"") && Number.isSafeInteger(line.quantity) && line.quantity>0);
+  const eligible=(order.line_items||[]).filter((line:{sku?:string,quantity?:number,total?:string})=> {
+    const qty=Number(line.quantity);
+    const sku=line.sku||"";
+    const unitCredits=packages[sku];
+    const total=Number(line.total);
+    return Object.hasOwn(packages,sku) && unitCredits>0 && Number.isSafeInteger(qty) && qty>0 && qty<=100 && Number.isFinite(total) && total>=0;
+  });
   // Deliberately fail closed: do not acknowledge successful issuance before
   // atomic voucher creation and encrypted outbox delivery are implemented.
   return json({accepted:false,eligibleLines:eligible.length,error:"Issuance and delivery not enabled"},503);
