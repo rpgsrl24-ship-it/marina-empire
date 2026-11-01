@@ -24,6 +24,8 @@ jobs:
         with:
           ref: beta/private-test-2026-10-29
           path: beta-test
+      - name: Verify game before publishing
+        run: node tests/smoke.cjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
