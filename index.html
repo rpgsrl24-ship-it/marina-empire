@@ -868,7 +868,7 @@ const estimatedStops=plan.legs.slice(1,-1);let simulatedFuel=state.fuel-first,es
 state.coins-=m.cost;state.fuel-=first;state.boat=m.boat;
 const missionDuration=Number(m.sec);const legSeconds=Math.max(10,Math.ceil((Number.isFinite(missionDuration)&&missionDuration>0?missionDuration:60)/(plan.legs.length-1)));
 state.voyageSerial=Math.max(0,Number.isSafeInteger(Number(state.voyageSerial))?Number(state.voyageSerial):0)+1;state.trip={voyageId:state.voyageSerial,id:m.id,origin:state.port,dest:m.dest,legs:plan.legs,legIndex:0,legSeconds,sec:legSeconds,mission:m,until:Date.now()+legSeconds*1000};
-persist();showTab("map");render();voyageHeartbeat();}
+persist();window.MarinaEmpireTraffic?.track("play_start",true);window.MarinaEmpireAuthenticatedActivity?.track("play_start");showTab("map");render();voyageHeartbeat();}
 function betaDiagnostics(){
  const checks=[];
  const check=(label,fn)=>{try{checks.push({label,ok:!!fn()})}catch(e){checks.push({label,ok:false})}};
