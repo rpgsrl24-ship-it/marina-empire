@@ -57,6 +57,7 @@ Deno.serve(async(req:Request)=>{
     const total=Number(line.total);
     return Object.hasOwn(packages,sku) && unitCredits>0 && Number.isSafeInteger(qty) && qty>0 && qty<=100 && Number.isFinite(total) && total>0;
   });
+  if (eligible.length === 0) return json({accepted:true,issued:0},200);
   // Deliberately fail closed: do not acknowledge successful issuance before
   // atomic voucher creation and encrypted outbox delivery are implemented.
   return json({accepted:false,eligibleLines:eligible.length,error:"Issuance and delivery not enabled"},503);
