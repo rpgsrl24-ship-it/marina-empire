@@ -10,7 +10,9 @@ export async function grantVerifiedDirectCreditStaging(grant:VerifiedGrant,rpc:R
     !Number.isSafeInteger(grant.credits)||grant.credits<1||
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(grant.accountId))
     throw new Error("Invalid verified grant");
-  const {data,error}=await rpc("me_grant_direct_order_internal",{
+  // A standard public PostgREST RPC cannot call a private-schema function by this name.
+  // Integration must use a restricted server database connection, not browser Supabase RPC.
+  const {data,error}=await rpc("me_private.grant_paid_order",{
     p_order_id:grant.orderId,p_item_id:grant.itemId,
     p_user_id:grant.accountId,p_credits:grant.credits
   });
