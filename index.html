@@ -1423,7 +1423,7 @@ let busy=false;
 function setBusy(value){busy=value;book.disabled=value||!availabilityVerified||availableSlots.size===0;cancel.disabled=value||!activeBooking;button.disabled=value;select.disabled=value;slotInput.disabled=value;}
 async function getAuthenticatedClient(){
  if(!window.supabase?.createClient)throw Error("Libreria online non disponibile");
- const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+ const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  const {data,error}=await client.auth.getUser();
  if(error||!data?.user)throw Error("Devi accedere con un account registrato");
  return client;
@@ -1485,7 +1485,7 @@ button.addEventListener("click",async()=>{
  availabilityVerified=false;availableSlots.clear();setBusy(true);status.textContent="Verifica disponibilità in corso...";
  try{
   if(!window.supabase||!window.supabase.createClient)throw Error("Libreria online non disponibile");
-  const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+  const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   const {data:authData,error:authError}=await client.auth.getUser();
   if(authError||!authData?.user){status.textContent="Per vedere gli ormeggi online devi accedere con un account registrato.";return;}
   const date=new Date().toISOString().slice(0,10);
