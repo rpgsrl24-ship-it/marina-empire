@@ -1433,6 +1433,7 @@ async function refreshMine(client){
  cancel.textContent=activeBooking?"ANNULLA POSTO "+activeBooking.berth_number:"NESSUNA PRENOTAZIONE DA ANNULLARE";
 }
 book?.addEventListener("click",async()=>{
+ let refreshAfter=false;
  const marina=select.value,slot=Number(slotInput.value);
  if(!valid.has(marina)||!Number.isInteger(slot)||slot<1||slot>60){status.textContent="Seleziona una marina e un posto da 1 a 60.";return;}
  if(busy)return;
@@ -1449,11 +1450,12 @@ book?.addEventListener("click",async()=>{
   if(error)throw Error(error.message||"Posto non disponibile");
   status.textContent="Prenotazione online confermata: "+marina.toUpperCase()+" posto "+slot+". Nessuna moneta addebitata.";
   await refreshMine(client);
-  button.click();
+  refreshAfter=true;
  }catch(e){status.textContent="Prenotazione non confermata: "+(e.message||"errore temporaneo");}
- finally{setBusy(false);}
+ finally{setBusy(false);if(refreshAfter)button.click();}
 });
 cancel?.addEventListener("click",async()=>{
+ let refreshAfter=false;
  if(busy)return;
  setBusy(true);
  try{
@@ -1464,9 +1466,9 @@ cancel?.addEventListener("click",async()=>{
   if(error||data!==true)throw Error("Cancellazione non confermata");
   status.textContent="Prenotazione online annullata. Nessuna moneta modificata.";
   await refreshMine(client);
-  button.click();
+  refreshAfter=true;
  }catch(e){status.textContent="Annullamento non riuscito: "+(e.message||"errore temporaneo");}
- finally{setBusy(false);}
+ finally{setBusy(false);if(refreshAfter)button.click();}
 });
 select.addEventListener("change",()=>{activeBooking=null;cancel.disabled=true;cancel.textContent="VERIFICA PRENOTAZIONE";});
 cancel.disabled=true;
