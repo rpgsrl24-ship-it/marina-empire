@@ -1488,9 +1488,13 @@ button.addEventListener("click",async()=>{
   const numbers=data.map(row=>Number(row.berth_number)).filter(n=>Number.isInteger(n)&&n>=1&&n<=60);
   await refreshMine(client);
   const free=Array.from({length:60},(_,i)=>i+1).filter(n=>!numbers.includes(n));
+  const selectedSlot=Number(slotInput.value);
+  if(numbers.includes(selectedSlot)&&free.length)slotInput.value=String(free[0]);
+  book.disabled=free.length===0;
+  slotInput.title=free.length?"Posti liberi: "+free.join(", "):"Nessun posto libero";
   status.textContent="Marina "+marina.toUpperCase()+" · "+date+" · occupati "+numbers.length+"/60 · liberi "+free.length+". "+(numbers.length?"Posti occupati: "+numbers.join(", ")+". ":"")+(activeBooking?"La tua prenotazione: posto "+activeBooking.berth_number+". ":"")+"Le prenotazioni della partita restano dimostrative.";
  }catch(e){status.textContent="Disponibilità online non verificabile. Le prenotazioni dimostrative restano separate.";}
- finally{setBusy(false);}
+ finally{setBusy(false);if(status.textContent.includes("liberi 0."))book.disabled=true;}
 });
 })();
 </script></body></html>
