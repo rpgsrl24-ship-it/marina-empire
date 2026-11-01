@@ -1,0 +1,22 @@
+// Non-destructive beta launch regression contracts (no browser state mutation).
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+const html=fs.readFileSync('index.html','utf8');
+function expect(fragment,reason){assert(html.includes(fragment),reason)}
+expect('function launch(id)', 'Missing mission launch');
+expect('function finishVoyage()', 'Missing mission arrival');
+expect('function voyageHeartbeat()', 'Missing voyage recovery heartbeat');
+expect('function persist()', 'Missing save persistence');
+expect('function betaDiagnostics()', 'Missing beta diagnostics');
+expect('function planSeaTrip(', 'Missing route planning');
+expect('function renderMissionChoices()', 'Missing mission listing');
+expect('window.meRegisteredPlayer', 'Missing guest/registered distinction');
+expect('state.setupComplete', 'Missing initial setup gate');
+expect('state.settledVoyages', 'Missing duplicate reward guard');
+expect('id="meVoucherRedeem"', 'Missing payment/voucher control');
+expect('meVoucherRedeem', 'Missing voucher disable diagnostics');
+expect('name="viewport"', 'Missing mobile viewport');
+expect('https://rpgsrl24-ship-it.github.io/marina-empire/', 'Missing canonical public game URL');
+assert(/function launch\(id\)[\s\S]*?state\.trip=\{[\s\S]*?persist\(\)/.test(html),'Mission must persist active voyage');
+assert(/function finishVoyage\(\)[\s\S]*?alreadySettled/.test(html),'Arrival must guard duplicate settlement');
+console.log('PASS: beta onboarding, mission persistence, duplicate settlement, and public URL contracts');
