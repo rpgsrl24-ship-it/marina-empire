@@ -41,3 +41,4 @@ jobs:
           node tests/voucher-functional.test.cjs
           node tests/credit-order-plan.test.cjs
           node tests/direct-credit-checkout.test.cjs
+          node tests/direct-credit-feature-gates.test.cjs
