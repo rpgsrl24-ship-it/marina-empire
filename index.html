@@ -1471,8 +1471,10 @@ cancel?.addEventListener("click",async()=>{
  }catch(e){status.textContent="Annullamento non riuscito: "+(e.message||"errore temporaneo");}
  finally{setBusy(false);if(refreshAfter)button.click();}
 });
-select.addEventListener("change",()=>{activeBooking=null;cancel.disabled=true;cancel.textContent="VERIFICA PRENOTAZIONE";});
+select.addEventListener("change",()=>{activeBooking=null;cancel.disabled=true;cancel.textContent="VERIFICA PRENOTAZIONE";book.disabled=true;slotInput.disabled=true;for(const option of slotInput.options){option.disabled=false;option.textContent="Posto "+option.value;}status.textContent="Marina cambiata. Premi AGGIORNA DISPONIBILITÀ prima di prenotare online.";});
 cancel.disabled=true;
+book.disabled=true;
+slotInput.disabled=true;
 button.addEventListener("click",async()=>{
  if(busy)return;
  const marina=select.value;
