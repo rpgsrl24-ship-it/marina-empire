@@ -5,6 +5,8 @@ on:
       - 'integrations/voucher-crypto.ts'
       - 'integrations/woo-order-validator.ts'
       - 'integrations/voucher-integration.test.ts'
+      - 'integrations/voucher-recovery-policy.ts'
+      - 'integrations/voucher-recovery.test.ts'
       - '.github/workflows/voucher-tests.yml'
   pull_request:
     paths:
@@ -23,4 +25,4 @@ jobs:
         with:
           deno-version: v2.x
       - name: Run voucher regression tests
-        run: deno test --no-check integrations/voucher-integration.test.ts
+        run: deno test --no-check integrations/voucher-integration.test.ts integrations/voucher-recovery.test.ts
