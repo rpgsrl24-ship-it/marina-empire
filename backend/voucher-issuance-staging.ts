@@ -25,6 +25,11 @@ export async function issuePaidLineStaging(line:PaidLine,key:Uint8Array,rpc:Rpc)
     p_nonce:voucher.codeNonce,
     p_key_version:voucher.keyVersion
   });
-  if(error||!data) throw new Error("Voucher issuance unavailable");
+  if(error){
+    if(/duplicate key|unique constraint|23505/i.test(error.message))
+      throw new Error("Voucher already issued for this order item and unit");
+    throw new Error("Voucher issuance unavailable");
+  }
+  if(!data) throw new Error("Voucher issuance unavailable");
   return {voucherId:data};
 }
