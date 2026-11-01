@@ -1443,6 +1443,7 @@ book?.addEventListener("click",async()=>{
   if(error)throw Error(error.message||"Posto non disponibile");
   status.textContent="Prenotazione online confermata: "+marina.toUpperCase()+" posto "+slot+". Nessuna moneta addebitata.";
   await refreshMine(client);
+  button.click();
  }catch(e){status.textContent="Prenotazione non confermata: "+(e.message||"errore temporaneo");}
  finally{book.disabled=false;}
 });
@@ -1456,6 +1457,7 @@ cancel?.addEventListener("click",async()=>{
   if(error||data!==true)throw Error("Cancellazione non confermata");
   status.textContent="Prenotazione online annullata. Nessuna moneta modificata.";
   await refreshMine(client);
+  button.click();
  }catch(e){status.textContent="Annullamento non riuscito: "+(e.message||"errore temporaneo");}
  finally{if(!activeBooking)cancel.disabled=true;}
 });
