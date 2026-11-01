@@ -50,14 +50,19 @@ Deno.serve(async(req:Request)=>{
   if(Number(order.id)!==orderId || !["processing","completed"].includes(order.status) || !order.date_paid || order.currency!=="EUR")
     return json({accepted:false,reason:"Order not eligible"},200);
   if(!Array.isArray(order.line_items)) return json({error:"Invalid order lines"},503);
-  const eligible=order.line_items.filter((line:{sku?:string,quantity?:number,total?:string})=> {
-    const qty=Number(line.quantity);
-    const sku=line.sku||"";
-    const unitCredits=packages[sku];
+  const creditLines=order.line_items.filter((line:{sku?:string}) =>
+    Object.hasOwn(packages,line.sku||""));
+  if (creditLines.length === 0) return json({accepted:true,issued:0},200);
+  const valid=creditLines.every((line:{sku?:string,quantity?:number,total?:string,id?:number}) => {
+    const qty=line.quantity;
     const total=Number(line.total);
-    return Object.hasOwn(packages,sku) && unitCredits>0 && Number.isSafeInteger(qty) && qty>0 && qty<=100 && Number.isFinite(total) && total>0;
+    return Number.isSafeInteger(line.id) && Number(line.id)>0 &&
+      typeof qty==="number" && Number.isSafeInteger(qty) && qty>0 && qty<=100 &&
+      typeof line.total==="string" && /^\\d+\\.\\d{2}$/.test(line.total) &&
+      Number.isFinite(total) && total>0;
   });
-  if (eligible.length === 0) return json({accepted:true,issued:0},200);
+  if(!valid) return json({accepted:false,error:"Invalid credit line"},503);
+  const eligible=creditLines;
   // Deliberately fail closed: do not acknowledge successful issuance before
   // atomic voucher creation and encrypted outbox delivery are implemented.
   return json({accepted:false,eligibleLines:eligible.length,error:"Issuance and delivery not enabled"},503);
