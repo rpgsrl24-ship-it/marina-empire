@@ -1,0 +1,6 @@
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+const src=fs.readFileSync('backend/woo-credit-webhook-staging.ts','utf8');
+for(const name of ['ME-CREDITS-50000','ME-CREDITS-120000','ME-CREDITS-300000','ME-CREDITS-900000','ME-CREDITS-2000000']) assert(src.includes(name));
+for(const name of ['x-wc-webhook-signature','order.date_paid','eligible.length === 0','Issuance and delivery not enabled']) assert(src.includes(name));
+console.log('PASS: credit webhook staging contracts');
