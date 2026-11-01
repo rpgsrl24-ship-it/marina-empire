@@ -11,7 +11,7 @@ export async function issuePaidLineStaging(line:PaidLine,key:Uint8Array,rpc:Rpc)
      !Number.isSafeInteger(line.itemId)||line.itemId<1 ||
      !Number.isSafeInteger(line.unitIndex)||line.unitIndex<0||line.unitIndex>=100 ||
      ![50000,120000,300000,900000,2000000].includes(line.credits) ||
-     !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(line.recipientEmail) ||
+     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(line.recipientEmail) ||
      line.recipientEmail.length>254) throw new Error("Invalid paid line");
   const voucher=await prepareVoucher(key);
   const {data,error}=await rpc("me_issue_voucher_with_outbox_internal",{
