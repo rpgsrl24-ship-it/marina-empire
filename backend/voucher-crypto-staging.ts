@@ -3,9 +3,16 @@
 export async function prepareVoucher(keyBytes: Uint8Array) {
   if(keyBytes.byteLength!==32) throw new Error("AES-256 key required");
   const alphabet="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const raw=crypto.getRandomValues(new Uint8Array(24));
-  const segments=Array.from({length:3},(_,i)=>
-    Array.from(raw.slice(i*8,i*8+8),n=>alphabet[n%alphabet.length]).join(""));
+  const chars: string[]=[];
+  while(chars.length<24){
+    const random=crypto.getRandomValues(new Uint8Array(32));
+    for(const n of random){
+      if(n>=Math.floor(256/alphabet.length)*alphabet.length) continue;
+      chars.push(alphabet[n%alphabet.length]);
+      if(chars.length===24) break;
+    }
+  }
+  const segments=[chars.slice(0,8).join(""),chars.slice(8,16).join(""),chars.slice(16,24).join("")];
   const code="ME-"+segments.join("-");
   const digest=new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(code)));
   const hash=Array.from(digest,b=>b.toString(16).padStart(2,"0")).join("");
