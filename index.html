@@ -1426,7 +1426,7 @@ async function getAuthenticatedClient(){
 async function refreshMine(client){
  const {data,error}=await client.from("berth_bookings").select("id,marina_id,berth_number,booking_date").eq("status","confirmed").gte("booking_date",new Date().toISOString().slice(0,10)).order("booking_date",{ascending:true}).limit(20);
  if(error)throw Error("Impossibile verificare le tue prenotazioni");
- activeBooking=(data||[]).find(r=>r.marina_id===select.value)||null;
+ activeBooking=(data||[]).find(r=>r.marina_id===select.value&&r.booking_date===new Date().toISOString().slice(0,10))||null;
  cancel.disabled=!activeBooking;
  cancel.textContent=activeBooking?"ANNULLA POSTO "+activeBooking.berth_number:"NESSUNA PRENOTAZIONE DA ANNULLARE";
 }
@@ -1439,6 +1439,9 @@ book?.addEventListener("click",async()=>{
   const date=new Date().toISOString().slice(0,10);
   await refreshMine(client);
   if(activeBooking){status.textContent="Hai già una prenotazione online attiva in questa marina: posto "+activeBooking.berth_number+".";return;}
+  const {data:otherBookings,error:otherError}=await client.from("berth_bookings").select("id,marina_id").eq("status","confirmed").eq("booking_date",date).limit(1);
+  if(otherError)throw Error("Impossibile verificare le prenotazioni del giorno");
+  if(otherBookings?.length){status.textContent="Hai già una prenotazione online per oggi in un’altra marina. Annullala prima di prenotare un altro posto.";return;}
   const {data,error}=await client.rpc("reserve_berth",{p_marina_id:marina,p_berth_number:slot,p_booking_date:date});
   if(error)throw Error(error.message||"Posto non disponibile");
   status.textContent="Prenotazione online confermata: "+marina.toUpperCase()+" posto "+slot+". Nessuna moneta addebitata.";
