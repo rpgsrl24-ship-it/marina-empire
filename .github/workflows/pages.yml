@@ -26,6 +26,13 @@ jobs:
           path: beta-test
       - name: Verify game before publishing
         run: node tests/smoke.cjs
+      - name: Verify missions and cloud save contracts
+        run: |
+          node tests/mission-contract.test.cjs
+          node tests/mission-arrival.test.cjs
+          node tests/cloud-backup.test.cjs
+          node tests/cloud-load.test.cjs
+          node tests/account-ui.test.cjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
