@@ -40,7 +40,8 @@ Deno.serve(async(req:Request)=>{
   const orderId=Number(event.id);
   if(!Number.isSafeInteger(orderId)||orderId<1) return json({error:"Invalid order"},400);
   const base=new URL(wooUrl);
-  if(base.protocol!=="https:") return json({error:"Invalid configuration"},503);
+  if(base.protocol!=="https:" || base.hostname!=="rpgyacht.com" || base.username || base.password || base.port || base.search || base.hash)
+    return json({error:"Invalid configuration"},503);
   const url=new URL("/wp-json/wc/v3/orders/"+orderId,base);
   const auth=btoa(wooKey+":"+wooSecret);
   const response=await fetch(url,{headers:{authorization:"Basic "+auth,accept:"application/json"}});
@@ -48,12 +49,13 @@ Deno.serve(async(req:Request)=>{
   const order=await response.json();
   if(Number(order.id)!==orderId || !["processing","completed"].includes(order.status) || !order.date_paid || order.currency!=="EUR")
     return json({accepted:false,reason:"Order not eligible"},200);
-  const eligible=(order.line_items||[]).filter((line:{sku?:string,quantity?:number,total?:string})=> {
+  if(!Array.isArray(order.line_items)) return json({error:"Invalid order lines"},503);
+  const eligible=order.line_items.filter((line:{sku?:string,quantity?:number,total?:string})=> {
     const qty=Number(line.quantity);
     const sku=line.sku||"";
     const unitCredits=packages[sku];
     const total=Number(line.total);
-    return Object.hasOwn(packages,sku) && unitCredits>0 && Number.isSafeInteger(qty) && qty>0 && qty<=100 && Number.isFinite(total) && total>=0;
+    return Object.hasOwn(packages,sku) && unitCredits>0 && Number.isSafeInteger(qty) && qty>0 && qty<=100 && Number.isFinite(total) && total>0;
   });
   // Deliberately fail closed: do not acknowledge successful issuance before
   // atomic voucher creation and encrypted outbox delivery are implemented.
