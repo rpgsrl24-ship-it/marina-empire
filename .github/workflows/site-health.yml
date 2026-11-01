@@ -1,0 +1,27 @@
+name: Monitor Marina Empire public site
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check published game
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://rpgsrl24-ship-it.github.io/marina-empire/"
+          for attempt in 1 2 3; do
+            if curl --fail --location --silent --show-error --max-time 20 "$url" -o /tmp/marina-health.html && grep -Fq 'Array.from({length:7}' /tmp/marina-health.html; then
+              echo "Public Marina Empire is reachable and has the expected release."
+              exit 0
+            fi
+            echo "Health check attempt $attempt failed."
+            sleep 15
+          done
+          echo "::error::Marina Empire public site unavailable or outdated"
+          exit 1
