@@ -18,7 +18,7 @@ const hex=(b:Uint8Array)=>Array.from(b).map(x=>x.toString(16).padStart(2,"0")).j
 async function sha256(v:string){return hex(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v))));}
 function newCode(){
   const b=crypto.getRandomValues(new Uint8Array(12));
-  const s=Array.from(b).map(x=>x.toString(36).toUpperCase().padStart(2,"0").slice(-2)).join("");
+  const s=Array.from(b).map(x=>x.toString(16).toUpperCase().padStart(2,"0")).join("");
   return "ME-"+s.slice(0,8)+"-"+s.slice(8,16)+"-"+s.slice(16,24);
 }
 async function validHmac(raw:string,provided:string,secret:string){
@@ -31,7 +31,9 @@ async function validHmac(raw:string,provided:string,secret:string){
 }
 Deno.serve(async(req)=>{
   if(req.method!=="POST")return json({error:"Method not allowed"},405);
-  if(env("ME_ISSUE_ENABLED")!=="true")return json({error:"Issuance disabled"},503);
+  // Fail closed: code delivery is not recoverable yet after an email failure.
+  // Do not remove this guard until an encrypted transactional outbox is implemented and tested.
+  if(env("ME_ISSUE_ENABLED")!=="true" || env("ME_RECOVERABLE_DELIVERY_READY")!=="true")return json({error:"Issuance disabled pending recoverable delivery"},503);
   const needed=["ME_WOO_WEBHOOK_SECRET","ME_WOO_API_KEY","ME_WOO_API_SECRET","ME_WOO_BASE_URL","SUPABASE_URL","SUPABASE_SERVICE_ROLE_KEY","ME_RESEND_API_KEY","ME_FROM_EMAIL"];
   if(needed.some(k=>!env(k)))return json({error:"Server not configured"},503);
   const raw=await req.text();
