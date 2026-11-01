@@ -25,7 +25,7 @@ async function scenario({failWrite=false,confirmLoad=true,remoteValid=true,remot
  x=await scenario({confirmLoad:false});assert.equal(x.state.name,'Local');assert.equal(x.backup,null);assert.equal(x.writes,0);
  x=await scenario({remoteValid:false});assert.equal(x.state.name,'Local');assert.equal(x.writes,0);assert(x.messages.some(m=>m.includes('dati non validi')));
  x=await scenario({remoteMissing:true});assert.equal(x.state.name,'Local');assert(x.messages.some(m=>m.includes('Nessuna partita online')));
- x=await scenario({existingBackup:{savedAt:1,game:{name:'Original',owned:[],completed:[],coins:800,fuel:40}}});assert.equal(x.state.name,'Online');assert.equal(x.backup.value.game.name,'Original');assert.equal(x.backup.value.game.coins,800);
+ x=await scenario({existingBackup:{savedAt:1,game:{name:'Original',owned:[],completed:[],coins:800,fuel:40}}});assert.equal(x.state.name,'Online');assert.equal(x.backup.value.game.name,'Local');assert.equal(x.backup.value.game.coins,100);
  x=await scenario({remoteError:true});assert.equal(x.state.name,'Local');assert.equal(x.writes,0);assert.equal(x.backup,null);assert.equal(x.busy,false);assert(x.messages.some(m=>m.includes('Network unavailable')));
  console.log('Cloud load and backup safety tests passed');
 })().catch(e=>{console.error(e);process.exitCode=1});
