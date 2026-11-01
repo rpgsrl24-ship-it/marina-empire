@@ -526,6 +526,21 @@ mask-image:linear-gradient(180deg,transparent,#000 48%,transparent);
 #map.me-voyage-docked #cinemaSea .me-sea-motion{animation:none!important;opacity:.08!important}
 #map #cinemaSea.me-helm-active.me-helm-gps .me-sea-motion{display:none!important}
 @keyframes meWaterTraverse{from{background-position:0 0}to{background-position:180px 0}}
+/* Navigazione: due livelli di riflessi in movimento, solo sulla vista esterna. */
+#map.me-voyage-running:not(.me-voyage-docked) #cinemaSea.me-helm-active:not(.me-helm-gps) .me-sea-motion::before,
+#map.me-voyage-running:not(.me-voyage-docked) #cinemaSea.me-helm-active:not(.me-helm-gps) .me-sea-motion::after{
+content:"";position:absolute;inset:0;pointer-events:none;
+background:repeating-linear-gradient(174deg,transparent 0 23px,rgba(226,249,255,.35) 24px 25px,transparent 26px 47px);
+background-size:210% 100%;animation:meWaterTraverse 17s linear infinite;opacity:.65;
+}
+#map.me-voyage-running:not(.me-voyage-docked) #cinemaSea.me-helm-active:not(.me-helm-gps) .me-sea-motion::after{
+background:repeating-linear-gradient(184deg,transparent 0 34px,rgba(190,234,245,.25) 35px 36px,transparent 37px 68px);
+animation-duration:25s;animation-direction:reverse;opacity:.5;
+}
+@media(prefers-reduced-motion:reduce){
+#map .me-sea-motion,#map .me-sea-motion::before,#map .me-sea-motion::after{animation:none!important}
+}
+
 @media(max-width:740px){#map.me-voyage-running #cinemaSea.me-helm-active:not(.me-helm-gps) .me-sea-motion{left:0;right:0;top:23%;height:13%;opacity:.15;animation-duration:17s}}
 @media(prefers-reduced-motion:reduce){#map #cinemaSea .me-sea-motion{animation:none!important;opacity:0!important}}
 </style><style id="me-mobile-chartplotter-fit-v62">
