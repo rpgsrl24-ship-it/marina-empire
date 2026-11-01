@@ -1421,12 +1421,15 @@ let availableSlots=new Set();
 function clearOnlineState(message){availabilityVerified=false;availableSlots.clear();activeBooking=null;book.disabled=true;cancel.disabled=true;slotInput.disabled=true;cancel.textContent="NESSUNA PRENOTAZIONE DA ANNULLARE";for(const option of slotInput.options){option.disabled=false;option.textContent="Posto "+option.value;}if(message)status.textContent=message;}
 for(let i=1;i<=60;i++){const option=document.createElement("option");option.value=String(i);option.textContent="Posto "+i;slotInput.appendChild(option);}
 let busy=false;
+let lastUserId=null;
 function setBusy(value){busy=value;book.disabled=value||!availabilityVerified||availableSlots.size===0;cancel.disabled=value||!activeBooking;button.disabled=value;select.disabled=value;slotInput.disabled=value;}
 async function getAuthenticatedClient(){
  if(!window.supabase?.createClient)throw Error("Libreria online non disponibile");
  const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  const {data,error}=await client.auth.getUser();
- if(error||!data?.user){clearOnlineState("Sessione non valida: accedi nuovamente per utilizzare gli ormeggi online.");throw Error("Devi accedere con un account registrato");}
+ if(error||!data?.user){lastUserId=null;clearOnlineState("Sessione non valida: accedi nuovamente per utilizzare gli ormeggi online.");throw Error("Devi accedere con un account registrato");}
+ if(lastUserId&&lastUserId!==data.user.id)clearOnlineState("Account cambiato: aggiorna la disponibilità degli ormeggi.");
+ lastUserId=data.user.id;
  return client;
 }
 async function refreshMine(client){
@@ -1490,7 +1493,9 @@ button.addEventListener("click",async()=>{
   if(!window.supabase||!window.supabase.createClient)throw Error("Libreria online non disponibile");
   const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   const {data:authData,error:authError}=await client.auth.getUser();
-  if(authError||!authData?.user){clearOnlineState("Per vedere gli ormeggi online devi accedere con un account registrato.");return;}
+  if(authError||!authData?.user){lastUserId=null;clearOnlineState("Per vedere gli ormeggi online devi accedere con un account registrato.");return;}
+  if(lastUserId&&lastUserId!==authData.user.id)clearOnlineState("Account cambiato: aggiorna la disponibilità.");
+  lastUserId=authData.user.id;
   const date=new Date().toISOString().slice(0,10);
   const {data,error}=await client.rpc("me_berth_availability",{p_marina_id:marina,p_booking_date:date});
   if(error||!Array.isArray(data))throw Error("Servizio temporaneamente non disponibile");
