@@ -42,3 +42,17 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify published homepage
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          for attempt in 1 2 3 4 5; do
+            if curl --fail --location --silent --show-error --max-time 20 "$PAGE_URL" | grep -q 'Marina Empire'; then
+              echo "Published Marina Empire homepage is reachable"
+              exit 0
+            fi
+            echo "Homepage not ready (attempt $attempt/5)"
+            sleep 12
+          done
+          echo "Published homepage verification failed" >&2
+          exit 1
