@@ -1,3 +1,4 @@
+import { validateFullRefundOrder, type RefundOrder } from "./woo-refund-validator.ts";
 // Staging only: WooCommerce full-refund webhook to atomic Supabase cancellation.
 // Disabled by default. Never deploy with ME_REFUND_ENABLED=true before E2E tests.
 import { createClient } from "npm:@supabase/supabase-js@2.95.0";
@@ -26,10 +27,10 @@ Deno.serve(async request=>{
  const auth=btoa(env("ME_WOO_API_KEY")+":"+env("ME_WOO_API_SECRET"));
  const res=await fetch(store+"/wp-json/wc/v3/orders/"+payload.id,{headers:{authorization:"Basic "+auth}});
  if(!res.ok)return json({error:"Order lookup failed"},502);
- const order=await res.json() as {id:number;status:string;refunds?:unknown[]};
- if(order.id!==payload.id)return json({error:"Order mismatch"},422);
- // Partial refunds and disputed payments require manual review.
- if(order.status!=="refunded")return json({ok:true,action:"manual_review_or_no_full_refund"});
+ const order=await res.json() as RefundOrder;
+ let decision:"full_refund"|"manual_review";
+ try{decision=validateFullRefundOrder(payload.id,order);}catch{return json({error:"Refund order verification failed"},422);}
+ if(decision!=="full_refund")return json({ok:true,action:"manual_review_or_no_full_refund"});
  const admin=createClient(env("SUPABASE_URL"),env("SUPABASE_SERVICE_ROLE_KEY"),{auth:{persistSession:false,autoRefreshToken:false}});
  const {data,error}=await admin.rpc("me_cancel_refunded_order_internal",{p_order_id:order.id});
  if(error)return json({error:"Atomic cancellation failed"},503);
