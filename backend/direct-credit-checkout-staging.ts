@@ -20,11 +20,13 @@ export function verifyPaidDirectOrder(order:{
   id:number;status:string;date_paid:string|null;currency:string;
   line_items:Array<{id:number;product_id:number;quantity:number;total:string;total_tax?:string}>;
   meta_data:Array<{key:string;value:unknown}>;
+  refunds?:Array<{id:number}>;total?:string;total_tax?:string;
 },expected:{orderId:number;productId:number;quantity:number;accountId:string}){
   if(!Number.isSafeInteger(order?.id)||order.id!==expected.orderId ||
     !["processing","completed"].includes(order.status)||!order.date_paid||
     order.currency!=="EUR"||!Array.isArray(order.line_items)||
-    order.line_items.length!==1||!Array.isArray(order.meta_data))
+    order.line_items.length!==1||!Array.isArray(order.meta_data)||
+    !Array.isArray(order.refunds)||order.refunds.length!==0)
     throw new Error("Order not eligible");
   const item=order.line_items[0];
   const product=Object.values(CREDIT_PRODUCTS).find(p=>p.productId===expected.productId);
@@ -36,6 +38,8 @@ export function verifyPaidDirectOrder(order:{
   if(!/^\d+\.\d{2}$/.test(item.total) ||
     Number(item.total.replace(".",""))!==product.priceCents*item.quantity)
     throw new Error("Unexpected order amount");
+  // Fail closed if the server cannot establish that the paid order has no refunds.
+  // A later refund requires a separate reversal/reconciliation workflow.
   const accounts=order.meta_data.filter(m=>m.key==="_me_account_id");
   if(accounts.length!==1||accounts[0].value!==expected.accountId)
     throw new Error("Account mismatch");
