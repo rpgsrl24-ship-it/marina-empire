@@ -19,4 +19,12 @@ expect('name="viewport"', 'Missing mobile viewport');
 expect('https://rpgsrl24-ship-it.github.io/marina-empire/', 'Missing canonical public game URL');
 assert(/function launch\(id\)[\s\S]*?state\.trip=\{[\s\S]*?persist\(\)/.test(html),'Mission must persist active voyage');
 assert(/function finishVoyage\(\)[\s\S]*?alreadySettled/.test(html),'Arrival must guard duplicate settlement');
+
+// Critical pre-launch checks: prevent broken trial gates or mission economics.
+expect('function confirmSetup()', 'Missing first-run setup confirmation');
+expect('REGISTRATI GRATIS E CONTINUA', 'Missing post-trial signup CTA');
+expect('Bilancio missione:', 'Missing voyage economy estimate');
+expect('Missioni pronte:', 'Missing mission readiness overview');
+assert(/function launch\(id\)[\s\S]*?window\.meRegisteredPlayer[\s\S]*?showTab\("profile"\)/.test(html), 'Guest must be directed to signup after trial');
+assert(/function renderMissionChoices\(\)[\s\S]*?state\.setupComplete[\s\S]*?CONFIGURA LA PARTITA/.test(html), 'First mission must respect setup gate');
 console.log('PASS: beta onboarding, mission persistence, duplicate settlement, and public URL contracts');
