@@ -38,3 +38,4 @@ jobs:
           node tests/credit-webhook.test.cjs
           node tests/voucher-crypto.test.cjs
           node tests/voucher-issuance.test.cjs
+          node tests/voucher-functional.test.cjs
