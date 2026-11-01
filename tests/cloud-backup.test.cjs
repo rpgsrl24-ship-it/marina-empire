@@ -23,7 +23,7 @@ x=run({backup:good,failWrite:true});assert.equal(x.state.name,'Cloud');assert.eq
 x=run({backup:null});assert.equal(x.state.name,'Cloud');assert.equal(x.writes,0);
 x=run({backup:good,invalidJson:true});assert.equal(x.state.name,'Cloud');assert.equal(x.writes,0);assert.equal(x.reverseBackup,null);
 x=run({backup:{game:{name:'Broken'}}});assert.equal(x.state.name,'Cloud');assert.equal(x.writes,0);
-assert(html.includes('localStorage.setItem(backupKey,JSON.stringify({savedAt:Date.now(),game:safeSnapshot()}))'));
+assert(html.includes('localStorage.setItem("marina_empire_before_backup_restore",backup)'));
 assert(html.includes('Impossibile creare la copia di sicurezza: caricamento annullato.'));
 assert(html.includes('restoreCloudButton.addEventListener("click",restoreCloudBackup)'));
 console.log('Cloud backup/restore tests passed');
