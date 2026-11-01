@@ -33,4 +33,9 @@ expect('window.addEventListener("pageshow"', 'Missing mobile page restore handle
 expect('window.addEventListener("focus"', 'Missing window focus voyage recovery');
 expect('localStorage.getItem(KEY)!==snapshot', 'Missing local save readback verification');
 assert(/function voyageHeartbeat\(\)/.test(html), 'Missing voyage progress recovery');
+// Do not accidentally accept real money before voucher issuance and delivery are working.
+assert(/id="meVoucherCode"[^>]*disabled/.test(html), 'Voucher code input must stay disabled before payment rollout');
+assert(/id="meVoucherRedeem"[^>]*disabled/.test(html), 'Voucher redeem action must stay disabled before payment rollout');
+expect('Saldo crediti acquistati:', 'Purchased-credit wallet must be distinct from beta coins');
+expect('separato dai crediti beta locali', 'Beta coins must not be presented as purchased credits');
 console.log('PASS: beta onboarding, mission persistence, duplicate settlement, and public URL contracts');
