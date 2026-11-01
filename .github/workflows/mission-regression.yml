@@ -35,3 +35,4 @@ jobs:
           node tests/account-ui.test.cjs
           node tests/mobile-navigation.test.cjs
           node tests/beta-launch.test.cjs
+          node tests/credit-webhook.test.cjs
