@@ -13,6 +13,7 @@ on:
       - 'integrations/voucher-refund-plan.test.ts'
       - 'integrations/woo-refund-validator.ts'
       - 'integrations/woo-refund-validator.test.ts'
+      - 'integrations/voucher-offline-e2e.test.ts'
       - '.github/workflows/voucher-tests.yml'
   pull_request:
     paths:
@@ -31,4 +32,4 @@ jobs:
         with:
           deno-version: v2.x
       - name: Run voucher regression tests
-        run: deno test --no-check integrations/voucher-integration.test.ts integrations/voucher-recovery.test.ts integrations/voucher-reconciliation.test.ts integrations/voucher-refund-plan.test.ts integrations/woo-refund-validator.test.ts
+        run: deno test --no-check integrations/voucher-integration.test.ts integrations/voucher-recovery.test.ts integrations/voucher-reconciliation.test.ts integrations/voucher-refund-plan.test.ts integrations/woo-refund-validator.test.ts integrations/voucher-offline-e2e.test.ts
