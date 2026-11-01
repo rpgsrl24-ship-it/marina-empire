@@ -37,7 +37,7 @@ export function verifyPaidDirectOrder(order:{
   // Compare integer cents; reject refunds separately before granting credits.
   // Woo line_items.total excludes tax. Compare gross cents against the
   // configured retail price and also validate the Woo order gross total.
-  const cents=(value:string)=>/^\\d+\\.\\d{2}$/.test(value)?Number(value.replace(".","")):NaN;
+  const cents=(value:string)=>/^\d+\.\d{2}$/.test(value)?Number(value.replace(".","")):NaN;
   const lineGross=cents(item.total)+cents(item.total_tax??"0.00");
   if(!Number.isSafeInteger(lineGross)||lineGross!==product.priceCents*item.quantity||
      cents(order.total??"")!==lineGross)
