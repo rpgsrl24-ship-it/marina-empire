@@ -34,7 +34,23 @@ begin
   insert into public.me_credit_vouchers
     (code_hash,credits,woo_order_id,woo_order_item_id,woo_unit_index,status)
   values (p_code_hash,p_credits,p_order_id,p_item_id,p_unit_index,'issued')
+  on conflict (woo_order_id,woo_order_item_id,woo_unit_index) do nothing
   returning id into v_id;
+
+  if v_id is null then
+    select id into v_id
+    from public.me_credit_vouchers
+    where woo_order_id=p_order_id
+      and woo_order_item_id=p_item_id
+      and woo_unit_index=p_unit_index;
+
+    if v_id is null then
+      raise exception 'Voucher issuance conflict';
+    end if;
+
+    return v_id;
+  end if;
+
   insert into public.me_voucher_delivery_outbox
     (voucher_id,woo_order_id,woo_order_item_id,woo_unit_index,recipient_email,
      code_ciphertext,code_nonce,key_version,status)
@@ -49,6 +65,7 @@ revoke all on function public.me_issue_voucher_with_outbox_internal(
 grant execute on function public.me_issue_voucher_with_outbox_internal(
  text,bigint,bigint,bigint,integer,text,text,text,integer
 ) to service_role;
--- Uniqueness on order/item/unit ensures retries fail atomically with SQLSTATE 23505.
--- Caller should then fetch the existing outbox entry, not generate a new code.
+-- Uniqueness on order/item/unit makes webhook retries idempotent.
+-- A repeated verified Woo order/item/unit returns the existing voucher UUID
+-- and does not create a second voucher or outbox row.
 -- The Edge Function must verify WooCommerce payment, SKU and amounts first.
