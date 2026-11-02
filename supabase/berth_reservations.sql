@@ -23,12 +23,22 @@ create table if not exists public.berth_reservations (
  created_at timestamptz not null default now(),
  constraint valid_stay check (departure_date > arrival_date and departure_date <= arrival_date + 90)
 );
-alter table public.berth_reservations
- add constraint no_overlapping_confirmed_bookings
- exclude using gist (
-   berth_id with =,
-   daterange(arrival_date, departure_date, '[)') with &&
- ) where (status = 'confirmed');
+-- Idempotent migration: avoid duplicate constraint failures when re-running SQL Editor.
+do $
+begin
+ if not exists (
+   select 1 from pg_constraint
+   where conname = 'no_overlapping_confirmed_bookings'
+     and conrelid = 'public.berth_reservations'::regclass
+ ) then
+   alter table public.berth_reservations
+     add constraint no_overlapping_confirmed_bookings
+     exclude using gist (
+       berth_id with =,
+       daterange(arrival_date, departure_date, '[)') with &&
+     ) where (status = 'confirmed');
+ end if;
+end $;
 create index if not exists berth_reservations_user_idx on public.berth_reservations(user_id);
 alter table public.marinas enable row level security;
 alter table public.berths enable row level security;
