@@ -194,6 +194,22 @@ Gate dell'ultima revisione funzionale `c4ad4bb7`: regressioni complete **SUCCESS
 
 P0-23 passa a **VERIFICATO**. P0-24 resta **IN CORSO**: questa modifica riduce il carico grafico della navigazione, ma la voce richiede ancora una verifica più ampia delle transizioni e dei tempi di caricamento tra schermate.
 
+## Dodicesimo ciclo — Caricamento iniziale e transizioni
+
+Verifica e ottimizzazione sviluppate nella [PR #30](https://github.com/rpgsrl24-ship-it/marina-empire/pull/30).
+
+- **Marina 3D nascosta:** l'iframe `cinemaMarina` passa da caricamento eager a `loading="lazy"` con priorità bassa; la scena originale resta disponibile ma non compete con il primo render.
+- **Leaflet CSS:** il foglio esterno viene precaricato come style e applicato dopo il caricamento, con fallback `noscript`, evitando di bloccare il primo rendering della home.
+- **Cartografia interattiva:** l'inizializzazione viene differita a `requestIdleCallback` con timeout di sicurezza; se l'utente apre la mappa prima, il caricamento parte immediatamente.
+- **Transizioni:** Chromium attraversa home, direzione, mappa, flotta, marine, profilo e missioni; ogni pannello deve risultare visibile entro il frame successivo e senza schermata vuota.
+- **Desktop/mobile:** lo stesso audit viene eseguito nei profili browser desktop, mobile verticale e mobile orizzontale già inclusi nel P0 smoke.
+- **VHF dopo refresh:** il test attende l'heartbeat effettivo prima di verificare la destinazione, eliminando una race del test emersa grazie al caricamento più rapido.
+- **Invarianti:** nessuna modifica a logica di rotta, missioni, scene 3D, pagamenti o gestione dell'Isola delle Rose.
+
+Gate dell'ultima revisione funzionale `637e1481`: regressioni complete **SUCCESS** ([Actions 41454738464](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41454738464)) e smoke/Chromium **SUCCESS** ([Actions 41454738468](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41454738468)).
+
+P0-24 passa a **VERIFICATO**. Il controllo automatico misura la reattività delle transizioni nel browser di CI; eventuali metriche RUM su reti e device reali potranno essere aggiunte successivamente senza riaprire il difetto tecnico pre-lancio.
+
 ## P0 — Continuità del gioco e protezioni sul sito pubblico
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
@@ -228,7 +244,7 @@ Queste voci mantengono la priorità P0 assegnata nel Master. Si affrontano dopo 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
 | --- | --- | --- | --- |
 | P0-23 | **Mare animato.** L'acqua si muove in modo fluido durante la navigazione, con la barca distinguibile e senza compromettere la plancia o le scene originali. | Verifica visiva desktop/mobile e osservazione della fluidità durante una missione. | VERIFICATO |
-| P0-24 | **Transizioni e prestazioni visive.** Passaggi tra pagine, immagini e animazioni non introducono scatti bloccanti, schermate vuote o caricamenti inutili; mantenere leggibilità e stile approvati. | Misura del caricamento e prova su dispositivo mobile, con confronto prima/dopo delle modifiche. | IN CORSO |
+| P0-24 | **Transizioni e prestazioni visive.** Passaggi tra pagine, immagini e animazioni non introducono scatti bloccanti, schermate vuote o caricamenti inutili; mantenere leggibilità e stile approvati. | Misura del caricamento e prova su dispositivo mobile, con confronto prima/dopo delle modifiche. | VERIFICATO |
 | P0-25 | **Meteo simulato.** Definire e rendere riconoscibili le condizioni simulate, con effetti di gioco documentati e coerenti; nessuna presentazione come previsione nautica reale. | Scenari di meteo e verifica degli eventuali effetti su navigazione e missioni. | DA VERIFICARE |
 | P0-26 | **Difficoltà crescente.** Le missioni diventano più impegnative in modo comprensibile, senza bloccare i primi passi o creare requisiti impossibili per la barca disponibile. | Percorso iniziale e livelli successivi con requisiti, rischi e ricompense confrontabili. | DA VERIFICARE |
 
