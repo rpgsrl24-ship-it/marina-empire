@@ -599,7 +599,8 @@ padding:5px!important;gap:4px!important;
    Only the clipped sea/reflection layers move, using composited transforms. */
 @keyframes meOceanDrift{0%,100%{transform:translate3d(-2%,0,0)}50%{transform:translate3d(2%,1px,0)}}
 @keyframes meOceanLayerDrift{from{transform:translate3d(-5%,0,0)}to{transform:translate3d(5%,0,0)}}
-#map.me-voyage-running #cinemaSea.me-helm-active:not(.me-helm-gps) #meHelmWindow{
+#map.me-voyage-running:not(.me-voyage-docked) #cinemaSea.me-helm-active:not(.me-helm-gps) #meHelmWindow,
+#map.me-voyage-docked #cinemaSea.me-helm-active #meHelmWindow{
  animation:none!important;transform:none!important;will-change:auto!important;
 }
 #map.me-voyage-running:not(.me-voyage-docked) #cinemaSea.me-helm-active:not(.me-helm-gps) .me-sea-motion{
