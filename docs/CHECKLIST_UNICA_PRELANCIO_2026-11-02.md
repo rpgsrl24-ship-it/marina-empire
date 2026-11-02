@@ -110,6 +110,22 @@ Implementazione tecnica verificata nella [PR #24](https://github.com/rpgsrl24-sh
 
 P0-18 passa a **VERIFICATO** come controllo tecnico pre-lancio. Questo esito non equivale a un parere o certificazione legale esterna; eventuale revisione legale può essere svolta separatamente senza riaprire il difetto tecnico originario.
 
+## Settimo ciclo — Integrità atomica dell'economia virtuale
+
+Verifica e correzione sviluppate nella [PR #25](https://github.com/rpgsrl24-ship-it/marina-empire/pull/25).
+
+- **Transazioni locali atomiche:** costi, premi e acquisti vengono applicati come snapshot → modifica → validazione → salvataggio verificato. Se la scrittura fallisce, lo stato torna esattamente alla copia precedente.
+- **Missioni:** costo iniziale, carburante, sosta tecnica, arrivo, premio, prestigio, conteggio viaggi e identificatore di liquidazione sono protetti. Un arrivo non salvato non lascia un premio solo in memoria e il viaggio resta da completare.
+- **Replay:** `settledVoyages` continua a impedire una seconda liquidazione dello stesso viaggio.
+- **Economia operativa:** rifornimento, manutenzione, ormeggi, acquisto yacht, attività, marine, upgrade, premi carriera e rendite passive usano la stessa semantica atomica.
+- **Saldi manipolati:** i crediti virtuali devono essere interi sicuri JavaScript e non negativi; valori negativi o oltre `Number.MAX_SAFE_INTEGER` vengono rifiutati dal guard del salvataggio.
+- **Nessun denaro reale:** questa protezione riguarda esclusivamente i crediti locali beta. Le funzioni di pagamento reale restano OFF e separate.
+- **Isola delle Rose e 3D:** nessuna modifica alle protezioni dell'Isola delle Rose o alla grafica/scena 3D.
+
+Test dell'ultima revisione funzionale `4bb7f28d`: regressioni complete **SUCCESS** ([Actions 41440126427](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41440126427)) e smoke/Chromium **SUCCESS** ([Actions 41440126359](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41440126359)). La suite dedicata simula anche rifiuto della scrittura browser, saldo negativo/non sicuro e arrivo missione senza persistenza.
+
+P0-10 passa a **VERIFICATO** per l'economia virtuale locale della beta. Non autorizza né attiva acquisti reali.
+
 ## P0 — Continuità del gioco e protezioni sul sito pubblico
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
@@ -123,7 +139,7 @@ P0-18 passa a **VERIFICATO** come controllo tecnico pre-lancio. Questo esito non
 | P0-07 | **Database e dati personali.** I permessi reali impediscono a ospiti e altri account di leggere o modificare dati riservati; le operazioni consentite corrispondono al proprietario autenticato. | Verifica delle regole applicate e richieste negative con account non autorizzato; il solo nascondere un pannello non chiude la voce. | IN CORSO |
 | P0-08 | **Direzione amministrativa.** Dashboard, dati dei giocatori e operazioni riservate richiedono autorizzazione amministrativa verificata dal server; gli accessi negati restano negati anche da link diretto. | Prove ospite, utente normale e amministratore; verifica delle richieste dati e della revoca al logout. | IN CORSO |
 | P0-09 | **Pagamenti OFF.** Nessun pulsante, link o chiamata attiva checkout, addebiti o accrediti a pagamento; anche i percorsi diretti devono restare chiusi. | Ispezione UI e richieste, test dei controlli disabilitati e delle protezioni applicative, senza acquisti reali. | VERIFICATO |
-| P0-10 | **Integrità dei crediti virtuali.** Costi, premi e acquisti rifiutano saldi negativi, richieste non valide e ripetizioni; un premio già liquidato non viene erogato di nuovo. I crediti locali beta non sono denaro acquistato. | Casi saldo insufficiente, doppio clic, replay dell'arrivo, dati alterati e operazione non autorizzata. | IN CORSO |
+| P0-10 | **Integrità dei crediti virtuali.** Costi, premi e acquisti rifiutano saldi negativi, richieste non valide e ripetizioni; un premio già liquidato non viene erogato di nuovo. I crediti locali beta non sono denaro acquistato. | Casi saldo insufficiente, doppio clic, replay dell'arrivo, dati alterati e operazione non autorizzata. | VERIFICATO |
 | P0-11 | **Isola delle Rose esclusiva RPG Yacht.** Rimuovere offerte e prezzi di acquisto ai giocatori; bloccare acquisto, upgrade e gestione economica riservata anche attraverso azioni dirette. Un vecchio salvataggio non deve attribuire proprietà o rendite dell'isola al giocatore. | Test UI, azioni dirette e salvataggio preesistente; nessuna deduzione/accredito improprio e nessuna cancellazione indiscriminata dei progressi. | VERIFICATO |
 | P0-12 | **Home, menu e indicatori mobile.** Layout leggibile, comandi raggiungibili, assenza di sovrapposizioni e navigazione utilizzabile in verticale e orizzontale. | Verifica browser a dimensioni mobili e controllo visivo nelle due orientazioni. | VERIFICATO |
 | P0-13 | **Plancia e GPS.** La console resta durante la navigazione; mappa, rotta e indicatori entrano nel display GPS previsto e restano leggibili. Conservare la grafica 3D originale. | Partenza, traversata, cambio vista e arrivo su desktop/mobile; confronto delle scene e dei riferimenti grafici approvati. | VERIFICATO |
