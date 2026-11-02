@@ -38,7 +38,7 @@ const context = vm.createContext({
   $: id => elements[id],
   money: n => Math.round(n).toLocaleString('it-IT'),
   notice: text => messages.push(text),
-  persist: () => { saves++; }, render: () => { renders++; },
+  persist: () => { saves++; return true; }, meAtomicPersist: fn => { fn(); saves++; return true; }, render: () => { renders++; },
   localStorage: { getItem: () => null },
   berthCapacity: 6,
   gameDay: () => '2026-11-02',
