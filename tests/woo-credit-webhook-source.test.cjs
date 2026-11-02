@@ -5,7 +5,7 @@ const src=fs.readFileSync('supabase/functions/marina-woo-credit-webhook/index.ts
 for(const token of [
  'ME_WOO_CREDIT_WEBHOOK_ENABLED','ME_ISSUE_ENABLED','ME_RECOVERABLE_DELIVERY_READY',
  'x-wc-webhook-signature','ME_WOO_WEBHOOK_SECRET','ME_WOO_API_KEY','ME_WOO_API_SECRET',
- 'SUPABASE_SERVICE_ROLE_KEY','ME_VOUCHER_ENCRYPTION_KEY','rpgyacht.com','www.rpgyacht.com',
+ 'SUPABASE_SECRET_KEYS','SUPABASE_SERVICE_ROLE_KEY','readSecretKey','ME_VOUCHER_ENCRYPTION_KEY','rpgyacht.com','www.rpgyacht.com',
  'processing','completed','order.currency!=="EUR"','order.refunds.length',
  'ME-CREDITS-50000','ME-CREDITS-2000000','priceCents:499','priceCents:9999',
  'gross!==pack.priceCents*qty','subGross!==pack.priceCents*qty',
