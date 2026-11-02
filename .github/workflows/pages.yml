@@ -15,44 +15,85 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Checkout beta test
-        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          ref: beta/private-test-2026-10-29
-          path: beta-test
+          node-version: '22'
       - name: Verify game before publishing
         run: node tests/smoke.cjs
-      - name: Verify missions and cloud save contracts
+      - name: Verify every offline regression before publishing
         run: |
-          node tests/mission-contract.test.cjs
-          node tests/mission-arrival.test.cjs
-          node tests/cloud-backup.test.cjs
-          node tests/cloud-load.test.cjs
-          node tests/account-ui.test.cjs
+          for test in tests/*.test.cjs; do
+            if [ "$test" != "tests/prelaunch-browser.test.cjs" ]; then
+              node "$test"
+            fi
+          done
+          node scripts/check-marina-inventory.cjs
+          node scripts/test-visual-berth-resolver.cjs
+      - name: Install pinned browser test dependencies
+        run: npm ci
+      - name: Install Chromium for P0 checks
+        run: npx playwright install --with-deps chromium
+      - name: Verify guest journey and P0 guards in Chromium
+        timeout-minutes: 4
+        run: node tests/prelaunch-browser.test.cjs
+      - name: Record the exact published revision
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const crypto = require('node:crypto');
+          fs.writeFileSync('release.json', JSON.stringify({
+            commit: process.env.GITHUB_SHA,
+            indexSha256: crypto.createHash('sha256').update(fs.readFileSync('index.html')).digest('hex')
+          }, null, 2) + '\n');
+          NODE
       - name: Configure Pages
         uses: actions/configure-pages@v5
+      - name: Prepare site without test dependencies or reports
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const excluded = new Set(['.git', 'node_modules', 'test-results', 'playwright-report']);
+          fs.cpSync(process.cwd(), path.join(process.env.RUNNER_TEMP, 'marina-empire-site'), {
+            recursive: true,
+            filter: source => !excluded.has(path.basename(source))
+          });
+          NODE
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: ${{ runner.temp }}/marina-empire-site
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Verify published homepage
+      - name: Verify published revision and homepage bytes
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           for attempt in 1 2 3 4 5; do
-            if curl --fail --location --silent --show-error --max-time 20 "$PAGE_URL" -o /tmp/marina-empire-public.html && grep -Fq 'Array.from({length:7}' /tmp/marina-empire-public.html; then
-              echo "Published Marina Empire homepage is reachable"
+            if curl --fail --location --silent --show-error --max-time 20 "${PAGE_URL%/}/release.json?revision=$GITHUB_SHA" -o /tmp/marina-empire-release.json &&
+              curl --fail --location --silent --show-error --max-time 20 "${PAGE_URL%/}/index.html?revision=$GITHUB_SHA" -o /tmp/marina-empire-public.html &&
+              node -e '
+                const fs = require("node:fs");
+                const crypto = require("node:crypto");
+                const assert = require("node:assert/strict");
+                const expected = JSON.parse(fs.readFileSync("release.json", "utf8"));
+                const actual = JSON.parse(fs.readFileSync("/tmp/marina-empire-release.json", "utf8"));
+                const digest = crypto.createHash("sha256").update(fs.readFileSync("/tmp/marina-empire-public.html")).digest("hex");
+                assert.equal(actual.commit, process.env.GITHUB_SHA, "Published commit differs from this deployment");
+                assert.equal(actual.indexSha256, expected.indexSha256, "Published manifest differs from this artifact");
+                assert.equal(digest, expected.indexSha256, "Published homepage is stale or different");
+              '; then
+              echo "Published Marina Empire revision and homepage match $GITHUB_SHA"
               exit 0
             fi
             echo "Homepage not ready (attempt $attempt/5)"
             sleep 12
           done
-          echo "Published homepage verification failed" >&2
+          echo "Published revision verification failed" >&2
           exit 1

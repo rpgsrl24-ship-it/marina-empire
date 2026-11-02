@@ -1,0 +1,14 @@
+{
+  "name": "marina-empire",
+  "private": true,
+  "version": "0.0.0-beta",
+  "description": "Regression checks for the Marina Empire public beta",
+  "scripts": {
+    "test:browser": "node tests/prelaunch-browser.test.cjs"
+  },
+  "devDependencies": {
+    "leaflet": "1.9.4",
+    "playwright": "1.58.2",
+    "three": "0.160.1"
+  }
+}
