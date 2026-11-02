@@ -33,8 +33,16 @@ Deno.serve(async request => {
   let payload: { id?: number };
   try { payload = JSON.parse(raw); } catch { return reply({ error: "Invalid payload" }, 400); }
   if (!Number.isSafeInteger(payload.id) || !payload.id || payload.id < 1) return reply({ error: "Invalid order ID" }, 400);
-  const store = env("ME_WOO_BASE_URL").replace(/\/$/, "");
-  if (!/^https:\/\//.test(store)) return reply({ error: "Invalid store configuration" }, 503);
+  let store:string;
+  try {
+    const parsed=new URL(env("ME_WOO_BASE_URL"));
+    if(parsed.protocol!=="https:" || !["rpgyacht.com","www.rpgyacht.com"].includes(parsed.hostname) ||
+       parsed.username || parsed.password || parsed.port || parsed.search || parsed.hash)
+      return reply({ error: "Invalid store configuration" }, 503);
+    store=parsed.origin;
+  } catch {
+    return reply({ error: "Invalid store configuration" }, 503);
+  }
   const auth = btoa(env("ME_WOO_API_KEY") + ":" + env("ME_WOO_API_SECRET"));
   const response = await fetch(store + "/wp-json/wc/v3/orders/" + payload.id, {
     headers: { authorization: "Basic " + auth }
