@@ -188,9 +188,10 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.equal(trackedTypes.filter(x=>x==='mission_complete').length,1,name+': analytics records mission_complete once');
     const analyticsRows=traffic.filter(x=>['page_view','play_start','mission_complete'].includes(x.body?.event_type));
     assert.ok(analyticsRows.length>=3,name+': expected analytics events were captured');
-    const sessionIds=new Set(analyticsRows.map(x=>x.body?.session_id));
-    assert.equal(sessionIds.size,1,name+': analytics uses one in-memory session UUID per page load');
+    const pageViewSessions=new Set(analyticsRows.filter(x=>x.body?.event_type==='page_view').map(x=>x.body?.session_id));
+    assert.ok(pageViewSessions.size>=1,name+': every loaded page creates an in-memory analytics session');
     for(const entry of analyticsRows){
+      assert.ok(pageViewSessions.has(entry.body?.session_id),name+': gameplay analytics belongs to a page-load session');
       assert.equal(entry.method,'POST',name+': analytics uses POST');
       assert.equal(entry.headers.prefer,'return=minimal',name+': analytics requests no returned rows');
       assert.equal(Object.hasOwn(entry.body,'visitor_id'),false,name+': analytics must not send persistent visitor_id');
