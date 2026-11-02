@@ -69,3 +69,66 @@ Deno.test("wrong encryption key cannot decrypt", async () => {
   try { await decryptVoucher(encrypted, "B2".repeat(32)); } catch { rejected = true; }
   assert(rejected, "Wrong key was accepted");
 });
+
+
+Deno.test("live rehearsal: first EUR 4.99 pack validates exactly one 50k voucher", () => {
+  const sample: WooOrder = {
+    id: 50001,
+    status: "processing",
+    currency: "EUR",
+    date_paid: "2026-11-02T18:00:00Z",
+    billing: { email: "buyer@example.com" },
+    refunds: [],
+    line_items: [{
+      id: 70001,
+      product_id: 38090,
+      sku: "ME-CREDITS-50000",
+      quantity: 1,
+      total: "4.09",
+      total_tax: "0.90",
+      subtotal: "4.09",
+      subtotal_tax: "0.90"
+    }]
+  };
+  const units = validatePaidWooOrder(sample);
+  assert(units.length === 1, "Expected exactly one voucher unit");
+  assert(units[0].orderId === 50001, "Wrong order id");
+  assert(units[0].itemId === 70001, "Wrong item id");
+  assert(units[0].unitIndex === 0, "Wrong unit index");
+  assert(units[0].credits === 50000, "Wrong credit amount");
+  assert(units[0].email === "buyer@example.com", "Wrong recipient");
+});
+
+Deno.test("live rehearsal: first pack rejects wrong gross price, sku, currency, unpaid and refunded states", () => {
+  const base = (): WooOrder => ({
+    id: 50002,
+    status: "processing",
+    currency: "EUR",
+    date_paid: "2026-11-02T18:00:00Z",
+    billing: { email: "buyer@example.com" },
+    refunds: [],
+    line_items: [{
+      id: 70002,
+      product_id: 38090,
+      sku: "ME-CREDITS-50000",
+      quantity: 1,
+      total: "4.09",
+      total_tax: "0.90",
+      subtotal: "4.09",
+      subtotal_tax: "0.90"
+    }]
+  });
+  for (const mutate of [
+    (x: WooOrder) => { x.currency = "USD"; },
+    (x: WooOrder) => { x.date_paid = null; },
+    (x: WooOrder) => { x.refunds = [{ id: 1 }]; },
+    (x: WooOrder) => { x.line_items[0].sku = "OTHER"; },
+    (x: WooOrder) => { x.line_items[0].total = "3.00"; }
+  ]) {
+    const sample = base();
+    mutate(sample);
+    let rejected = false;
+    try { validatePaidWooOrder(sample); } catch { rejected = true; }
+    assert(rejected, "Invalid live rehearsal order was accepted");
+  }
+});
