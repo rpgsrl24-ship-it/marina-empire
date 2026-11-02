@@ -197,8 +197,8 @@ async function multiTabConflict(browser,origin) {
   const first=await context.newPage(),stale=await context.newPage(),errors=[];
   stale.on('pageerror',e=>errors.push(e.message));
   try {
-    await first.goto(origin,{waitUntil:'domcontentloaded'});
-    await stale.goto(origin,{waitUntil:'domcontentloaded'});
+    await first.goto(origin,{waitUntil:'domcontentloaded',timeout:30000});
+    await stale.goto(origin,{waitUntil:'domcontentloaded',timeout:30000});
     await first.waitForFunction(()=>typeof window.meCanWriteLocalSave==='function');
     await stale.waitForFunction(()=>typeof window.meCanWriteLocalSave==='function');
     const latest=await first.evaluate(key=>{
@@ -229,6 +229,7 @@ async function multiTabConflict(browser,origin) {
   if(process.env.ME_CHROMIUM_PATH) options.executablePath=process.env.ME_CHROMIUM_PATH;
   const browser=await chromium.launch(options);
   try {
+    if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO==='multi-tab-conflict') await multiTabConflict(browser,origin);
     for (const scenario of [
       ['desktop',{width:1440,height:1000},false],
       ['mobile-portrait',{width:390,height:844},true],
@@ -237,6 +238,5 @@ async function multiTabConflict(browser,origin) {
       if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO===scenario[0]) await trial(browser,origin,...scenario);
     }
     if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO==='recovery-mobile') await corruptSaveRecovery(browser,origin);
-    if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO==='multi-tab-conflict') await multiTabConflict(browser,origin);
   } finally {await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>server.close());
