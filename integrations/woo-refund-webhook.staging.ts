@@ -3,6 +3,7 @@ import { validateFullRefundOrder, type RefundOrder } from "./woo-refund-validato
 // Disabled by default. Never deploy with ME_REFUND_ENABLED=true before E2E tests.
 import { createClient } from "npm:@supabase/supabase-js@2.95.0";
 const env=(k:string)=>Deno.env.get(k)||"";
+const readSecretKey=()=>{const raw=env("SUPABASE_SECRET_KEYS");if(raw){try{const parsed=JSON.parse(raw);if(parsed&&typeof parsed.default==="string"&&parsed.default)return parsed.default}catch{}}return env("SUPABASE_SERVICE_ROLE_KEY")};
 const json=(x:unknown,status=200)=>new Response(JSON.stringify(x),{status,headers:{"content-type":"application/json","cache-control":"no-store"}});
 async function verify(raw:string,sig:string,secret:string){
  const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
@@ -15,8 +16,8 @@ async function verify(raw:string,sig:string,secret:string){
 Deno.serve(async request=>{
  if(request.method!=="POST")return json({error:"Method not allowed"},405);
  if(env("ME_REFUND_ENABLED")!=="true")return json({error:"Refund automation disabled"},503);
- const required=["ME_WOO_WEBHOOK_SECRET","ME_WOO_API_KEY","ME_WOO_API_SECRET","ME_WOO_BASE_URL","SUPABASE_URL","SUPABASE_SERVICE_ROLE_KEY"];
- if(required.some(k=>!env(k)))return json({error:"Configuration incomplete"},503);
+ const required=["ME_WOO_WEBHOOK_SECRET","ME_WOO_API_KEY","ME_WOO_API_SECRET","ME_WOO_BASE_URL","SUPABASE_URL"];
+ if(required.some(k=>!env(k))||!readSecretKey())return json({error:"Configuration incomplete"},503);
  const raw=await request.text();
  if(raw.length>200000)return json({error:"Payload too large"},413);
  if(!await verify(raw,request.headers.get("x-wc-webhook-signature")||"",env("ME_WOO_WEBHOOK_SECRET")))return json({error:"Invalid signature"},401);
@@ -31,7 +32,7 @@ Deno.serve(async request=>{
  let decision:"full_refund"|"manual_review";
  try{decision=validateFullRefundOrder(payload.id,order);}catch{return json({error:"Refund order verification failed"},422);}
  if(decision!=="full_refund")return json({ok:true,action:"manual_review_or_no_full_refund"});
- const admin=createClient(env("SUPABASE_URL"),env("SUPABASE_SERVICE_ROLE_KEY"),{auth:{persistSession:false,autoRefreshToken:false}});
+ const admin=createClient(env("SUPABASE_URL"),readSecretKey(),{auth:{persistSession:false,autoRefreshToken:false}});
  const {data,error}=await admin.rpc("me_cancel_refunded_order_internal",{p_order_id:order.id});
  if(error)return json({error:"Atomic cancellation failed"},503);
  return json({ok:true,result:data});
