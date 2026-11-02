@@ -48,7 +48,9 @@ test('Registered 3D debit/reward uses its own save and never changes the guest',
  assert.equal(f.read(accountKey('player-a')).coins,38450);
  assert.equal(f.data.get(GUEST),guestBefore);
  assert.equal(f.data.get(accountKey('player-b')),bBefore);
- assert(f.data.has(accountKey('player-a')+'_marina_rimini'));
+ assert.equal(f.data.has(accountKey('player-a')+'_marina_rimini'),false,'Opening the scene and changing only empire credits must not create a layout write');
+ assert.equal(h.run('save()'),true);
+ assert(f.data.has(accountKey('player-a')+'_marina_rimini'),'An explicit marina save persists the account layout');
  assert.equal(f.read('marina-empire-phase1-rimini').built,9);
  assert(!f.writes.includes(GUEST));
 });
