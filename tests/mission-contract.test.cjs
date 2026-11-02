@@ -15,9 +15,9 @@ const tests = [
   ['Diagnostica beta presente', /function betaDiagnostics\(\)/.test(html)],
   ['Portafoglio marine: ricavi e costi separati', /function marinaPortfolioSummary\(\)/.test(html) && /gross,costs,net:gross-costs/.test(html)],
   ['Costi operativi marina inclusi nel rendimento', /function fleetDailyIncome\(\)/.test(html) && /berthDailyNet\(id\)-marinaOperatingCosts\(id\)\.total/.test(html)],
-  ['Rendite ormeggi limitate a 24 ore per ciclo', /function earnBerthRentals\(\)/.test(html) && /Math\.min\(24,Math\.floor\(Math\.max\(0,now-Number\(m\.berthLastReward\)\)\/3600000\)\)/.test(html)],
+  ['Rendite ormeggi limitate a 24 ore per ciclo', /function earnBerthRentals\(\)/.test(html) && /Math\.min\(24,Math\.floor\(Math\.max\(0,now-last\)\/3600000\)\)/.test(html)],
   ['Rendite marine limitate a sette giorni per ciclo', /function earnMarinaIncome\(\)/.test(html) && /Math\.min\(7,Math\.floor\(Math\.max\(0,now-m\.lastReward\)\/86400000\)\)/.test(html)],
-  ['Prima inizializzazione rendite ormeggi salvata', /function earnBerthRentals\(\)/.test(html) && /m\.berthLastReward=now;advanced=true/.test(html) && /if\(advanced\)persist\(\)/.test(html)],
+  ['Prima inizializzazione rendite ormeggi salvata', /function earnBerthRentals\(\)/.test(html) && /if\(!Number\.isFinite\(last\)\)last=Number\(m\.lastReward\)/.test(html) && /updates\.push\(\[id,last\]\)/.test(html) && /meAtomicPersist/.test(html)],
 ];
 let failures = 0;
 for (const [label, ok] of tests) { console.log((ok ? 'PASS' : 'FAIL') + ' ' + label); if (!ok) failures++; }
