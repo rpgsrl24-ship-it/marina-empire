@@ -14,7 +14,7 @@ assert.equal(catalog.marinas.reduce((n,m)=>n+m.berths,0),11100);
 for(const marina of catalog.marinas){
   assert.equal(marina.pier_ids.length,marina.piers,marina.id);
   assert.equal(new Set(marina.pier_ids).size,marina.piers,marina.id);
-  for(let i=0;i<marina.piers;i++) assert.equal(marina.pier_ids[i],marina.id+':P'+String(i+1).padStart(2,'0'));
+  for(let i=0;i<marina.piers;i++) assert.equal(marina.pier_ids[i],(marina.database_id || marina.id)+':P'+String(i+1).padStart(2,'0'));
   const m=byId.get(marina.id);
   assert.ok(m,'Missing scene: '+marina.id);
   assert.equal(m.piers,marina.piers,marina.id);
