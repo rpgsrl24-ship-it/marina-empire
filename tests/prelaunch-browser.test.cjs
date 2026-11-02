@@ -97,6 +97,7 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.ok(launched.coins>=0 && launched.coins<=before.coins,'Launch must not create a negative balance');
     assert.ok(launched.fuel>=0 && launched.fuel<before.fuel,'Launch must consume fuel');
     assert.ok(launched.condition>=0 && launched.condition<=100,'Condition must remain bounded');
+    assert.ok(['calm','breeze','rain','rough'].includes(launched.trip.weather),name+': voyage stores a recognized simulated weather profile');
     const voyageId=launched.trip.voyageId;
     await page.reload({waitUntil:'load'});
     const resumed=await save(page);
@@ -133,6 +134,9 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.ok(seaMotion.waterAnimation.includes('meWaveTravel'),name+': water surface is animated in helm view');
     assert.ok(seaMotion.wakeAnimation.includes('meWakeFlow'),name+': wake is animated in helm view');
     assert.ok(seaMotion.waterOpacity>0&&seaMotion.wakeOpacity>0,name+': animated water and wake remain visible');
+    const weatherText=await page.locator('#meBridgeWeather').innerText();
+    assert.ok(weatherText.includes('METEO SIMULATO'),name+': helm labels weather as simulated');
+    assert.ok(/tempo x1\.(00|05|08|12)/.test(weatherText),name+': helm documents simulated duration effect');
     const geometry=await page.evaluate(()=>{
       const rect=id=>{const b=document.getElementById(id).getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height,right:b.right,bottom:b.bottom}};
       return {viewport:innerWidth,overflow:document.documentElement.scrollWidth>innerWidth+2,sea:rect('cinemaSea'),gps:rect('voyageRouteMap'),controls:rect('meHelmControls'),markers:document.querySelectorAll('#voyageRouteMap .leaflet-marker-icon').length,route:document.querySelectorAll('#voyageRouteMap path.leaflet-interactive').length};
@@ -160,6 +164,7 @@ async function trial(browser,origin,name,viewport,mobile) {
     const arrived=await save(page);
     assert.equal(arrived.trip,null,'Arrival clears the active trip');
     assert.equal(arrived.port,launched.trip.dest,'Arrival updates yacht location');
+    assert.equal(arrived.lastArrival.weather,launched.trip.weather,name+': arrival preserves the simulated weather profile');
     assert.equal(arrived.voyages,1,'The first trip is counted once');
     assert.equal(arrived.lastArrival.reward,launched.trip.mission.reward,'The advertised mission reward is recorded');
     assert.ok(arrived.coins>=launched.coins+launched.trip.mission.reward,'Reward is credited');
