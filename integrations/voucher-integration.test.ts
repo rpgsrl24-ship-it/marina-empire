@@ -10,7 +10,7 @@ function order(): WooOrder {
     date_paid: "2026-11-01T10:00:00", billing: { email: "buyer@example.com" },
     refunds: [],
     line_items: [{ id: 901, product_id: 38090, sku: "ME-CREDITS-50000",
-      quantity: 2, total: "9.98", subtotal: "9.98" }]
+      quantity: 2, total: "8.18", total_tax: "1.80", subtotal: "8.18", subtotal_tax: "1.80" }]
   };
 }
 Deno.test("paid order produces one voucher unit per purchased item", () => {
@@ -31,11 +31,21 @@ Deno.test("refunded orders are rejected", () => {
   try { validatePaidWooOrder(sample); } catch { rejected = true; }
   assert(rejected, "Refunded order was accepted");
 });
-Deno.test("changed prices are rejected", () => {
+Deno.test("gross Woo price including tax is accepted", () => {
+  const units = validatePaidWooOrder(order());
+  assert(units.length === 2, "Expected tax-inclusive order to validate");
+});
+Deno.test("changed gross prices are rejected", () => {
   const sample = order(); sample.line_items[0].total = "0.00";
   let rejected = false;
   try { validatePaidWooOrder(sample); } catch { rejected = true; }
   assert(rejected, "Price mismatch was accepted");
+});
+Deno.test("discounted subtotal or total is rejected", () => {
+  const sample = order(); sample.line_items[0].subtotal = "8.00";
+  let rejected = false;
+  try { validatePaidWooOrder(sample); } catch { rejected = true; }
+  assert(rejected, "Discounted order was accepted");
 });
 Deno.test("product and SKU mismatches are rejected", () => {
   const sample = order(); sample.line_items[0].sku = "OTHER";
