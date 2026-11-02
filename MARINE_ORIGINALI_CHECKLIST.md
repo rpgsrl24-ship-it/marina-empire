@@ -89,3 +89,10 @@ Le scene approvate contengono ancora progressi in `localStorage`. I saldi mostra
 ### Controllo integrità aggiuntivo
 - [x] Query di sola lettura: nessuna duplicazione di coppie marina/pontile in `marina_docks`.
 - [ ] Verificare su database live la distribuzione geometrica dei posti per pontile prima di rendere selezionabili gli ormeggi.
+
+### Verifica automatica e mapping (02/11/2026)
+- [x] Test GitHub `Marina Empire smoke tests` superato sul commit `fc7c4f4`; deploy completato con successo.
+- [x] Il test verifica 12 marine, 295 pontili, 11.100 posti e ID pontili del catalogo, gestendo gli ID database diversi da quelli delle scene.
+- [x] Verificato in sola lettura su `marina_docks` il campione dei primi dieci pontili di `rose`: gli intervalli alternano 37 e 38 posti.
+- [ ] NON assumere che l'indice locale del posto 3D sia equivalente al numero globale nel database: la distribuzione dei posti per pontile differisce.
+- [ ] Definire mapping esplicito e verificato per tutti i pontili prima di abilitare ormeggi condivisi.
