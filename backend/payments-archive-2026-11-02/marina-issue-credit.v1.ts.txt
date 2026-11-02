@@ -1,0 +1,6 @@
+Deno.serve((_req: Request) => {
+  return new Response(JSON.stringify({ error: "Voucher issuance is not configured" }), {
+    status: 503,
+    headers: { "content-type": "application/json", "cache-control": "no-store" }
+  });
+});

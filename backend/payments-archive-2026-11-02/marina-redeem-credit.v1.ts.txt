@@ -1,0 +1,29 @@
+import { createClient } from "npm:@supabase/supabase-js@2.95.0";
+const headers={"content-type":"application/json","access-control-allow-origin":"https://rpgsrl24-ship-it.github.io","access-control-allow-headers":"authorization,apikey,content-type","access-control-allow-methods":"POST,OPTIONS"};
+const respond=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers});
+Deno.serve(async(req:Request)=>{
+ if(req.method==="OPTIONS")return new Response(null,{status:204,headers});
+ if(req.method!=="POST")return respond({error:"Method not allowed"},405);
+ if(req.headers.get("origin")!=="https://rpgsrl24-ship-it.github.io")return respond({error:"Origin not allowed"},403);
+ if(Deno.env.get("ME_VOUCHERS_ENABLED")!=="true")return respond({error:"Ricariche non ancora attive"},503);
+ const auth=req.headers.get("authorization")||"";
+ if(!auth.startsWith("Bearer "))return respond({error:"Accesso richiesto"},401);
+ const url=Deno.env.get("SUPABASE_URL")||"";
+ const pub=Deno.env.get("SUPABASE_ANON_KEY")||"";
+ const secret=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
+ if(!url||!pub||!secret)return respond({error:"Configurazione incompleta"},503);
+ const userClient=createClient(url,pub);
+ const {data:{user},error}=await userClient.auth.getUser(auth.slice(7));
+ if(error||!user||user.is_anonymous)return respond({error:"Account verificato richiesto"},401);
+ let body:{code?:string};
+ try{body=await req.json()}catch{return respond({error:"Richiesta non valida"},400)}
+ const code=String(body.code||"").trim().toUpperCase();
+ if(!/^ME-[A-Z0-9]{8}-[A-Z0-9]{8}-[A-Z0-9]{8}$/.test(code))return respond({error:"Formato codice non valido"},400);
+ const bytes=new TextEncoder().encode(code);
+ const digest=await crypto.subtle.digest("SHA-256",bytes);
+ const hash=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,"0")).join("");
+ const admin=createClient(url,secret,{auth:{persistSession:false,autoRefreshToken:false}});
+ const {data,error:dbError}=await admin.rpc("me_redeem_voucher_internal",{p_user_id:user.id,p_code_hash:hash});
+ if(dbError)return respond({error:"Codice non valido o già utilizzato"},400);
+ return respond({ok:true,balance:data});
+});
