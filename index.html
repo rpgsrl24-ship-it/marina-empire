@@ -671,7 +671,8 @@ window.meClaimGuestProgress=function(user){
 // A new game requires the explicit NUOVA PARTITA action on a readable save.
 const $=id=>document.getElementById(id);
 const ports=[{id:"rose",name:"Isola delle Rose",x:66,y:36},{id:"rimini",name:"Rimini",x:67,y:32},{id:"ancona",name:"Ancona",x:74,y:48},{id:"lignano",name:"Lignano",x:63,y:19},{id:"cervia",name:"Cervia",x:66,y:29},{id:"bari",name:"Bari",x:83,y:73},{id:"ravenna",name:"Marina di Ravenna",x:65,y:27},{id:"pescara",name:"Marina di Pescara",x:76,y:56},{id:"brindisi",name:"Marina di Brindisi",x:88,y:81},{id:"salerno",name:"Marina d’Arechi — Salerno",x:64,y:80},{id:"nettuno",name:"Marina di Nettuno",x:57,y:67},{id:"scarlino",name:"Marina di Scarlino",x:48,y:56},{id:"loano",name:"Marina di Loano",x:31,y:32},{id:"portocervo",name:"Marina di Porto Cervo",x:39,y:69},{id:"capodorlando",name:"Marina di Capo d’Orlando",x:62,y:91}];
-const boats=[{id:"voyager",name:"RPG Academy 8",price:0,tank:400},{id:"open",name:"RPG Open 7",price:80000,tank:300},{id:"yacht",name:"RPG Cruiser 12",price:350000,tank:550},{id:"yacht14",name:"RPG Prestige 14",price:650000,tank:700},{id:"yacht20",name:"RPG Elite 20",price:1800000,tank:1100},{id:"yacht30",name:"RPG Majesty 30",price:6000000,tank:1700},{id:"luna",name:"RPG Imperial 60",price:45000000,tank:900}];
+const boats=[{id:"voyager",name:"RPG Academy 8",price:0,tank:400,burn:0.85},{id:"open",name:"RPG Open 7",price:80000,tank:300,burn:0.75},{id:"yacht",name:"RPG Cruiser 12",price:350000,tank:550,burn:0.92},{id:"yacht14",name:"RPG Prestige 14",price:650000,tank:700,burn:0.98},{id:"yacht20",name:"RPG Elite 20",price:1800000,tank:1100,burn:1.05},{id:"yacht30",name:"RPG Majesty 30",price:6000000,tank:1700,burn:1.12},{id:"luna",name:"RPG Imperial 60",price:45000000,tank:900,burn:1.18}];
+function fuelBurnPerNm(id){const rate=Number(boats.find(b=>b.id===id)?.burn);return Number.isFinite(rate)&&rate>0?rate:0.85}
 /* Virtual acquisition valuations, not real-world marina sale prices. */
 const marinaEconomy={
 rimini:{price:8000000,income:80000},ancona:{price:11000000,income:110000},lignano:{price:12000000,income:120000},cervia:{price:6500000,income:65000},bari:{price:18000000,income:180000},ravenna:{price:9500000,income:95000},pescara:{price:9000000,income:90000},brindisi:{price:14000000,income:140000},salerno:{price:22000000,income:220000},nettuno:{price:16000000,income:160000},scarlino:{price:28000000,income:280000},loano:{price:26000000,income:260000},portocervo:{price:85000000,income:850000},capodorlando:{price:24000000,income:240000}
@@ -750,11 +751,11 @@ else {const ad=isAdA?A:B,ty=isAdA?B:A;const cross=[...chain(ad,seaCorridors.otra
 return [A,...mid,B];
 }
 function seaMiles(a,b){if(!harborGPS[a]||!harborGPS[b])return 0;const points=voyageRoutePoints(a,b);return points.slice(1).reduce((n,p,i)=>n+straightNm(points[i],p),0)}
-function planSeaTrip(from,to,tank){
- const capacity=Math.max(1,Number(tank)||1),reserve=Math.ceil(capacity*.15),usable=(capacity-reserve)/.85;
+function planSeaTrip(from,to,tank,burnRate=0.85){
+ const capacity=Math.max(1,Number(tank)||1),reserve=Math.ceil(capacity*.15),rate=Number.isFinite(Number(burnRate))&&Number(burnRate)>0?Number(burnRate):0.85;
  if(!harborGPS[from]||!harborGPS[to]||from===to)return {possible:false,distance:0,stops:[],reason:"Marina di partenza o destinazione non valida"};
  // Dijkstra on the available marinas: minimize actual simulated sea miles, with
- // each leg respecting fuel consumption and the mandatory 15% reserve.
+ // each leg respecting this vessel's fuel consumption and the mandatory 15% reserve.
  const ids=ports.map(p=>p.id),dist=Object.fromEntries(ids.map(id=>[id,Infinity])),prev={},visited=new Set();
  dist[from]=0;
  while(visited.size<ids.length){
@@ -765,17 +766,17 @@ function planSeaTrip(from,to,tank){
    for(const next of ids){
      if(next===current||visited.has(next))continue;
      const miles=seaMiles(current,next);
-     if(!Number.isFinite(miles)||miles<=0||Math.ceil(miles*.85)+reserve>capacity)continue;
+     if(!Number.isFinite(miles)||miles<=0||Math.ceil(miles*rate)+reserve>capacity)continue;
      const cost=dist[current]+miles;
      if(cost<dist[next]){dist[next]=cost;prev[next]=current}
    }
  }
- if(!Number.isFinite(dist[to]))return {possible:false,distance:seaMiles(from,to),stops:[],reason:"Nessuna combinazione di marine raggiungibile con il serbatoio e la riserva del 15%"};
+ if(!Number.isFinite(dist[to]))return {possible:false,distance:seaMiles(from,to),stops:[],reason:"Nessuna combinazione di marine raggiungibile con il serbatoio, il consumo dello yacht e la riserva del 15%"};
  const legs=[to];let cursor=to;
  while(cursor!==from&&legs.length<=ids.length){cursor=prev[cursor];if(!cursor)break;legs.unshift(cursor)}
  if(legs[0]!==from)return {possible:false,distance:0,stops:[],reason:"Impossibile costruire la rotta"};
  const stops=legs.slice(1,-1),distance=legs.slice(1).reduce((sum,id,i)=>sum+seaMiles(legs[i],id),0);
- return {possible:true,distance,stops,legs,fuel:legs.slice(1).reduce((sum,id,i)=>sum+Math.ceil(seaMiles(legs[i],id)*.85),0),reserve,refuelCost:0};
+ return {possible:true,distance,stops,legs,fuel:legs.slice(1).reduce((sum,id,i)=>sum+Math.ceil(seaMiles(legs[i],id)*rate),0),reserve,burnRate:rate,refuelCost:0};
 }
 function crewForBoat(id){return ({voyager:{roles:"Comandante",daily:0,count:1},open:{roles:"Comandante e marinaio",daily:160,count:2},yacht:{roles:"Comandante, marinaio e hostess",daily:420,count:3},yacht14:{roles:"Comandante, marinaio e hostess",daily:550,count:3},yacht20:{roles:"Comandante, marinaio, chef e hostess",daily:850,count:4},yacht30:{roles:"Comandante, primo ufficiale, chef, hostess e marinai",daily:1250,count:6},luna:{roles:"Comandante, primo ufficiale, chef, hostess e marinai",daily:1500,count:7}})[id]||{roles:"Comandante",daily:0,count:1}}
 function charterContract(boatId,dest){
@@ -790,7 +791,7 @@ function charterContract(boatId,dest){
  const [client,service,multiplier,bonus]=choices[index];
  return {client,service,multiplier,bonus};
 }
-function availableMissions(){const here=state.port||"rose",activeBoat=state.owned.includes(state.boat)?state.boat:"voyager";const intro=here==="rimini"&&activeBoat==="voyager"&&(state.voyages||0)===0&&!state.completed.includes("INTRO_RIMINI_CERVIA")?[{id:"INTRO_RIMINI_CERVIA",name:"PRIMA MISSIONE · RPG Academy 8 · Rimini - Cervia",dest:"cervia",boat:"voyager",reward:500,cost:0,fuel:Math.ceil(seaMiles("rimini","cervia")*.85),prestige:50,sec:25,plan:planSeaTrip("rimini","cervia",boat("voyager").tank)}]:[];return [...intro,...ports.filter(p=>p.id!==here).map(p=>{const plan=planSeaTrip(here,p.id,boat(activeBoat).tank);const fuel=plan.fuel||Math.ceil(seaMiles(here,p.id)*.85);const charter=activeBoat==="luna"||activeBoat==="yacht30"?"Charter di lusso":activeBoat==="yacht20"||activeBoat==="yacht14"?"Charter premium":activeBoat==="yacht"?"Charter premium":activeBoat==="open"?"Escursione privata":"Trasferimento nautico";const multiplier=activeBoat==="luna"?2.7:activeBoat==="yacht30"?2.55:activeBoat==="yacht20"?2.3:activeBoat==="yacht14"?2.05:activeBoat==="yacht"?1.9:activeBoat==="open"?1.3:1;const contract=charterContract(activeBoat,p.id);return {client:contract.client,service:contract.service,id:"R_"+activeBoat+"_"+here+"_"+p.id,name:contract.service+" verso "+p.name,dest:p.id,boat:activeBoat,reward:Math.max(1200,Math.round(plan.distance*20*multiplier*contract.multiplier*(activeBoat==="luna"?5:activeBoat==="yacht30"?4:activeBoat==="yacht20"?3:activeBoat==="yacht14"?2.2:activeBoat==="yacht"?1.7:activeBoat==="open"?1.3:1)))+contract.bonus,cost:Math.max(250,Math.round(plan.distance*7*multiplier))+crewForBoat(activeBoat).daily,crewCost:crewForBoat(activeBoat).daily,crewRoles:crewForBoat(activeBoat).roles,fuel,prestige:Math.max(15,Math.round(plan.distance*.4*multiplier)),sec:Math.max(25,Math.min(120,Math.round(plan.distance*.55))),plan}})]}
+function availableMissions(){const here=state.port||"rose",activeBoat=state.owned.includes(state.boat)?state.boat:"voyager",burn=fuelBurnPerNm(activeBoat);const introBurn=fuelBurnPerNm("voyager");const intro=here==="rimini"&&activeBoat==="voyager"&&(state.voyages||0)===0&&!state.completed.includes("INTRO_RIMINI_CERVIA")?[{id:"INTRO_RIMINI_CERVIA",name:"PRIMA MISSIONE · RPG Academy 8 · Rimini - Cervia",dest:"cervia",boat:"voyager",reward:500,cost:0,fuel:Math.ceil(seaMiles("rimini","cervia")*introBurn),prestige:50,sec:25,plan:planSeaTrip("rimini","cervia",boat("voyager").tank,introBurn)}]:[];return [...intro,...ports.filter(p=>p.id!==here).map(p=>{const plan=planSeaTrip(here,p.id,boat(activeBoat).tank,burn);const fuel=plan.fuel||Math.ceil(seaMiles(here,p.id)*burn);const charter=activeBoat==="luna"||activeBoat==="yacht30"?"Charter di lusso":activeBoat==="yacht20"||activeBoat==="yacht14"?"Charter premium":activeBoat==="yacht"?"Charter premium":activeBoat==="open"?"Escursione privata":"Trasferimento nautico";const multiplier=activeBoat==="luna"?2.7:activeBoat==="yacht30"?2.55:activeBoat==="yacht20"?2.3:activeBoat==="yacht14"?2.05:activeBoat==="yacht"?1.9:activeBoat==="open"?1.3:1;const contract=charterContract(activeBoat,p.id);return {client:contract.client,service:contract.service,id:"R_"+activeBoat+"_"+here+"_"+p.id,name:contract.service+" verso "+p.name,dest:p.id,boat:activeBoat,reward:Math.max(1200,Math.round(plan.distance*20*multiplier*contract.multiplier*(activeBoat==="luna"?5:activeBoat==="yacht30"?4:activeBoat==="yacht20"?3:activeBoat==="yacht14"?2.2:activeBoat==="yacht"?1.7:activeBoat==="open"?1.3:1)))+contract.bonus,cost:Math.max(250,Math.round(plan.distance*7*multiplier))+crewForBoat(activeBoat).daily,crewCost:crewForBoat(activeBoat).daily,crewRoles:crewForBoat(activeBoat).roles,fuel,prestige:Math.max(15,Math.round(plan.distance*.4*multiplier)),sec:Math.max(25,Math.min(120,Math.round(plan.distance*.55))),plan}})]}
 function findAvailableMission(id){return availableMissions().find(m=>m.id===id)||missions.find(m=>m.id===id&&m.origin===state.port&&m.dest!==state.port)}
 const fresh=()=>({name:"",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],trip:null,marinas:{},reservations:[],voyages:0,earnings:0,voyageSerial:0,settledVoyages:[]});
 let state=fresh(),timer=null;
@@ -850,11 +851,11 @@ function missionBudget(m){
  if(!state.owned.includes(m.boat))return {ready:false,reason:"Yacht richiesto non disponibile",refuel:0,total:m.cost};
  if(state.boat!==m.boat)return {ready:false,reason:"Seleziona lo yacht richiesto nella flotta",refuel:0,total:m.cost};
  if(state.trip)return {ready:false,reason:"Viaggio già in corso",refuel:0,total:m.cost};
- const plan=m.plan,capacity=boat(m.boat).tank,reserve=Math.ceil(capacity*.15);
+ const plan=m.plan,capacity=boat(m.boat).tank,reserve=Math.ceil(capacity*.15),burn=Number.isFinite(Number(plan?.burnRate))?Number(plan.burnRate):fuelBurnPerNm(m.boat);
  if(!plan?.possible||!Array.isArray(plan.legs)||plan.legs.length<2)return {ready:false,reason:plan?.reason||"Rotta non disponibile",refuel:0,total:m.cost};
  let fuel=Math.max(0,Math.min(capacity,Number(state.fuel)||0)),refuel=0;
  for(let i=0;i<plan.legs.length-1;i++){
-  const required=Math.ceil(seaMiles(plan.legs[i],plan.legs[i+1])*.85);
+  const required=Math.ceil(seaMiles(plan.legs[i],plan.legs[i+1])*burn);
   if(required+reserve>capacity)return {ready:false,reason:"Autonomia insufficiente",refuel,total:m.cost};
   if(i>0){const liters=Math.max(0,required+reserve-fuel);refuel+=liters*3;fuel+=liters;}
   if(fuel<required+reserve)return {ready:false,reason:"Carburante insufficiente per la prima tratta",refuel,total:m.cost+refuel};
@@ -919,7 +920,7 @@ function finishVoyage(){const mapScreen=$("map"),trip=state.trip;if(!trip)return
 const legIndex=Array.isArray(trip.legs)&&trip.legs.length>1?Math.max(0,Math.min(trip.legs.length-2,Number(trip.legIndex)||0)):0;
 if(Array.isArray(trip.legs)&&legIndex<trip.legs.length-2){
  const stop=trip.legs[legIndex+1],next=trip.legs[legIndex+2],tank=boat((trip.mission||{}).boat||state.boat).tank;
- const needed=Math.ceil(seaMiles(stop,next)*.85),reserve=Math.ceil(tank*.15);
+ const burn=Number.isFinite(Number(trip.fuelRate))?Number(trip.fuelRate):Number.isFinite(Number(trip.mission?.plan?.burnRate))?Number(trip.mission.plan.burnRate):fuelBurnPerNm((trip.mission||{}).boat||state.boat),needed=Math.ceil(seaMiles(stop,next)*burn),reserve=Math.ceil(tank*.15);
  const fill=Math.max(0,needed+reserve-state.fuel),price=fill*3;
  if(needed+reserve>tank||state.coins<price){
   if(!meAtomicPersist(()=>{state.port=stop;state.lastDockedBridge={origin:trip.origin||stop,destination:stop,at:Date.now(),interrupted:true};state.trip=null}))return notice("Sosta tecnica non registrata: salvataggio non confermato.");
@@ -948,28 +949,28 @@ const cinema=$("voyageCinema");if(cinema)cinema.classList.remove("hide");if(mapS
 function tick(){clearTimeout(timer);voyageHeartbeat()}
 function launch(id){if(state.trip)return notice("Un viaggio è già in corso: completa la navigazione prima di partire di nuovo.");if(!window.meRegisteredPlayer&&(Number(state.voyages)||0)>=1){showTab("profile");return notice("Hai completato la missione di prova. Registrati gratuitamente o accedi per continuare, senza obbligo di acquisto.")}if(!state.setupComplete&&(state.voyages||0)===0&&!state.completed.length){showTab("office");document.getElementById("setupDashboard")?.scrollIntoView({behavior:"smooth",block:"center"});return notice("Conferma prima barca e marina nella Direzione")}const m=findAvailableMission(id);if(!m)return notice("Missione non disponibile dalla darsena attuale");if(m.dest===state.port)return notice("La destinazione coincide con la marina di partenza");if(!state.owned.includes(m.boat))return notice("Imbarcazione richiesta non disponibile");
 if(state.condition<30)return notice("Manutenzione necessaria: ripara lo yacht dalla Direzione prima di partire.");if(m.boat!==state.boat)return notice("Seleziona prima lo yacht richiesto nella flotta");
-const plan=planSeaTrip(state.port,m.dest,boat(m.boat).tank);
+const burn=fuelBurnPerNm(m.boat),plan=planSeaTrip(state.port,m.dest,boat(m.boat).tank,burn);
 if(!plan.possible||!Array.isArray(plan.legs)||plan.legs.length<2||!Number.isFinite(plan.distance))return notice(plan.reason||"Rotta non disponibile");
-const tank=boat(m.boat).tank,reserve=Math.ceil(tank*.15),first=Math.ceil(seaMiles(plan.legs[0],plan.legs[1])*.85);if(state.fuel>tank)state.fuel=tank;
+const tank=boat(m.boat).tank,reserve=Math.ceil(tank*.15),first=Math.ceil(seaMiles(plan.legs[0],plan.legs[1])*burn);if(state.fuel>tank)state.fuel=tank;
 if(first+reserve>tank)return notice("Autonomia insufficiente");
 if(state.fuel<first+reserve)return notice("Carburante insufficiente: rifornisci lo yacht prima della partenza, mantenendo la riserva del 15%.");
 if(state.coins<m.cost)return notice("Crediti insufficienti");
-const estimatedStops=plan.legs.slice(1,-1);let simulatedFuel=state.fuel-first,estimatedRefuel=0;for(let i=1;i<plan.legs.length-1;i++){const needed=Math.ceil(seaMiles(plan.legs[i],plan.legs[i+1])*.85);if(needed+reserve>tank)return notice("La tratta "+port(plan.legs[i]).name+" → "+port(plan.legs[i+1]).name+" supera la capacità del serbatoio");const fill=Math.max(0,needed+reserve-simulatedFuel);estimatedRefuel+=fill*3;simulatedFuel+=fill-needed;}if(state.coins<m.cost+estimatedRefuel)return notice("Crediti insufficienti per missione e rifornimenti previsti: "+money(m.cost+estimatedRefuel));
+const estimatedStops=plan.legs.slice(1,-1);let simulatedFuel=state.fuel-first,estimatedRefuel=0;for(let i=1;i<plan.legs.length-1;i++){const needed=Math.ceil(seaMiles(plan.legs[i],plan.legs[i+1])*burn);if(needed+reserve>tank)return notice("La tratta "+port(plan.legs[i]).name+" → "+port(plan.legs[i+1]).name+" supera la capacità del serbatoio");const fill=Math.max(0,needed+reserve-simulatedFuel);estimatedRefuel+=fill*3;simulatedFuel+=fill-needed;}if(state.coins<m.cost+estimatedRefuel)return notice("Crediti insufficienti per missione e rifornimenti previsti: "+money(m.cost+estimatedRefuel));
 const missionDuration=Number(m.sec);const legSeconds=Math.max(10,Math.ceil((Number.isFinite(missionDuration)&&missionDuration>0?missionDuration:60)/(plan.legs.length-1)));
-if(!meAtomicPersist(()=>{state.coins-=m.cost;state.fuel-=first;state.boat=m.boat;state.voyageSerial=Math.max(0,Number.isSafeInteger(Number(state.voyageSerial))?Number(state.voyageSerial):0)+1;state.trip={voyageId:state.voyageSerial,id:m.id,origin:state.port,dest:m.dest,legs:plan.legs,legIndex:0,legSeconds,sec:legSeconds,mission:m,until:Date.now()+legSeconds*1000}}))return notice("Partenza annullata: salvataggio non confermato.");
+if(!meAtomicPersist(()=>{state.coins-=m.cost;state.fuel-=first;state.boat=m.boat;state.voyageSerial=Math.max(0,Number.isSafeInteger(Number(state.voyageSerial))?Number(state.voyageSerial):0)+1;state.trip={voyageId:state.voyageSerial,id:m.id,origin:state.port,dest:m.dest,legs:plan.legs,legIndex:0,legSeconds,sec:legSeconds,fuelRate:burn,mission:m,until:Date.now()+legSeconds*1000}}))return notice("Partenza annullata: salvataggio non confermato.");
 window.MarinaEmpireTraffic?.track("play_start",true);window.MarinaEmpireAuthenticatedActivity?.track("play_start");showTab("map");render();voyageHeartbeat();}
 function betaDiagnostics(){
  const checks=[];
  const check=(label,fn)=>{try{checks.push({label,ok:!!fn()})}catch(e){checks.push({label,ok:false})}};
  check("Errori JavaScript della sessione",()=>window.MarinaEmpireRuntimeErrors?.count()===0);
- check("Rotta Rimini - Cervia",()=>{const p=planSeaTrip("rimini","cervia",boat("voyager").tank);return p.possible&&p.legs[0]==="rimini"&&p.legs[p.legs.length-1]==="cervia"&&p.distance>0});
+ check("Rotta Rimini - Cervia",()=>{const p=planSeaTrip("rimini","cervia",boat("voyager").tank,fuelBurnPerNm("voyager"));return p.possible&&p.legs[0]==="rimini"&&p.legs[p.legs.length-1]==="cervia"&&p.distance>0});
  check("Marina e yacht iniziali",()=>ports.some(p=>p.id==="rimini")&&boats.some(b=>b.id==="voyager"&&b.tank>=300));
  check("Navigazione menu principale",()=>{const links=[...document.querySelectorAll("[data-tab]")];return links.length>=4&&["home","map","missions","fleet"].every(id=>!!document.getElementById(id))&&links.every(el=>{const id=el.getAttribute("data-tab");return !!id&&!!document.getElementById(id)})});
  check("Pulsanti GPS e plancia accessibili",()=>["meHelmView","meHelmGps"].every(id=>{const el=$(id);return !!el&&el.tagName==="BUTTON"&&el.getAttribute("type")==="button"&&["true","false"].includes(el.getAttribute("aria-pressed"))}));
  check("Elementi essenziali della console",()=>["cinemaSea","meHelmWindow","meHelmView","meHelmGps","voyageRouteMap","cinemaPercent","cinemaStatus"].every(id=>!!$(id)));
  check("Catalogo missioni",()=>Array.isArray(missions)&&missions.length>0&&missions.some(m=>ports.some(p=>p.id===m.dest)&&boats.some(b=>b.id===m.boat)));
- check("Rotte senza spostare la partita",()=>{const a=planSeaTrip("rimini","cervia",boat("voyager").tank),b=planSeaTrip("rimini","cervia",boat("voyager").tank);return a.possible&&b.possible&&JSON.stringify(a.legs)===JSON.stringify(b.legs)});
- check("Calcolo carburante e riserva",()=>{const tank=boat("voyager").tank,dist=seaMiles("rimini","cervia"),need=Math.ceil(dist*.85),reserve=Math.ceil(tank*.15);return Number.isFinite(dist)&&dist>0&&need>0&&reserve>0&&reserve<tank&&need+reserve<=tank});
+ check("Rotte senza spostare la partita",()=>{const rate=fuelBurnPerNm("voyager"),a=planSeaTrip("rimini","cervia",boat("voyager").tank,rate),b=planSeaTrip("rimini","cervia",boat("voyager").tank,rate);return a.possible&&b.possible&&JSON.stringify(a.legs)===JSON.stringify(b.legs)});
+ check("Calcolo carburante e riserva",()=>{const tank=boat("voyager").tank,dist=seaMiles("rimini","cervia"),need=Math.ceil(dist*fuelBurnPerNm("voyager")),reserve=Math.ceil(tank*.15);return Number.isFinite(dist)&&dist>0&&need>0&&reserve>0&&reserve<tank&&need+reserve<=tank&&new Set(boats.map(b=>fuelBurnPerNm(b.id))).size===boats.length});
  check("Viaggio salvato leggibile",()=>{const raw=localStorage.getItem(KEY);if(!raw)return true;const saved=JSON.parse(raw);if(!saved||typeof saved!=="object")return false;const t=saved.trip;if(!t)return true;return !!t.dest&&Array.isArray(t.legs)&&t.legs.length>=2&&t.legs[t.legs.length-1]===t.dest&&Number.isFinite(Number(t.until))&&Number.isFinite(Number(t.sec))&&Number(t.sec)>0&&Number.isInteger(Number(t.legIndex))&&Number(t.legIndex)>=0&&Number(t.legIndex)<t.legs.length-1});
  check("Navigazione attiva coerente",()=>{const t=state.trip;if(!t)return true;return Array.isArray(t.legs)&&t.legs.length>=2&&t.legs.every(id=>ports.some(p=>p.id===id))&&t.dest===t.legs[t.legs.length-1]&&Number.isFinite(Number(t.until))&&Number.isFinite(Number(t.sec))&&Number(t.sec)>0&&Number.isInteger(Number(t.legIndex))&&Number(t.legIndex)>=0&&Number(t.legIndex)<t.legs.length-1});
  check("Risorse yacht nei limiti",()=>{const b=boat(state.boat);return Number.isFinite(Number(state.fuel))&&Number(state.fuel)>=0&&Number(state.fuel)<=b.tank&&Number.isFinite(Number(state.condition))&&Number(state.condition)>=0&&Number(state.condition)<=100});
