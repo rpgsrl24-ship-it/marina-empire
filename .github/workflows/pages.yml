@@ -67,10 +67,13 @@ jobs:
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
+          name: github-pages-${{ github.run_attempt }}
           path: ${{ runner.temp }}/marina-empire-site
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
       - name: Verify published revision and homepage bytes
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
