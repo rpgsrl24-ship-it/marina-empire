@@ -143,6 +143,22 @@ Verifica e correzione sviluppate nella [PR #26](https://github.com/rpgsrl24-ship
 
 P0-15 e P0-16 passano a **VERIFICATO**.
 
+## Nono ciclo — Origine, yacht e destinazione nella plancia
+
+Verifica e correzione sviluppate nella [PR #27](https://github.com/rpgsrl24-ship-it/marina-empire/pull/27).
+
+- **Yacht reale:** la radio VHF non usa più il nome fisso `RPG Voyager`; mostra il modello realmente in navigazione.
+- **Origine e destinazione:** il titolo della plancia mostra `yacht · marina di origine → prossima marina/destinazione` ricavando i dati dal viaggio attivo.
+- **Refresh:** il viaggio ripristinato conserva lo stesso `voyageId`, la stessa origine, destinazione, yacht, carburante e rotta.
+- **Arrivo:** dopo la liquidazione la console mostra il modello attivo e la marina effettivamente salvata in `state.port`; l'indicatore di rotta usa la stessa destinazione.
+- **Due missioni consecutive:** il test comportamentale Rimini → Cervia → Ancona dimostra che la seconda missione parte da Cervia, non da un'origine obsoleta, e che il secondo arrivo persiste ad Ancona.
+- **Tutti gli yacht:** ogni imbarcazione configurata produce un viaggio persistente e un arrivo valido.
+- **Scena di viaggio:** la beta mantiene intenzionalmente la plancia GPS come vista principale durante la navigazione; la vecchia scena marina `cinemaDock` resta nascosta. Questo evita di mostrare una marina 3D non coerente con la tratta e preserva la plancia approvata.
+- **Browser:** la prova Chromium controlla direttamente dopo refresh che titolo e VHF contengano yacht, origine e destinazione corretti; all'arrivo controlla yacht e marina salvata.
+- **Gate:** regressioni complete **SUCCESS** ([Actions 41446049920](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41446049920)) e smoke/Chromium **SUCCESS** ([Actions 41446049909](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41446049909)).
+
+P0-14 passa a **VERIFICATO**. Nessuna modifica alle scene 3D approvate, ai pagamenti o alla protezione dell'Isola delle Rose.
+
 ## P0 — Continuità del gioco e protezioni sul sito pubblico
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
@@ -160,7 +176,7 @@ P0-15 e P0-16 passano a **VERIFICATO**.
 | P0-11 | **Isola delle Rose esclusiva RPG Yacht.** Rimuovere offerte e prezzi di acquisto ai giocatori; bloccare acquisto, upgrade e gestione economica riservata anche attraverso azioni dirette. Un vecchio salvataggio non deve attribuire proprietà o rendite dell'isola al giocatore. | Test UI, azioni dirette e salvataggio preesistente; nessuna deduzione/accredito improprio e nessuna cancellazione indiscriminata dei progressi. | VERIFICATO |
 | P0-12 | **Home, menu e indicatori mobile.** Layout leggibile, comandi raggiungibili, assenza di sovrapposizioni e navigazione utilizzabile in verticale e orizzontale. | Verifica browser a dimensioni mobili e controllo visivo nelle due orientazioni. | VERIFICATO |
 | P0-13 | **Plancia e GPS.** La console resta durante la navigazione; mappa, rotta e indicatori entrano nel display GPS previsto e restano leggibili. Conservare la grafica 3D originale. | Partenza, traversata, cambio vista e arrivo su desktop/mobile; confronto delle scene e dei riferimenti grafici approvati. | VERIFICATO |
-| P0-14 | **Origine, yacht e destinazione.** Partenza dalla marina effettiva, barca e posizione visibili, rotta coerente e ingresso nella marina corretta; al termine la posizione è memorizzata. | Due missioni consecutive da porti diversi e ripristino della partita, con controllo delle scene usate. | IN CORSO |
+| P0-14 | **Origine, yacht e destinazione.** Partenza dalla marina effettiva, barca e posizione visibili, rotta coerente e ingresso nella marina corretta; al termine la posizione è memorizzata. | Due missioni consecutive da porti diversi e ripristino della partita, con controllo delle scene usate. | VERIFICATO |
 | P0-15 | **Rotte, distanze e tempi.** Calcolare distanze nautiche e durata, consentire viaggi tra marine sbloccate, gestire le soste e impedire destinazioni incompatibili o uguali alla partenza. Le rotte sono simulazioni di gioco. | Matrice di tratte rappresentative, incluse rotte a più tappe, limiti di carburante e destinazioni chiuse. | VERIFICATO |
 | P0-16 | **Carburante e manutenzione.** Consumi e serbatoi dipendono dall'imbarcazione; usura, rifornimento, riserva, costi e sosta sono coerenti e non producono quantità negative. | Casi limite di autonomia e condizione, cambio yacht, sosta, ripresa e indisponibilità dei servizi durante il viaggio. | VERIFICATO |
 | P0-17 | **Arrivo e liquidazione missione.** Completamento, premio, prestigio, riepilogo e numero di viaggi si aggiornano una volta; ritorno in primo piano e refresh non duplicano l'incasso. | Fine missione normale, refresh al termine, viaggio già liquidato e ripresa dopo sospensione mobile. | VERIFICATO |
