@@ -15,6 +15,7 @@ on:
       - 'package-lock.json'
       - 'route-planner.js'
       - 'local-save-context.js'
+      - 'save-state-guard.js'
       - 'marine-catalogo-approvato.json'
       - 'marine-deluxe-originali.html'
       - 'isola-delle-rose-originale.html'

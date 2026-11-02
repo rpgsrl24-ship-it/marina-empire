@@ -144,6 +144,49 @@ async function trial(browser,origin,name,viewport,mobile) {
   } finally {await context.close();}
 }
 
+async function corruptSaveRecovery(browser,origin) {
+  const name='recovery-mobile',raw='{"name":"Capitano da recuperare è", BROKEN';
+  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
+  await isolated(context,origin);
+  await context.addInitScript(({key,raw})=>localStorage.setItem(key,raw),{key:saveKey,raw});
+  const page=await context.newPage(),errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  try {
+    await page.goto(origin,{waitUntil:'load'});
+    const panel=page.locator('#meLocalSaveRecovery');
+    await panel.waitFor({state:'visible'});
+    assert.equal(await page.locator('#welcome').isVisible(),true,'Recovery must be available over the welcome screen');
+    const geometry=await panel.evaluate(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:innerWidth,height:innerHeight};});
+    assert.ok(geometry.left>=0&&geometry.right<=geometry.width&&geometry.top>=0&&geometry.bottom<=geometry.height,'Recovery panel must fit the mobile viewport');
+    for(const id of ['meDownloadProtectedSave','meRecoveryAccountAccess']){
+      const button=page.locator('#'+id);await button.scrollIntoViewIfNeeded();
+      assert.equal(await button.evaluate(el=>{const r=el.getBoundingClientRect();return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}),true,`${id}: welcome must not cover the recovery action`);
+    }
+    await page.evaluate(()=>{document.getElementById('playerName').value='Cannot replace original';document.getElementById('play').click();});
+    assert.equal(await page.evaluate(key=>localStorage.getItem(key),saveKey),raw,'Entry must preserve the original corrupt save');
+    const downloadEvent=page.waitForEvent('download');
+    await page.locator('#meDownloadProtectedSave').click();
+    const download=await downloadEvent;
+    assert.equal(fs.readFileSync(await download.path(),'utf8'),raw,'Downloaded recovery copy must preserve the original text');
+    await download.delete();
+    await page.screenshot({path:path.join(output,`${name}-protected.png`),fullPage:false,animations:'disabled'});
+    await page.locator('#meRecoveryAccountAccess').click();
+    assert.equal(await page.locator('#welcome').isVisible(),false,'Account access must dismiss the welcome overlay');
+    await page.locator('#cloudEmail').scrollIntoViewIfNeeded();
+    assert.equal(await page.locator('#cloudEmail').isVisible(),true,'The account form remains reachable');
+    assert.equal(await page.locator('#cloudEmail').evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===el;}),true,'Recovery must not cover the account input');
+    assert.equal(await panel.evaluate(el=>el.parentElement.id),'profile','The recovery notice remains in the profile');
+    assert.equal(await page.evaluate(key=>localStorage.getItem(key),saveKey),raw,'Opening account access must not overwrite the protected save');
+    assert.deepEqual(errors,[],`${name}: runtime errors`);
+    await page.screenshot({path:path.join(output,`${name}-account.png`),fullPage:false,animations:'disabled'});
+    console.log(`PASS ${name}: corrupt startup/original text/download/visible recovery/account access`);
+  } catch(e) {
+    await page.screenshot({path:path.join(output,`${name}-failure.png`),fullPage:false,animations:'disabled'}).catch(()=>{});
+    console.error(JSON.stringify({scenario:name,runtimeErrors:errors}));
+    throw e;
+  } finally {await context.close();}
+}
+
 (async()=>{
   fs.mkdirSync(output,{recursive:true});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -159,5 +202,6 @@ async function trial(browser,origin,name,viewport,mobile) {
     ]) {
       if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO===scenario[0]) await trial(browser,origin,...scenario);
     }
+    if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO==='recovery-mobile') await corruptSaveRecovery(browser,origin);
   } finally {await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>server.close());
