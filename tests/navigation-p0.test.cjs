@@ -57,7 +57,7 @@ function harness(extra = {}) {
   }
   for (const name of ['straightNm','seaWaypoints','voyageRoutePoints','seaMiles','planSeaTrip',
     'crewForBoat','charterContract','availableMissions','findAvailableMission','missionBudget',
-    'persist','meCloneState','meEconomyStateValid','meAtomicPersist','launch','finishVoyage','voyageHeartbeat']) {
+    'persist','meCloneState','meEconomyStateValid','meAtomicPersist','fuelBurnPerNm','launch','finishVoyage','voyageHeartbeat']) {
     vm.runInContext(functionSource(name), context);
   }
   const run = code => vm.runInContext(code, context);
@@ -137,7 +137,7 @@ test('All configured vessel/port plans use finite valid legs and preserve the fu
     let possible=0, blocked=0, multi=0;
     for(const b of boats) for(const a of ports) for(const z of ports) {
       if(a.id===z.id)continue;
-      const p=planSeaTrip(a.id,z.id,b.tank);
+      const p=planSeaTrip(a.id,z.id,b.tank,fuelBurnPerNm(b.id));
       if(!p.possible){blocked++;continue;}
       if(p.legs.length>2)multi++;
       if(p.legs[0]!==a.id||p.legs.at(-1)!==z.id)throw Error('Wrong route endpoints');
@@ -147,7 +147,7 @@ test('All configured vessel/port plans use finite valid legs and preserve the fu
         const points=voyageRoutePoints(p.legs[i-1],p.legs[i]);
         if(points.length<2||points.some(x=>x.length!==2||!x.every(Number.isFinite)))throw Error('Invalid coordinates');
         if(JSON.stringify(points[0])!==JSON.stringify(harborGPS[p.legs[i-1]])||JSON.stringify(points.at(-1))!==JSON.stringify(harborGPS[p.legs[i]]))throw Error('GPS endpoints mismatch');
-        const d=seaMiles(p.legs[i-1],p.legs[i]),f=Math.ceil(d*.85);
+        const d=seaMiles(p.legs[i-1],p.legs[i]),f=Math.ceil(d*fuelBurnPerNm(b.id));
         if(!(d>0)||f+Math.ceil(b.tank*.15)>b.tank)throw Error('Impossible leg');
         distance+=d;fuel+=f;
       }
@@ -163,7 +163,7 @@ test('All configured vessel/port plans use finite valid legs and preserve the fu
 
 test('First-leg fuel boundary matches budget and rejects one litre below reserve', () => {
   const h = harness();
-  const required = h.run('Math.ceil(seaMiles("rimini","cervia")*.85)+Math.ceil(boat("voyager").tank*.15)');
+  const required = h.run('Math.ceil(seaMiles("rimini","cervia")*fuelBurnPerNm("voyager"))+Math.ceil(boat("voyager").tank*.15)');
   h.state.fuel = required - 1;
   assert.equal(h.run('missionBudget(findAvailableMission("INTRO_RIMINI_CERVIA")).ready'), false);
   const before = h.snapshot();
