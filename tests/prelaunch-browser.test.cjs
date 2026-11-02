@@ -21,10 +21,16 @@ const server = http.createServer((req,res) => {
   fs.createReadStream(file).pipe(res);
 });
 
-async function isolated(context,origin) {
+async function isolated(context,origin,traffic=[]) {
   await context.route('**/*', async route => {
     const request = route.request(), url = new URL(request.url());
     if (url.origin === origin) return route.continue();
+    if (url.hostname === 'zrdetqvnjmqkfyajxjgp.supabase.co' && url.pathname === '/rest/v1/me_game_events') {
+      let body={};
+      try {body=JSON.parse(request.postData()||'{}')} catch {}
+      traffic.push({method:request.method(),headers:request.headers(),body});
+      return route.fulfill({status:201,contentType:'application/json',body:''});
+    }
     let file;
     if (url.hostname === 'unpkg.com' && url.pathname.startsWith('/leaflet@1.9.4/')) file = path.join(leaflet,url.pathname.split('/leaflet@1.9.4/')[1]);
     if (url.hostname === 'cdn.jsdelivr.net' && url.pathname.startsWith('/npm/three@0.160.1/')) file = path.join(three,url.pathname.split('/npm/three@0.160.1/')[1]);
@@ -47,7 +53,8 @@ async function goTab(page,id,mobile) {
 
 async function trial(browser,origin,name,viewport,mobile) {
   const context=await browser.newContext({viewport,isMobile:mobile,hasTouch:mobile,deviceScaleFactor:1});
-  await isolated(context,origin);
+  const traffic=[];
+  await isolated(context,origin,traffic);
   const page=await context.newPage(),errors=[],missing=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('response',r=>{if(r.url().startsWith(origin) && r.status()>=400) missing.push(`${r.status()} ${new URL(r.url()).pathname}`);});
@@ -175,6 +182,21 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.equal(reloaded.coins,arrived.coins,'Arrival refresh must not credit another reward');
     assert.equal(reloaded.voyages,1,'Arrival refresh must not duplicate the voyage');
     assert.equal(reloaded.port,arrived.port,'Arrival port persists');
+    const trackedTypes=traffic.map(x=>x.body?.event_type);
+    assert.ok(trackedTypes.includes('page_view'),name+': analytics records page_view');
+    assert.equal(trackedTypes.filter(x=>x==='play_start').length,1,name+': analytics records play_start once');
+    assert.equal(trackedTypes.filter(x=>x==='mission_complete').length,1,name+': analytics records mission_complete once');
+    const analyticsRows=traffic.filter(x=>['page_view','play_start','mission_complete'].includes(x.body?.event_type));
+    assert.ok(analyticsRows.length>=3,name+': expected analytics events were captured');
+    const pageViewSessions=new Set(analyticsRows.filter(x=>x.body?.event_type==='page_view').map(x=>x.body?.session_id));
+    assert.ok(pageViewSessions.size>=1,name+': every loaded page creates an in-memory analytics session');
+    for(const entry of analyticsRows){
+      assert.ok(pageViewSessions.has(entry.body?.session_id),name+': gameplay analytics belongs to a page-load session');
+      assert.equal(entry.method,'POST',name+': analytics uses POST');
+      assert.equal(entry.headers.prefer,'return=minimal',name+': analytics requests no returned rows');
+      assert.equal(Object.hasOwn(entry.body,'visitor_id'),false,name+': analytics must not send persistent visitor_id');
+      assert.equal(entry.body.source,'direct',name+': local QA traffic defaults to direct source');
+    }
     await goTab(page,'missions',mobile);
     assert.ok((await page.locator('#missionList').innerText()).includes('REGISTRATI GRATIS E CONTINUA'),'Guest receives the signup invitation after trial');
     assert.equal(await page.locator('#missionList [data-mission]:enabled').count(),0,'Guest cannot start a second mission');
