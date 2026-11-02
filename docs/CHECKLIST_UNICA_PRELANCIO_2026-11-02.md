@@ -81,6 +81,21 @@ Esito tecnico prima del merge: regressioni offline **SUCCESS** ([Actions 4142549
 
 P0-05 e P0-06 restano **IN CORSO**: questa prova chiude il rischio multi-scheda sullo stesso browser, ma non sostituisce il collaudo con due dispositivi reali né la verifica end-to-end del salvataggio account remoto.
 
+## Quinto ciclo — Hardening database, privilegi minimi e disponibilità Rose
+
+Applicata in Supabase la migrazione `20261102110124_p0_least_privilege_and_rose_availability_guard` e tracciata nella [PR #24](https://github.com/rpgsrl24-ship-it/marina-empire/pull/24).
+
+- **Profili e progressi:** il ruolo `anon` non ha più grant diretti. `authenticated` conserva solo `SELECT, INSERT, UPDATE`, necessari per profilo e salvataggio cloud.
+- **Catalogo marine e pontili:** `anon` e `authenticated` hanno sola lettura.
+- **Sblocchi pontili:** sola lettura per `authenticated`; nessuna scrittura diretta dal client.
+- **Segnalazioni chat:** `authenticated` conserva solo `SELECT, INSERT, UPDATE`.
+- **RPC ormeggi:** `reserve_berth`, `cancel_berth` e `me_berth_availability` non sono eseguibili da `anon`; restano disponibili agli utenti autenticati con controlli interni.
+- **Isola delle Rose:** `me_berth_availability` non include più `rose`; la prenotazione Rose era già bloccata server-side. La base resta esclusivamente RPG Yacht.
+- **RLS negativa in sola lettura:** un JWT autenticato con UUID non esistente vede 0 membership admin, 0 profili, 0 progressi, 0 analytics e 0 report. Nessun dato giocatore è stato scritto o modificato durante la prova.
+- **Cloud multi-dispositivo:** il codice esistente usa già `updated_at` come revisione ottimistica e rifiuta un salvataggio se un altro dispositivo ha modificato la copia remota nel frattempo; i test contrattuali lo verificano. Resta aperto il collaudo end-to-end con due dispositivi/account reali.
+
+P0-06 e P0-07 restano quindi **IN CORSO**: l'hardening server e i test negativi sono verificati, ma la checklist richiede ancora prova reale account/dispositivo prima della chiusura completa.
+
 ## P0 — Continuità del gioco e protezioni sul sito pubblico
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
