@@ -5,6 +5,9 @@ on:
     paths:
       - 'index.html'
       - 'route-planner.js'
+      - 'marine-catalogo-approvato.json'
+      - 'marine-deluxe-originali.html'
+      - 'scripts/check-marina-inventory.cjs'
       - 'tests/**'
       - '.github/workflows/smoke.yml'
   pull_request:
@@ -25,3 +28,5 @@ jobs:
           node-version: '22'
       - name: Verify game scripts and core elements
         run: node tests/smoke.cjs
+      - name: Verify marina inventory against 3D scene
+        run: node scripts/check-marina-inventory.cjs
