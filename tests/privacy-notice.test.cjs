@@ -27,6 +27,6 @@ for(const required of [
 
 assert(privacy.includes('metriche tecniche minime di utilizzo'));
 assert(privacy.includes('identificativo casuale della sola sessione in memoria'));
-assert(privacy.includes('non vengono registrati nel modulo traffico anonimo email, nome comandante, salvataggi, chat, password'));
+assert(privacy.includes('Non vengono registrati nel modulo traffico anonimo email, nome comandante, salvataggi, chat, password'));
 assert(privacy.includes('pagamenti e le ricariche di crediti sono disabilitati'));
 console.log('PASS: game privacy notice linked, necessary processing separated from marketing, beta collection described');
