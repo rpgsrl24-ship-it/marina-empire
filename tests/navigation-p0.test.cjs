@@ -57,7 +57,7 @@ function harness(extra = {}) {
   }
   for (const name of ['straightNm','seaWaypoints','voyageRoutePoints','seaMiles','planSeaTrip',
     'crewForBoat','charterContract','availableMissions','findAvailableMission','missionBudget',
-    'persist','launch','finishVoyage','voyageHeartbeat']) {
+    'persist','meCloneState','meEconomyStateValid','meAtomicPersist','launch','finishVoyage','voyageHeartbeat']) {
     vm.runInContext(functionSource(name), context);
   }
   const run = code => vm.runInContext(code, context);
