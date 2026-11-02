@@ -125,3 +125,17 @@ test('missing validation code fails closed and preserves the existing save',()=>
  assert.equal(h.ctx.window.meLocalSaveBlocked?.(),true);assert.equal(h.run('persist()'),false);
  assert.equal(h.raw(),raw);assert.equal(h.writes.length,0);
 });
+
+
+test('a valid save changed by another tab is blocked instead of overwritten',()=>{
+ const original=JSON.stringify(game()),h=harness(original);
+ const newer=JSON.stringify({...game(),coins:83000,voyages:2});
+ h.data.set(GUEST,newer);
+ h.run('state.coins=99999');
+ assert.equal(h.run('persist()'),false);
+ assert.equal(h.raw(),newer);
+ assert.equal(h.run('meRecoveryRecord().reason'),'conflict');
+ const panel=h.get('meLocalSaveRecovery');
+ assert(panel&&!panel.hidden);
+ assert(panel.children.some(n=>String(n.textContent).includes("un'altra scheda")));
+});

@@ -48,7 +48,9 @@ test('Registered 3D debit/reward uses its own save and never changes the guest',
  assert.equal(f.read(accountKey('player-a')).coins,38450);
  assert.equal(f.data.get(GUEST),guestBefore);
  assert.equal(f.data.get(accountKey('player-b')),bBefore);
- assert(f.data.has(accountKey('player-a')+'_marina_rimini'));
+ assert.equal(f.data.has(accountKey('player-a')+'_marina_rimini'),false,'Opening the scene and changing only empire credits must not create a layout write');
+ assert.equal(h.run('save()'),true);
+ assert(f.data.has(accountKey('player-a')+'_marina_rimini'),'An explicit marina save persists the account layout');
  assert.equal(f.read('marina-empire-phase1-rimini').built,9);
  assert(!f.writes.includes(GUEST));
 });
@@ -131,4 +133,28 @@ test('Invalid amounts and inaccessible storage cannot mutate saves',()=>{
  const blocked=createContext({getItem(){throw Error('storage blocked')},setItem(){throw Error('storage blocked')}});
  assert.equal(blocked.select(null),false);assert.equal(blocked.capture(),null);
  assert.equal(blocked.writeGame(null,game('Guest',1000)),false);
+});
+
+
+test('two tabs cannot overwrite a newer game or marina layout',()=>{
+ const f=fixture();f.session('player-a');
+ const tabA=createContext(f.storage),tabB=createContext(f.storage);
+ assert(tabA.select('player-a'));
+ const a=tabA.capture(),b=tabB.capture();
+ assert(a&&b);
+ const gameA=tabA.readGame(a),gameB=tabB.readGame(b);
+ assert(gameA&&gameB);
+ const layoutA=tabA.readLayout(a,'rimini')||{built:1,occupied:[],credits:gameA.coins};
+ const layoutB=tabB.readLayout(b,'rimini')||{built:1,occupied:[],credits:gameB.coins};
+ gameA.coins-=1000;
+ assert.equal(tabA.writeGame(a,gameA),true);
+ gameB.coins-=2000;
+ assert.equal(tabB.writeGame(b,gameB),false);
+ assert.equal(f.read(accountKey('player-a')).coins,39000);
+ assert.equal(tabB.hasExternalChange(b,'rimini'),true);
+ layoutA.built=2;
+ assert.equal(tabA.writeLayout(a,'rimini',layoutA),true);
+ layoutB.built=3;
+ assert.equal(tabB.writeLayout(b,'rimini',layoutB),false);
+ assert.equal(f.read(accountKey('player-a')+'_marina_rimini').built,2);
 });

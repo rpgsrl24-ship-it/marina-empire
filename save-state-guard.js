@@ -90,6 +90,7 @@
    if(!protection||protection.blocked)return false;
    let raw;
    try{raw=getStorage().getItem(key);}catch(_){lock(key,'storage');return false;}
+   if(raw!==protection.raw){lock(key,'conflict',raw);return false;}
    if(raw!==null){try{if(!valid(JSON.parse(raw))){lock(key,'invalid',raw);return false;}}catch(_){lock(key,'invalid',raw);return false;}}
    if(!valid(state)){lock(key,'state',raw);return false;}
    return true;

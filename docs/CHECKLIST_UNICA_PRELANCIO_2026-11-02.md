@@ -67,6 +67,20 @@ Il punto di partenza è il commit `b9057f6`. La [PR #22](https://github.com/rpgs
 
 **33 suite offline superate.** Il collaudo browser aggiunge il percorso di recupero su telefono a quello ospite desktop, telefono verticale e orizzontale. Le Actions della PR e del merge devono eseguire queste prove prima del deploy. Nessuna modifica ai gestori pagamenti OFF, alle scene 3D originali o alla riserva di Isola delle Rose. Questa sezione registra le prove tecniche del ciclo; l'esito del commit pubblicato è collegato nella pull request e verificabile tramite `release.json`.
 
+## Quarto ciclo — Concorrenza tra schede e scritture delle marine 3D
+
+La [PR #23](https://github.com/rpgsrl24-ship-it/marina-empire/pull/23) affronta un rischio residuo dei salvataggi locali: due schede valide aperte contemporaneamente potevano applicare la regola "ultimo salvataggio vince" e sostituire progressi più recenti. La correzione usa un confronto ottimistico della copia letta prima di ogni scrittura.
+
+- **Partita principale:** se un'altra scheda modifica una partita valida, la scheda obsoleta non può più sovrascriverla. Mostra invece un avviso di conflitto e richiede il ricaricamento.
+- **Marine Deluxe 3D:** partita e layout della marina hanno lo stesso controllo di revisione; una scheda obsoleta non può modificare crediti, pontili o layout. L'apertura e il semplice ridisegno della scena non generano più scritture passive.
+- **Azioni sugli ormeggi:** l'interfaccia non prosegue come se il salvataggio fosse riuscito quando la revisione non è più corrente.
+- **Grafica 3D:** nessuna modifica intenzionale a geometria, camera, modelli, materiali o rendering; gli audit di inventario e capacità della scena restano verdi.
+- **Vincoli invariati:** pagamenti OFF e Isola delle Rose riservata a RPG Yacht.
+
+Esito tecnico prima del merge: regressioni offline **SUCCESS** ([Actions 41425491407](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41425491407)); smoke/Chromium **SUCCESS** ([Actions 41425491101](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41425491101)). Chromium ha superato desktop, mobile verticale, mobile orizzontale, recupero salvataggio corrotto e il nuovo scenario **multi-tab-conflict**, che verifica evento storage, avviso e blocco della scrittura obsoleta.
+
+P0-05 e P0-06 restano **IN CORSO**: questa prova chiude il rischio multi-scheda sullo stesso browser, ma non sostituisce il collaudo con due dispositivi reali né la verifica end-to-end del salvataggio account remoto.
+
 ## P0 — Continuità del gioco e protezioni sul sito pubblico
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
@@ -219,7 +233,7 @@ Per ogni aggiornamento aggiungere una riga; mantenere separati risultati automat
 | 02/11/2026 10:23 CET | P0-18, P0-19, P1-19 | CONTENIMENTO VERIFICATO | tests/privacy-containment.test.cjs | 7/7: nessun evento statistico nuovo dai gestori aggiornati, due sole chiavi rimosse, diagnostica senza query/hash, nessuna email inviata. | Informativa incompleta; raccolta bloccata nel frontend corrente, non nelle vecchie schede o a livello server. Storico non cancellato. |
 | 02/11/2026 10:23 CET | P1-13, P1-20, P1-21 | 5/5 PASS | tests/admin-presence.test.cjs | Presenza indipendente dalle statistiche, distinzione zero/offline, risposte obsolete dopo logout/riconnessione respinte. | Conta schede/sessioni; non deduplica persone o account. Prova live con più utenti ancora aperta. |
 
-**Progetto pubblico:** https://rpgsrl24-ship-it.github.io/marina-empire/
+| 02/11/2026 11:05 CET | P0-05, P0-06, P0-21 | CONCORRENZA LOCALE VERIFICATA | PR #23 / f1a26c0 | Regressioni offline SUCCESS; Chromium desktop/mobile/recovery e multi-tab SUCCESS. Una scheda con revisione obsoleta non sovrascrive la partita o il layout Deluxe aggiornato da un'altra scheda. | Restano aperti due dispositivi reali, sincronizzazione account remota e procedure complete di ripristino. |\n\n**Progetto pubblico:** https://rpgsrl24-ship-it.github.io/marina-empire/
 
 **Repository:** https://github.com/rpgsrl24-ship-it/marina-empire
 

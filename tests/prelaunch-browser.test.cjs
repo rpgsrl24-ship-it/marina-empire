@@ -187,6 +187,40 @@ async function corruptSaveRecovery(browser,origin) {
   } finally {await context.close();}
 }
 
+
+async function multiTabConflict(browser,origin) {
+  const name='multi-tab-conflict';
+  const base={name:'Concorrenza P0',coins:10000,fuel:300,condition:100,port:'rimini',boat:'voyager',owned:['voyager'],completed:[],trip:null,reservations:[],voyages:0};
+  const context=await browser.newContext({viewport:{width:1100,height:800}});
+  await isolated(context,origin);
+  await context.addInitScript(({key,raw})=>localStorage.setItem(key,raw),{key:saveKey,raw:JSON.stringify(base)});
+  const first=await context.newPage(),stale=await context.newPage(),errors=[];
+  stale.on('pageerror',e=>errors.push(e.message));
+  try {
+    await first.goto(origin,{waitUntil:'domcontentloaded'});
+    await stale.goto(origin,{waitUntil:'domcontentloaded'});
+    await first.waitForFunction(()=>typeof window.meCanWriteLocalSave==='function');
+    await stale.waitForFunction(()=>typeof window.meCanWriteLocalSave==='function');
+    const latest=await first.evaluate(key=>{
+      const value=JSON.parse(localStorage.getItem(key));
+      value.coins=12345;
+      value.voyages=1;
+      const raw=JSON.stringify(value);
+      localStorage.setItem(key,raw);
+      return raw;
+    },saveKey);
+    await stale.waitForFunction(()=>window.meLocalSaveBlocked?.()===true);
+    const panel=stale.locator('#meLocalSaveRecovery');
+    await panel.waitFor({state:'visible'});
+    assert.match(await panel.innerText(),/altra scheda/i,'Stale tab must explain the conflict');
+    assert.equal(await stale.evaluate(()=>window.meCanWriteLocalSave?.()),false,'Stale tab must be write-blocked');
+    assert.equal(await stale.evaluate(()=>persist()),false,'Stale tab persistence must fail closed');
+    assert.equal(await stale.evaluate(key=>localStorage.getItem(key),saveKey),latest,'Stale tab cannot overwrite the newer save');
+    assert.deepEqual(errors,[],name+': runtime errors');
+    console.log('PASS '+name+': storage event/conflict notice/stale write blocked');
+  } finally {await context.close();}
+}
+
 (async()=>{
   fs.mkdirSync(output,{recursive:true});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -203,5 +237,6 @@ async function corruptSaveRecovery(browser,origin) {
       if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO===scenario[0]) await trial(browser,origin,...scenario);
     }
     if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO==='recovery-mobile') await corruptSaveRecovery(browser,origin);
+    if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO==='multi-tab-conflict') await multiTabConflict(browser,origin);
   } finally {await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>server.close());
