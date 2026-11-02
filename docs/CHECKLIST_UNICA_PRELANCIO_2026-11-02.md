@@ -178,6 +178,22 @@ Gate dell'ultima revisione funzionale `01529f3d`: regressioni complete **SUCCESS
 
 P0-21 passa a **VERIFICATO**. Il collaudo automatico non sostituisce il collaudo finale del titolare previsto da P0-22.
 
+## Undicesimo ciclo — Mare animato con plancia stabile
+
+Verifica e ottimizzazione sviluppate nella [PR #29](https://github.com/rpgsrl24-ship-it/marina-empire/pull/29).
+
+- **Plancia stabile:** la foto approvata della cabina, il chartplotter e gli strumenti non oscillano più durante la navigazione; il browser verifica `animation-name: none` sull'intera plancia.
+- **Acqua animata:** il movimento è affidato ai layer dedicati `me-water-motion` e `me-wake`, con animazioni `meWaveTravel` e `meWakeFlow`.
+- **Riflesso ridondante alleggerito:** `me-sea-motion` resta un livello statico leggero, evitando tre animazioni concorrenti sulla stessa area.
+- **Mobile:** secondo layer acqua/scia disabilitato, opacità ridotta e minore lavoro grafico; la plancia resta leggibile.
+- **Accessibilità:** `prefers-reduced-motion` disabilita movimento di acqua, scia e riflessi.
+- **Vista GPS:** il mare non viene forzato nella modalità GPS grande; il test passa esplicitamente alla vista PLANCIA prima di verificare l'animazione.
+- **Grafica:** nessuna sostituzione della cabina, nessun cambio alla scena 3D approvata, nessuna modifica a missioni, pagamenti o Isola delle Rose.
+
+Gate dell'ultima revisione funzionale `c4ad4bb7`: regressioni complete **SUCCESS** ([Actions 41452740174](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41452740174)) e smoke/Chromium **SUCCESS** ([Actions 41452739810](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41452739810)).
+
+P0-23 passa a **VERIFICATO**. P0-24 resta **IN CORSO**: questa modifica riduce il carico grafico della navigazione, ma la voce richiede ancora una verifica più ampia delle transizioni e dei tempi di caricamento tra schermate.
+
 ## P0 — Continuità del gioco e protezioni sul sito pubblico
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
@@ -211,7 +227,7 @@ Queste voci mantengono la priorità P0 assegnata nel Master. Si affrontano dopo 
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
 | --- | --- | --- | --- |
-| P0-23 | **Mare animato.** L'acqua si muove in modo fluido durante la navigazione, con la barca distinguibile e senza compromettere la plancia o le scene originali. | Verifica visiva desktop/mobile e osservazione della fluidità durante una missione. | IN CORSO |
+| P0-23 | **Mare animato.** L'acqua si muove in modo fluido durante la navigazione, con la barca distinguibile e senza compromettere la plancia o le scene originali. | Verifica visiva desktop/mobile e osservazione della fluidità durante una missione. | VERIFICATO |
 | P0-24 | **Transizioni e prestazioni visive.** Passaggi tra pagine, immagini e animazioni non introducono scatti bloccanti, schermate vuote o caricamenti inutili; mantenere leggibilità e stile approvati. | Misura del caricamento e prova su dispositivo mobile, con confronto prima/dopo delle modifiche. | IN CORSO |
 | P0-25 | **Meteo simulato.** Definire e rendere riconoscibili le condizioni simulate, con effetti di gioco documentati e coerenti; nessuna presentazione come previsione nautica reale. | Scenari di meteo e verifica degli eventuali effetti su navigazione e missioni. | DA VERIFICARE |
 | P0-26 | **Difficoltà crescente.** Le missioni diventano più impegnative in modo comprensibile, senza bloccare i primi passi o creare requisiti impossibili per la barca disponibile. | Percorso iniziale e livelli successivi con requisiti, rischi e ricompense confrontabili. | DA VERIFICARE |
