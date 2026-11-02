@@ -8,7 +8,10 @@ export const PACKS: Record<number, { sku: string; credits: number; price: string
   38093: { sku: "ME-CREDITS-900000", credits: 900000, price: "49.99" },
   38094: { sku: "ME-CREDITS-2000000", credits: 2000000, price: "99.99" }
 };
-type OrderLine = { id: number; product_id: number; sku?: string; quantity: number; total?: string; subtotal?: string };
+type OrderLine = {
+  id: number; product_id: number; sku?: string; quantity: number;
+  total?: string; total_tax?: string; subtotal?: string; subtotal_tax?: string;
+};
 export type WooOrder = {
   id: number; status: string; currency: string; date_paid: string | null;
   billing?: { email?: string }; line_items: OrderLine[];
@@ -35,8 +38,14 @@ export function validatePaidWooOrder(order: WooOrder): VerifiedUnit[] {
     if (!pack) continue;
     if (line.sku !== pack.sku) throw new Error("SKU/product mismatch");
     if (!Number.isSafeInteger(line.id) || line.id <= 0 || !Number.isSafeInteger(line.quantity) || line.quantity < 1 || line.quantity > 100) throw new Error("Invalid line");
-    // Fail closed for discounts/coupons or changed prices until a discount policy is approved.
-    if (cents(line.total) !== cents(pack.price) * line.quantity || cents(line.subtotal) !== cents(pack.price) * line.quantity) {
+    // WooCommerce line total/subtotal exclude tax. The approved Marina Empire
+    // retail prices are gross EUR amounts, so validate gross totals exactly.
+    // total gross must also equal subtotal gross: coupons/discounts remain
+    // unsupported in the initial release and go to manual review.
+    const totalGross = cents(line.total) + cents(line.total_tax ?? "0.00");
+    const subtotalGross = cents(line.subtotal) + cents(line.subtotal_tax ?? "0.00");
+    const expectedGross = cents(pack.price) * line.quantity;
+    if (totalGross !== expectedGross || subtotalGross !== expectedGross) {
       throw new Error("Price mismatch; manual review required");
     }
     for (let i = 0; i < line.quantity; i++) {
