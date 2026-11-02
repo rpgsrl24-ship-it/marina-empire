@@ -48,3 +48,4 @@ jobs:
           node tests/prelaunch-economy-contract.test.cjs
           node tests/prelaunch-save-contract.test.cjs
           node tests/prelaunch-cloud-account-contract.test.cjs
+          node tests/prelaunch-admin-access-contract.test.cjs
