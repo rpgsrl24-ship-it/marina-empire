@@ -7,14 +7,15 @@ import { createClient } from "npm:@supabase/supabase-js@2.95.0";
 import { decryptVoucher } from "./voucher-crypto.ts";
 import { decideRecovery } from "./voucher-recovery-policy.ts";
 const env=(key:string)=>Deno.env.get(key)||"";
+const readSecretKey=()=>{const raw=env("SUPABASE_SECRET_KEYS");if(raw){try{const parsed=JSON.parse(raw);if(parsed&&typeof parsed.default==="string"&&parsed.default)return parsed.default}catch{}}return env("SUPABASE_SERVICE_ROLE_KEY")};
 const respond=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers:{"content-type":"application/json","cache-control":"no-store"}});
 Deno.serve(async request=>{
  if(request.method!=="POST")return respond({error:"Method not allowed"},405);
  if(env("ME_DELIVERY_ENABLED")!=="true")return respond({error:"Delivery disabled"},503);
- const required=["SUPABASE_URL","SUPABASE_SERVICE_ROLE_KEY","ME_DELIVERY_WORKER_TOKEN","ME_VOUCHER_ENCRYPTION_KEY","ME_RESEND_API_KEY","ME_FROM_EMAIL"];
- if(required.some(k=>!env(k)))return respond({error:"Server configuration incomplete"},503);
+ const required=["SUPABASE_URL","ME_DELIVERY_WORKER_TOKEN","ME_VOUCHER_ENCRYPTION_KEY","ME_RESEND_API_KEY","ME_FROM_EMAIL"];
+ if(required.some(k=>!env(k))||!readSecretKey())return respond({error:"Server configuration incomplete"},503);
  if(request.headers.get("authorization")!=="Bearer "+env("ME_DELIVERY_WORKER_TOKEN"))return respond({error:"Unauthorized"},401);
- const admin=createClient(env("SUPABASE_URL"),env("SUPABASE_SERVICE_ROLE_KEY"),{auth:{persistSession:false,autoRefreshToken:false}});
+ const admin=createClient(env("SUPABASE_URL"),readSecretKey(),{auth:{persistSession:false,autoRefreshToken:false}});
  const {data:due,error:lookupError}=await admin.from("me_voucher_delivery_outbox").select("id,woo_order_id,woo_order_item_id,woo_unit_index,status,attempts,updated_at,provider_message_id")
   .in("status",["pending","retry"]).lte("next_attempt_at",new Date().toISOString()).lt("attempts",8).order("created_at").limit(10);
  if(lookupError)return respond({error:"Queue unavailable"},503);
