@@ -69,6 +69,25 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.equal(await page.locator('[data-business-marina="rose"]').count(),0,'Headquarters must not sell businesses');
     assert.equal(await page.locator('#meVoucherRedeem').isDisabled(),true,'Paid-credit redemption stays disabled');
     assert.equal(await page.locator('#meVoucherCode').isDisabled(),true,'Paid-credit entry stays disabled');
+    const transitionAudit=await page.evaluate(async tabs=>{
+      const results=[];
+      for(const tab of tabs){
+        const button=document.querySelector('[data-tab="'+tab+'"]');
+        const screen=document.getElementById(tab);
+        if(!button||!screen)continue;
+        const start=performance.now();
+        button.click();
+        await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
+        const style=getComputedStyle(screen),rect=screen.getBoundingClientRect();
+        results.push({tab,elapsed:performance.now()-start,visible:style.display!=='none'&&!screen.classList.contains('hide')&&rect.height>0});
+      }
+      return results;
+    },['home','office','map','fleet','marinas','profile','missions']);
+    assert.ok(transitionAudit.length>=6,name+': primary navigation screens are present');
+    for(const item of transitionAudit){
+      assert.equal(item.visible,true,name+': '+item.tab+' screen is visible after navigation');
+      assert.ok(item.elapsed<500,name+': '+item.tab+' transition completes within one responsive frame budget window');
+    }
     const before=await save(page);
     await page.locator('#missionList [data-mission]:enabled').first().click();
     await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key))?.trip,saveKey);
@@ -93,6 +112,7 @@ async function trial(browser,origin,name,viewport,mobile) {
       destination:port(trip.legs?.[trip.legIndex+1]||trip.dest).name,
       yacht:boat(trip.mission?.boat||trip.boat||state.boat).name
     }),launched.trip);
+    await page.waitForFunction(expected=>document.getElementById('cinemaRadio')?.textContent?.includes(expected),voyageIdentity.destination);
     const cinemaTitle=await page.locator('#cinemaTitle').innerText();
     const cinemaRadio=await page.locator('#cinemaRadio').innerText();
     assert.ok(cinemaTitle.includes(voyageIdentity.yacht),name+': console shows the active yacht');
