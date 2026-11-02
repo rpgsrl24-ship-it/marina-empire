@@ -9,7 +9,7 @@
  const finite=value=>typeof value==='number'&&Number.isFinite(value);
  const nonnegative=value=>finite(value)&&value>=0;
  function validate(value,portIds,boatIds){
-  if(!record(value)||typeof value.name!=='string'||!nonnegative(value.coins)||!nonnegative(value.fuel))return false;
+  if(!record(value)||typeof value.name!=='string'||!Number.isSafeInteger(value.coins)||value.coins<0||!nonnegative(value.fuel))return false;
   if(!Array.isArray(value.owned)||!value.owned.length||!value.owned.every(id=>typeof id==='string'&&boatIds.has(id)))return false;
   if(!Array.isArray(value.completed)||!value.completed.every(id=>typeof id==='string'))return false;
   for(const key of ['port','homeMarina','investmentMarina'])if(own(value,key)&&!portIds.has(value[key]))return false;
