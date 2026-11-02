@@ -47,3 +47,4 @@ jobs:
           node tests/direct-credit-intent.test.cjs
           node tests/prelaunch-economy-contract.test.cjs
           node tests/prelaunch-save-contract.test.cjs
+          node tests/prelaunch-cloud-account-contract.test.cjs
