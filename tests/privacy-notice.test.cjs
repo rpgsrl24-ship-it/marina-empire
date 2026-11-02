@@ -25,6 +25,8 @@ for(const required of [
  'GitHub Pages'
 ]) assert(privacy.includes(required),'Missing privacy section/content: '+required);
 
-assert(privacy.includes('raccolta di analytics di utilizzo dal client di gioco è sospesa'));
+assert(privacy.includes('metriche tecniche minime di utilizzo'));
+assert(privacy.includes('identificativo casuale della sola sessione in memoria'));
+assert(privacy.includes('Non vengono registrati nel modulo traffico anonimo email, nome comandante, salvataggi, chat, password'));
 assert(privacy.includes('pagamenti e le ricariche di crediti sono disabilitati'));
 console.log('PASS: game privacy notice linked, necessary processing separated from marketing, beta collection described');

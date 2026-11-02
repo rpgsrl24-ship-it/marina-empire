@@ -43,8 +43,10 @@ a{color:#e6bf7d}h1,h2{color:#f4d79e}section{margin:28px 0;padding:20px;border:1p
 
 <section>
 <h2>5. Analisi dell'uso del gioco</h2>
-<p>Nella versione pubblica attuale la raccolta di analytics di utilizzo dal client di gioco è sospesa: il gioco non crea nuovi identificativi di traffico persistenti e non invia eventi di utilizzo attraverso il modulo analytics disattivato.</p>
-<p>Eventi tecnici o statistiche generati da precedenti versioni beta possono restare negli archivi amministrativi fino alla loro normale cancellazione o anonimizzazione. Eventuali future funzioni analytics saranno attivate solo dopo un aggiornamento di questa informativa e delle relative regole di raccolta.</p>
+<p>Nella versione pubblica attuale Marina Empire registra metriche tecniche minime di utilizzo per capire se la beta viene aperta, se una missione viene avviata e se viene completata. Per il traffico anonimo viene generato un identificativo casuale della sola sessione in memoria, che non viene salvato in localStorage o sessionStorage e viene perso alla chiusura o al ricaricamento della pagina.</p>
+<p>Per queste metriche possono essere registrati tipo di evento, identificativo temporaneo di sessione, data e ora, sorgente/campagna ricavata dai parametri UTM o dal dominio referrer. Non vengono registrati nel modulo traffico anonimo email, nome comandante, salvataggi, chat, password o un identificativo persistente del browser.</p>
+<p>Per gli utenti registrati possono inoltre essere registrati, in una tabella separata e protetta, gli eventi di avvio e completamento missione associati all'identificativo tecnico dell'account. Questi dati servono a misurare l'uso reale del gioco e la continuità del servizio; non vengono usati per attivare comunicazioni commerciali.</p>
+<p>Eventi tecnici o statistiche di precedenti versioni beta possono restare negli archivi amministrativi fino alla loro normale cancellazione o anonimizzazione. Gli identificativi persistenti usati nelle versioni beta precedenti non vengono più creati dal tracker attuale.</p>
 </section>
 
 <section>
