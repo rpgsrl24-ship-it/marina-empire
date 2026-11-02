@@ -159,6 +159,25 @@ Verifica e correzione sviluppate nella [PR #27](https://github.com/rpgsrl24-ship
 
 P0-14 passa a **VERIFICATO**. Nessuna modifica alle scene 3D approvate, ai pagamenti o alla protezione dell'Isola delle Rose.
 
+## Decimo ciclo — Backup e rollback reversibili
+
+Verifica e documentazione sviluppate nella [PR #28](https://github.com/rpgsrl24-ship-it/marina-empire/pull/28).
+
+- **Backup locale:** export JSON, quarantena dei salvataggi corrotti e blocco della scrittura quando il browser non conferma il salvataggio.
+- **Restore locale:** validazione del backup prima della sostituzione; se la scrittura del nuovo stato fallisce, la partita precedente resta attiva.
+- **Backup cloud:** copia pre-caricamento in `marina_empire_before_cloud_load` e copia inversa prima di un restore in `marina_empire_before_backup_restore`.
+- **Restore cloud controllato:** backup valido ripristinabile; backup invalido, JSON corrotto o impossibilità di creare la copia inversa annullano l'operazione.
+- **Concorrenza:** una revisione obsoleta da altra scheda/dispositivo non può sovrascrivere silenziosamente una copia più recente.
+- **Rollback codice:** solo tramite nuovo commit/revert verificabile; nessun force-push di `main` e nessuna riscrittura indiscriminata di dati giocatore.
+- **Pagamenti:** i tre handler server di checkout/emissione/riscatto restano hard-disabled con `PAYMENTS_DISABLED` e risposta 503; il rollback Pages non li abilita.
+- **Isola delle Rose:** resta esclusa dagli investimenti giocatore e il rollback deve preservare la gestione esclusiva RPG Yacht.
+- **Pubblicazione rollback:** obbligatori regressioni, Chromium, `release.json` e confronto hash/byte della homepage pubblica.
+- **Prova campione:** le suite esistenti verificano restore valido, rifiuto backup invalido, fallimento della copia di sicurezza, conservazione della partita corrente, quarantena salvataggio corrotto e conflitto di revisione.
+
+Gate dell'ultima revisione funzionale `01529f3d`: regressioni complete **SUCCESS** ([Actions 41448181943](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41448181943)) e smoke/Chromium **SUCCESS** ([Actions 41448181980](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41448181980)).
+
+P0-21 passa a **VERIFICATO**. Il collaudo automatico non sostituisce il collaudo finale del titolare previsto da P0-22.
+
 ## P0 — Continuità del gioco e protezioni sul sito pubblico
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
@@ -183,7 +202,7 @@ P0-14 passa a **VERIFICATO**. Nessuna modifica alle scene 3D approvate, ai pagam
 | P0-18 | **Privacy e raccolta email.** Informativa accessibile, consensi pertinenti e finalità chiare; la registrazione al gioco non deve implicare consensi commerciali non dichiarati. | Controllo dei testi, moduli, collegamenti e registrazione dei consensi previsti. | VERIFICATO |
 | P0-19 | **Segnalazioni e assistenza.** Un giocatore può segnalare un problema e trovare il contatto di supporto; la segnalazione arriva al canale operativo previsto senza esporre dati di altri utenti. | Verifica del percorso e del recapito, con prova controllata se autorizzata; non inviare messaggi di test a terzi senza autorizzazione. | IN CORSO |
 | P0-20 | **Test e deploy verificabili.** I controlli automatici obbligatori precedono la pubblicazione; il sito pubblicato corrisponde al commit testato e non a una cache precedente. | Actions del commit corretto, prova browser P0 e confronto della revisione pubblica con il contenuto pubblicato. | VERIFICATO |
-| P0-21 | **Backup e ripristino.** Esiste una procedura reversibile per codice e salvataggi; il ritorno a una versione precedente mantiene pagamenti OFF, Isola riservata e dati dei giocatori. | Versione recuperabile, istruzioni di rollback e prova controllata di ripristino di un salvataggio campione. | IN CORSO |
+| P0-21 | **Backup e ripristino.** Esiste una procedura reversibile per codice e salvataggi; il ritorno a una versione precedente mantiene pagamenti OFF, Isola riservata e dati dei giocatori. | Versione recuperabile, istruzioni di rollback e prova controllata di ripristino di un salvataggio campione. | VERIFICATO |
 | P0-22 | **Report e collaudo finale.** Ogni intervento riporta file, commit, test, esiti, limiti e link della versione; il titolare effettua il collaudo finale prima di dichiarare pronta la beta o autorizzare pagamenti. | Report completato/in corso/bloccato e risultato del collaudo del titolare. | IN CORSO |
 
 ### P0 del Master — Qualità della navigazione da verificare dopo i blocchi di accesso
