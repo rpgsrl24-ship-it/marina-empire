@@ -77,3 +77,11 @@ Le scene approvate contengono ancora progressi in `localStorage`. I saldi mostra
 - [ ] Testare collisioni tra due utenti che prenotano lo stesso posto, e tra due sessioni dello stesso utente.
 - [ ] Verificare link da mappa alle 12 scene su desktop e mobile, senza modificare la grafica originale.
 - [ ] Conservare separati i crediti beta locali dai crediti acquistati; nessun acquisto attivo.
+
+### Audit database live — 2 novembre 2026
+- [x] Verificato in sola lettura Supabase `marina-empire`: `marina_docks` contiene 295 pontili e 11.100 posti distribuiti su 12 marine.
+- [x] Confermati zero intervalli di posti sovrapposti tra pontili della stessa marina; numerazione pontili consecutiva da 1 in ogni marina.
+- [x] `berth_bookings` contiene zero prenotazioni al momento della verifica.
+- [x] Verificata assenza nel database live delle nuove tabelle `marinas`, `berths`, `berth_reservations` previste dallo script SQL nel repository.
+- [ ] Verificare corrispondenza tra ciascun pontile del database e geometria delle scene 3D approvate prima di esporre i singoli posti.
+- [ ] Preparare e testare la migrazione senza sovrascrivere `marina_docks`; non attivare prenotazioni o pagamenti prima di test RLS e concorrenza.
