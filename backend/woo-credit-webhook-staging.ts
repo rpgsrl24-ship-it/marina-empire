@@ -2,12 +2,16 @@ import { planVerifiedCreditOrder } from "./credit-order-plan-staging.ts";
 // Marina Empire: preparatory WooCommerce webhook validation.
 // NOT a voucher issuer. It never credits accounts or returns voucher codes.
 // Deploy only after configuring server-side secrets and finishing issuance/outbox.
-const packages: Record<string, number> = {
-  "ME-CREDITS-50000": 50000,
-  "ME-CREDITS-120000": 120000,
-  "ME-CREDITS-300000": 300000,
-  "ME-CREDITS-900000": 900000,
-  "ME-CREDITS-2000000": 2000000,
+const packages: Record<string, {credits:number;productId:number;priceCents:number}> = {
+  "ME-CREDITS-50000": {credits:50000,productId:38090,priceCents:499},
+  "ME-CREDITS-120000": {credits:120000,productId:38091,priceCents:999},
+  "ME-CREDITS-300000": {credits:300000,productId:38092,priceCents:1999},
+  "ME-CREDITS-900000": {credits:900000,productId:38093,priceCents:4999},
+  "ME-CREDITS-2000000": {credits:2000000,productId:38094,priceCents:9999},
+};
+const cents=(value:unknown)=>{
+  const text=String(value??"");
+  return /^\d+\.\d{2}$/.test(text)?Number(text.replace(".","")):NaN;
 };
 const json = (body: unknown, status: number) =>
   new Response(JSON.stringify(body), {status, headers: {"content-type":"application/json","cache-control":"no-store"}});
@@ -54,13 +58,14 @@ Deno.serve(async(req:Request)=>{
   const creditLines=order.line_items.filter((line:{sku?:string}) =>
     Object.hasOwn(packages,line.sku||""));
   if (creditLines.length === 0) return json({accepted:true,issued:0},200);
-  const valid=creditLines.every((line:{sku?:string,quantity?:number,total?:string,id?:number}) => {
-    const qty=line.quantity;
-    const total=Number(line.total);
-    return Number.isSafeInteger(line.id) && Number(line.id)>0 &&
+  const valid=creditLines.every((line:{sku?:string,product_id?:number,quantity?:number,total?:string,total_tax?:string,id?:number}) => {
+    const qty=line.quantity,pack=packages[line.sku||""];
+    const gross=cents(line.total)+cents(line.total_tax??"0.00");
+    return !!pack &&
+      Number.isSafeInteger(line.id) && Number(line.id)>0 &&
+      Number.isSafeInteger(line.product_id) && line.product_id===pack.productId &&
       typeof qty==="number" && Number.isSafeInteger(qty) && qty>0 && qty<=100 &&
-      typeof line.total==="string" && /^\d+\.\d{2}$/.test(line.total) &&
-      Number.isFinite(total) && total>0;
+      Number.isSafeInteger(gross) && gross===pack.priceCents*qty;
   });
   if(!valid) return json({accepted:false,error:"Invalid credit line"},503);
   const recipient=String(order.billing?.email||"").trim();
@@ -70,7 +75,10 @@ Deno.serve(async(req:Request)=>{
   if(totalUnits>100) return json({accepted:false,error:"Too many credit units"},503);
   let plannedUnits=0;
   try {
-    plannedUnits=planVerifiedCreditOrder(orderId,recipient,creditLines).length;
+    const planLines=creditLines.map((line:{id:number;sku:string;quantity:number})=>({
+      id:line.id,sku:line.sku,quantity:line.quantity
+    }));
+    plannedUnits=planVerifiedCreditOrder(orderId,recipient,planLines).length;
   } catch { return json({accepted:false,error:"Invalid credit issuance plan"},503); }
   // Deliberately fail closed: do not acknowledge successful issuance before
   // atomic voucher creation and encrypted outbox delivery are implemented.
