@@ -7,7 +7,7 @@ const crypto=fs.readFileSync('supabase/functions/marina-voucher-delivery-worker-
 const recovery=fs.readFileSync('supabase/functions/marina-voucher-delivery-worker-rc/voucher-recovery-policy.ts','utf8');
 
 for(const token of [
-  'ME_DELIVERY_ENABLED','ME_DELIVERY_WORKER_TOKEN','ME_VOUCHER_ENCRYPTION_KEY','ME_RESEND_API_KEY','ME_FROM_EMAIL',
+  'ME_DELIVERY_ENABLED','ME_DELIVERY_WORKER_TOKEN','ME_VOUCHER_ENCRYPTION_KEY','ME_RESEND_API_KEY','ME_FROM_EMAIL','SUPABASE_SECRET_KEYS','SUPABASE_SERVICE_ROLE_KEY','readSecretKey',
   'me_voucher_delivery_outbox','me_claim_voucher_delivery_internal','Idempotency-Key',
   'pending','retry','sending','sent','provider_message_id','attempts', 'limit(10)',
   'https://api.resend.com/emails','Delivery disabled','Unauthorized'
