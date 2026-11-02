@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const saveProtection = require('../save-state-guard.js');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 function functionSource(name) {
@@ -61,6 +62,10 @@ function harness(extra = {}) {
   }
   const run = code => vm.runInContext(code, context);
   context.state = {...run('fresh()'), name:'Navigation test', setupComplete:true, coins:100000, ...extra};
+  const guard=saveProtection.create({getStorage:()=>context.localStorage,fresh:()=>run('fresh()'),ports:run('ports.map(p=>p.id)'),boats:run('boats.map(b=>b.id)')});
+  guard.read('navigation-p0-test');
+  context.window.meCanWriteLocalSave=()=>{assert(guard.canWrite('navigation-p0-test',context.state),'Production navigation state must pass the save validator');return true;};
+  context.window.meDidWriteLocalSave=raw=>guard.didWrite('navigation-p0-test',raw);
   return {
     context, run, notices, events, storage, elements, handlers,
     get state() { return context.state; },
@@ -110,6 +115,19 @@ test('Unknown, stale and same-port missions cannot charge credits or move the ya
   for (const [a,b] of [['rimini','rimini'],['rimini','unknown'],['unknown','rimini']]) {
     h.context.from = a; h.context.to = b;
     assert.equal(h.run('planSeaTrip(from,to,400).possible'), false);
+  }
+});
+
+test('Every configured vessel produces a valid saved voyage and valid arrival state', () => {
+  const catalog=harness().run('boats.map(b=>({id:b.id,tank:b.tank}))');
+  for(const vessel of catalog){
+    const h=harness({boat:vessel.id,owned:[vessel.id],fuel:vessel.tank});
+    const mission=h.run('availableMissions().find(m=>m.dest==="cervia"&&missionBudget(m).ready)');
+    assert(mission,vessel.id+' must have a representative available mission');
+    h.context.missionId=mission.id;h.run('launch(missionId)');
+    assert(h.state.trip);h.restore();assert(h.state.trip,vessel.id+' voyage is persisted');
+    while(h.state.trip)h.nextLeg();
+    h.restore();assert.equal(h.state.port,'cervia');assert.equal(h.state.trip,null);
   }
 });
 

@@ -69,8 +69,10 @@ test('A late wallet response cannot show the previous account balance',async()=>
 });
 function guestHarness(){
  const base='marina_empire_beta_test_session',guest={name:'Guest captain',owned:['voyager'],completed:['trial'],coins:10420,fuel:350,voyages:1};const ui=dom(),saved=storage({[base]:JSON.stringify(guest)});
- const context={KEY:base,state:JSON.parse(JSON.stringify(guest)),window:{},localStorage:saved,$:ui.get,console,fresh:()=>({name:'',owned:['voyager'],completed:[],coins:10000,fuel:400,voyages:0}),render(){},showTab(){},persist(){saved.setItem(context.KEY,JSON.stringify(context.state))}};
- vm.createContext(context);vm.runInContext(functionSection('const ME_BASE_SAVE_KEY=KEY;','// For testers only:'),context);return {context,ui,saved,guest,base};
+ const context={KEY:base,state:JSON.parse(JSON.stringify(guest)),window:{MarinaSaveProtection:require('../save-state-guard.js')},localStorage:saved,$:ui.get,document:ui.document,ports:[{id:'rimini'},{id:'cervia'}],boats:[{id:'voyager'}],console,fresh:()=>({name:'',owned:['voyager'],completed:[],coins:10000,fuel:400,voyages:0}),render(){},showTab(){},persist(){saved.setItem(context.KEY,JSON.stringify(context.state))}};
+ vm.createContext(context);vm.runInContext(functionSection('const ME_BASE_SAVE_KEY=KEY;','// For testers only:'),context);
+ if(html.includes('const meSaveProtection='))vm.runInContext(functionSection('const meSaveProtection=','function persist()'),context);
+ return {context,ui,saved,guest,base};
 }
 test('Verified first signup keeps guest progress and assigns it to only one account',()=>{
  const h=guestHarness(),w=h.context.window,user={id:'new-a',email:'new@example.test',email_confirmed_at:'2026-11-02'};
@@ -109,6 +111,7 @@ test('Password recovery emitted during session initialization opens the recovery
  const user={id:'recovery-user',email:'recover@example.test',email_confirmed_at:'2026-11-02'};
  const client={auth:{onAuthStateChange:fn=>{listener=fn},getUser:async()=>{if(listener)listener('PASSWORD_RECOVERY',{user});return {data:{user},error:null}}}};
  const context={el:ui.get,client:null,account:null,passwordRecoveryMode:false,URL:'https://example.test',KEY_PUBLIC:'test',window:{supabase:{createClient:()=>client}},state:{name:''},toggle(){},status(){},console,render(){},showTab:id=>tabs.push(id),setTimeout:()=>1};vm.createContext(context);
+ if(html.includes('let activeAuthRequest='))vm.runInContext(functionSection('let activeAuthRequest=','async function login()'),context);
  vm.runInContext(functionSection('function showPasswordRecovery()','async function applyNewPassword()'),context);
  await vm.runInContext(functionSection('async function initialize()','el("roseAdminRefresh").addEventListener')+';initialize()',context);
  assert.equal(context.passwordRecoveryMode,true);assert.equal(ui.get('cloudRecoveryPanel').classList.contains('hide'),false);assert.equal(ui.get('welcome').classList.contains('hide'),true);assert(tabs.includes('profile'));
