@@ -31,6 +31,13 @@ for(const marina of catalog.marinas){
 }
 assert.ok(html.includes("localBerthIndex:k+1"),'Visual slot indices missing');
 assert.ok(html.includes("visualBerthCode:"),'Visual berth codes missing');
+// Every marina must have a distinct scene ID and database ID.
+assert.equal(new Set(catalog.marinas.map(m=>m.id)).size,catalog.marinas.length,'Duplicate scene marina ID');
+assert.equal(new Set(catalog.marinas.map(m=>m.database_id || m.id)).size,catalog.marinas.length,'Duplicate database marina ID');
+for(const marina of catalog.marinas){
+  assert.ok(marina.database_id || marina.id,'Missing database mapping');
+  assert.ok(marina.pier_ids.every(id=>id.startsWith((marina.database_id || marina.id)+':P')),marina.id+': incorrect database pier prefix');
+}
 assert.equal(scene.length,catalog.marinas.length);
 console.log('OK: 12 marine, 295 pontili, 11100 posti; catalogo e scena allineati per i totali.');
 console.log('Nota: i singoli intervalli di posti in Supabase NON sono verificati da questo test.');
