@@ -1,0 +1,12 @@
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+const html=fs.readFileSync('index.html','utf8');
+const i=html.indexOf('client.from("me_admin_users").select("user_id").eq("user_id",account.id).maybeSingle()');
+assert(i>0,'Missing server-backed admin membership check');
+const section=html.slice(i,i+2200);
+assert(section.includes('if(membership.error||!membership.data)'), 'Admin must reject absent or failed membership');
+assert(section.indexOf('if(membership.error||!membership.data)')<section.indexOf('panel.classList.remove("hide")'),'Admin panel must only open after membership verification');
+assert(section.includes('client.from("player_profiles")'),'Admin profile access must follow membership check');
+assert(section.includes('client.from("player_progress")'),'Admin progress access must follow membership check');
+assert(!/service_role|SUPABASE_SERVICE_ROLE_KEY/.test(html),'Privileged Supabase key reference must not appear in public HTML');
+console.log('PASS: admin UI membership gate and no service-role key reference');
