@@ -31,6 +31,9 @@ for(const marina of catalog.marinas){
 }
 assert.ok(html.includes("localBerthIndex:k+1"),'Visual slot indices missing');
 assert.ok(html.includes("visualBerthCode:"),'Visual berth codes missing');
+// Explicit safety guard: never equate visual slot numbering with server bookings.
+assert.ok(html.includes('visualBerthCode:'),'Visual slot code must remain distinct');
+assert.ok(!html.includes('berth_number:slots.length'),'Scene must not assign global berth numbers from visual slots');
 // Every marina must have a distinct scene ID and database ID.
 assert.equal(new Set(catalog.marinas.map(m=>m.id)).size,catalog.marinas.length,'Duplicate scene marina ID');
 assert.equal(new Set(catalog.marinas.map(m=>m.database_id || m.id)).size,catalog.marinas.length,'Duplicate database marina ID');
