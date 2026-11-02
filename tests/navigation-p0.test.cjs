@@ -55,6 +55,9 @@ function harness(extra = {}) {
     'coastalExit','adriaticSpine','tyrrhenianSpine','missions','fresh','boat','port']) {
     vm.runInContext(declaration(name), context);
   }
+  const weatherStart=html.indexOf('const simulatedWeather=['),weatherEnd=html.indexOf('// Simulated sea-corridor graph',weatherStart);
+  assert(weatherStart>=0&&weatherEnd>weatherStart,'Missing production simulated weather block');
+  vm.runInContext(html.slice(weatherStart,weatherEnd),context);
   for (const name of ['straightNm','seaWaypoints','voyageRoutePoints','seaMiles','planSeaTrip',
     'crewForBoat','charterContract','availableMissions','findAvailableMission','missionBudget',
     'persist','meCloneState','meEconomyStateValid','meAtomicPersist','fuelBurnPerNm','launch','finishVoyage','voyageHeartbeat']) {
