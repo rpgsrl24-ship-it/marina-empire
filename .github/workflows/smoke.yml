@@ -7,9 +7,8 @@ on:
       - 'route-planner.js'
       - 'marine-catalogo-approvato.json'
       - 'marine-deluxe-originali.html'
-      - 'scripts/check-marina-inventory.cjs'
-      - 'scripts/resolve-visual-berth.cjs'
-      - 'scripts/test-visual-berth-resolver.cjs'
+      - 'isola-delle-rose-originale.html'
+      - 'scripts/**'
       - 'tests/**'
       - '.github/workflows/smoke.yml'
   pull_request:
@@ -32,5 +31,5 @@ jobs:
         run: node tests/smoke.cjs
       - name: Verify marina inventory against 3D scene
         run: node scripts/check-marina-inventory.cjs
-      - name: Verify safe visual berth resolution
+      - name: Verify actual scene capacities and safe berth resolution
         run: node scripts/test-visual-berth-resolver.cjs
