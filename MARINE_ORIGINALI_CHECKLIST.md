@@ -96,3 +96,9 @@ Le scene approvate contengono ancora progressi in `localStorage`. I saldi mostra
 - [x] Verificato in sola lettura su `marina_docks` il campione dei primi dieci pontili di `rose`: gli intervalli alternano 37 e 38 posti.
 - [ ] NON assumere che l'indice locale del posto 3D sia equivalente al numero globale nel database: la distribuzione dei posti per pontile differisce.
 - [ ] Definire mapping esplicito e verificato per tutti i pontili prima di abilitare ormeggi condivisi.
+
+### Verifica CI e inventario live (02/11/2026)
+- [x] Commit `15a3d98`: smoke test completato con esito positivo e deploy GitHub Pages riuscito.
+- [x] Query in sola lettura su Supabase: 12 marine, 295 pontili, 11.100 posti; totali per marina coerenti con il catalogo.
+- [ ] I totali non dimostrano la corrispondenza dei singoli posti visivi agli intervalli di `marina_docks`.
+- [ ] Completare audit degli intervalli pontile per pontile prima di attivare prenotazioni condivise.
