@@ -132,3 +132,27 @@ test('Invalid amounts and inaccessible storage cannot mutate saves',()=>{
  assert.equal(blocked.select(null),false);assert.equal(blocked.capture(),null);
  assert.equal(blocked.writeGame(null,game('Guest',1000)),false);
 });
+
+
+test('two tabs cannot overwrite a newer game or marina layout',()=>{
+ const f=fixture();f.session('player-a');
+ const tabA=createContext(f.storage),tabB=createContext(f.storage);
+ assert(tabA.select('player-a'));
+ const a=tabA.capture(),b=tabB.capture();
+ assert(a&&b);
+ const gameA=tabA.readGame(a),gameB=tabB.readGame(b);
+ assert(gameA&&gameB);
+ const layoutA=tabA.readLayout(a,'rimini')||{built:1,occupied:[],credits:gameA.coins};
+ const layoutB=tabB.readLayout(b,'rimini')||{built:1,occupied:[],credits:gameB.coins};
+ gameA.coins-=1000;
+ assert.equal(tabA.writeGame(a,gameA),true);
+ gameB.coins-=2000;
+ assert.equal(tabB.writeGame(b,gameB),false);
+ assert.equal(f.read(accountKey('player-a')).coins,39000);
+ assert.equal(tabB.hasExternalChange(b,'rimini'),true);
+ layoutA.built=2;
+ assert.equal(tabA.writeLayout(a,'rimini',layoutA),true);
+ layoutB.built=3;
+ assert.equal(tabB.writeLayout(b,'rimini',layoutB),false);
+ assert.equal(f.read(accountKey('player-a')+'_marina_rimini').built,2);
+});
