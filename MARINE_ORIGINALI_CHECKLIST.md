@@ -102,3 +102,9 @@ Le scene approvate contengono ancora progressi in `localStorage`. I saldi mostra
 - [x] Query in sola lettura su Supabase: 12 marine, 295 pontili, 11.100 posti; totali per marina coerenti con il catalogo.
 - [ ] I totali non dimostrano la corrispondenza dei singoli posti visivi agli intervalli di `marina_docks`.
 - [ ] Completare audit degli intervalli pontile per pontile prima di attivare prenotazioni condivise.
+
+### Audit completo degli intervalli (02/11/2026)
+- [x] Query SQL read-only con LAG su tutti i 295 pontili: 0 intervalli non consecutivi, 0 intervalli invalidi.
+- [x] Numerazione database consecutiva all'interno di ciascuna marina.
+- [ ] Mapping dei posti visuali 3D ai posti database ancora da validare: non equiparare `localBerthIndex` a `berth_number`.
+- [ ] Prima delle prenotazioni condivise verificare RLS, collisioni e concorrenza.
