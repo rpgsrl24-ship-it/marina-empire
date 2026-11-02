@@ -1,8 +1,8 @@
-# Marina Empire — Checklist unica di sviluppo e pre-lancio
+# Marina Empire — Checklist unica di sviluppo e stabilizzazione della beta online
 
 **RPG Yacht · Revisione del 2 novembre 2026 · Fuso di riferimento: Europe/Rome**
 
-Documento operativo unico per proseguire lo sviluppo su GitHub e preparare la beta pubblica. Il gioco è già promosso sui social: si risolvono per primi gli errori che impediscono l'ingresso, la prima missione, il salvataggio e l'uso corretto delle aree riservate.
+Documento operativo unico per proseguire lo sviluppo su GitHub e stabilizzare la beta già online. Il gioco è promosso sui social e può essere in uso: si risolvono per primi gli errori che impediscono l'ingresso, la prima missione, il salvataggio e l'uso corretto delle aree riservate, con controlli prima della pubblicazione.
 
 ## Fonti e deduplicazione
 
@@ -30,7 +30,7 @@ Gli stati includono gli esiti tecnici del ciclo corrente. **VERIFICATO** indica 
 
 **Correzioni integrate tramite [PR #20](https://github.com/rpgsrl24-ship-it/marina-empire/pull/20), revisione codice [e99ab32](https://github.com/rpgsrl24-ship-it/marina-empire/commit/e99ab32ea13a6fe3cb57fa60ec302dba9d4b3fb1).** La PR è stata unita in main con commit 683a6c0. Il [deploy del merge](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41410025881) è verde. Alle 09:05 CET del 2 novembre, il manifest pubblico riportava quel commit e i sei file funzionali controllati corrispondevano byte per byte ai sorgenti testati.
 
-**Stato complessivo: 68 controlli, di cui 26 P0, 24 P1 e 18 P2.** Sono verificati 8 controlli; 17 sono in corso, 2 bloccati e 41 da verificare. Le prove e i loro limiti sono riportati nel registro finale.
+**Stato complessivo: 68 controlli, di cui 26 P0, 24 P1 e 18 P2.** Sono verificati 9 controlli; 16 sono in corso, 2 bloccati e 41 da verificare. Le prove e i loro limiti sono riportati nel registro finale.
 
 - Corretto il richiamo al contenitore mappa rimosso che bloccava il primo ingresso e il resto del rendering.
 - Il refresh di un viaggio riapre la plancia; i test seguono partenza, consumo, arrivo, premio unico e invito alla registrazione.
@@ -40,11 +40,21 @@ Gli stati includono gli esiti tecnici del ciclo corrente. **VERIFICATO** indica 
 - La vecchia copia pubblica beta, che permetteva ancora di acquistare Rose a 35.000 crediti, è sostituita nel deploy da un collegamento alla versione corrente.
 - **25 suite offline verdi anche su GitHub** ([regressione](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41409668871)); percorso ospite completo in Chromium verificato anche su GitHub ([browser](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41409668911)) a 1440×1000, 390×844 e 844×390. Verificata anche la plancia espansa su telefono. Servizi account, pagamenti e analytics isolati nei test browser: nessun ordine o email di prova.
 
-**Aperti da affrontare per primi:** informativa specifica del gioco assente (P0-18); prova reale di conferma/recupero email e secondo dispositivo (P0-04/P0-06); controllo completo dei percorsi di pagamento lato server (P0-09); chat con autorizzazione ancora soltanto nell'interfaccia (P1-11). Le ricariche reali rispondono 503; checkout e emissione respingono la richiesta non autenticata con 401. Il 401 non prova il valore del flag checkout.
+**Aperti da affrontare per primi:** informativa specifica del gioco assente (P0-18); prova reale di conferma/recupero email e secondo dispositivo (P0-04/P0-06); chat autorizzata dal server (P1-11), temporaneamente sospesa nel secondo ciclo. Il controllo pagamenti P0-09 è stato chiuso con gestori server costantemente OFF, sorgenti live verificati e risposte HTTP 503: dettagli nel secondo ciclo e nel registro.
 
 Per gli ormeggi, l'audit copre 295 pontili e rileva ancora **136 disallineamenti** tra capacità visuali e snapshot dei dati. Il test verde conferma che i casi ambigui vengono respinti, non che la mappatura sia terminata (P1-09).
 
-## P0 — Funzionamento e protezioni prima dell'afflusso pubblico
+## Secondo ciclo — Stabilizzazione della beta già online
+
+Il [report del secondo ciclo](https://github.com/rpgsrl24-ship-it/marina-empire/blob/main/docs/P0_LIVE_STABILITY_2026-11-02.md) raccoglie correzioni e limiti. Le prove browser e la pubblicazione devono passare le Actions della PR e del merge.
+
+- **P0-09 verificato sul server:** checkout, riscatto ed emissione distribuiti in versione 2 alle 09:58 CET. Ogni POST gestita risponde 503 / PAYMENTS_DISABLED; non esistono rami attivabili da flag, né chiamate a ordini, saldi o provider. Sorgenti live identici ai bundle testati.
+- **Salvataggi corretti:** confronto dei dati indipendente dall'ordine delle proprietà JSONB; controlli sul cambio account; nessuna falsa conferma dal pulsante SALVA; partita precedente mantenuta in memoria se caricamento, ripristino, importazione o reset non riescono a salvare. Una missione caricata riapre la navigazione. Suite specifica 14/14 superata.
+- **Navigazione verificata numericamente:** 10 test, due missioni consecutive con ripristino, 1.470 combinazioni di rotte, soglie carburante/manutenzione, soste e cambio yacht. Restano da verificare cartografia e consumi differenziati per modello.
+- **Chat temporaneamente sospesa:** il canale pubblico non viene più aperto dalle nuove pagine. Nessun invio/ricezione o timer chat; contatore globale conservato. P1-11 resta aperto fino all'autorizzazione server; le vecchie schede richiedono refresh.
+- **29 suite offline verdi.** Nessun account, acquisto, accredito, email o messaggio reale creato. Isola esclusiva e grafica 3D originale conservate.
+
+## P0 — Continuità del gioco e protezioni sul sito pubblico
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
 | --- | --- | --- | --- |
@@ -56,7 +66,7 @@ Per gli ormeggi, l'audit copre 295 pontili e rileva ancora **136 disallineamenti
 | P0-06 | **Sincronizzazione account.** Logout/login e secondo dispositivo recuperano i dati del proprietario corretto; cambio account e conflitti di salvataggio non sovrascrivono un'altra partita. | Due account e due sessioni/dispositivi, backup prima del ripristino e confronto dei dati letti. | IN CORSO |
 | P0-07 | **Database e dati personali.** I permessi reali impediscono a ospiti e altri account di leggere o modificare dati riservati; le operazioni consentite corrispondono al proprietario autenticato. | Verifica delle regole applicate e richieste negative con account non autorizzato; il solo nascondere un pannello non chiude la voce. | IN CORSO |
 | P0-08 | **Direzione amministrativa.** Dashboard, dati dei giocatori e operazioni riservate richiedono autorizzazione amministrativa verificata dal server; gli accessi negati restano negati anche da link diretto. | Prove ospite, utente normale e amministratore; verifica delle richieste dati e della revoca al logout. | IN CORSO |
-| P0-09 | **Pagamenti OFF.** Nessun pulsante, link o chiamata attiva checkout, addebiti o accrediti a pagamento; anche i percorsi diretti devono restare chiusi. | Ispezione UI e richieste, test dei controlli disabilitati e delle protezioni applicative, senza acquisti reali. | IN CORSO |
+| P0-09 | **Pagamenti OFF.** Nessun pulsante, link o chiamata attiva checkout, addebiti o accrediti a pagamento; anche i percorsi diretti devono restare chiusi. | Ispezione UI e richieste, test dei controlli disabilitati e delle protezioni applicative, senza acquisti reali. | VERIFICATO |
 | P0-10 | **Integrità dei crediti virtuali.** Costi, premi e acquisti rifiutano saldi negativi, richieste non valide e ripetizioni; un premio già liquidato non viene erogato di nuovo. I crediti locali beta non sono denaro acquistato. | Casi saldo insufficiente, doppio clic, replay dell'arrivo, dati alterati e operazione non autorizzata. | IN CORSO |
 | P0-11 | **Isola delle Rose esclusiva RPG Yacht.** Rimuovere offerte e prezzi di acquisto ai giocatori; bloccare acquisto, upgrade e gestione economica riservata anche attraverso azioni dirette. Un vecchio salvataggio non deve attribuire proprietà o rendite dell'isola al giocatore. | Test UI, azioni dirette e salvataggio preesistente; nessuna deduzione/accredito improprio e nessuna cancellazione indiscriminata dei progressi. | VERIFICATO |
 | P0-12 | **Home, menu e indicatori mobile.** Layout leggibile, comandi raggiungibili, assenza di sovrapposizioni e navigazione utilizzabile in verticale e orizzontale. | Verifica browser a dimensioni mobili e controllo visivo nelle due orientazioni. | VERIFICATO |
@@ -187,6 +197,10 @@ Per ogni aggiornamento aggiungere una riga; mantenere separati risultati automat
 | 02/11/2026 09:05 CET | P0-02, P0-11, P0-20 | DEPLOY VERIFICATO | 683a6c0 / Actions 41410025881 | Deploy verde; release.json indica 683a6c0; index, admin, Rose, marine Deluxe, contesto salvataggi e reindirizzamento beta rispondono HTTP 200 e corrispondono byte per byte ai sorgenti. Hash index coerente con il manifest. | Verifica HTTP in sola lettura. Nessuna registrazione reale, email, transazione o esecuzione di analytics. |
 | 02/11/2026 08:58 CET | P0-18, P1-11 | BLOCCATO | Audit documentato | Informativa assente; marketing disabilitato. Chat pubblica con solo filtro UI registrati. | Definire informativa completa e protezione canale chat sul server. |
 | 02/11/2026 08:58 CET | P1-09 | IN CORSO | scripts/test-visual-berth-resolver.cjs | 8 test verdi, 295 intervalli analizzati e 136 disallineamenti respinti. | Mappatura scena-database ancora da completare; nessuna prenotazione autorizzata dal solo numero visivo. |
+| 02/11/2026 09:58 CET | P0-09 | VERIFICATO | Funzioni live v2 | Tre sorgenti identici ai bundle revisionati; 6 test e 1.134 POST simulate; POST reali vuote con sola apikey pubblica → 503 PAYMENTS_DISABLED su tutti i gestori. | Nessun account reale usato. L'OFF dipende dal codice distribuito, non da flag modificabili. |
+| 02/11/2026 10:00 CET | P0-05, P0-06, P0-21 | 14/14 PASS | tests/cloud-save-integrity.test.cjs | Confronto JSONB, cambio account, errore storage, ripristino e ripresa navigazione coperti da test delle funzioni effettive. | Prova su due dispositivi/account reali ancora aperta; rollback in memoria non equivale a transazione atomica dello storage. |
+| 02/11/2026 09:58 CET | P0-14, P0-15, P0-16 | 10/10 PASS | tests/navigation-p0.test.cjs | Due missioni con ripristino e matrice 1.470 tratte: 1.244 fattibili, 226 respinte, 604 con soste. | Nessun controllo cartografico terra/mare; consumo ancora 0,85 L/NM per tutte le barche. |
+| 02/11/2026 09:58 CET | P1-11 | SOSPESA | tests/community-pause.test.cjs | 5/5 test: nessun client, canale, invio, ricezione o timer chat, anche con flag registrato. Presenza globale identica. | Riattivazione subordinata ad autorizzazione server e identità verificata. Aggiornare le vecchie schede. |
 
 **Progetto pubblico:** https://rpgsrl24-ship-it.github.io/marina-empire/
 
