@@ -85,3 +85,7 @@ Le scene approvate contengono ancora progressi in `localStorage`. I saldi mostra
 - [x] Verificata assenza nel database live delle nuove tabelle `marinas`, `berths`, `berth_reservations` previste dallo script SQL nel repository.
 - [ ] Verificare corrispondenza tra ciascun pontile del database e geometria delle scene 3D approvate prima di esporre i singoli posti.
 - [ ] Preparare e testare la migrazione senza sovrascrivere `marina_docks`; non attivare prenotazioni o pagamenti prima di test RLS e concorrenza.
+
+### Controllo integrità aggiuntivo
+- [x] Query di sola lettura: nessuna duplicazione di coppie marina/pontile in `marina_docks`.
+- [ ] Verificare su database live la distribuzione geometrica dei posti per pontile prima di rendere selezionabili gli ormeggi.
