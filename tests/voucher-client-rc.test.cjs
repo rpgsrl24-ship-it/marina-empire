@@ -13,7 +13,9 @@ for(const token of [
   'apikey":KEY_PUBLIC',
   'ME-[A-Z0-9]{8}-[A-Z0-9]{8}-[A-Z0-9]{8}',
   'Codice riscattato. Saldo server aggiornato.',
-  'el("meVoucherRedeem").addEventListener("click",redeemVoucherRc)',
+  'window.meRedeemVoucherRc=redeemVoucherRc',
+  'window.meSyncVoucherRcUi=syncVoucherRcUi',
+  'el("meVoucherRedeem").addEventListener("click",()=>window.meRedeemVoucherRc?.())',
   'syncVoucherRcUi()'
 ]) assert(src.includes(token),'Missing voucher client safeguard: '+token);
 
