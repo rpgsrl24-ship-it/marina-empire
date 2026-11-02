@@ -64,7 +64,7 @@ test('Authenticated activity records only verified play starts and mission compl
  await window.MarinaEmpireAuthenticatedActivity.track('play_start');
  await window.MarinaEmpireAuthenticatedActivity.track('mission_complete');
  await window.MarinaEmpireAuthenticatedActivity.track('unknown');
- assert.equal(verified,2);assert.deepEqual(inserted,[{user_id:'player-a',event_type:'play_start'},{user_id:'player-a',event_type:'mission_complete'}]);
+ assert.equal(verified,2);assert.equal(JSON.stringify(inserted),JSON.stringify([{user_id:'player-a',event_type:'play_start'},{user_id:'player-a',event_type:'mission_complete'}]));
 });
 
 function helpHarness(href){
