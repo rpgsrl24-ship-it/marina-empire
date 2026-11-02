@@ -67,3 +67,12 @@ Le scene approvate contengono ancora progressi in `localStorage`. I saldi mostra
 - [x] Imposto intervallo minimo di 90 secondi tra missioni e conteggio missioni nel salvataggio locale.
 - [ ] La ricompensa è dimostrativa e salvata solo nel browser; per economia condivisa implementare verifica server-side e anti-abuso.
 - [ ] Provare missioni manualmente su desktop e mobile.
+
+## Verifica tecnica 2 novembre 2026 — fase successiva
+- [x] Confermato che il catalogo `marine-catalogo-approvato.json` contiene 12 marine, 295 ID di pontile e capienza dichiarata di 11.100 posti; gli ID non certificano la geometria dei singoli ormeggi.
+- [x] Ultima versione frontend `42dbfe0` con deploy, smoke test e regressione missioni riusciti.
+- [ ] Recuperare o confermare la capienza e la geometria reale di ciascun pontile dalle scene approvate e dal database prima di generare ID di posto barca.
+- [ ] Progettare tabella occupazione server con vincoli di unicità e permessi per utente; nessuna prenotazione reale finché RLS e transazioni atomiche non sono testate.
+- [ ] Testare collisioni tra due utenti che prenotano lo stesso posto, e tra due sessioni dello stesso utente.
+- [ ] Verificare link da mappa alle 12 scene su desktop e mobile, senza modificare la grafica originale.
+- [ ] Conservare separati i crediti beta locali dai crediti acquistati; nessun acquisto attivo.
