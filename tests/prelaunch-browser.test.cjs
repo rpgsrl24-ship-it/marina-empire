@@ -112,6 +112,7 @@ async function trial(browser,origin,name,viewport,mobile) {
       destination:port(trip.legs?.[trip.legIndex+1]||trip.dest).name,
       yacht:boat(trip.mission?.boat||trip.boat||state.boat).name
     }),launched.trip);
+    await page.waitForFunction(expected=>document.getElementById('cinemaRadio')?.textContent?.includes(expected),voyageIdentity.destination);
     const cinemaTitle=await page.locator('#cinemaTitle').innerText();
     const cinemaRadio=await page.locator('#cinemaRadio').innerText();
     assert.ok(cinemaTitle.includes(voyageIdentity.yacht),name+': console shows the active yacht');
