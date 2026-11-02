@@ -195,8 +195,8 @@ async function multiTabConflict(browser,origin) {
   const first=await context.newPage(),stale=await context.newPage(),errors=[];
   stale.on('pageerror',e=>errors.push(e.message));
   try {
-    await first.goto(origin,{waitUntil:'load'});
-    await stale.goto(origin,{waitUntil:'load'});
+    await first.goto(origin,{waitUntil:'domcontentloaded'});
+    await stale.goto(origin,{waitUntil:'domcontentloaded'});
     await first.locator('#playerName').fill('Scheda principale');
     await first.locator('#play').click();
     const latest=await first.evaluate(key=>localStorage.getItem(key),saveKey);
