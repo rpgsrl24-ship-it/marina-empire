@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');
+const catalog=require('../marine-catalogo-approvato.json');
+const {resolveVisualBerth}=require('./resolve-visual-berth.cjs');
+const marina=catalog.marinas.find(m=>m.id==='rose');
+assert.ok(marina);
+const dock={marina_id:'rose',dock_number:1,berth_start:1,berth_end:37};
+assert.throws(()=>resolveVisualBerth(catalog,dock,'rose',1,1),/capacities differ/);
+const same={marina_id:'rose',dock_number:1,berth_start:1,berth_end:38};
+assert.deepEqual(resolveVisualBerth(catalog,same,'rose',1,2),{marina_id:'rose',dock_number:1,berth_number:2});
+assert.throws(()=>resolveVisualBerth(catalog,same,'rose',1,39),/Invalid local/);
+assert.throws(()=>resolveVisualBerth(catalog,same,'rimini',1,2),/mismatch/);
+console.log('OK: visual berth resolver rejects mismatched pier capacities and invalid IDs.');
