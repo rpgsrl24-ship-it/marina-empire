@@ -88,6 +88,17 @@ async function trial(browser,origin,name,viewport,mobile) {
     await page.locator('#voyageCinema').waitFor({state:'visible'});
     await page.locator('#cinemaSea').waitFor({state:'visible'});
     await page.locator('#cinemaSea').scrollIntoViewIfNeeded();
+    const voyageIdentity=await page.evaluate(trip=>({
+      origin:port(trip.origin).name,
+      destination:port(trip.legs?.[trip.legIndex+1]||trip.dest).name,
+      yacht:boat(trip.mission?.boat||trip.boat||state.boat).name
+    }),launched.trip);
+    const cinemaTitle=await page.locator('#cinemaTitle').innerText();
+    const cinemaRadio=await page.locator('#cinemaRadio').innerText();
+    assert.ok(cinemaTitle.includes(voyageIdentity.yacht),name+': console shows the active yacht');
+    assert.ok(cinemaTitle.includes(voyageIdentity.origin)&&cinemaTitle.includes(voyageIdentity.destination),name+': console shows the current leg origin and destination');
+    assert.ok(cinemaRadio.includes(voyageIdentity.yacht)&&cinemaRadio.includes(voyageIdentity.destination),name+': VHF follows active yacht and next marina');
+    assert.equal(await page.locator('#cinemaDock').isVisible(),false,name+': old marina scene stays hidden while GPS bridge is the voyage view');
     const geometry=await page.evaluate(()=>{
       const rect=id=>{const b=document.getElementById(id).getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height,right:b.right,bottom:b.bottom}};
       return {viewport:innerWidth,overflow:document.documentElement.scrollWidth>innerWidth+2,sea:rect('cinemaSea'),gps:rect('voyageRouteMap'),controls:rect('meHelmControls'),markers:document.querySelectorAll('#voyageRouteMap .leaflet-marker-icon').length,route:document.querySelectorAll('#voyageRouteMap path.leaflet-interactive').length};
@@ -121,6 +132,9 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.ok(arrived.fuel>=0 && arrived.condition>=0,'Arrival cannot underflow fuel or condition');
     assert.equal(await page.locator('#voyageCinema').isVisible(),true,'The console remains after arrival');
     assert.equal(await page.locator('#voyageArrivalNotice').isVisible(),true,'Arrival summary is visible');
+    const arrivalIdentity=await page.evaluate(()=>({title:document.getElementById('cinemaTitle')?.textContent||'',route:document.getElementById('meBridgeRoute')?.textContent||'',yacht:boat(state.boat).name,port:port(state.port).name}));
+    assert.ok(arrivalIdentity.title.includes(arrivalIdentity.yacht)&&arrivalIdentity.title.includes(arrivalIdentity.port),name+': docked console shows yacht and actual arrival marina');
+    assert.ok(arrivalIdentity.route.includes(arrivalIdentity.port),name+': docked route indicator uses the saved arrival marina');
     await page.reload({waitUntil:'load'});
     await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key))?.trip===null,saveKey);
     const reloaded=await save(page);
