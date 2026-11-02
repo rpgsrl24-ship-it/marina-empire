@@ -8,6 +8,8 @@ on:
       - 'marine-catalogo-approvato.json'
       - 'marine-deluxe-originali.html'
       - 'scripts/check-marina-inventory.cjs'
+      - 'scripts/resolve-visual-berth.cjs'
+      - 'scripts/test-visual-berth-resolver.cjs'
       - 'tests/**'
       - '.github/workflows/smoke.yml'
   pull_request:
@@ -30,3 +32,5 @@ jobs:
         run: node tests/smoke.cjs
       - name: Verify marina inventory against 3D scene
         run: node scripts/check-marina-inventory.cjs
+      - name: Verify safe visual berth resolution
+        run: node scripts/test-visual-berth-resolver.cjs
