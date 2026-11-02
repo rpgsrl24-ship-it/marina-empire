@@ -21,5 +21,5 @@ begin
  end;
 end;
 $test$;
-select 'PASS: Rose rejected before writes; other-marina validation retained' as result;
 rollback;
+select 'PASS: Rose rejected before writes; other-marina validation retained' as result;

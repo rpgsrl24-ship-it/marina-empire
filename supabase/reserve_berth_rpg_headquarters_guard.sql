@@ -1,5 +1,6 @@
 -- Marina Empire P0, 2026-11-02. Apply only to the existing player booking RPC.
--- This is a reviewed SQL patch, not a record of a migration already applied.
+-- Applied on 2026-11-02 to project zrdetqvnjmqkfyajxjgp through the official
+-- migration reserve_berth_rpg_headquarters_guard; READ ONLY regression passed.
 -- The function signature, owner, EXECUTE grants, and non-Rose behavior are preserved.
 -- No booking, player, wallet, or balance rows are read or changed by this DDL.
 -- Live metadata audit: public.berth_bookings grants authenticated SELECT only;

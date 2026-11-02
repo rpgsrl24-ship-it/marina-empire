@@ -3,8 +3,11 @@ on:
   pull_request:
     paths:
       - 'index.html'
+      - 'beta-test/**'
+      - '.github/workflows/pages.yml'
       - 'admin.html'
       - 'route-planner.js'
+      - 'local-save-context.js'
       - 'package.json'
       - 'package-lock.json'
       - 'tests/**'
@@ -16,8 +19,11 @@ on:
       - 'dev/mission-regression-2026-10-29'
     paths:
       - 'index.html'
+      - 'beta-test/**'
+      - '.github/workflows/pages.yml'
       - 'admin.html'
       - 'route-planner.js'
+      - 'local-save-context.js'
       - 'package.json'
       - 'package-lock.json'
       - 'tests/**'
@@ -30,7 +36,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   mission-contract:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4

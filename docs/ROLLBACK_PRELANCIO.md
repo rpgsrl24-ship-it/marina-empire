@@ -51,6 +51,6 @@ node tests/prelaunch-browser.test.cjs
 
 I test usano le versioni fissate nel lockfile e servizi esterni isolati. Non dimostrano il funzionamento di un servizio esterno o delle autorizzazioni reali del database. L'artifact del sito esclude `node_modules` e i report di collaudo.
 
-## Percorso beta già presente
+## Chiusura della vecchia pubblicazione beta
 
-Il workflow esistente include anche il ramo `beta/private-test-2026-10-29` nella cartella pubblicata `beta-test`. Il nome del ramo non rende privata una pagina GitHub Pages. Questo comportamento non viene modificato dal gate P0: le verifiche e il manifest di versione descritti qui attestano la homepage principale, non certificano il contenuto o la revisione del ramo beta separato.
+La vecchia copia `beta/private-test-2026-10-29` conteneva ancora acquisto Rose a 35.000 crediti e non viene più aggiunta all’artifact Pages. Il ramo GitHub resta disponibile come storico. Il percorso `beta-test/` contiene soltanto un reindirizzamento alla versione corrente: non rimettere online la vecchia copia durante un rollback.

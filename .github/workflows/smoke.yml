@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'beta-test/**'
       - '*.html'
       - 'assets/**'
       - 'advertising/**'
@@ -13,6 +14,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'route-planner.js'
+      - 'local-save-context.js'
       - 'marine-catalogo-approvato.json'
       - 'marine-deluxe-originali.html'
       - 'isola-delle-rose-originale.html'
@@ -28,7 +30,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   smoke:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4

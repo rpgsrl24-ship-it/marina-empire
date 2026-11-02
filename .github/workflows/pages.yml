@@ -15,16 +15,11 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Checkout beta test
-        uses: actions/checkout@v4
-        with:
-          ref: beta/private-test-2026-10-29
-          path: beta-test
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

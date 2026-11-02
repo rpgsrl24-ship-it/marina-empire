@@ -98,6 +98,16 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.ok(geometry.controls.x>=-2 && geometry.controls.right<=geometry.viewport+2,`${name}: helm buttons remain on screen`);
     assert.ok(geometry.markers>0 && geometry.route>0,`${name}: yacht and route are drawn`);
     await page.screenshot({path:path.join(output,`${name}-voyage.png`),fullPage:false,animations:'disabled'});
+    const expand=page.locator('#meVoyageExpand');
+    if (mobile && await expand.isVisible()) {
+      await expand.click();
+      await page.waitForFunction(()=>document.body.classList.contains('me-voyage-focus'));
+      const expanded=await page.evaluate(()=>{const r=document.getElementById('meHelmControls').getBoundingClientRect();const gps=document.getElementById('voyageRouteMap').getBoundingClientRect();return {bottom:r.bottom,top:r.top,height:innerHeight,gpsTop:gps.top,gpsBottom:gps.bottom}});
+      assert.ok(expanded.top>=0 && expanded.bottom<=expanded.height+2, `${name}: expanded helm controls must be reachable`);
+      assert.ok(expanded.gpsTop>=0 && expanded.gpsBottom<=expanded.height+2, `${name}: expanded GPS must be visible`);
+      await page.screenshot({path:path.join(output,`${name}-expanded.png`),fullPage:false,animations:'disabled'});
+      await expand.click();
+    }
     const active=await save(page);
     assert.ok(active.trip, 'The console inspection must happen during navigation');
     await page.clock.setFixedTime(new Date(active.trip.until+1000));
@@ -142,8 +152,12 @@ async function trial(browser,origin,name,viewport,mobile) {
   if(process.env.ME_CHROMIUM_PATH) options.executablePath=process.env.ME_CHROMIUM_PATH;
   const browser=await chromium.launch(options);
   try {
-    await trial(browser,origin,'desktop',{width:1440,height:1000},false);
-    await trial(browser,origin,'mobile-portrait',{width:390,height:844},true);
-    await trial(browser,origin,'mobile-landscape',{width:844,height:390},true);
+    for (const scenario of [
+      ['desktop',{width:1440,height:1000},false],
+      ['mobile-portrait',{width:390,height:844},true],
+      ['mobile-landscape',{width:844,height:390},true]
+    ]) {
+      if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO===scenario[0]) await trial(browser,origin,...scenario);
+    }
   } finally {await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>server.close());

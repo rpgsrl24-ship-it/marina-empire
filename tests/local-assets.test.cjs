@@ -5,7 +5,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 
 const root = path.resolve(__dirname, '..');
-const pending = ['index.html', 'admin.html', 'pubblicita.html',
+const pending = ['index.html', 'beta-test/index.html', 'admin.html', 'pubblicita.html',
   'isola-delle-rose-originale.html', 'marine-deluxe-originali.html', 'voyage-3d.html'];
 const inspected = new Set();
 const checked = new Set();
