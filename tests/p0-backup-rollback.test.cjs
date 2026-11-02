@@ -38,7 +38,7 @@ test('local and cloud restore retain a reverse path before replacing state',()=>
  assert(html.includes('marina_empire_before_backup_restore'));
  assert(html.includes('Impossibile creare la copia di sicurezza: caricamento annullato.'));
  assert(html.includes('const previousState=state;state=safe;if(persist()===false){state=previousState;return;}'));
- assert(backup.includes('Se la copia di sicurezza non puo essere scritta o verificata, il ripristino deve essere annullato.'));
+ assert(backup.normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes('Se la copia di sicurezza non puo essere scritta o verificata, il ripristino deve essere annullato.'));
 });
 
 test('backup procedure documents conflict, corrupt-save and owner acceptance limits',()=>{
