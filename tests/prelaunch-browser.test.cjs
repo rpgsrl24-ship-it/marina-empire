@@ -187,6 +187,32 @@ async function corruptSaveRecovery(browser,origin) {
   } finally {await context.close();}
 }
 
+
+async function multiTabConflict(browser,origin) {
+  const name='multi-tab-conflict';
+  const context=await browser.newContext({viewport:{width:1100,height:800}});
+  await isolated(context,origin);
+  const first=await context.newPage(),stale=await context.newPage(),errors=[];
+  stale.on('pageerror',e=>errors.push(e.message));
+  try {
+    await first.goto(origin,{waitUntil:'load'});
+    await stale.goto(origin,{waitUntil:'load'});
+    await first.locator('#playerName').fill('Scheda principale');
+    await first.locator('#play').click();
+    const latest=await first.evaluate(key=>localStorage.getItem(key),saveKey);
+    assert.ok(latest&&JSON.parse(latest).name==='Scheda principale','First tab must create the save');
+    const panel=stale.locator('#meLocalSaveRecovery');
+    await panel.waitFor({state:'visible'});
+    assert.match(await panel.innerText(),/altra scheda/i,'Stale tab must explain the conflict');
+    assert.equal(await stale.evaluate(()=>window.meLocalSaveBlocked?.()),true,'Stale tab must be write-blocked');
+    await stale.locator('#playerName').fill('Scheda obsoleta');
+    await stale.locator('#play').click();
+    assert.equal(await stale.evaluate(key=>localStorage.getItem(key),saveKey),latest,'Stale tab cannot overwrite the newer save');
+    assert.deepEqual(errors,[],name+': runtime errors');
+    console.log('PASS '+name+': storage event/conflict notice/stale write blocked');
+  } finally {await context.close();}
+}
+
 (async()=>{
   fs.mkdirSync(output,{recursive:true});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -203,5 +229,6 @@ async function corruptSaveRecovery(browser,origin) {
       if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO===scenario[0]) await trial(browser,origin,...scenario);
     }
     if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO==='recovery-mobile') await corruptSaveRecovery(browser,origin);
+    if (!process.env.ME_TEST_SCENARIO || process.env.ME_TEST_SCENARIO==='multi-tab-conflict') await multiTabConflict(browser,origin);
   } finally {await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>server.close());
