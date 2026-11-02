@@ -126,6 +126,23 @@ Test dell'ultima revisione funzionale `4bb7f28d`: regressioni complete **SUCCESS
 
 P0-10 passa a **VERIFICATO** per l'economia virtuale locale della beta. Non autorizza né attiva acquisti reali.
 
+## Ottavo ciclo — Rotte, carburante e manutenzione per imbarcazione
+
+Verifica e correzione sviluppate nella [PR #26](https://github.com/rpgsrl24-ship-it/marina-empire/pull/26).
+
+- **Consumi differenziati:** i sette yacht hanno un coefficiente L/NM dedicato. RPG Academy 8 mantiene il baseline beta 0,85 L/NM; gli altri modelli non usano più un consumo uniforme.
+- **Unica fonte di calcolo:** pianificatore, budget missione, carburante stimato, partenza, soste tecniche e viaggio salvato usano lo stesso coefficiente della barca.
+- **Refresh coerente:** il viaggio salva il `fuelRate` usato alla partenza, evitando che un refresh o una modifica successiva del catalogo cambi il consumo di una missione già iniziata.
+- **Riserva e serbatoi:** resta obbligatoria la riserva del 15%; ogni yacht usa la propria capacità serbatoio e le tratte incompatibili vengono rifiutate.
+- **Manutenzione:** condizione limitata 0–100, usura a viaggio, ripristino massimo a 100, costo legato alla classe/prezzo dello yacht e servizi indisponibili durante la navigazione.
+- **Cambio yacht:** posizione, carburante e usura restano separati per singola imbarcazione.
+- **Matrice rotte:** 1.470 combinazioni barca/porto verificate; 1.254 possibili, 216 correttamente bloccate e 654 con più tappe nella revisione testata.
+- **Test comportamentali:** 11/11 controlli P0 navigazione superati, inclusi due viaggi consecutivi, cambio porto, primo limite carburante, soste, perdita inattesa dei fondi di rifornimento, servizi in marina e cambio yacht.
+- **Browser:** regressioni complete **SUCCESS** ([Actions 41443334559](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41443334559)) e smoke/Chromium **SUCCESS** ([Actions 41443334178](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41443334178)).
+- **P0-14 resta IN CORSO:** posizione, origine/destinazione, refresh e arrivo sono verificati; resta il controllo finale della rappresentazione visiva d'ingresso/uscita. La beta mantiene intenzionalmente la plancia GPS durante il viaggio invece di sostituirla con una scena 3D.
+
+P0-15 e P0-16 passano a **VERIFICATO**.
+
 ## P0 — Continuità del gioco e protezioni sul sito pubblico
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
@@ -144,8 +161,8 @@ P0-10 passa a **VERIFICATO** per l'economia virtuale locale della beta. Non auto
 | P0-12 | **Home, menu e indicatori mobile.** Layout leggibile, comandi raggiungibili, assenza di sovrapposizioni e navigazione utilizzabile in verticale e orizzontale. | Verifica browser a dimensioni mobili e controllo visivo nelle due orientazioni. | VERIFICATO |
 | P0-13 | **Plancia e GPS.** La console resta durante la navigazione; mappa, rotta e indicatori entrano nel display GPS previsto e restano leggibili. Conservare la grafica 3D originale. | Partenza, traversata, cambio vista e arrivo su desktop/mobile; confronto delle scene e dei riferimenti grafici approvati. | VERIFICATO |
 | P0-14 | **Origine, yacht e destinazione.** Partenza dalla marina effettiva, barca e posizione visibili, rotta coerente e ingresso nella marina corretta; al termine la posizione è memorizzata. | Due missioni consecutive da porti diversi e ripristino della partita, con controllo delle scene usate. | IN CORSO |
-| P0-15 | **Rotte, distanze e tempi.** Calcolare distanze nautiche e durata, consentire viaggi tra marine sbloccate, gestire le soste e impedire destinazioni incompatibili o uguali alla partenza. Le rotte sono simulazioni di gioco. | Matrice di tratte rappresentative, incluse rotte a più tappe, limiti di carburante e destinazioni chiuse. | IN CORSO |
-| P0-16 | **Carburante e manutenzione.** Consumi e serbatoi dipendono dall'imbarcazione; usura, rifornimento, riserva, costi e sosta sono coerenti e non producono quantità negative. | Casi limite di autonomia e condizione, cambio yacht, sosta, ripresa e indisponibilità dei servizi durante il viaggio. | IN CORSO |
+| P0-15 | **Rotte, distanze e tempi.** Calcolare distanze nautiche e durata, consentire viaggi tra marine sbloccate, gestire le soste e impedire destinazioni incompatibili o uguali alla partenza. Le rotte sono simulazioni di gioco. | Matrice di tratte rappresentative, incluse rotte a più tappe, limiti di carburante e destinazioni chiuse. | VERIFICATO |
+| P0-16 | **Carburante e manutenzione.** Consumi e serbatoi dipendono dall'imbarcazione; usura, rifornimento, riserva, costi e sosta sono coerenti e non producono quantità negative. | Casi limite di autonomia e condizione, cambio yacht, sosta, ripresa e indisponibilità dei servizi durante il viaggio. | VERIFICATO |
 | P0-17 | **Arrivo e liquidazione missione.** Completamento, premio, prestigio, riepilogo e numero di viaggi si aggiornano una volta; ritorno in primo piano e refresh non duplicano l'incasso. | Fine missione normale, refresh al termine, viaggio già liquidato e ripresa dopo sospensione mobile. | VERIFICATO |
 | P0-18 | **Privacy e raccolta email.** Informativa accessibile, consensi pertinenti e finalità chiare; la registrazione al gioco non deve implicare consensi commerciali non dichiarati. | Controllo dei testi, moduli, collegamenti e registrazione dei consensi previsti. | VERIFICATO |
 | P0-19 | **Segnalazioni e assistenza.** Un giocatore può segnalare un problema e trovare il contatto di supporto; la segnalazione arriva al canale operativo previsto senza esporre dati di altri utenti. | Verifica del percorso e del recapito, con prova controllata se autorizzata; non inviare messaggi di test a terzi senza autorizzazione. | IN CORSO |
