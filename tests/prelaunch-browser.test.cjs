@@ -104,13 +104,15 @@ async function trial(browser,origin,name,viewport,mobile) {
     await page.waitForFunction(()=>!document.getElementById('cinemaSea')?.classList.contains('me-helm-gps'));
     const seaMotion=await page.evaluate(()=>({
       helmAnimation:getComputedStyle(document.getElementById('meHelmWindow')).animationName,
-      seaAnimation:getComputedStyle(document.querySelector('.me-sea-motion')).animationName,
-      seaOpacity:Number.parseFloat(getComputedStyle(document.querySelector('.me-sea-motion')).opacity||'0'),
-      seaDisplay:getComputedStyle(document.querySelector('.me-sea-motion')).display
+      waterAnimation:getComputedStyle(document.querySelector('.me-water-motion'),'::before').animationName,
+      wakeAnimation:getComputedStyle(document.querySelector('.me-wake'),'::before').animationName,
+      waterOpacity:Number.parseFloat(getComputedStyle(document.querySelector('.me-water-motion')).opacity||'0'),
+      wakeOpacity:Number.parseFloat(getComputedStyle(document.querySelector('.me-wake')).opacity||'0')
     }));
     assert.equal(seaMotion.helmAnimation,'none',name+': approved helm photo remains stable');
-    assert.ok(seaMotion.seaAnimation.includes('meOceanDrift'),name+': sea reflection is animated in helm view');
-    assert.ok(seaMotion.seaOpacity>0&&seaMotion.seaDisplay!=='none',name+': animated sea reflection remains visible in helm view');
+    assert.ok(seaMotion.waterAnimation.includes('meWaveTravel'),name+': water surface is animated in helm view');
+    assert.ok(seaMotion.wakeAnimation.includes('meWakeFlow'),name+': wake is animated in helm view');
+    assert.ok(seaMotion.waterOpacity>0&&seaMotion.wakeOpacity>0,name+': animated water and wake remain visible');
     const geometry=await page.evaluate(()=>{
       const rect=id=>{const b=document.getElementById(id).getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height,right:b.right,bottom:b.bottom}};
       return {viewport:innerWidth,overflow:document.documentElement.scrollWidth>innerWidth+2,sea:rect('cinemaSea'),gps:rect('voyageRouteMap'),controls:rect('meHelmControls'),markers:document.querySelectorAll('#voyageRouteMap .leaflet-marker-icon').length,route:document.querySelectorAll('#voyageRouteMap path.leaflet-interactive').length};
