@@ -26,37 +26,45 @@ function trafficHarness({registered=false,blockedStorage=false,admin=false}={}){
  return {calls,window,local,session};
 }
 
-for(const registered of [false,true])test('Paused usage analytics performs no network or persistent tracking for '+(registered?'registered players':'guests'),()=>{
+for(const registered of [false,true])test('Session analytics records only allowed events without persistent traffic identifiers for '+(registered?'registered players':'guests'),()=>{
  const h=trafficHarness({registered});
- for(const event of ['page_view','play_start','mission_complete','heartbeat','unknown'])h.window.MarinaEmpireTraffic.track(event,true);
- assert.deepEqual(h.calls,{network:0,uuid:0,timer:0,listeners:0,writes:0});
+ h.window.MarinaEmpireTraffic.track('play_start',true);
+ h.window.MarinaEmpireTraffic.track('play_start',true);
+ h.window.MarinaEmpireTraffic.track('mission_complete');
+ h.window.MarinaEmpireTraffic.track('heartbeat');
+ assert.equal(h.calls.network,3,'page_view plus one play_start plus one mission_complete');
+ assert.equal(h.calls.uuid,1,'one in-memory session id per page load');
+ assert.equal(h.calls.timer,0);assert.equal(h.calls.listeners,0);assert.equal(h.calls.writes,0);
  assert.equal(h.local.has('me_anonymous_visitor_v1'),false);
  assert.equal(h.session.has('me_traffic_session'),false);
  assert.equal(h.local.get('marina_empire_beta_test_session'),'guest progress');
  assert.equal(h.local.get('marina_empire_user_player-a'),'account progress');
  assert.equal(h.local.get('sb-project-auth-token'),'auth session');
- assert.equal(h.local.get('me_admin_analytics_optout_v1'),'0');
  assert.equal(h.session.get('unrelated'),'preserve');
 });
 
-test('Blocked browser storage does not break gameplay or reactivate analytics',()=>{
+test('Blocked browser storage does not break session analytics or gameplay',()=>{
  const h=trafficHarness({blockedStorage:true});
  assert.doesNotThrow(()=>h.window.MarinaEmpireTraffic.track('play_start'));
- assert.deepEqual(h.calls,{network:0,uuid:0,timer:0,listeners:0,writes:0});
+ assert.equal(h.calls.network,2,'page_view and play_start still use the in-memory session');
+ assert.equal(h.calls.uuid,1);assert.equal(h.calls.timer,0);assert.equal(h.calls.listeners,0);assert.equal(h.calls.writes,0);
 });
 
-test('Admin exclusion preference is preserved while old tracker identifiers are removed',()=>{
- const h=trafficHarness({admin:true});assert.equal(h.local.get('me_admin_analytics_optout_v1'),'1');assert.equal(h.local.has('me_anonymous_visitor_v1'),false);
+test('Old tracker identifiers are removed without touching unrelated browser state',()=>{
+ const h=trafficHarness({admin:true});assert.equal(h.local.has('me_anonymous_visitor_v1'),false);assert.equal(h.local.get('me_admin_analytics_optout_v1'),'1');assert.equal(h.calls.writes,0);
 });
 
-test('Authenticated usage events never query identity or insert into the database while paused',async()=>{
+test('Authenticated activity records only verified play starts and mission completions',async()=>{
  const start=html.indexOf('window.MarinaEmpireAuthenticatedActivity='),end=html.indexOf('function status(',start);assert(start>0&&end>start);
- let calls=0;
- const client={auth:{getUser(){calls++;return Promise.resolve({data:{user:{id:'player-a'}},error:null})}},from(){calls++;return {insert:async()=>({error:null})}}};
+ const inserted=[];let verified=0;
+ const client={auth:{getUser(){verified++;return Promise.resolve({data:{user:{id:'player-a'}},error:null})}},from(name){assert.equal(name,'me_authenticated_activity');return {insert:async row=>{inserted.push(row);return {error:null}}}}};
  const window={},context={window,client,account:{id:'player-a',email_confirmed_at:'2026-11-02'},Date,console,lastAuthenticatedStart:0};
  vm.runInNewContext(html.slice(start,end),context);
- for(const type of ['play_start','mission_complete','unknown'])await window.MarinaEmpireAuthenticatedActivity.track(type);
- assert.equal(calls,0);
+ await window.MarinaEmpireAuthenticatedActivity.track('play_start');
+ await window.MarinaEmpireAuthenticatedActivity.track('play_start');
+ await window.MarinaEmpireAuthenticatedActivity.track('mission_complete');
+ await window.MarinaEmpireAuthenticatedActivity.track('unknown');
+ assert.equal(verified,2);assert.deepEqual(inserted,[{user_id:'player-a',event_type:'play_start'},{user_id:'player-a',event_type:'mission_complete'}]);
 });
 
 function helpHarness(href){
