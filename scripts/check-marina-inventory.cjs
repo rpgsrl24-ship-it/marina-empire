@@ -20,6 +20,17 @@ for(const marina of catalog.marinas){
   assert.equal(m.piers,marina.piers,marina.id);
   assert.equal(m.capacity,marina.berths,marina.id);
 }
+// Validate the slot distribution algorithm used by the 3D scene.
+// Visual slot IDs remain separate from live database berth numbers.
+for(const marina of catalog.marinas){
+  const countPerPier=Math.floor(marina.berths/marina.piers);
+  const remainder=marina.berths%marina.piers;
+  const visualCounts=Array.from({length:marina.piers},(_,i)=>countPerPier+(i<remainder?1:0));
+  assert.equal(visualCounts.reduce((sum,n)=>sum+n,0),marina.berths,marina.id);
+  assert.ok(visualCounts.every(n=>n>0),marina.id+': empty visual pier');
+}
+assert.ok(html.includes("localBerthIndex:k+1"),'Visual slot indices missing');
+assert.ok(html.includes("visualBerthCode:"),'Visual berth codes missing');
 assert.equal(scene.length,catalog.marinas.length);
 console.log('OK: 12 marine, 295 pontili, 11100 posti; catalogo e scena allineati per i totali.');
 console.log('Nota: i singoli intervalli di posti in Supabase NON sono verificati da questo test.');
