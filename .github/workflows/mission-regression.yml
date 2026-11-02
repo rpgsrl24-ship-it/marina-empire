@@ -3,18 +3,26 @@ on:
   pull_request:
     paths:
       - 'index.html'
+      - 'admin.html'
+      - 'route-planner.js'
+      - 'package.json'
+      - 'package-lock.json'
       - 'tests/**'
       - 'backend/**'
-      - '.github/workflows/mission-regression.yml'
+      - '.github/workflows/**'
   push:
     branches:
       - main
       - 'dev/mission-regression-2026-10-29'
     paths:
       - 'index.html'
+      - 'admin.html'
+      - 'route-planner.js'
+      - 'package.json'
+      - 'package-lock.json'
       - 'tests/**'
       - 'backend/**'
-      - '.github/workflows/mission-regression.yml'
+      - '.github/workflows/**'
 permissions:
   contents: read
 concurrency:
@@ -23,30 +31,16 @@ concurrency:
 jobs:
   mission-contract:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Check mission navigation contracts
+      - name: Verify every offline regression
         run: |
-          node tests/mission-contract.test.cjs
-          node tests/mission-arrival.test.cjs
-          node tests/cloud-backup.test.cjs
-          node tests/cloud-load.test.cjs
-          node tests/account-ui.test.cjs
-          node tests/mobile-navigation.test.cjs
-          node tests/beta-launch.test.cjs
-          node tests/credit-webhook.test.cjs
-          node tests/voucher-crypto.test.cjs
-          node tests/voucher-issuance.test.cjs
-          node tests/voucher-functional.test.cjs
-          node tests/credit-order-plan.test.cjs
-          node tests/direct-credit-checkout.test.cjs
-          node tests/direct-credit-feature-gates.test.cjs
-          node tests/direct-credit-intent.test.cjs
-          node tests/prelaunch-economy-contract.test.cjs
-          node tests/prelaunch-save-contract.test.cjs
-          node tests/prelaunch-cloud-account-contract.test.cjs
-          node tests/prelaunch-admin-access-contract.test.cjs
-          node tests/prelaunch-auth-contract.test.cjs
+          for test in tests/*.test.cjs; do
+            if [ "$test" != "tests/prelaunch-browser.test.cjs" ]; then
+              node "$test"
+            fi
+          done

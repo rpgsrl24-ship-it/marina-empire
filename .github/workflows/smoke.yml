@@ -4,13 +4,21 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - '*.html'
+      - 'assets/**'
+      - 'advertising/**'
+      - 'anteprima/**'
+      - 'manifest.webmanifest'
+      - 'app-icon.svg'
+      - 'package.json'
+      - 'package-lock.json'
       - 'route-planner.js'
       - 'marine-catalogo-approvato.json'
       - 'marine-deluxe-originali.html'
       - 'isola-delle-rose-originale.html'
       - 'scripts/**'
       - 'tests/**'
-      - '.github/workflows/smoke.yml'
+      - '.github/workflows/**'
   pull_request:
   workflow_dispatch:
 permissions:
@@ -21,7 +29,7 @@ concurrency:
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,7 +37,16 @@ jobs:
           node-version: '22'
       - name: Verify game scripts and core elements
         run: node tests/smoke.cjs
+      - name: Verify local pages and media resolve
+        run: node tests/local-assets.test.cjs
       - name: Verify marina inventory against 3D scene
         run: node scripts/check-marina-inventory.cjs
       - name: Verify actual scene capacities and safe berth resolution
         run: node scripts/test-visual-berth-resolver.cjs
+      - name: Install pinned browser test dependencies
+        run: npm ci
+      - name: Install Chromium for P0 checks
+        run: npx playwright install --with-deps chromium
+      - name: Verify guest journey and P0 guards in Chromium
+        timeout-minutes: 4
+        run: node tests/prelaunch-browser.test.cjs
