@@ -7,8 +7,8 @@ const html=fs.readFileSync('index.html','utf8');
 
 test('approved helm photo stays fixed while sea layers animate',()=>{
  assert(html.includes('<style id="me-helm-ocean-motion-v3">'));
- assert(html.includes('#meHelmWindow{
- animation:none!important;transform:none!important;will-change:auto!important;'));
+ assert(html.includes('#meHelmWindow{'));
+ assert(html.includes('animation:none!important;transform:none!important;will-change:auto!important;'));
  assert(html.includes('@keyframes meOceanDrift'));
  assert(html.includes('@keyframes meOceanLayerDrift'));
  assert(html.includes('animation:meOceanDrift 10s ease-in-out infinite!important'));
