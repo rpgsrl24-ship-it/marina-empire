@@ -45,3 +45,4 @@ jobs:
           node tests/direct-credit-checkout.test.cjs
           node tests/direct-credit-feature-gates.test.cjs
           node tests/direct-credit-intent.test.cjs
+          node tests/prelaunch-economy-contract.test.cjs
