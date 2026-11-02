@@ -96,6 +96,20 @@ Applicata in Supabase la migrazione `20261102110124_p0_least_privilege_and_rose_
 
 P0-06 e P0-07 restano quindi **IN CORSO**: l'hardening server e i test negativi sono verificati, ma la checklist richiede ancora prova reale account/dispositivo prima della chiusura completa.
 
+## Sesto ciclo — Informativa privacy e separazione marketing
+
+Implementazione tecnica verificata nella [PR #24](https://github.com/rpgsrl24-ship-it/marina-empire/pull/24).
+
+- Aggiunta `privacy.html`, accessibile direttamente dal modulo di registrazione.
+- La checkbox account ora attesta la lettura dell'informativa; il trattamento necessario all'account non viene presentato come consenso marketing opzionale.
+- Il marketing resta disabilitato e viene dichiarato non necessario per giocare.
+- L'informativa descrive account, email, nome comandante, salvataggi locali/cloud, fornitori tecnici, conservazione, diritti, pagamenti OFF e stato degli analytics.
+- Il client di gioco mantiene gli analytics di utilizzo sospesi: nessun nuovo identificativo di traffico persistente e nessun evento inviato dal modulo analytics disattivato.
+- Test dedicato `privacy-notice.test.cjs` e test di contenimento privacy inclusi nelle regressioni.
+- Regressioni e Chromium della revisione `72aee242` **SUCCESS**: [regressioni 41435115100](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41435115100), [smoke/Chromium 41435115360](https://github.com/rpgsrl24-ship-it/marina-empire/actions/runs/41435115360).
+
+P0-18 passa a **VERIFICATO** come controllo tecnico pre-lancio. Questo esito non equivale a un parere o certificazione legale esterna; eventuale revisione legale può essere svolta separatamente senza riaprire il difetto tecnico originario.
+
 ## P0 — Continuità del gioco e protezioni sul sito pubblico
 
 | ID | Attività e criterio di completamento | Prova richiesta | Stato |
@@ -117,7 +131,7 @@ P0-06 e P0-07 restano quindi **IN CORSO**: l'hardening server e i test negativi 
 | P0-15 | **Rotte, distanze e tempi.** Calcolare distanze nautiche e durata, consentire viaggi tra marine sbloccate, gestire le soste e impedire destinazioni incompatibili o uguali alla partenza. Le rotte sono simulazioni di gioco. | Matrice di tratte rappresentative, incluse rotte a più tappe, limiti di carburante e destinazioni chiuse. | IN CORSO |
 | P0-16 | **Carburante e manutenzione.** Consumi e serbatoi dipendono dall'imbarcazione; usura, rifornimento, riserva, costi e sosta sono coerenti e non producono quantità negative. | Casi limite di autonomia e condizione, cambio yacht, sosta, ripresa e indisponibilità dei servizi durante il viaggio. | IN CORSO |
 | P0-17 | **Arrivo e liquidazione missione.** Completamento, premio, prestigio, riepilogo e numero di viaggi si aggiornano una volta; ritorno in primo piano e refresh non duplicano l'incasso. | Fine missione normale, refresh al termine, viaggio già liquidato e ripresa dopo sospensione mobile. | VERIFICATO |
-| P0-18 | **Privacy e raccolta email.** Informativa accessibile, consensi pertinenti e finalità chiare; la registrazione al gioco non deve implicare consensi commerciali non dichiarati. | Controllo dei testi, moduli, collegamenti e registrazione dei consensi previsti. | BLOCCATO |
+| P0-18 | **Privacy e raccolta email.** Informativa accessibile, consensi pertinenti e finalità chiare; la registrazione al gioco non deve implicare consensi commerciali non dichiarati. | Controllo dei testi, moduli, collegamenti e registrazione dei consensi previsti. | VERIFICATO |
 | P0-19 | **Segnalazioni e assistenza.** Un giocatore può segnalare un problema e trovare il contatto di supporto; la segnalazione arriva al canale operativo previsto senza esporre dati di altri utenti. | Verifica del percorso e del recapito, con prova controllata se autorizzata; non inviare messaggi di test a terzi senza autorizzazione. | IN CORSO |
 | P0-20 | **Test e deploy verificabili.** I controlli automatici obbligatori precedono la pubblicazione; il sito pubblicato corrisponde al commit testato e non a una cache precedente. | Actions del commit corretto, prova browser P0 e confronto della revisione pubblica con il contenuto pubblicato. | VERIFICATO |
 | P0-21 | **Backup e ripristino.** Esiste una procedura reversibile per codice e salvataggi; il ritorno a una versione precedente mantiene pagamenti OFF, Isola riservata e dati dei giocatori. | Versione recuperabile, istruzioni di rollback e prova controllata di ripristino di un salvataggio campione. | IN CORSO |
