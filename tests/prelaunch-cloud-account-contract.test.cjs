@@ -1,0 +1,13 @@
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+const html=fs.readFileSync('index.html','utf8');
+const section=html.slice(html.indexOf('async function saveCloud()'),html.indexOf('async function login()'));
+assert(section.includes('account.id'),'Cloud save/load must bind to signed-in account');
+assert(section.includes('.eq("user_id",userId)'),'Cloud save/load must filter by account ID');
+assert(section.includes('.eq("updated_at",previous.data.updated_at)'),'Concurrent cloud saves must use version checks');
+assert(section.includes('account?.id!==userId'),'Account switch during requests must abort');
+assert(section.includes('marina_empire_before_cloud_load'),'Cloud load must create local backup');
+assert(section.includes('if(!validState(r.data.game_state))'),'Cloud load must reject invalid saves');
+assert(section.includes('if(!confirm("Caricare la partita online?'),'Cloud load must ask before overwrite');
+assert(section.includes('if(localStorage.getItem(backupKey)!==backup)'),'Backup must be verified before cloud load');
+console.log('PASS: cloud account scoping, concurrent-write guard, and restore backup contracts');
