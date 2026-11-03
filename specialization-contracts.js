@@ -17,7 +17,7 @@ function render(){
  if(!c){box.innerHTML="<strong>🎯 CONTRATTO SPECIALIZZAZIONE</strong><p>Scegli una specializzazione di carriera per ricevere incarichi esclusivi.</p>";return;}
  const rarity=c.rank?.label||"Junior";
  const availability=c.available!==false;
- box.innerHTML='<strong>'+c.icon+' CONTRATTO ESCLUSIVO · '+c.label+'</strong><p>'+c.title+'</p><div class="me-spec-contract-meta"><span>RARITÀ CONTRATTO · '+rarity.toUpperCase()+'</span><span>'+c.type+'</span><span>⏱ '+c.duration+'s</span><span>Costo '+c.cost+'</span><span>Ricompensa '+c.reward+'</span><span>Prestigio +'+c.prestige+'</span><span>Rep. '+c.sector+' +'+c.reputation+'</span></div>'+(availability?'<button type="button" '+(job?'disabled':'')+'>ACCETTA CONTRATTO</button>':'<p style="color:#f0c58e"><b>Nessun contratto '+rarity+' disponibile in questa finestra.</b> Controlla più tardi o cambia marina.</p>')+'<div class="me-spec-contract-progress"><span></span></div><p class="me-spec-contract-status">'+(job?'In corso':'Disponibile ora')+'</p>';
+ box.innerHTML='<strong>'+c.icon+' CONTRATTO ESCLUSIVO · '+c.label+'</strong><p>'+c.title+'</p><div class="me-spec-contract-meta"><span>CATENA · STEP '+c.stage+'/3</span><span>RARITÀ · '+rarity.toUpperCase()+'</span><span>'+c.type+'</span><span>⏱ '+c.duration+'s</span><span>Costo '+c.cost+'</span><span>Ricompensa '+c.reward+'</span><span>Prestigio +'+c.prestige+'</span><span>Rep. '+c.sector+' +'+c.reputation+'</span></div>'+(availability?'<button type="button" '+(job?'disabled':'')+'>'+(c.stage===3?'CHIUDI CONTRATTO FINALE':'ACCETTA STEP '+c.stage)+'</button>':'<p style="color:#f0c58e"><b>Nessun contratto '+rarity+' disponibile in questa finestra.</b> Controlla più tardi o cambia marina.</p>')+'<div class="me-spec-contract-progress"><span></span></div><p class="me-spec-contract-status">'+(job?'In corso':(c.stage===3?'Finale della catena disponibile':'Catena in corso · prossimo step '+c.stage))+'</p>';
  box.querySelector("button")?.addEventListener("click",accept);
 }
 function accept(){
@@ -35,7 +35,7 @@ function accept(){
   if(p>=100){
    clearInterval(tick);tick=null;
    const r=window.MarinaEmpireSpecializationContracts?.complete?.(job,job.id)||{ok:false,message:"Contratto non registrato."};
-   if(status)status.textContent=r.ok?("Completato · netto +"+r.net+" · prestigio +"+r.prestige+" · rep. "+r.sector+" +"+r.reputation):(r.message||"Contratto non registrato.");
+   if(status)status.textContent=r.ok?(r.chainCompleted?("CATENA COMPLETATA · netto +"+r.net+" · bonus finale +"+(r.finaleBonus||0)+" · prestigio +"+r.prestige):("STEP "+(r.chainStage||job.stage)+" COMPLETATO · prossimo "+(r.chainNext||"—")+" · netto +"+r.net)):(r.message||"Contratto non registrato.");
    setTimeout(()=>{job=null;render()},r.ok?3500:5000);
   }
  },500);
