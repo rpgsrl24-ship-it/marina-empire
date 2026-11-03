@@ -1577,6 +1577,13 @@ window.MarinaEmpireSpecialization={
   const key=String(state?.specialization||"");
   return this.definitions[key]?{key,...this.definitions[key]}:null;
  },
+ rankFor(key){
+  const rep=window.MarinaEmpireNpcEconomy?.reputation?.()?.[key]||0;
+  if(rep>=500)return {id:"master",label:"Master",level:4,min:500,next:null,mult:1.65,availability:.38};
+  if(rep>=250)return {id:"elite",label:"Elite",level:3,min:250,next:500,mult:1.38,availability:.55};
+  if(rep>=100)return {id:"pro",label:"Pro",level:2,min:100,next:250,mult:1.20,availability:.75};
+  return {id:"junior",label:"Junior",level:1,min:40,next:100,mult:1,availability:1};
+ },
  bonusFor(sector){
   const s=this.get();
   return s&&s.sector===sector?1.10:1;
@@ -1605,12 +1612,15 @@ window.MarinaEmpireSpecializationContracts={
   if(!s)return null;
   const base=this.catalog[s.key];if(!base)return null;
   const lv=window.MarinaEmpireNpcEconomy?.sectorLevel?.(s.sector)||1;
+  const rank=window.MarinaEmpireSpecialization?.rankFor?.(s.key)||{id:"junior",label:"Junior",level:1,mult:1,availability:1};
   const world=window.MarinaEmpireWorldEvents?.modifiers?.(state.port)||null;
   const worldBoost=world?.event?.sectors?.includes(s.sector)?Math.max(1,Number(world.event.demand)||1):1;
-  return {...base,key:s.key,icon:s.icon,label:s.label,reward:Math.round(base.reward*(1+(lv-2)*.12)*worldBoost),prestige:Math.round(base.prestige*(1+(lv-2)*.08)),requiredSectorLevel:2};
+  const slot=Math.floor(Date.now()/1800000),seed=[...String(s.key+"|"+state.port+"|"+slot)].reduce((n,ch)=>(n*31+ch.charCodeAt(0))>>>0,7),available=(seed%1000)/1000<rank.availability;
+  return {...base,key:s.key,icon:s.icon,label:s.label,rank,available,reward:Math.round(base.reward*rank.mult*worldBoost),prestige:Math.round(base.prestige*(1+(rank.level-1)*.18)),reputation:Math.round(base.reputation*(1+(rank.level-1)*.2)),requiredSectorLevel:2};
  },
  complete(contract,id){
   const c=contract||this.current();if(!c)return {ok:false,message:"Nessun contratto esclusivo disponibile."};
+  if(c.available===false)return {ok:false,message:"Nessun contratto "+(c.rank?.label||"speciale")+" disponibile in questa finestra."};
   return window.MarinaEmpireNpcEconomy?.complete?.(c,id)||{ok:false,message:"Sistema incarichi non disponibile."};
  }
 };
@@ -1735,7 +1745,9 @@ function renderCareer(){const target=$("careerPanel");if(!target)return;
  };
  const specialization=window.MarinaEmpireSpecialization?.get?.()||null;
  const specDefs=window.MarinaEmpireSpecialization?.definitions||{};
- const specHtml='<div class="item" style="margin:12px 0"><strong>🎯 Specializzazione di carriera</strong><p>'+(specialization?(specialization.icon+' <b>'+specialization.label+'</b> · '+specialization.bonus):'Nessuna specializzazione scelta. Serve almeno Livello 2 nel settore.')+'</p><div class="row" style="gap:6px;flex-wrap:wrap">'+Object.entries(specDefs).map(([k,v])=>'<button type="button" data-career-spec="'+k+'" '+((reps[k]||0)<40?'disabled':'')+' class="'+(specialization?.key===k?'gold':'')+'">'+v.icon+' '+v.label+'</button>').join('')+'</div><p style="font-size:11px;opacity:.75">La specializzazione dà un +10% nel proprio settore. Puoi cambiarla soltanto quando sei ormeggiato.</p><div id="careerSpecStatus" class="small muted" role="status"></div></div>';
+ const specRank=specialization?window.MarinaEmpireSpecialization?.rankFor?.(specialization.key):null;
+ const specRankText=specRank?(specRank.label+(specRank.next?' · prossimo grado a '+specRank.next+' rep.':' · grado massimo')):'';
+ const specHtml='<div class="item" style="margin:12px 0"><strong>🎯 Specializzazione di carriera</strong><p>'+(specialization?(specialization.icon+' <b>'+specialization.label+'</b> · <b>'+specRankText+'</b> · '+specialization.bonus):'Nessuna specializzazione scelta. Serve almeno Livello 2 nel settore.')+'</p><div class="row" style="gap:6px;flex-wrap:wrap">'+Object.entries(specDefs).map(([k,v])=>'<button type="button" data-career-spec="'+k+'" '+((reps[k]||0)<40?'disabled':'')+' class="'+(specialization?.key===k?'gold':'')+'">'+v.icon+' '+v.label+'</button>').join('')+'</div><p style="font-size:11px;opacity:.75">La specializzazione dà un +10% nel proprio settore. Puoi cambiarla soltanto quando sei ormeggiato.</p><div id="careerSpecStatus" class="small muted" role="status"></div></div>';
  const marketDeals=(Array.isArray(state.marketHistory)?state.marketHistory:[]).filter(x=>["sell_boat","sell_item","npc_demand"].includes(x?.action)).length;
  const jobs=Math.max(0,Math.floor(Number(state.npcJobsCompleted)||0));
  const emergencies=Math.max(0,Math.floor(Number(state.emergenciesCompleted)||0));const count=Math.max(0,Number.isFinite(Number(state.voyages))?Math.floor(Number(state.voyages)):0),next=careerMilestones.find(m=>m.at>count),awards=Array.isArray(state.careerAwards)?state.careerAwards:[];const portfolio=marinaPortfolioSummary();const repHtml=Object.keys(reps).map(k=>{const r=reps[k],lv=sectorLevel(r),next=sectorNext(r),pct=next?Math.min(100,Math.round(r/next*100)):100,currentBenefit=sectorBenefits[k]?.[lv]||'Beneficio base',nextBenefit=lv<5?(sectorBenefits[k]?.[lv+1]||'Nuovo vantaggio'):null;return '<div class="item" style="padding:10px"><strong>'+sectorIcons[k]+' '+sectorLabels[k]+' · Lv '+lv+'</strong><p style="margin:5px 0">'+r+' reputazione'+(next?' · prossimo livello a '+next:' · livello massimo attuale')+'</p><p style="margin:5px 0;color:#f1d292"><b>Sbloccato:</b> '+currentBenefit+'</p>'+(nextBenefit?'<p style="margin:5px 0;opacity:.8"><b>Prossimo:</b> '+nextBenefit+'</p>':'')+'<progress max="100" value="'+pct+'" style="width:100%;accent-color:#d6b575"></progress></div>'}).join('');
