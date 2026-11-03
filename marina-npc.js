@@ -6,16 +6,16 @@ window.__ME_MARINA_NPC__=true;
 const OPPORTUNITIES=[
  {role:"Comandante",icon:"🧑‍✈️",type:"Rifornimento",text:"richiede rifornimento prima della partenza",duration:18,cost:120,reward:320,prestige:8},
  {role:"Comandante",icon:"🧑‍✈️",type:"Ormeggio",text:"cerca un posto transito per questa notte",duration:22,cost:80,reward:280,prestige:7},
- {role:"Comandante",icon:"🧑‍✈️",type:"Tecnica",text:"segnala un problema al generatore",duration:28,cost:160,reward:460,prestige:12},
+ {role:"Comandante",icon:"🧑‍✈️",type:"Tecnica",text:"segnala un problema al generatore",duration:28,cost:160,reward:460,prestige:12,reputation:8,requiredSectorLevel:2},
  {role:"Marinaio",icon:"🧑‍🔧",type:"Assistenza",text:"richiede assistenza per una cima nell'elica",duration:20,cost:90,reward:300},
  {role:"Marinaio",icon:"🧑‍🔧",type:"Pulizia",text:"prenota lavaggio coperta",duration:16,cost:70,reward:220,prestige:5},
  {role:"Charter",icon:"🛥️",type:"Charter",text:"cerca disponibilità per un'uscita giornaliera",duration:35,cost:240,reward:720},
  {role:"Charter",icon:"🛥️",type:"Cambusa",text:"richiede cambusa urgente",duration:24,cost:130,reward:390,prestige:10},
  {role:"Armatore",icon:"👤",type:"Detailing",text:"richiede detailing completo",duration:30,cost:180,reward:540,prestige:14},
- {role:"Armatore",icon:"👤",type:"Manutenzione",text:"chiede preventivo manutenzione",duration:32,cost:210,reward:620,prestige:16},
+ {role:"Armatore",icon:"👤",type:"Manutenzione",text:"chiede preventivo manutenzione",duration:32,cost:210,reward:620,prestige:16,reputation:9,requiredSectorLevel:2},
  {role:"Tecnico",icon:"🔧",type:"Elettrico",text:"intervento su batterie di bordo",duration:26,cost:150,reward:450,prestige:12},
  {role:"Broker",icon:"💼",type:"Brokerage",text:"organizza visita a uno yacht in vendita",duration:20,cost:60,reward:260,prestige:7},
- {role:"Broker",icon:"💼",type:"Sea Trial",text:"cerca disponibilità per prova in mare",duration:30,cost:140,reward:500,prestige:13}
+ {role:"Broker",icon:"💼",type:"Sea Trial",text:"cerca disponibilità per prova in mare",duration:30,cost:140,reward:500,prestige:13,reputation:8,requiredSectorLevel:2}
 ];
 
 const style=document.createElement("style");
@@ -64,7 +64,12 @@ function renderCurrent(){
  if(!ensure())return;
  if(!current)current=pick();
  box.querySelector(".me-npc-row").innerHTML='<span>'+current.icon+'</span><span><span class="me-npc-role">'+current.role+'</span> · '+current.text+'</span>';
- box.querySelector(".me-npc-meta").innerHTML='<span>'+current.type+'</span><span>⏱ '+current.duration+'s</span><span>Costo operativo '+current.cost+'</span><span>Ricompensa '+current.reward+'</span><span>Prestigio +'+current.prestige+'</span>';
+ const economy=window.MarinaEmpireNpcEconomy;
+ const sector=economy?.sectorFor?economy.sectorFor(current):"servizi";
+ const sectorLevel=economy?.sectorLevel?economy.sectorLevel(sector):1;
+ const rep=current.reputation||Math.max(3,Math.round(current.reward/70));
+ const req=current.requiredSectorLevel||1;
+ box.querySelector(".me-npc-meta").innerHTML='<span>'+current.type+'</span><span>⏱ '+current.duration+'s</span><span>Costo '+current.cost+'</span><span>Ricompensa '+current.reward+'</span><span>Prestigio +'+current.prestige+'</span><span>Rep. '+sector+' +'+rep+'</span><span>Lv settore '+sectorLevel+(req>1?' / richiesto '+req:'')+'</span>';
  box.querySelector(".me-npc-level").textContent="Attività marina: "+level();
  box.querySelector(".me-npc-status").textContent=job?"Attività in corso":"Disponibile ora";
  box.querySelector(".me-npc-progress span").style.width=job?Math.min(100,job.progress)+"%":"0%";
@@ -92,7 +97,7 @@ function acceptCurrent(){
    if(job.progress>=100){
      clearInterval(jobTick);jobTick=null;
      const result=window.MarinaEmpireNpcEconomy?.complete(job,job.id)||{ok:false,message:"Economia marina non disponibile."};
-     if(st)st.textContent=result.ok?("Completata · netto +"+result.net+" · prestigio +"+result.prestige+" · livello "+result.level):(result.message||"Completamento non registrato.");
+     if(st)st.textContent=result.ok?("Completata · netto +"+result.net+" · prestigio +"+result.prestige+" · rep. "+result.sector+" +"+result.reputation+" · lv settore "+result.sectorLevel):(result.message||"Completamento non registrato.");
      setTimeout(()=>{job=null;current=pick();renderCurrent();},result.ok?3200:5000);
    }
  },500);
