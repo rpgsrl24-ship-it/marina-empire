@@ -896,6 +896,59 @@ padding:5px!important;gap:4px!important;
   #missionList .me-mission-card button+button{margin-top:6px}
   #missionList .me-trial-finished{padding:15px}
 }
+</style><style id="me-mobile-map-v3">
+@media(max-width:740px){
+  #map{padding-bottom:94px}
+  #map>.me-lux-page-head{min-height:108px;padding:15px 15px 13px;margin-bottom:7px}
+  #map>.me-lux-page-head h1{font-size:25px;line-height:1;margin:4px 0}
+  #map>.me-lux-page-head p{font-size:12px;margin:0}
+  #map:not(:has(#voyageCinema:not(.hide)))>.grid{display:block!important}
+  #map:not(:has(#voyageCinema:not(.hide)))>.grid>.panel:first-child{padding:5px!important;margin:0!important}
+  #map:not(:has(#voyageCinema:not(.hide)))>.grid>.panel:first-child>.visual-banner,
+  #map:not(:has(#voyageCinema:not(.hide)))>.grid>.panel:first-child>h2,
+  #map:not(:has(#voyageCinema:not(.hide)))>.grid>.panel:first-child>p.small:first-of-type,
+  #map:not(:has(#voyageCinema:not(.hide)))>.grid>.panel:first-child>div.panel{display:none!important}
+  #map:not(:has(#voyageCinema:not(.hide))) #interactiveMapDisplay{
+    height:clamp(420px,64svh,680px)!important;
+    min-height:420px!important;
+    border-width:1px!important;
+    border-radius:15px!important;
+  }
+  #map:not(:has(#voyageCinema:not(.hide))) #satelliteMapStatus{margin:5px 4px!important;font-size:10px!important}
+  #map:not(:has(#voyageCinema:not(.hide))) .map-info-bar{
+    position:sticky;bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:700;
+    display:grid!important;grid-template-columns:1fr 1fr;gap:7px;
+    margin:7px 0 0;padding:9px!important;border:1px solid #b89555;border-radius:14px;
+    background:#082b3bf2;backdrop-filter:blur(9px);box-shadow:0 8px 26px #00151f99
+  }
+  #map:not(:has(#voyageCinema:not(.hide))) .map-info-bar>span{
+    grid-column:1/-1;min-width:0!important;padding:3px 3px 5px;font-size:13px!important;color:#f3d797
+  }
+  #map:not(:has(#voyageCinema:not(.hide))) .map-info-bar button{
+    min-height:43px;padding:9px 6px!important;font-size:10.5px!important;line-height:1.15
+  }
+  #map:not(:has(#voyageCinema:not(.hide)))>.grid>.panel:first-child>p.small:last-child{
+    margin:6px 5px 2px!important;font-size:9px!important;opacity:.68
+  }
+  #map:not(:has(#voyageCinema:not(.hide)))>.grid>.panel:last-child{
+    margin:7px 0 0!important;padding:10px!important;border-radius:14px!important
+  }
+  #map:not(:has(#voyageCinema:not(.hide)))>.grid>.panel:last-child>h2{display:none!important}
+  #map:not(:has(#voyageCinema:not(.hide))) #position,
+  #map:not(:has(#voyageCinema:not(.hide))) #boatName{
+    display:inline-block;margin:3px 8px 7px 0!important;font-size:10.5px!important;color:#c8d8dc
+  }
+  #map:not(:has(#voyageCinema:not(.hide))) #chooseMission{width:100%;min-height:44px;margin:1px 0 0;font-weight:900}
+  #map:not(:has(#voyageCinema:not(.hide)))>.grid>.panel:last-child>.item:not(#tripBox){display:none!important}
+  #map:not(:has(#voyageCinema:not(.hide))) #tripBox{margin:7px 0 0!important;padding:10px!important}
+  #interactiveMapDisplay .leaflet-control-zoom a{width:38px!important;height:38px!important;line-height:38px!important}
+  #interactiveMapDisplay .leaflet-popup-content{margin:11px!important}
+  #interactiveMapDisplay .marina-leaflet-popup{min-width:145px!important;font-size:12px!important}
+  #interactiveMapDisplay .marina-leaflet-popup b{font-size:14px!important}
+}
+@media(max-width:390px){
+  #map:not(:has(#voyageCinema:not(.hide))) #interactiveMapDisplay{height:61svh!important;min-height:390px!important}
+}
 </style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">PROVA GRATIS · 1 MISSIONE</button><p class="muted" style="font-size:13px;margin:6px 0 14px">Nessuna email richiesta per la prova. Dopo la prima missione registrati gratis per continuare. Acquisti sempre facoltativi.</p><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><nav class="nav" id="navigation" aria-label="Sezioni del gioco"><button data-tab="home" class="on">🏠 HOME</button><button data-tab="office">⚓ DIREZIONE</button><button data-tab="map">🗺️ NAVIGAZIONE</button><button data-tab="missions">🎯 MISSIONI</button><button data-tab="fleet">🛥️ FLOTTA</button><button data-tab="marinas">⚓ MARINE</button><button data-tab="credits" class="me-credits-nav">💳 ACQUISTA CREDITI</button><button data-tab="profile">👤 COMANDANTE / ACCOUNT</button><button data-tab="headquarters">🏝️ ISOLA DELLE ROSE</button></nav><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA TEST CLIENTI</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
