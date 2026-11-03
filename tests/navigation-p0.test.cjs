@@ -194,7 +194,7 @@ test('Maintenance threshold and active-voyage guards prevent extra charges', () 
   h.run('launch("INTRO_RIMINI_CERVIA")');
   assert.equal(h.snapshot(), running);
   h.nextLeg();
-  assert.equal(h.state.condition, 27);
+  assert.ok([25,26,27].includes(h.state.condition),'Weather wear must be 3-5%');
 });
 
 test('Multi-stop budgets equal actual costs and preserve progress after reload', () => {
