@@ -77,13 +77,45 @@ function seasonTarget(rows,me){
  if(rank===1)return "Sei al comando della stagione";
  return "";
 }
+function seasonZone(rank){
+ rank=Number(rank)||0;
+ if(rank===1)return "🥇 LEADER";
+ if(rank<=3&&rank>0)return "🏆 PODIO";
+ if(rank<=10&&rank>0)return "🎁 ZONA PREMIO";
+ return "FUORI TOP 10";
+}
+function seasonMilestone(rows,me){
+ if(!me)return "";
+ const rank=Number(me.rank_position)||0,points=Number(me.season_points)||0;
+ const sorted=[...rows].sort((a,b)=>(Number(a.rank_position)||999)-(Number(b.rank_position)||999));
+ const targetRank=rank>10?10:rank>3?3:rank>1?1:0;
+ if(!targetRank)return "";
+ const target=sorted.find(r=>Number(r.rank_position)===targetRank);
+ if(!target)return "";
+ const need=Math.max(1,(Number(target.season_points)||0)-points+1);
+ const label=targetRank===10?"Top 10":targetRank===3?"Podio":"1° posto";
+ return "Per "+label+" servono "+need.toLocaleString("it-IT")+" punti";
+}
+function rankMovement(me,seasonInfo){
+ if(!me||!seasonInfo?.season_key)return "";
+ const key="me-lb-rank|"+mode+"|"+String(seasonInfo.season_key);
+ const current=Number(me.rank_position)||0;
+ let previous=0;
+ try{previous=Number(localStorage.getItem(key))||0;localStorage.setItem(key,String(current))}catch(_){}
+ if(!previous||!current||previous===current)return "";
+ const diff=previous-current;
+ return diff>0?"📈 +"+diff+" posizioni dall'ultima visita":"📉 "+Math.abs(diff)+" posizioni dall'ultima visita";
+}
 function renderRows(rows,seasonInfo){
  if(!box)return;
  const season=mode!=="absolute";
  const me=season?rows.find(r=>r.is_me):null;
  const prize=seasonPrize(me?.rank_position);
  const target=seasonTarget(rows,me);
- const center=season?'<div class="me-season-note"><b>Centro Stagione</b> · chiusura tra '+seasonCountdown()+(me?' · posizione #'+esc(me.rank_position)+' · '+Number(me.season_points||0).toLocaleString("it-IT")+' punti':' · non ancora classificato')+(prize?' · premio potenziale '+prize:'')+(target?'<br><b>Obiettivo:</b> '+target:'')+'</div>':'';
+ const milestone=seasonMilestone(rows,me);
+ const movement=rankMovement(me,seasonInfo);
+ const zone=me?seasonZone(me.rank_position):"";
+ const center=season?'<div class="me-season-note"><b>Centro Stagione</b> · chiusura tra '+seasonCountdown()+(me?' · posizione #'+esc(me.rank_position)+' · '+Number(me.season_points||0).toLocaleString("it-IT")+' punti · '+zone:' · non ancora classificato')+(prize?' · premio potenziale '+prize:'')+(movement?'<br><b>Trend:</b> '+movement:'')+(target?'<br><b>Prossimo passo:</b> '+target:'')+(milestone?'<br><b>Traguardo:</b> '+milestone:'')+'</div>':'';
  const note=season?center+'<div class="me-season-note">La classifica stagionale misura i <b>punti Empire guadagnati nel periodo</b>, non il totale storico. I nuovi giocatori possono quindi competere subito.'+(seasonInfo?.season_key?' · Periodo '+esc(seasonInfo.season_key):'')+'<div style="margin-top:8px"><button type="button" id="meSeasonClaim">🎁 RISCATTA PREMIO STAGIONE PRECEDENTE</button></div><div id="meSeasonClaimStatus" class="me-leaderboard-status"></div></div>':'';
  if(!rows.length){
   box.innerHTML='<h3>'+title()+'</h3>'+tabs()+note+'<p class="me-leaderboard-status">Nessun giocatore classificato in questo periodo.</p>';
