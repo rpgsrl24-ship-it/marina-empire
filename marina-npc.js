@@ -96,7 +96,6 @@ function pick(){
   if(w?.id==="rain"&&sector==="servizi")weighted.push(op);
  }
  const picked=adjusted(weighted[Math.floor(Math.random()*weighted.length)]);
- const w=worldWeather();
  if(w&&w.id==="rough"&&worldSector(picked)==="charter")picked.reward=Math.round(picked.reward*.9);
  return picked;
 }
