@@ -47,8 +47,51 @@ Deno.serve(async req=>{
  const response=await fetch(new URL("/wp-json/wc/v3/orders/"+payload.id,base),{headers:{authorization:"Basic "+auth,accept:"application/json"}});
  if(!response.ok)return reply({error:"Order lookup failed"},502);
  const order=await response.json();
- if(Number(order.id)!==payload.id||!["processing","completed"].includes(order.status)||!order.date_paid||order.currency!=="EUR"||!Array.isArray(order.line_items)||!Array.isArray(order.refunds)||order.refunds.length)
-   return reply({error:"Order ineligible for automatic issuance"},422);
+ if(Number(order.id)!==payload.id||!order.date_paid||order.currency!=="EUR"||!Array.isArray(order.line_items)||!Array.isArray(order.refunds))
+   return reply({error:"Order ineligible for automatic processing"},422);
+
+ const admin=createClient(env("SUPABASE_URL"),readSecretKey(),{auth:{persistSession:false,autoRefreshToken:false}});
+
+ // Refund path: always re-read WooCommerce refund records and map each refund line
+ // back to the original order item via _refunded_item_id.
+ if(order.refunds.length){
+   const refundsResponse=await fetch(new URL("/wp-json/wc/v3/orders/"+payload.id+"/refunds?per_page=100",base),{headers:{authorization:"Basic "+auth,accept:"application/json"}});
+   if(!refundsResponse.ok)return reply({error:"Refund lookup failed"},502);
+   const refunds=await refundsResponse.json();
+   if(!Array.isArray(refunds))return reply({error:"Invalid refund data"},502);
+   const refundedByItem=new Map<number,number>();
+   for(const refund of refunds){
+     if(!Array.isArray(refund.line_items))continue;
+     for(const line of refund.line_items){
+       const meta=Array.isArray(line.meta_data)?line.meta_data:[];
+       const original=Number(meta.find((m:any)=>m?.key==="_refunded_item_id")?.value);
+       const qty=Math.abs(Number(line.quantity)||0);
+       if(Number.isSafeInteger(original)&&original>0&&Number.isSafeInteger(qty)&&qty>0){
+         refundedByItem.set(original,(refundedByItem.get(original)||0)+qty);
+       }
+     }
+   }
+   let revoked=0,review=0;
+   for(const orderLine of order.line_items){
+     const pack=PACKS[Number(orderLine.product_id)];
+     if(!pack)continue;
+     const itemId=Number(orderLine.id);
+     const refundedQty=Math.min(Number(orderLine.quantity)||0,refundedByItem.get(itemId)||0);
+     for(let i=0;i<refundedQty;i++){
+       const {data:action,error:refundError}=await admin.rpc("me_handle_refunded_voucher_internal",{
+         p_order_id:order.id,p_item_id:itemId,p_unit_index:i
+       });
+       if(refundError)return reply({error:"Refund protection unavailable",revoked,review},503);
+       if(action==="revoked_cancelled"||action==="already_revoked")revoked++;
+       else if(action==="revoked_review"||action==="redeemed_review")review++;
+     }
+   }
+   return reply({ok:true,refund:true,revoked,review});
+ }
+
+ if(!["processing","completed"].includes(order.status))
+   return reply({error:"Order not paid for automatic issuance"},422);
+
  const email=String(order.billing?.email||"").trim();
  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254)return reply({error:"Invalid recipient"},422);
  const units:Array<{itemId:number;unitIndex:number;credits:number}>=[];
@@ -61,7 +104,6 @@ Deno.serve(async req=>{
  }
  if(units.length===0)return reply({ok:true,queued:0,duplicate:0});
  if(units.length>100)return reply({error:"Too many credit units"},422);
- const admin=createClient(env("SUPABASE_URL"),readSecretKey(),{auth:{persistSession:false,autoRefreshToken:false}});
  let queued=0,duplicate=0;
  for(const unit of units){
    const voucherCode=code(),codeHash=await hash(voucherCode),encrypted=await encrypt(voucherCode,env("ME_VOUCHER_ENCRYPTION_KEY"));
