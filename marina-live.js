@@ -49,6 +49,11 @@
   .me-live-marina[data-phase="dawn"] .me-live-water{filter:brightness(.88) sepia(.08)}
   .me-live-marina[data-phase="sunset"] .me-live-water{filter:brightness(.82) sepia(.16) saturate(1.15)}
   .me-live-phase{font-size:9px;color:#9fb9c4}
+  .me-live-community{padding:8px 10px 10px;border-top:1px solid rgba(194,154,96,.18);background:#082431}
+  .me-live-community-head{font-size:9px;letter-spacing:.06em;color:#d9c39e;margin-bottom:5px}
+  .me-live-community-row{display:grid;grid-template-columns:38px minmax(70px,auto) 1fr;gap:6px;align-items:start;font-size:9px;color:#b9cdd4;padding:3px 0}
+  .me-live-community-row span{color:#789eac}.me-live-community-row b{color:#f0d29d}.me-live-community-row em{font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .me-live-community-empty{font-size:9px;color:#87a7b2}
   @keyframes meBoatCross{0%{transform:translateX(0)}100%{transform:translateX(calc(100vw + 220px))}}
   @keyframes meWaterShine{to{transform:translateX(100%)}}
   @keyframes meLivePulse{50%{opacity:.35;transform:scale(.8)}}
@@ -60,7 +65,7 @@
   style.textContent=css;
   document.head.appendChild(style);
 
-  let timer=null, feedRows=[], host=null;
+  let timer=null, feedRows=[], host=null,communityObserver=null;
 
   function marinaKey(){
     try{
@@ -102,6 +107,24 @@
     feedRows=feedRows.slice(0,3);
     feed.innerHTML=feedRows.map((r,i)=>`<div class="me-live-feed-row"><span class="me-live-feed-time">${r.t}</span><span>${i===0?"<strong>LIVE</strong> · ":""}${r.text}</span></div>`).join("");
   }
+  function mirrorCommunity(){
+    if(!host)return;
+    let box=host.querySelector(".me-live-community");
+    if(!box){
+      box=document.createElement("div");
+      box.className="me-live-community";
+      host.appendChild(box);
+    }
+    const source=document.getElementById("communityMessages");
+    if(!source){box.innerHTML='<div class="me-live-community-head">👥 COMMUNITY LIVE</div><div class="me-live-community-empty">Accedi per vedere l’attività dei comandanti.</div>';return}
+    const items=[...source.querySelectorAll(".me-community-message")].slice(-3).reverse();
+    box.innerHTML='<div class="me-live-community-head">👥 COMMUNITY LIVE</div>'+(items.length?items.map(item=>{
+      const name=item.querySelector("strong")?.textContent||"Comandante";
+      const when=item.querySelector(".me-community-message-head span")?.textContent||"";
+      const body=item.querySelector(".me-community-message-body")?.textContent||item.querySelector("p")?.textContent||"";
+      return '<div class="me-live-community-row"><span>'+when+'</span><b>'+name+'</b><em>'+body.slice(0,90)+'</em></div>';
+    }).join(""):'<div class="me-live-community-empty">Nessun messaggio recente nella community.</div>');
+  }
   function build(){
     const card=currentCard();
     if(!card) return false;
@@ -122,12 +145,14 @@
         <div class="me-live-boat">⛵<small>${names[1]}</small></div>
         <div class="me-live-boat">🚤<small>${names[2]}</small></div>
       </div>
-      <div class="me-live-feed"></div>`;
+      <div class="me-live-feed"></div>
+      <div class="me-live-community"></div>`;
     card.insertBefore(host,card.firstChild);
     feedRows=[];
     addFeed(eventText(key));
     addFeed(eventText(key));
     addFeed(eventText(key));
+    mirrorCommunity();
     return true;
   }
   function schedule(){
@@ -147,6 +172,11 @@
     schedule();
     const list=document.getElementById("marinaList");
     if(list) new MutationObserver(()=>setTimeout(build,50)).observe(list,{childList:true,subtree:true});
+    const community=document.getElementById("communityMessages");
+    if(community&&!communityObserver){
+      communityObserver=new MutationObserver(()=>setTimeout(mirrorCommunity,40));
+      communityObserver.observe(community,{childList:true,subtree:true});
+    }
     window.addEventListener("marina-empire-updated",()=>setTimeout(build,60));
     window.addEventListener("marina-world-event",()=>setTimeout(()=>{build();schedule();},80));
     document.addEventListener("visibilitychange",()=>{if(!document.hidden)schedule();});
