@@ -45,8 +45,33 @@ function level(){
  if(h>=19&&h<23)return "MEDIA";
  return "BASSA";
 }
+function worldEvent(){return window.MarinaEmpireWorldEvents?.current?.()||null}
+function worldSector(op){
+ const economy=window.MarinaEmpireNpcEconomy;
+ return economy?.sectorFor?economy.sectorFor(op):"servizi";
+}
+function adjusted(op){
+ const e=worldEvent();
+ if(!e)return {...op};
+ const sector=worldSector(op),fav=Array.isArray(e.sectors)&&e.sectors.includes(sector);
+ const rewardMult=fav?Math.max(1.05,Number(e.demand)||1):1;
+ const prestigeMult=fav?1.15:1;
+ return {...op,
+  reward:Math.max(1,Math.round(op.reward*rewardMult)),
+  prestige:Math.max(1,Math.round((op.prestige||Math.max(2,op.reward/40))*prestigeMult)),
+  worldEvent:e.title,
+  worldFavored:fav
+ };
+}
 function pick(){
- return OPPORTUNITIES[Math.floor(Math.random()*OPPORTUNITIES.length)];
+ const e=worldEvent();
+ const weighted=[];
+ for(const op of OPPORTUNITIES){
+  const sector=worldSector(op),fav=e&&Array.isArray(e.sectors)&&e.sectors.includes(sector);
+  weighted.push(op);
+  if(fav){weighted.push(op);weighted.push(op);}
+ }
+ return adjusted(weighted[Math.floor(Math.random()*weighted.length)]);
 }
 function ensure(){
  const live=document.querySelector(".me-live-marina");
@@ -69,7 +94,7 @@ function renderCurrent(){
  const sectorLevel=economy?.sectorLevel?economy.sectorLevel(sector):1;
  const rep=current.reputation||Math.max(3,Math.round(current.reward/70));
  const req=current.requiredSectorLevel||1;
- box.querySelector(".me-npc-meta").innerHTML='<span>'+current.type+'</span><span>⏱ '+current.duration+'s</span><span>Costo '+current.cost+'</span><span>Ricompensa '+current.reward+'</span><span>Prestigio +'+current.prestige+'</span><span>Rep. '+sector+' +'+rep+'</span><span>Lv settore '+sectorLevel+(req>1?' / richiesto '+req:'')+'</span>';
+ box.querySelector(".me-npc-meta").innerHTML='<span>'+current.type+'</span><span>⏱ '+current.duration+'s</span><span>Costo '+current.cost+'</span><span>Ricompensa '+current.reward+'</span><span>Prestigio +'+current.prestige+'</span><span>Rep. '+sector+' +'+rep+'</span><span>Lv settore '+sectorLevel+(req>1?' / richiesto '+req:'')+'</span>'+(current.worldFavored?'<span>🔥 BONUS EVENTO: '+current.worldEvent+'</span>':'');
  box.querySelector(".me-npc-level").textContent="Attività marina: "+level();
  box.querySelector(".me-npc-status").textContent=job?"Attività in corso":"Disponibile ora";
  box.querySelector(".me-npc-progress span").style.width=job?Math.min(100,job.progress)+"%":"0%";
@@ -113,6 +138,7 @@ function boot(){
  const list=document.getElementById("marinaList");
  if(list)new MutationObserver(()=>setTimeout(()=>{box=null;ensure();renderCurrent();},100)).observe(list,{childList:true,subtree:true});
  window.addEventListener("marina-empire-updated",()=>setTimeout(()=>{box=null;ensure();renderCurrent();},100));
+ window.addEventListener("marina-world-event",()=>{if(!job){current=pick();setTimeout(renderCurrent,80);}});
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)renderCurrent();});
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true}); else boot();
