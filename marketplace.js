@@ -50,20 +50,48 @@ document.head.appendChild(style);
 let mode="boats",marketFilter="all",seed=Math.floor(Date.now()/3600000);
 
 function econ(){return window.MarinaEmpireMarketplaceEconomy}
-function snap(){return econ()?.snapshot?.()||{coins:0,owned:[],inventory:{},registered:false}}
-function money(n){return Math.round(Number(n)||0).toLocaleString("it-IT")}
+function snap(){return econ()?.snapshot?.()||{coins:0,owned:[],inventory:{},registered:false,port:"rimini"}}
+function brokerInfo(){
+ const npc=window.MarinaEmpireNpcEconomy;
+ const rep=npc?.reputation?.().broker||0;
+ const level=npc?.sectorLevel?.("broker")||1;
+ return {rep,level};
+}
+function marinaProfile(port){
+ const profiles={
+  rimini:{label:"Rimini",boat:.99,toys:.98,tech:1.02,note:"Mercato equilibrato · charter e accessori"},
+  ancona:{label:"Ancona",boat:.96,toys:1.01,tech:.97,note:"Buona disponibilità tecnica"},
+  lignano:{label:"Lignano",boat:1.02,toys:.95,tech:1.01,note:"Forte domanda water toys"},
+  cervia:{label:"Cervia",boat:.97,toys:.96,tech:1.03,note:"Occasioni su piccole unità"},
+  bari:{label:"Bari",boat:1.04,toys:1.02,tech:.98,note:"Domanda elevata su yacht e tecnica"},
+  ravenna:{label:"Ravenna",boat:.95,toys:1.01,tech:.96,note:"Mercato tecnico e refit"},
+  pescara:{label:"Pescara",boat:.98,toys:.99,tech:1.00,note:"Mercato stabile"},
+  brindisi:{label:"Brindisi",boat:1.01,toys:1.00,tech:.97,note:"Buona offerta tecnica"},
+  salerno:{label:"Salerno",boat:1.05,toys:1.03,tech:1.01,note:"Mercato premium"},
+  nettuno:{label:"Nettuno",boat:1.00,toys:.98,tech:1.00,note:"Mercato equilibrato"},
+  scarlino:{label:"Scarlino",boat:1.06,toys:1.03,tech:1.02,note:"Yacht premium e charter"},
+  loano:{label:"Loano",boat:1.03,toys:1.01,tech:.99,note:"Usato di fascia medio-alta"},
+  portocervo:{label:"Porto Cervo",boat:1.12,toys:1.08,tech:1.04,note:"Mercato luxury · prezzi elevati"},
+  capodorlando:{label:"Capo d’Orlando",boat:.99,toys:.97,tech:1.00,note:"Buone occasioni stagionali"},
+  rose:{label:"Isola delle Rose",boat:1.00,toys:1.00,tech:1.00,note:"Base RPG Yacht · mercato osservato"}
+ };
+ return profiles[port]||{label:port||"Marina",boat:1,toys:1,tech:1,note:"Mercato locale"};
+}function money(n){return Math.round(Number(n)||0).toLocaleString("it-IT")}
 function factor(key,min=.82,max=1.12){
  let h=seed;
  for(const ch of String(key))h=(h*31+ch.charCodeAt(0))>>>0;
  return min+((h%1000)/1000)*(max-min);
 }
-function boatOffer(b){
+function boatOffer(b,s){
  const k=Math.abs(Math.floor(factor("class-"+b.id,0,300)));
  const marketType=k<100?"Nuovo":k<220?"Usato":"Occasione";
  const range=marketType==="Nuovo"?[.98,1.08]:marketType==="Usato"?[.72,.91]:[.55,.70];
- const price=Math.max(1000,Math.round((b.price||0)*factor("boat-"+b.id,range[0],range[1])));
+ const profile=marinaProfile(s?.port);
+ const broker=brokerInfo();
+ const brokerDiscount=Math.max(.94,1-(broker.level-1)*.012);
+ const price=Math.max(1000,Math.round((b.price||0)*factor("boat-"+b.id+"-"+(s?.port||""),range[0],range[1])*profile.boat*brokerDiscount));
  const condition=marketType==="Nuovo"?100:marketType==="Usato"?Math.round(78+factor("cond-"+b.id,0,16)):Math.round(62+factor("cond-"+b.id,0,15));
- return {...b,marketPrice:price,marketType,condition};
+ return {...b,marketPrice:price,marketType,condition,marina:profile.label,brokerLevel:broker.level};
 }
 function priceHistory(key,base,min,max){
  const rows=[];
@@ -80,8 +108,12 @@ function historyHTML(values){
  const min=Math.min(...values),max=Math.max(...values),spread=Math.max(1,max-min);
  return '<div class="me-market-history">'+values.map((v,i)=>'<span title="'+money(v)+'" style="height:'+(12+Math.round(((v-min)/spread)*28))+'px"></span>').join('')+'</div><div class="me-market-history-label">Andamento ultime 6 ore · '+money(values[0])+' → '+money(values[values.length-1])+'</div>';
 }
-function itemOffer(i){
- const buy=Math.max(50,Math.round(i.base*factor("item-"+i.id,.88,1.08)));
+function itemOffer(i,s){
+ const profile=marinaProfile(s?.port);
+ const catFactor=i.cat==="Water Toys"?profile.toys:(i.cat==="Tecnica"||i.cat==="Elettronica")?profile.tech:1;
+ const broker=brokerInfo();
+ const brokerDiscount=Math.max(.95,1-(broker.level-1)*.01);
+ const buy=Math.max(50,Math.round(i.base*factor("item-"+i.id+"-"+(s?.port||""),.88,1.08)*catFactor*brokerDiscount));
  return {...i,buy,sell:Math.round(buy*.62)};
 }
 function setStatus(msg){
@@ -92,19 +124,20 @@ function headerHTML(s){
  const inv=Object.entries(s.inventory||{}).filter(([,q])=>q>0).map(([id,q])=>{
   const i=ITEMS.find(x=>x.id===id);return i?'<span class="me-market-chip">'+i.icon+' '+i.name+' × '+q+'</span>':"";
  }).join("");
- return '<div class="me-market-summary"><div><div class="me-market-balance">Saldo: '+money(s.coins)+' crediti</div><div class="me-market-inventory">'+(inv||'<span class="me-market-chip">Inventario vuoto</span>')+'</div></div><div class="me-market-tabs"><button type="button" data-market-mode="boats" class="'+(mode==="boats"?"on":"")+'">🛥️ IMBARCAZIONI</button><button type="button" data-market-mode="items" class="'+(mode==="items"?"on":"")+'">🧰 ACCESSORI & TOYS</button></div></div>'+(mode==="boats"?'<div class="me-market-filters"><button type="button" data-market-filter="all" class="'+(marketFilter==="all"?"on":"")+'">TUTTE</button><button type="button" data-market-filter="Nuovo" class="'+(marketFilter==="Nuovo"?"on":"")+'">NUOVO</button><button type="button" data-market-filter="Usato" class="'+(marketFilter==="Usato"?"on":"")+'">USATO</button><button type="button" data-market-filter="Occasione" class="'+(marketFilter==="Occasione"?"on":"")+'">OCCASIONI</button></div>':'')+'<div class="me-market-status" role="status"></div>';
+ const p=marinaProfile(s.port),b=brokerInfo();
+ return '<div class="me-market-summary"><div><div class="me-market-balance">Saldo: '+money(s.coins)+' crediti</div><div class="me-market-chip">⚓ '+p.label+' · '+p.note+'</div><div class="me-market-chip">💼 Broker Lv '+b.level+' · rep '+b.rep+'</div><div class="me-market-inventory">'+(inv||'<span class="me-market-chip">Inventario vuoto</span>')+'</div></div><div class="me-market-tabs"><button type="button" data-market-mode="boats" class="'+(mode==="boats"?"on":"")+'">🛥️ IMBARCAZIONI</button><button type="button" data-market-mode="items" class="'+(mode==="items"?"on":"")+'">🧰 ACCESSORI & TOYS</button></div></div>'+(mode==="boats"?'<div class="me-market-filters"><button type="button" data-market-filter="all" class="'+(marketFilter==="all"?"on":"")+'">TUTTE</button><button type="button" data-market-filter="Nuovo" class="'+(marketFilter==="Nuovo"?"on":"")+'">NUOVO</button><button type="button" data-market-filter="Usato" class="'+(marketFilter==="Usato"?"on":"")+'">USATO</button><button type="button" data-market-filter="Occasione" class="'+(marketFilter==="Occasione"?"on":"")+'">OCCASIONI</button></div>':'')+'<div class="me-market-status" role="status"></div>';
 }
 function boatsHTML(s){
  const boats=econ()?.boats?.()||[];
- return '<div class="me-market-grid">'+boats.filter(b=>b.id!=="voyager").map(b=>boatOffer(b)).filter(o=>marketFilter==="all"||o.marketType===marketFilter).map(o=>{ const b=o;
+ return '<div class="me-market-grid">'+boats.filter(b=>b.id!=="voyager").map(b=>boatOffer(b,s)).filter(o=>marketFilter==="all"||o.marketType===marketFilter).map(o=>{ const b=o;
   const owned=s.owned.includes(b.id),sell=Math.round(o.marketPrice*.72);
   const hist=priceHistory("boat-"+b.id,b.price,o.marketType==="Nuovo"?.98:o.marketType==="Usato"?.72:.55,o.marketType==="Nuovo"?1.08:o.marketType==="Usato"?.91:.70);
-  return '<article class="me-market-card"><span class="me-market-badge">'+o.marketType.toUpperCase()+' NPC · stato '+o.condition+'%</span><h3>🛥️ '+b.name+'</h3><p>Serbatoio '+money(b.tank)+' L · consumo '+b.burn+' / NM</p><div class="me-market-price">'+money(o.marketPrice)+' crediti</div>'+historyHTML(hist)+'<p>'+(owned?'Già nella tua flotta':'Disponibile nella marina attuale')+'</p><div class="me-market-actions">'+(owned?'<button type="button" data-sell-boat="'+b.id+'" data-price="'+sell+'">VENDI · '+money(sell)+'</button>':'<button type="button" class="gold" data-buy-boat="'+b.id+'" data-price="'+o.marketPrice+'">COMPRA</button>')+'</div></article>';
+  return '<article class="me-market-card"><span class="me-market-badge">'+o.marketType.toUpperCase()+' NPC · '+o.marina+' · stato '+o.condition+'%</span><h3>🛥️ '+b.name+'</h3><p>Serbatoio '+money(b.tank)+' L · consumo '+b.burn+' / NM</p><div class="me-market-price">'+money(o.marketPrice)+' crediti</div>'+historyHTML(hist)+'<p>'+(owned?'Già nella tua flotta':'Disponibile nella marina attuale')+'</p><div class="me-market-actions">'+(owned?'<button type="button" data-sell-boat="'+b.id+'" data-price="'+sell+'">VENDI · '+money(sell)+'</button>':'<button type="button" class="gold" data-buy-boat="'+b.id+'" data-price="'+o.marketPrice+'">COMPRA</button>')+'</div></article>';
  }).join("")+'</div>';
 }
 function itemsHTML(s){
  return '<div class="me-market-grid">'+ITEMS.map(i=>{
-  const o=itemOffer(i),qty=Math.max(0,Number(s.inventory?.[i.id])||0);
+  const o=itemOffer(i,s),qty=Math.max(0,Number(s.inventory?.[i.id])||0);
   return '<article class="me-market-card"><span class="me-market-badge">'+i.cat+'</span><h3>'+i.icon+' '+i.name+'</h3><div class="me-market-price">'+money(o.buy)+' crediti</div><p>Posseduti: '+qty+' · Valore rivendita: '+money(o.sell)+'</p><div class="me-market-actions"><button type="button" class="gold" data-buy-item="'+i.id+'" data-price="'+o.buy+'">COMPRA</button><button type="button" data-sell-item="'+i.id+'" data-price="'+o.sell+'" '+(qty<1?'disabled':'')+'>VENDI</button></div></article>';
  }).join("")+'</div>';
 }
@@ -124,11 +157,24 @@ function bind(root){
   const i=ITEMS.find(x=>x.id===b.dataset.sellItem);const r=econ()?.sellItem?.(i,Number(b.dataset.price));setStatus(r?.message);if(r?.ok)setTimeout(render,500);
  }));
 }
+function marketPulseHTML(s){
+ const p=marinaProfile(s.port),b=brokerInfo();
+ const events=[
+  "Arrivo yacht in conto vendita",
+  "Cantiere locale libera stock ricambi",
+  "Charter vende attrezzatura stagionale",
+  "Dealer cerca liquidità immediata",
+  "Nuova richiesta di acquisto da armatore"
+ ];
+ const idx=Math.abs(Math.floor(factor("pulse-"+s.port,0,events.length)))%events.length;
+ const edge=b.level>=3?"Accesso anticipato alle occasioni Broker attivo.":"Aumenta la reputazione Broker per ricevere condizioni migliori.";
+ return '<div class="me-market-card"><span class="me-market-badge">MERCATO LIVE</span><h3>📈 '+p.label+'</h3><p>'+events[idx]+'</p><p>'+edge+'</p></div>';
+}
 function render(){
  const root=document.getElementById("meMarketplaceApp");
  if(!root)return;
  const s=snap();
- root.innerHTML=headerHTML(s)+(mode==="boats"?boatsHTML(s):itemsHTML(s));
+ root.innerHTML=headerHTML(s)+marketPulseHTML(s)+(mode==="boats"?boatsHTML(s):itemsHTML(s));
  bind(root);
 }
 function boot(){
