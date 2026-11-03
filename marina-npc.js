@@ -51,15 +51,34 @@ function worldSector(op){
  const economy=window.MarinaEmpireNpcEconomy;
  return economy?.sectorFor?economy.sectorFor(op):"servizi";
 }
+function sectorLevel(sector){
+ const economy=window.MarinaEmpireNpcEconomy;
+ return economy?.sectorLevel?economy.sectorLevel(sector):1;
+}
+function applyReputationBenefits(op){
+ const sector=worldSector(op),lv=sectorLevel(sector);
+ const rewardMult=1+(lv-1)*.05;
+ const prestigeMult=1+(lv-1)*.025;
+ const copy={...op,reward:Math.round(op.reward*rewardMult),prestige:Math.round((op.prestige||Math.max(2,op.reward/40))*prestigeMult),sectorLevelBenefit:lv};
+ if(lv>=3){
+  if(sector==="charter")copy.text=copy.text+" · contratto premium";
+  if(sector==="tecnica")copy.text=copy.text+" · intervento specializzato";
+  if(sector==="marina")copy.text=copy.text+" · priorità marina";
+  if(sector==="servizi")copy.text=copy.text+" · cliente VIP";
+  if(sector==="broker")copy.text=copy.text+" · mandato esclusivo";
+ }
+ return copy;
+}
 function adjusted(op){
  const e=worldEvent();
- if(!e)return {...op};
+ if(!e)return applyReputationBenefits(op);
  const sector=worldSector(op),fav=Array.isArray(e.sectors)&&e.sectors.includes(sector);
  const rewardMult=fav?Math.max(1.05,Number(e.demand)||1):1;
  const prestigeMult=fav?1.15:1;
- return {...op,
-  reward:Math.max(1,Math.round(op.reward*rewardMult)),
-  prestige:Math.max(1,Math.round((op.prestige||Math.max(2,op.reward/40))*prestigeMult)),
+ const base=applyReputationBenefits(op);
+ return {...base,
+  reward:Math.max(1,Math.round(base.reward*rewardMult)),
+  prestige:Math.max(1,Math.round((base.prestige||Math.max(2,base.reward/40))*prestigeMult)),
   worldEvent:e.title,
   worldFavored:fav
  };
