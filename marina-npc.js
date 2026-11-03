@@ -55,9 +55,10 @@ function sectorLevel(sector){
  const economy=window.MarinaEmpireNpcEconomy;
  return economy?.sectorLevel?economy.sectorLevel(sector):1;
 }
+function specializationBonus(sector){return window.MarinaEmpireSpecialization?.bonusFor?.(sector)||1}
 function applyReputationBenefits(op){
  const sector=worldSector(op),lv=sectorLevel(sector);
- const rewardMult=1+(lv-1)*.05;
+ const rewardMult=(1+(lv-1)*.05)*specializationBonus(sector);
  const prestigeMult=1+(lv-1)*.025;
  const copy={...op,reward:Math.round(op.reward*rewardMult),prestige:Math.round((op.prestige||Math.max(2,op.reward/40))*prestigeMult),sectorLevelBenefit:lv};
  if(lv>=3){
@@ -67,6 +68,7 @@ function applyReputationBenefits(op){
   if(sector==="servizi")copy.text=copy.text+" · cliente VIP";
   if(sector==="broker")copy.text=copy.text+" · mandato esclusivo";
  }
+ if(specializationBonus(sector)>1)copy.specializationBonus=true;
  return copy;
 }
 function adjusted(op){
@@ -90,7 +92,6 @@ function pick(){
   const sector=worldSector(op),fav=e&&Array.isArray(e.sectors)&&e.sectors.includes(sector);
   weighted.push(op);
   if(fav){weighted.push(op);weighted.push(op);}
-  const sector=worldSector(op);
   if(w?.id==="rough"&&(sector==="tecnica"||sector==="marina")){weighted.push(op);weighted.push(op);}
   if(w?.id==="rain"&&sector==="servizi")weighted.push(op);
  }
