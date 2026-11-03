@@ -58,3 +58,15 @@ Da completare prima dell'attivazione:
 - [ ] Solo dopo il collaudo: abilitare i pulsanti ACQUISTA CREDITI nel client.
 
 Nota: al 3 novembre 2026 gli acquisti restano intenzionalmente disabilitati nel client pubblico.
+
+
+## Verifica WooCommerce live - 3 novembre 2026 ore 11:06 Italia
+- [x] Pagina ufficiale Marina Empire pubblicata: https://rpgyacht.com/marina-empire/ (WP page 38101).
+- [x] Prodotti WooCommerce 38090-38094 presenti come draft, virtuali, SKU e prezzi coerenti con i controlli backend.
+- [x] Gateway WooPayments carta, PayPal, carta tramite PayPal e Satispay risultano enabled.
+- [ ] Nessun webhook WooCommerce esistente: configurazione ancora necessaria.
+- [ ] Verifica segreti Supabase da pannello amministrativo sicuro.
+- [ ] Test di pagamento reale, emissione email, riscatto e rimborso.
+- [ ] Pubblicazione prodotti crediti e abilitazione pulsanti nel gioco SOLO dopo collaudo.
+
+I prodotti restano in bozza e le vendite nel gioco restano disabilitate.
