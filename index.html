@@ -1525,6 +1525,46 @@ window.MarinaEmpireMarketplaceEconomy={
   return {ok:true,message:"Affare concluso: +"+money(value)+" crediti · reputazione Broker +"+repGain+"."};
  }
 };
+window.MarinaEmpireEmergencyEconomy={
+ snapshot(){
+  return {port:state.port,coins:Number(state.coins)||0,registered:!!window.meRegisteredPlayer,trip:!!state.trip};
+ },
+ canStart(em){
+  const cost=Math.max(0,Math.floor(Number(em?.cost)||0));
+  if(!state?.name)return {ok:false,message:"Avvia prima la tua partita."};
+  if(!window.meRegisteredPlayer)return {ok:false,message:"Registrati gratuitamente per accettare emergenze del mondo."};
+  if(state.trip)return {ok:false,message:"Completa prima la navigazione in corso."};
+  if(state.coins<cost)return {ok:false,message:"Crediti insufficienti per coprire il costo operativo."};
+  return {ok:true};
+ },
+ complete(em,id){
+  const key=String(id||"").slice(0,90);
+  const reward=Math.max(0,Math.floor(Number(em?.reward)||0));
+  const cost=Math.max(0,Math.floor(Number(em?.cost)||0));
+  const prestige=Math.max(0,Math.floor(Number(em?.prestige)||0));
+  const rep=Math.max(1,Math.floor(Number(em?.reputation)||5));
+  const sector=String(em?.sector||"tecnica");
+  if(!key)return {ok:false,message:"Emergenza non valida."};
+  const check=this.canStart(em);if(!check.ok)return check;
+  const settled=Array.isArray(state.emergencySettled)?state.emergencySettled:[];
+  if(settled.includes(key))return {ok:false,duplicate:true,message:"Emergenza già registrata."};
+  const ok=meAtomicPersist(()=>{
+   state.coins-=cost;
+   state.coins+=reward;
+   state.prestige=(Number(state.prestige)||0)+prestige;
+   state.earnings=(Number(state.earnings)||0)+reward-cost;
+   state.emergencySettled=[...settled,key].slice(-120);
+   state.emergenciesCompleted=(Number(state.emergenciesCompleted)||0)+1;
+   state.sectorReputation=state.sectorReputation&&typeof state.sectorReputation==="object"?state.sectorReputation:{};
+   state.sectorReputation[sector]=Math.max(0,Math.floor(Number(state.sectorReputation[sector])||0))+rep;
+   state.lastEmergency={id:key,type:String(em?.type||"SOS"),reward,cost,prestige,reputation:rep,sector,port:state.port,at:Date.now()};
+  });
+  if(!ok)return {ok:false,message:"Emergenza non registrata: salvataggio non confermato."};
+  render();
+  try{window.MarinaEmpireTraffic?.track("emergency_complete");window.MarinaEmpireAuthenticatedActivity?.track("emergency_complete")}catch(e){}
+  return {ok:true,net:reward-cost,reward,cost,prestige,reputation:rep,sector};
+ }
+};
 window.MarinaEmpireNpcEconomy={
  sectorFor(op){
   const type=String(op?.type||"Servizio").toLowerCase();
@@ -3029,4 +3069,4 @@ button.addEventListener("click",async()=>{
  if(marinaList)new MutationObserver(syncCurrentMarina).observe(marinaList,{childList:true});
  window.addEventListener("marina-empire-updated",()=>setTimeout(syncCurrentMarina,0));
 })();
-</script><script src="world-events.js?v=20261103-world1"></script><script src="marina-live.js?v=20261103-live1"></script><script src="marina-npc.js?v=20261103-npc1"></script><script src="marketplace.js?v=20261103-market1"></script></body></html>
+</script><script src="world-events.js?v=20261103-world1"></script><script src="marina-live.js?v=20261103-live1"></script><script src="marina-npc.js?v=20261103-npc1"></script><script src="world-emergencies.js?v=20261103-emergency1"></script><script src="marketplace.js?v=20261103-market1"></script></body></html>
