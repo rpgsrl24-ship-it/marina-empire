@@ -1816,7 +1816,15 @@ if(!meAtomicPersist(()=>{
   if(trip.voyageId!=null)state.settledVoyages=[...settledIds,trip.voyageId].slice(-200);
   if(!state.completed.includes(m.id))state.completed.push(m.id);
   const weather=simulatedWeatherById(trip.weather);const worldWear=Number(trip.weatherWear)||weather.wear;state.coins+=reward;state.prestige+=prestige;state.voyages=(state.voyages||0)+1;state.earnings=(state.earnings||0)+reward;state.condition=Math.max(0,state.condition-worldWear);
-  state.lastArrival={destination,reward,prestige,weather:weather.id,at:Date.now(),mission:missionName};
+  if(m.emergency){
+   const sector=String(m.emergencySector||"tecnica"),rep=Math.max(1,Math.floor(Number(m.emergencyReputation)||8));
+   state.sectorReputation=state.sectorReputation&&typeof state.sectorReputation==="object"?state.sectorReputation:{};
+   state.sectorReputation[sector]=Math.max(0,Math.floor(Number(state.sectorReputation[sector])||0))+rep;
+   state.emergenciesCompleted=(Number(state.emergenciesCompleted)||0)+1;
+   state.emergencySettled=Array.isArray(state.emergencySettled)?state.emergencySettled:[];
+   if(m.emergencySourceId&&!state.emergencySettled.includes(m.emergencySourceId))state.emergencySettled=[...state.emergencySettled,m.emergencySourceId].slice(-120);
+  }
+  state.lastArrival={destination,reward,prestige,weather:weather.id,at:Date.now(),mission:missionName,emergency:!!m.emergency};
  }
  state.lastDockedBridge={origin:trip.origin||state.port,destination:state.port,at:Date.now()};
  state.trip=null;
@@ -1840,6 +1848,43 @@ const weather=worldWeather?simulatedWeatherById(worldWeather.id):simulatedWeathe
 const missionDuration=Number(m.sec)*(worldWeather?.duration||weather.duration);const legSeconds=Math.max(10,Math.ceil((Number.isFinite(missionDuration)&&missionDuration>0?missionDuration:60)/(plan.legs.length-1)));
 if(!meAtomicPersist(()=>{state.coins-=m.cost;state.fuel-=first;state.boat=m.boat;state.voyageSerial=nextVoyageSerial;state.trip={voyageId:state.voyageSerial,id:m.id,origin:state.port,dest:m.dest,legs:plan.legs,legIndex:0,legSeconds,sec:legSeconds,fuelRate:burn,weather:weather.id,weatherWear:(worldWeather?.wear||weather.wear),weatherLabel:(worldWeather?.label||weather.label),mission:m,until:Date.now()+legSeconds*1000}}))return notice("Partenza annullata: salvataggio non confermato.");
 window.MarinaEmpireTraffic?.track("play_start",true);window.MarinaEmpireAuthenticatedActivity?.track("play_start");showTab("map");render();voyageHeartbeat();}
+window.MarinaEmpireEmergencyNavigation={
+ start(em){
+  if(state.trip)return {ok:false,message:"Hai già una navigazione in corso."};
+  if(!window.meRegisteredPlayer)return {ok:false,message:"Registrati gratuitamente per accettare missioni SOS."};
+  if(!state.setupComplete)return {ok:false,message:"Completa prima la configurazione della partita."};
+  if(state.condition<30)return {ok:false,message:"Manutenzione necessaria prima di salpare."};
+  const origin=state.port,activeBoat=state.owned.includes(state.boat)?state.boat:"voyager";
+  const candidates=ports.filter(p=>p.id!==origin&&p.id!=="rose").map(p=>({id:p.id,d:seaMiles(origin,p.id)})).filter(x=>Number.isFinite(x.d)&&x.d>0).sort((a,b)=>a.d-b.d).slice(0,3);
+  if(!candidates.length)return {ok:false,message:"Nessuna rotta SOS disponibile dalla marina attuale."};
+  let h=0;for(const ch of String(em?.id||"sos"))h=(h*31+ch.charCodeAt(0))>>>0;
+  const dest=candidates[h%candidates.length].id;
+  const burn=fuelBurnPerNm(activeBoat),plan=planSeaTrip(origin,dest,boat(activeBoat).tank,burn);
+  if(!plan.possible)return {ok:false,message:plan.reason||"Rotta SOS non disponibile."};
+  const id="SOSNAV_"+String(em?.id||Date.now()).replace(/[^a-zA-Z0-9_-]/g,"").slice(0,70);
+  if(state.completed.includes(id))return {ok:false,message:"Questa emergenza è già stata completata."};
+  const mission={
+   id,
+   origin,
+   dest,
+   boat:activeBoat,
+   name:"🆘 SOS · "+String(em?.title||"Emergenza in mare"),
+   reward:Math.max(600,Math.floor(Number(em?.reward)||0)+Math.round(plan.distance*18)),
+   cost:Math.max(0,Math.floor(Number(em?.cost)||0)),
+   fuel:plan.fuel||Math.ceil(plan.distance*burn),
+   prestige:Math.max(10,Math.floor(Number(em?.prestige)||0)+Math.round(plan.distance*.25)),
+   sec:Math.max(25,Math.min(95,Math.round(plan.distance*.45))),
+   plan,
+   emergency:true,
+   emergencySector:String(em?.sector||"tecnica"),
+   emergencyReputation:Math.max(1,Math.floor(Number(em?.reputation)||8)),
+   emergencySourceId:String(em?.id||id)
+  };
+  if(!missions.some(x=>x.id===id))missions.push(mission);
+  launch(id);
+  return state.trip&&state.trip.id===id?{ok:true,destination:dest,message:"Missione SOS avviata verso "+port(dest).name+"."}:{ok:false,message:"Partenza SOS non riuscita."};
+ }
+};
 function betaDiagnostics(){
  const checks=[];
  const check=(label,fn)=>{try{checks.push({label,ok:!!fn()})}catch(e){checks.push({label,ok:false})}};
