@@ -4,18 +4,18 @@ if(window.__ME_MARINA_NPC__) return;
 window.__ME_MARINA_NPC__=true;
 
 const OPPORTUNITIES=[
- {role:"Comandante",icon:"🧑‍✈️",type:"Rifornimento",text:"richiede rifornimento prima della partenza",duration:18,cost:120,reward:320},
- {role:"Comandante",icon:"🧑‍✈️",type:"Ormeggio",text:"cerca un posto transito per questa notte",duration:22,cost:80,reward:280},
- {role:"Comandante",icon:"🧑‍✈️",type:"Tecnica",text:"segnala un problema al generatore",duration:28,cost:160,reward:460},
+ {role:"Comandante",icon:"🧑‍✈️",type:"Rifornimento",text:"richiede rifornimento prima della partenza",duration:18,cost:120,reward:320,prestige:8},
+ {role:"Comandante",icon:"🧑‍✈️",type:"Ormeggio",text:"cerca un posto transito per questa notte",duration:22,cost:80,reward:280,prestige:7},
+ {role:"Comandante",icon:"🧑‍✈️",type:"Tecnica",text:"segnala un problema al generatore",duration:28,cost:160,reward:460,prestige:12},
  {role:"Marinaio",icon:"🧑‍🔧",type:"Assistenza",text:"richiede assistenza per una cima nell'elica",duration:20,cost:90,reward:300},
- {role:"Marinaio",icon:"🧑‍🔧",type:"Pulizia",text:"prenota lavaggio coperta",duration:16,cost:70,reward:220},
+ {role:"Marinaio",icon:"🧑‍🔧",type:"Pulizia",text:"prenota lavaggio coperta",duration:16,cost:70,reward:220,prestige:5},
  {role:"Charter",icon:"🛥️",type:"Charter",text:"cerca disponibilità per un'uscita giornaliera",duration:35,cost:240,reward:720},
- {role:"Charter",icon:"🛥️",type:"Cambusa",text:"richiede cambusa urgente",duration:24,cost:130,reward:390},
- {role:"Armatore",icon:"👤",type:"Detailing",text:"richiede detailing completo",duration:30,cost:180,reward:540},
- {role:"Armatore",icon:"👤",type:"Manutenzione",text:"chiede preventivo manutenzione",duration:32,cost:210,reward:620},
- {role:"Tecnico",icon:"🔧",type:"Elettrico",text:"intervento su batterie di bordo",duration:26,cost:150,reward:450},
- {role:"Broker",icon:"💼",type:"Brokerage",text:"organizza visita a uno yacht in vendita",duration:20,cost:60,reward:260},
- {role:"Broker",icon:"💼",type:"Sea Trial",text:"cerca disponibilità per prova in mare",duration:30,cost:140,reward:500}
+ {role:"Charter",icon:"🛥️",type:"Cambusa",text:"richiede cambusa urgente",duration:24,cost:130,reward:390,prestige:10},
+ {role:"Armatore",icon:"👤",type:"Detailing",text:"richiede detailing completo",duration:30,cost:180,reward:540,prestige:14},
+ {role:"Armatore",icon:"👤",type:"Manutenzione",text:"chiede preventivo manutenzione",duration:32,cost:210,reward:620,prestige:16},
+ {role:"Tecnico",icon:"🔧",type:"Elettrico",text:"intervento su batterie di bordo",duration:26,cost:150,reward:450,prestige:12},
+ {role:"Broker",icon:"💼",type:"Brokerage",text:"organizza visita a uno yacht in vendita",duration:20,cost:60,reward:260,prestige:7},
+ {role:"Broker",icon:"💼",type:"Sea Trial",text:"cerca disponibilità per prova in mare",duration:30,cost:140,reward:500,prestige:13}
 ];
 
 const style=document.createElement("style");
@@ -64,7 +64,7 @@ function renderCurrent(){
  if(!ensure())return;
  if(!current)current=pick();
  box.querySelector(".me-npc-row").innerHTML='<span>'+current.icon+'</span><span><span class="me-npc-role">'+current.role+'</span> · '+current.text+'</span>';
- box.querySelector(".me-npc-meta").innerHTML='<span>'+current.type+'</span><span>⏱ '+current.duration+'s</span><span>Costo operativo '+current.cost+'</span><span>Ricompensa '+current.reward+'</span>';
+ box.querySelector(".me-npc-meta").innerHTML='<span>'+current.type+'</span><span>⏱ '+current.duration+'s</span><span>Costo operativo '+current.cost+'</span><span>Ricompensa '+current.reward+'</span><span>Prestigio +'+current.prestige+'</span>';
  box.querySelector(".me-npc-level").textContent="Attività marina: "+level();
  box.querySelector(".me-npc-status").textContent=job?"Attività in corso":"Disponibile ora";
  box.querySelector(".me-npc-progress span").style.width=job?Math.min(100,job.progress)+"%":"0%";
@@ -73,7 +73,11 @@ function renderCurrent(){
 }
 function acceptCurrent(){
  if(job||!current)return;
- job={...current,started:Date.now(),progress:0};
+ const economy=window.MarinaEmpireNpcEconomy;
+ if(!economy||typeof economy.canStart!=="function"){box.querySelector(".me-npc-status").textContent="Economia marina non disponibile.";return;}
+ const check=economy.canStart(current);
+ if(!check.ok){box.querySelector(".me-npc-status").textContent=check.message||"Incarico non disponibile.";return;}
+ job={...current,started:Date.now(),progress:0,id:"npc-"+Date.now()+"-"+Math.random().toString(36).slice(2,8)};
  box.querySelector(".me-npc-status").textContent="Attività accettata · simulazione locale";
  box.querySelector(".me-npc-accept").disabled=true;
  box.querySelector(".me-npc-skip").disabled=true;
@@ -84,10 +88,12 @@ function acceptCurrent(){
    const bar=box&&box.querySelector(".me-npc-progress span");
    if(bar)bar.style.width=job.progress+"%";
    const st=box&&box.querySelector(".me-npc-status");
-   if(st)st.textContent=job.progress>=100?"Completata · ricompensa demo "+job.reward:"In corso · "+Math.max(0,Math.ceil(job.duration-elapsed))+"s";
+   if(st)st.textContent=job.progress>=100?"Completamento in registrazione…":"In corso · "+Math.max(0,Math.ceil(job.duration-elapsed))+"s";
    if(job.progress>=100){
      clearInterval(jobTick);jobTick=null;
-     setTimeout(()=>{job=null;current=pick();renderCurrent();},2500);
+     const result=window.MarinaEmpireNpcEconomy?.complete(job,job.id)||{ok:false,message:"Economia marina non disponibile."};
+     if(st)st.textContent=result.ok?("Completata · netto +"+result.net+" · prestigio +"+result.prestige+" · livello "+result.level):(result.message||"Completamento non registrato.");
+     setTimeout(()=>{job=null;current=pick();renderCurrent();},result.ok?3200:5000);
    }
  },500);
 }
