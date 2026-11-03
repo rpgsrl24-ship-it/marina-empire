@@ -30,10 +30,17 @@ function currentPort(){
 }
 function current(){return eventFor(currentPort())}
 function modifiers(port=currentPort()){
- const e=eventFor(port);
- return {boats:e.market.boats,toys:e.market.toys,tech:e.market.tech,traffic:e.traffic,demand:e.demand,event:e};
+ const e=eventFor(port),phase=dayPhase();
+ return {boats:e.market.boats,toys:e.market.toys,tech:e.market.tech,traffic:e.traffic*phase.traffic,demand:e.demand,event:e,phase};
 }
-window.MarinaEmpireWorldEvents={current,eventFor,modifiers,slot};
+function dayPhase(){
+ const h=new Date().getHours();
+ if(h>=6&&h<9)return {id:"dawn",label:"ALBA",icon:"🌅",traffic:.8};
+ if(h>=9&&h<18)return {id:"day",label:"GIORNO",icon:"☀️",traffic:1.15};
+ if(h>=18&&h<21)return {id:"sunset",label:"TRAMONTO",icon:"🌇",traffic:1.05};
+ return {id:"night",label:"NOTTE",icon:"🌙",traffic:.55};
+}
+window.MarinaEmpireWorldEvents={current,eventFor,modifiers,slot,dayPhase};
 
 const style=document.createElement("style");
 style.textContent=".me-world-event{margin:10px 0;padding:10px 12px;border:1px solid rgba(214,181,117,.38);border-radius:12px;background:linear-gradient(135deg,#0b3042,#102739);display:flex;gap:10px;align-items:flex-start}.me-world-event-icon{font-size:22px}.me-world-event strong{display:block;color:#f0cf8a;font-size:12px}.me-world-event p{margin:3px 0;font-size:10px;color:#cbdbe1}.me-world-event small{color:#829fab;font-size:9px}";
@@ -51,7 +58,7 @@ function render(){
  const h=host();if(!h)return false;
  if(!box||!box.isConnected){box=document.createElement("div");box.className="me-world-event";h.prepend(box)}
  const e=current();
- box.innerHTML='<div class="me-world-event-icon">'+e.icon+'</div><div><strong>EVENTO MONDO · '+e.title+'</strong><p>'+e.text+'</p><small>Aggiornamento tra '+timeLeft(e.until)+'</small></div>';
+ const phase=dayPhase();box.innerHTML='<div class="me-world-event-icon">'+e.icon+'</div><div><strong>EVENTO MONDO · '+e.title+'</strong><p>'+e.text+'</p><small>'+phase.icon+' '+phase.label+' · aggiornamento tra '+timeLeft(e.until)+'</small></div>';
  window.dispatchEvent(new CustomEvent("marina-world-event",{detail:e}));
  return true;
 }
