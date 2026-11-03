@@ -36,6 +36,6 @@ assert(/function voyageHeartbeat\(\)/.test(html), 'Missing voyage progress recov
 // Do not accidentally accept real money before voucher issuance and delivery are working.
 assert(/id="meVoucherCode"[^>]*disabled/.test(html), 'Voucher code input must stay disabled before payment rollout');
 assert(/id="meVoucherRedeem"[^>]*disabled/.test(html), 'Voucher redeem action must stay disabled before payment rollout');
-expect('Saldo crediti acquistati:', 'Purchased-credit wallet must be distinct from beta coins');
-expect('separato dai crediti beta locali', 'Beta coins must not be presented as purchased credits');
+expect('Saldo crediti acquistati:', 'Purchased-credit wallet summary must remain visible');
+expect('marina-claim-purchased-credits', 'Purchased credits must be claimed through the server');
 console.log('PASS: beta onboarding, mission persistence, duplicate settlement, and public URL contracts');
