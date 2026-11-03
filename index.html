@@ -846,25 +846,28 @@ padding:5px!important;gap:4px!important;
 <div style="padding:15px;border:1px solid #597080;border-radius:12px"><strong>MAXI YACHT</strong><p style="font-size:1.4em;margin:8px 0;color:#f0ce8c">6.000.000 crediti</p><p>€ 299,99</p><span class="small muted">Prezzo indicativo</span></div>
 <div style="padding:15px;border:1px solid #b99b64;border-radius:12px"><strong>IMPERIAL</strong><p style="font-size:1.4em;margin:8px 0;color:#f0ce8c">45.000.000 crediti</p><p>€ 999,99</p><span class="small muted">Prezzo indicativo</span></div>
 </div><p class="small muted"><strong>Anteprima commerciale — acquisti non attivi.</strong> Nessun pagamento viene richiesto e nessun credito viene aggiunto da questa sezione. I pacchetti saranno disponibili solo dopo l'attivazione di pagamenti verificati e salvataggi online sicuri. Il gioco rimane gratuito.</p></div><div id="marinaCommunity" class="item" style="margin-top:20px;border:1px solid #b99b64;padding:18px;border-radius:12px"><h3>💬 Community della darsena</h3><p id="communityLocation">La community della darsena sarà riservata agli utenti registrati.</p><p id="communityStatus" class="small muted" role="status">Chat temporaneamente non disponibile · accesso riservato in aggiornamento.</p><div id="communityUsers" class="small"></div><div id="communityMessages" aria-live="polite" style="max-height:240px;overflow:auto;margin:12px 0;padding:10px;background:#082535;border-radius:8px"></div><form id="communityForm" style="display:flex;gap:8px"><input id="communityInput" maxlength="240" placeholder="Chat temporaneamente non disponibile" autocomplete="off" style="flex:1;min-width:0" disabled><button id="communitySend" type="submit" disabled>INVIA</button></form><p class="small muted">Stiamo aggiornando l’accesso alla chat. Puoi continuare a giocare e salvare i progressi.</p></div></div></section><section id="credits" class="screen hide">
-<header class="me-lux-page-head me-credits-head"><span>MARINA EMPIRE · RPG YACHT</span><h1>ACQUISTA CREDITI</h1><p>Potenzia il tuo impero nautico con ricariche sicure tramite RPG Yacht.</p></header>
+<header class="me-lux-page-head me-credits-head"><span>MARINA EMPIRE · RPG YACHT</span><h1>ACQUISTA CREDITI</h1><p>Acquista su RPG Yacht e ricevi i crediti direttamente nella tua partita.</p></header>
 <div class="panel me-credits-page">
   <div class="me-credits-intro">
-    <div><span class="home-eyebrow">RICARICHE MARINA EMPIRE</span><h2>Crediti per continuare a crescere</h2><p>I pagamenti saranno gestiti dal checkout sicuro di RPG Yacht. Durante il collaudo finale i pulsanti di acquisto restano temporaneamente disattivati.</p></div>
-    <div class="me-credits-status">🔒 PAGAMENTI IN ATTIVAZIONE</div>
+    <div><span class="home-eyebrow">RICARICHE MARINA EMPIRE</span><h2>Crediti direttamente nel gioco</h2><p>Accedi con il tuo account Marina Empire, scegli il pacchetto e completa il pagamento sul checkout sicuro RPG Yacht. Dopo la conferma, i crediti vengono trasferiti automaticamente nelle monete della tua partita online.</p></div>
+    <div class="me-credits-status">🔒 ATTIVAZIONE FINALE</div>
   </div>
+  <p id="meCreditLoginHint" class="small muted">Accedi o registrati prima dell'acquisto: così i crediti vengono accreditati direttamente al tuo account.</p>
+  <p id="meCreditWalletSummary" class="small"><strong>Saldo crediti acquistati:</strong> accedi per visualizzarlo.</p>
   <div class="me-credit-packs" aria-label="Pacchetti crediti Marina Empire">
-    <article class="item me-credit-pack"><span>STARTER</span><h3>50.000 CREDITI</h3><strong>€ 4,99</strong><button type="button" disabled>ACQUISTA · IN ATTIVAZIONE</button></article>
-    <article class="item me-credit-pack"><span>CAPTAIN</span><h3>120.000 CREDITI</h3><strong>€ 9,99</strong><button type="button" disabled>ACQUISTA · IN ATTIVAZIONE</button></article>
-    <article class="item me-credit-pack me-credit-pack-featured"><span>ADMIRAL</span><h3>300.000 CREDITI</h3><strong>€ 19,99</strong><button type="button" disabled>ACQUISTA · IN ATTIVAZIONE</button></article>
-    <article class="item me-credit-pack"><span>TYCOON</span><h3>900.000 CREDITI</h3><strong>€ 49,99</strong><button type="button" disabled>ACQUISTA · IN ATTIVAZIONE</button></article>
-    <article class="item me-credit-pack"><span>EMPIRE</span><h3>2.000.000 CREDITI</h3><strong>€ 99,99</strong><button type="button" disabled>ACQUISTA · IN ATTIVAZIONE</button></article>
+    <article class="item me-credit-pack"><span>STARTER</span><h3>50.000 CREDITI</h3><strong>€ 4,99</strong><button type="button" data-me-credit-product="38090" disabled>ACQUISTA · ATTIVAZIONE FINALE</button></article>
+    <article class="item me-credit-pack"><span>CAPTAIN</span><h3>120.000 CREDITI</h3><strong>€ 9,99</strong><button type="button" data-me-credit-product="38091" disabled>ACQUISTA · ATTIVAZIONE FINALE</button></article>
+    <article class="item me-credit-pack me-credit-pack-featured"><span>ADMIRAL</span><h3>300.000 CREDITI</h3><strong>€ 19,99</strong><button type="button" data-me-credit-product="38092" disabled>ACQUISTA · ATTIVAZIONE FINALE</button></article>
+    <article class="item me-credit-pack"><span>TYCOON</span><h3>900.000 CREDITI</h3><strong>€ 49,99</strong><button type="button" data-me-credit-product="38093" disabled>ACQUISTA · ATTIVAZIONE FINALE</button></article>
+    <article class="item me-credit-pack"><span>EMPIRE</span><h3>2.000.000 CREDITI</h3><strong>€ 99,99</strong><button type="button" data-me-credit-product="38094" disabled>ACQUISTA · ATTIVAZIONE FINALE</button></article>
   </div>
+  <p id="meCreditPurchaseStatus" class="small muted" role="status" aria-live="polite">Il sistema di accredito diretto è pronto per il collaudo finale.</p>
   <div class="item me-credits-account">
-    <h3>🎟️ Hai già un codice ricarica?</h3>
-    <p>Accedi al tuo account Marina Empire per visualizzare il saldo server e, appena il servizio sarà aperto, riscattare il codice ricevuto da RPG Yacht.</p>
+    <h3>👤 Account obbligatorio per gli acquisti</h3>
+    <p>Prima del checkout la partita viene verificata con il salvataggio online. Questo impedisce doppi accrediti o perdite di crediti passando da telefono a computer.</p>
     <button type="button" class="gold" data-tab="profile">VAI A COMANDANTE / ACCOUNT</button>
   </div>
-  <p class="small muted">Nessun pagamento viene avviato da questa pagina finché il collaudo tecnico non è completato.</p>
+  <p class="small muted">Il vecchio codice ricarica rimane disponibile solo come procedura di assistenza in caso di ordine non associato automaticamente.</p>
 </div>
 </section>
 <section id="profile" class="screen hide"><header class="me-lux-page-head" style="--me-page-image:url('./anteprima/assets/render-2026/cantieri.jpg')"><span>MARINA EMPIRE · RPG YACHT</span><h1>IL COMANDANTE</h1><p>La tua carriera nautica</p></header><div class="panel"><h2>Profilo comandante</h2><p id="profileText"></p><div id="careerPanel" class="item" style="margin:12px 0;padding:15px;border:1px solid #b99b64;border-radius:12px"></div><button id="save">SALVA</button><button id="exportSave" type="button">SCARICA BACKUP PARTITA</button><button id="importSave" type="button">RIPRISTINA BACKUP</button><input id="importSaveFile" type="file" accept=".json,application/json" style="display:none" aria-label="Seleziona backup Marina Empire"><p class="small muted">Il ripristino sostituisce la partita locale attiva. Non modifica il saldo degli acquisti online.</p><button id="reset">NUOVA PARTITA</button><div class="cloudBox" id="meRegistrationArea"><h3>ACCOUNT E SALVATAGGI ONLINE</h3><p id="meFreeRegistrationNote" style="padding:12px;border:1px solid #c9a76e;border-radius:12px;background:#143447;color:#f5dfb2;font-weight:650">⚓ Hai completato la prova? Registrati gratuitamente per continuare a navigare e conservare i progressi. Nessun acquisto obbligatorio.</p><div id="cloudConnectionBadge" role="status" style="padding:12px;margin:10px 0;border:2px solid #c69a43;border-radius:10px;font-weight:800;background:#152632;color:#fff">⏳ VERIFICA ACCESSO IN CORSO</div><p class="muted small" id="cloudStatus">Partita locale attiva. Accedi per sincronizzare i progressi beta.</p><label for="cloudUsername">Nome utente (pubblico)</label><input id="cloudUsername" maxlength="32" autocomplete="nickname" placeholder="Nome comandante"><label for="cloudEmail">Email del comandante</label><input id="cloudEmail" type="email" autocomplete="email" placeholder="nome@email.it"><label for="cloudPassword">Password (solo per accesso tradizionale)</label><input id="cloudPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Password"><label style="display:block;margin-top:10px"><input type="checkbox" id="cloudPrivacy"> Ho letto l’<a href="./privacy.html" target="_blank" rel="noopener">informativa privacy di Marina Empire</a> per account e salvataggi online.</label><label style="display:block;margin-top:8px"><input type="checkbox" id="cloudMarketing" disabled> Comunicazioni commerciali RPG Yacht non disponibili nella beta e non richieste per giocare.</label><p class="muted small">Le comunicazioni commerciali non sono attive nella beta. Dopo la registrazione controlla qui l’esito del salvataggio online; usa SALVA ONLINE per aggiornare la copia cloud.</p><div class="cloudActions"><button id="cloudMagicLink" class="gold" type="button">CONTINUA GRATIS CON EMAIL</button><button id="cloudRegister" class="gold" type="button">REGISTRATI</button><button id="cloudLogin" type="button">ACCEDI CON PASSWORD</button><button id="cloudResend" type="button">RINVIA EMAIL DI CONFERMA</button><button id="cloudResetPassword" type="button">RECUPERA PASSWORD</button><div id="cloudRecoveryPanel" class="item hide" style="margin-top:12px"><label for="cloudNewPassword">Nuova password (almeno 8 caratteri)</label><input id="cloudNewPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Nuova password"><label for="cloudConfirmPassword">Conferma nuova password</label><input id="cloudConfirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Ripeti password"><button id="cloudApplyNewPassword" type="button">SALVA NUOVA PASSWORD</button></div><button id="cloudDownload" type="button">CARICA PARTITA ONLINE</button><button id="cloudUpload" type="button">SALVA ONLINE</button><button id="cloudLogout" type="button">ESCI DALL'ACCOUNT</button></div><div class="item" style="margin-top:12px"><h3>🎟️ Ricarica crediti RPG Yacht · In preparazione</h3><p class="muted small">Acquista un codice monouso sul negozio RPG Yacht quando il servizio sarà attivo. Il saldo acquistato sarà conservato sul server, separato dai crediti beta locali.</p><label for="meVoucherCode">Codice ricarica</label><input id="meVoucherCode" type="text" placeholder="ME-XXXXXXXX-XXXXXXXX-XXXXXXXX" maxlength="29" autocomplete="off" spellcheck="false" disabled><div class="cloudActions"><button id="meVoucherRedeem" type="button" disabled>RISCATTA CODICE · PROSSIMAMENTE</button></div><p id="meVoucherStatus" class="muted small" role="status">Ricariche non disponibili durante la beta: gioca gratuitamente e guadagna crediti completando missioni. Nessun pagamento richiesto.</p><p id="meWalletBalance" class="muted small" role="status">Saldo crediti acquistati: accedi al tuo account per visualizzarlo.</p></div><p class="muted small">Le monete e gli yacht restano valori di test, non utilizzabili per acquisti reali. La partita locale rimane disponibile.</p></div><p class="muted small">Salvataggio soltanto su questo dispositivo. Nessun pagamento reale.</p></div></section></div>
@@ -1649,6 +1652,78 @@ async function redeemVoucherRc(){
  }finally{syncVoucherRcUi();}
 }
 window.meRedeemVoucherRc=redeemVoucherRc;
+window.meCreditCheckoutReady=async function(){
+ if(!client||!account?.id||!account?.email_confirmed_at)return false;
+ if(!state?.name||!validState(safeSnapshot())){status("Avvia una partita valida prima di acquistare crediti.");return false;}
+ const userId=account.id;
+ try{
+  const remote=await client.from("player_progress").select("game_state,updated_at").eq("user_id",userId).maybeSingle();
+  if(remote.error)throw remote.error;
+  if(account?.id!==userId)return false;
+  const snapshot=safeSnapshot();
+  if(!remote.data){
+   const profile=await client.from("player_profiles").upsert({user_id:userId,captain_name:(snapshot.name||"Comandante").slice(0,32),updated_at:new Date().toISOString()},{onConflict:"user_id"});
+   if(profile.error)throw profile.error;
+   const saved=await client.from("player_progress").insert({user_id:userId,game_state:snapshot,updated_at:new Date().toISOString()});
+   if(saved.error)throw saved.error;
+   status("Partita sincronizzata online. Puoi procedere con l'acquisto.");
+   return true;
+  }
+  if(!validState(remote.data.game_state)){status("La partita online non è valida: acquisto sospeso per proteggere i progressi.");return false;}
+  if(!sameGameState(remote.data.game_state,snapshot)){
+   status("Prima di acquistare, sincronizza la partita: usa SALVA ONLINE oppure CARICA PARTITA ONLINE.");
+   showTab("profile");
+   return false;
+  }
+  return true;
+ }catch(e){
+  status("Verifica pre-acquisto non riuscita: "+(e?.message||"errore di connessione"));
+  return false;
+ }
+};
+
+let creditReturnInFlight=false;
+async function claimPurchasedCreditsAfterReturn(){
+ if(creditReturnInFlight||!client||!account?.id||!account?.email_confirmed_at)return;
+ const url=new URL(location.href);
+ if(url.searchParams.get("credit_purchase")!=="success")return;
+ creditReturnInFlight=true;
+ const userId=account.id;
+ try{
+  for(let attempt=0;attempt<8;attempt++){
+   if(account?.id!==userId)return;
+   const result=await client.functions.invoke("marina-claim-purchased-credits",{body:{}});
+   if(result.error)throw result.error;
+   const data=result.data||{};
+   if(data.result==="merged"&&data.game_state&&validState(data.game_state)){
+    const backup=JSON.stringify({savedAt:Date.now(),accountId:userId,game:safeSnapshot()});
+    localStorage.setItem("marina_empire_before_credit_merge",backup);
+    const previous=state;
+    state={...fresh(),...data.game_state};
+    if(persist()===false){state=previous;throw new Error("Salvataggio locale non confermato");}
+    el("playerName").value=state.name||"";
+    el("welcome").classList.toggle("hide",!!state.name);
+    render();tick();
+    await refreshPurchasedWallet();
+    status("Acquisto completato: +"+Number(data.credits||0).toLocaleString("it-IT")+" crediti caricati direttamente nella partita.");
+    const purchaseStatus=el("meCreditPurchaseStatus");if(purchaseStatus)purchaseStatus.textContent="✅ +"+Number(data.credits||0).toLocaleString("it-IT")+" crediti caricati nella tua partita.";
+    url.searchParams.delete("credit_purchase");history.replaceState(null,"",url.pathname+(url.search||"")+url.hash);
+    showTab("credits");
+    return;
+   }
+   if(data.result==="nothing"){
+    if(attempt<7){await new Promise(resolve=>setTimeout(resolve,2500));continue;}
+    status("Pagamento ricevuto. L'accredito è ancora in elaborazione: riapri questa pagina tra poco.");
+    return;
+   }
+   if(data.code==="NO_PROGRESS"){status("Crediti ricevuti ma partita online non trovata. Salva la partita online e contatta l'assistenza: il saldo resta protetto.");return;}
+   throw new Error(data.code||data.error||"Accredito non disponibile");
+  }
+ }catch(e){
+  status("Pagamento registrato; accredito automatico da verificare: "+(e?.message||"errore")+". Il saldo acquistato resta protetto sul server.");
+ }finally{creditReturnInFlight=false;}
+}
+
 async function initialize(){
  let authVersion=0,initialVersion=0;
  toggle();
@@ -1666,6 +1741,7 @@ async function initialize(){
    if(window.meRegisteredPlayer&&["SIGNED_IN","INITIAL_SESSION"].includes(event)){
     const userId=account.id;
     setTimeout(()=>{if(account?.id===userId&&window.meRegisteredPlayer&&!passwordRecoveryMode&&!busy)void reconcileAccountProgress()},1100);
+    setTimeout(()=>{if(account?.id===userId&&window.meRegisteredPlayer)void claimPurchasedCreditsAfterReturn()},1800);
    }
    if(!passwordRecoveryMode)status(account?"Account connesso: "+(account.email||"comandante")+". Salva online per sincronizzare i progressi di questo account.":"Partita locale attiva. Nessun account connesso.");
   }
