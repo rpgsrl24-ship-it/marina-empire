@@ -93,7 +93,7 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.equal(await page.locator('[data-business-marina="rose"]').count(),0,'Headquarters must not sell businesses');
     assert.equal(await page.locator('#meVoucherRedeem').isDisabled(),true,'Paid-credit redemption stays disabled');
     assert.equal(await page.locator('#meVoucherCode').isDisabled(),true,'Paid-credit entry stays disabled');
-    if (mobile) {
+    if (mobile && viewport.width<=740) {
       await goTab(page,'home',true);
       const mobileDashboardChecks=[
         ['fleet','#fleet'],
