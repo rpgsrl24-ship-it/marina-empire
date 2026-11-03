@@ -63,12 +63,27 @@ function seasonPrize(rank){
  }
  return "";
 }
+function seasonTarget(rows,me){
+ if(!me)return "";
+ const rank=Number(me.rank_position)||0,points=Number(me.season_points)||0;
+ const sorted=[...rows].sort((a,b)=>(Number(a.rank_position)||999)-(Number(b.rank_position)||999));
+ if(rank>1){
+  const ahead=sorted.find(r=>Number(r.rank_position)===rank-1);
+  if(ahead){
+   const need=Math.max(1,(Number(ahead.season_points)||0)-points+1);
+   return "Per salire al #"+(rank-1)+" servono "+need.toLocaleString("it-IT")+" punti";
+  }
+ }
+ if(rank===1)return "Sei al comando della stagione";
+ return "";
+}
 function renderRows(rows,seasonInfo){
  if(!box)return;
  const season=mode!=="absolute";
  const me=season?rows.find(r=>r.is_me):null;
  const prize=seasonPrize(me?.rank_position);
- const center=season?'<div class="me-season-note"><b>Centro Stagione</b> · chiusura tra '+seasonCountdown()+(me?' · posizione #'+esc(me.rank_position)+' · '+Number(me.season_points||0).toLocaleString("it-IT")+' punti':' · non ancora classificato')+(prize?' · premio potenziale '+prize:'')+'</div>':'';
+ const target=seasonTarget(rows,me);
+ const center=season?'<div class="me-season-note"><b>Centro Stagione</b> · chiusura tra '+seasonCountdown()+(me?' · posizione #'+esc(me.rank_position)+' · '+Number(me.season_points||0).toLocaleString("it-IT")+' punti':' · non ancora classificato')+(prize?' · premio potenziale '+prize:'')+(target?'<br><b>Obiettivo:</b> '+target:'')+'</div>':'';
  const note=season?center+'<div class="me-season-note">La classifica stagionale misura i <b>punti Empire guadagnati nel periodo</b>, non il totale storico. I nuovi giocatori possono quindi competere subito.'+(seasonInfo?.season_key?' · Periodo '+esc(seasonInfo.season_key):'')+'<div style="margin-top:8px"><button type="button" id="meSeasonClaim">🎁 RISCATTA PREMIO STAGIONE PRECEDENTE</button></div><div id="meSeasonClaimStatus" class="me-leaderboard-status"></div></div>':'';
  if(!rows.length){
   box.innerHTML='<h3>'+title()+'</h3>'+tabs()+note+'<p class="me-leaderboard-status">Nessun giocatore classificato in questo periodo.</p>';
