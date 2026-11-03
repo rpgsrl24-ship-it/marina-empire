@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const CONFIG={
-  enabled:false,
+  enabled:true,
   directCheckoutReady:true,
   supabaseUrl:"https://zrdetqvnjmqkfyajxjgp.supabase.co",
   publishableKey:"sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw",
