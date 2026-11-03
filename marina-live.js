@@ -54,6 +54,7 @@
   .me-live-intensity span{font-weight:800;color:#f0d29d}.me-live-intensity small{font-size:9px;color:#91afba}
   .me-live-vhf{margin:0 10px 8px;padding:7px 8px;border-left:2px solid #7eb9cf;background:rgba(10,48,62,.72);font-size:9px;color:#bfd1d7}
   .me-live-vhf b{color:#9dd7ea;margin-right:5px}.me-live-vhf-text{display:inline}
+  .me-live-vhf-action{margin-top:6px;padding:5px 8px;min-height:0;border-radius:8px;font-size:9px;background:#123b4b;border-color:#5d91a4}
   .me-live-community{padding:8px 10px 10px;border-top:1px solid rgba(194,154,96,.18);background:#082431}
   .me-live-community-head{font-size:9px;letter-spacing:.06em;color:#d9c39e;margin-bottom:5px}
   .me-live-community-row{display:grid;grid-template-columns:38px minmax(70px,auto) 1fr;gap:6px;align-items:start;font-size:9px;color:#b9cdd4;padding:3px 0}
@@ -136,6 +137,40 @@
     if(!host)return;
     const box=host.querySelector(".me-live-vhf-text");
     if(box)box.textContent=vhfMessage();
+    const action=host.querySelector(".me-live-vhf-action");
+    if(action)action.textContent=state&&state.trip?"IN NAVIGAZIONE":"PRENDI INCARICO";
+  }
+  function vhfJob(){
+    const intensity=marinaIntensity();
+    const key=marinaKey();
+    const options=[
+      {id:"berth",label:"Assistenza ormeggio",reward:180+intensity.arrivals*35,prestige:2},
+      {id:"fuel",label:"Supporto rifornimento",reward:160+intensity.departures*30,prestige:2},
+      {id:"tech",label:"Assistenza tecnica rapida",reward:220+(intensity.label==="INTENSA"?90:30),prestige:3},
+      {id:"traffic",label:"Supporto Port Control",reward:200+intensity.arrivals*25,prestige:3}
+    ];
+    const idx=Math.floor(Date.now()/30000)%options.length;
+    return {...options[idx],marina:key};
+  }
+  function runVhfJob(){
+    if(typeof state==="undefined")return;
+    if(state.trip){if(typeof notice==="function")notice("Completa prima la navigazione in corso.");return}
+    if(!window.meRegisteredPlayer){if(typeof notice==="function")notice("Registrati per accettare incarichi VHF.");return}
+    const job=vhfJob();
+    const started=Date.now();
+    if(typeof meAtomicPersist!=="function")return;
+    const ok=meAtomicPersist(()=>{
+      state.vhfJobs=Array.isArray(state.vhfJobs)?state.vhfJobs:[];
+      state.vhfJobs.push({id:job.id,marina:job.marina,at:started,reward:job.reward,prestige:job.prestige});
+      state.vhfJobs=state.vhfJobs.slice(-40);
+      state.coins=(Number(state.coins)||0)+job.reward;
+      state.prestige=(Number(state.prestige)||0)+job.prestige;
+      state.earnings=(Number(state.earnings)||0)+job.reward;
+    });
+    if(!ok){if(typeof notice==="function")notice("Incarico VHF non salvato.");return}
+    if(typeof render==="function")render();
+    if(typeof notice==="function")notice(job.label+" completato · +"+job.reward.toLocaleString("it-IT")+" crediti · prestigio +"+job.prestige);
+    window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"vhf-job"}}));
   }
   function eventText(key){
     const names=namesFor(key);
@@ -201,7 +236,7 @@
       <div class="me-live-marina-head"><span><i class="me-live-dot"></i>MARINA LIVE · TRAFFICO ATTIVO</span><span class="me-live-phase">${phase.icon} ${phase.label}</span></div>
       <div class="me-live-player-status">community in ascolto</div>
       <div class="me-live-intensity"></div>
-      <div class="me-live-vhf"><b>VHF 09</b><span class="me-live-vhf-text"></span></div>
+      <div class="me-live-vhf"><b>VHF 09</b><span class="me-live-vhf-text"></span><div><button type="button" class="me-live-vhf-action">PRENDI INCARICO</button></div></div>
       <div class="me-live-water" aria-hidden="true">
         <div class="me-live-boat">🛥️<small>${names[0]}</small></div>
         <div class="me-live-boat">⛵<small>${names[1]}</small></div>
@@ -218,6 +253,7 @@
     updateLiveStatus();
     updateMarinaPulse();
     updateVhf();
+    host.querySelector(".me-live-vhf-action")?.addEventListener("click",runVhfJob);
     return true;
   }
   function schedule(){
