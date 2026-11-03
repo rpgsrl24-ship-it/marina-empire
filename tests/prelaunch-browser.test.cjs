@@ -93,6 +93,28 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.equal(await page.locator('[data-business-marina="rose"]').count(),0,'Headquarters must not sell businesses');
     assert.equal(await page.locator('#meVoucherRedeem').isDisabled(),true,'Paid-credit redemption stays disabled');
     assert.equal(await page.locator('#meVoucherCode').isDisabled(),true,'Paid-credit entry stays disabled');
+    if (mobile) {
+      await goTab(page,'map',true);
+      await page.locator('#interactiveMapDisplay').waitFor({state:'visible'});
+      await page.waitForTimeout(500);
+      const mainMap=await page.evaluate(()=>{
+        const el=document.getElementById('interactiveMapDisplay');
+        const r=el.getBoundingClientRect();
+        return {
+          width:r.width,height:r.height,
+          overflow:document.documentElement.scrollWidth>innerWidth+2,
+          tiles:el.querySelectorAll('.leaflet-tile-pane img').length,
+          vectorMarkers:el.querySelectorAll('.leaflet-overlay-pane path').length,
+          htmlMarkers:el.querySelectorAll('.leaflet-marker-pane .leaflet-marker-icon').length
+        };
+      });
+      assert.ok(mainMap.width>250&&mainMap.height>300,name+': main marina map has usable mobile dimensions');
+      assert.equal(mainMap.overflow,false,name+': main marina map does not cause horizontal overflow');
+      assert.ok(mainMap.tiles>0,name+': main marina map requests visible tiles after mobile tab activation');
+      assert.ok(mainMap.vectorMarkers+mainMap.htmlMarkers>0,name+': main marina map renders marina markers after mobile tab activation');
+      await page.screenshot({path:path.join(output,`${name}-main-map.png`),fullPage:false,animations:'disabled'});
+      await goTab(page,'missions',true);
+    }
     const transitionAudit=await page.evaluate(async tabs=>{
       const results=[];
       for(const tab of tabs){
