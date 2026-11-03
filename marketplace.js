@@ -83,13 +83,14 @@ function factor(key,min=.82,max=1.12){
  return min+((h%1000)/1000)*(max-min);
 }
 function boatOffer(b,s){
+ const world=window.MarinaEmpireWorldEvents?.modifiers?.(s?.port)||{boats:1,toys:1,tech:1,demand:1};
  const k=Math.abs(Math.floor(factor("class-"+b.id,0,300)));
  const marketType=k<100?"Nuovo":k<220?"Usato":"Occasione";
  const range=marketType==="Nuovo"?[.98,1.08]:marketType==="Usato"?[.72,.91]:[.55,.70];
  const profile=marinaProfile(s?.port);
  const broker=brokerInfo();
  const brokerDiscount=Math.max(.94,1-(broker.level-1)*.012);
- const price=Math.max(1000,Math.round((b.price||0)*factor("boat-"+b.id+"-"+(s?.port||""),range[0],range[1])*profile.boat*brokerDiscount));
+ const price=Math.max(1000,Math.round((b.price||0)*factor("boat-"+b.id+"-"+(s?.port||""),range[0],range[1])*profile.boat*brokerDiscount*world.boats));
  const condition=marketType==="Nuovo"?100:marketType==="Usato"?Math.round(78+factor("cond-"+b.id,0,16)):Math.round(62+factor("cond-"+b.id,0,15));
  return {...b,marketPrice:price,marketType,condition,marina:profile.label,brokerLevel:broker.level};
 }
@@ -109,11 +110,13 @@ function historyHTML(values){
  return '<div class="me-market-history">'+values.map((v,i)=>'<span title="'+money(v)+'" style="height:'+(12+Math.round(((v-min)/spread)*28))+'px"></span>').join('')+'</div><div class="me-market-history-label">Andamento ultime 6 ore · '+money(values[0])+' → '+money(values[values.length-1])+'</div>';
 }
 function itemOffer(i,s){
+ const world=window.MarinaEmpireWorldEvents?.modifiers?.(s?.port)||{boats:1,toys:1,tech:1,demand:1};
  const profile=marinaProfile(s?.port);
  const catFactor=i.cat==="Water Toys"?profile.toys:(i.cat==="Tecnica"||i.cat==="Elettronica")?profile.tech:1;
  const broker=brokerInfo();
  const brokerDiscount=Math.max(.95,1-(broker.level-1)*.01);
- const buy=Math.max(50,Math.round(i.base*factor("item-"+i.id+"-"+(s?.port||""),.88,1.08)*catFactor*brokerDiscount));
+ const eventFactor=i.cat==="Water Toys"?world.toys:(i.cat==="Tecnica"||i.cat==="Elettronica")?world.tech:1;
+ const buy=Math.max(50,Math.round(i.base*factor("item-"+i.id+"-"+(s?.port||""),.88,1.08)*catFactor*brokerDiscount*eventFactor));
  return {...i,buy,sell:Math.round(buy*.62)};
 }
 function setStatus(msg){
@@ -170,7 +173,8 @@ function demandOffers(s){
   const item=ITEMS.find(x=>x.id===id);
   if(item){
    const premium=1.08+(b.level-1)*.025;
-   const value=Math.round(itemOffer(item,s).buy*premium);
+   const demandBoost=window.MarinaEmpireWorldEvents?.modifiers?.(s.port)?.demand||1;
+   const value=Math.round(itemOffer(item,s).buy*premium*demandBoost);
    offers.push({id:"demand-item-"+s.port+"-"+id+"-"+seed,kind:"item",targetId:id,title:"Cliente cerca "+item.name,detail:"Richiesta urgente a "+p.label,value,repGain:4+b.level});
   }
  }
@@ -178,7 +182,8 @@ function demandOffers(s){
  if(sellable.length){
   const boat=sellable[Math.abs(Math.floor(factor("demand-boat-"+s.port,0,sellable.length)))%sellable.length];
   const offer=boatOffer(boat,s);
-  const value=Math.round(offer.marketPrice*(1.03+b.level*.02));
+  const demandBoost=window.MarinaEmpireWorldEvents?.modifiers?.(s.port)?.demand||1;
+  const value=Math.round(offer.marketPrice*(1.03+b.level*.02)*demandBoost);
   offers.push({id:"demand-boat-"+s.port+"-"+boat.id+"-"+seed,kind:"boat",targetId:boat.id,title:"Armatore cerca "+boat.name,detail:"Acquisto diretto tramite broker locale",value,repGain:7+b.level});
  }
  return offers;
@@ -190,6 +195,7 @@ function demandHTML(s){
 }
 function marketPulseHTML(s){
  const p=marinaProfile(s.port),b=brokerInfo();
+ const world=window.MarinaEmpireWorldEvents?.current?.();
  const events=[
   "Arrivo yacht in conto vendita",
   "Cantiere locale libera stock ricambi",
@@ -199,7 +205,7 @@ function marketPulseHTML(s){
  ];
  const idx=Math.abs(Math.floor(factor("pulse-"+s.port,0,events.length)))%events.length;
  const edge=b.level>=3?"Accesso anticipato alle occasioni Broker attivo.":"Aumenta la reputazione Broker per ricevere condizioni migliori.";
- return '<div class="me-market-card"><span class="me-market-badge">MERCATO LIVE</span><h3>📈 '+p.label+'</h3><p>'+events[idx]+'</p><p>'+edge+'</p></div>';
+ return '<div class="me-market-card"><span class="me-market-badge">MERCATO LIVE</span><h3>📈 '+p.label+'</h3><p>'+(world?(world.icon+" "+world.title+" · "+world.text):events[idx])+'</p><p>'+edge+'</p></div>';
 }
 function render(){
  const root=document.getElementById("meMarketplaceApp");
@@ -212,6 +218,7 @@ function boot(){
  render();
  document.querySelectorAll('[data-tab="marketplace"],[data-mobile-more-tab="marketplace"]').forEach(b=>b.addEventListener("click",()=>setTimeout(render,50)));
  window.addEventListener("marina-empire-updated",()=>setTimeout(render,50));
+ window.addEventListener("marina-world-event",()=>setTimeout(render,50));
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
