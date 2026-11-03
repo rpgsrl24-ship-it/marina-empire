@@ -949,6 +949,70 @@ padding:5px!important;gap:4px!important;
 @media(max-width:390px){
   #map:not(:has(#voyageCinema:not(.hide))) #interactiveMapDisplay{height:61svh!important;min-height:390px!important}
 }
+</style><style id="me-mobile-fleet-v4">
+@media(max-width:740px){
+  #fleet{padding-bottom:94px}
+  #fleet>.me-lux-page-head{min-height:108px!important;padding:15px!important;margin-bottom:7px!important}
+  #fleet>.me-lux-page-head h1{font-size:25px!important;line-height:1!important;margin:4px 0!important}
+  #fleet>.me-lux-page-head p{font-size:12px!important;margin:0!important}
+
+  #fleet .me-fleet-premium{padding:8px!important;border-radius:16px!important}
+  #fleet .me-fleet-banner{display:none!important}
+
+  #fleet .me-fleet-section-title{
+    display:block!important;padding:8px 5px 5px!important;margin:0!important
+  }
+  #fleet .me-fleet-section-title>div>span{font-size:9px!important;letter-spacing:1px!important}
+  #fleet .me-fleet-section-title h3{font-size:20px!important;margin:3px 0!important}
+  #fleet .me-fleet-live{display:none!important}
+
+  #fleet .fleet-command-strip{
+    display:grid!important;grid-template-columns:1fr!important;gap:8px!important;
+    margin:7px 0 9px!important;padding:11px!important;border-radius:13px!important
+  }
+  #fleet .fleet-command-strip>div:first-child>span,
+  #fleet .fleet-command-strip>div:first-child>p{display:none!important}
+  #fleet .fleet-command-strip h3{font-size:16px!important;margin:0!important}
+  #fleet .fleet-command-actions{display:grid!important;grid-template-columns:1fr 1fr!important;width:100%!important;gap:7px!important}
+  #fleet .fleet-command-actions button{min-width:0!important;min-height:42px!important;padding:8px 5px!important;font-size:10px!important;line-height:1.15!important}
+
+  #fleet #fleetList{display:block!important;padding:0!important}
+  #fleet #fleetList .yacht-card{
+    display:grid!important;grid-template-columns:110px minmax(0,1fr)!important;
+    margin:7px 0!important;border-radius:14px!important;overflow:hidden!important
+  }
+  #fleet #fleetList .yacht-card .yacht-visual{
+    height:100%!important;min-height:164px!important;border-right:1px solid #8e744d!important
+  }
+  #fleet #fleetList .yacht-card .yacht-visual span{font-size:32px!important}
+  #fleet #fleetList .yacht-card .yacht-visual small{
+    top:7px!important;left:7px!important;padding:4px 6px!important;font-size:8px!important
+  }
+  #fleet #fleetList .yacht-detail{padding:10px!important;min-width:0!important}
+  #fleet #fleetList .yacht-detail>b{font-size:16px!important;line-height:1.1!important}
+  #fleet #fleetList .yacht-specs{
+    grid-template-columns:1fr 1fr!important;gap:4px 7px!important;margin-top:7px!important;font-size:9.5px!important
+  }
+  #fleet #fleetList .yacht-detail p{
+    margin:7px 0!important;font-size:10px!important;line-height:1.28!important;color:#c8d8dc!important
+  }
+  #fleet #fleetList .yacht-detail p:nth-of-type(2){display:none!important}
+  #fleet #fleetList .yacht-detail button{
+    min-height:40px!important;margin-top:5px!important;padding:8px 6px!important;font-size:10px!important;font-weight:900!important
+  }
+
+  #fleet .me-secondary-details{margin:9px 0!important}
+  #fleet .me-secondary-details>summary{padding:11px!important;font-size:10px!important}
+  #fleet .me-fleet-footer{padding:12px!important;margin-top:9px!important}
+  #fleet .me-fleet-footer strong{font-size:16px!important}
+  #fleet .me-fleet-footer span{font-size:10px!important}
+  #fleet .me-fleet-footer button{width:100%!important;min-height:42px!important}
+}
+@media(max-width:380px){
+  #fleet #fleetList .yacht-card{grid-template-columns:96px minmax(0,1fr)!important}
+  #fleet #fleetList .yacht-card .yacht-visual{min-height:158px!important}
+  #fleet #fleetList .yacht-specs{grid-template-columns:1fr!important}
+}
 </style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">PROVA GRATIS · 1 MISSIONE</button><p class="muted" style="font-size:13px;margin:6px 0 14px">Nessuna email richiesta per la prova. Dopo la prima missione registrati gratis per continuare. Acquisti sempre facoltativi.</p><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><nav class="nav" id="navigation" aria-label="Sezioni del gioco"><button data-tab="home" class="on">🏠 HOME</button><button data-tab="office">⚓ DIREZIONE</button><button data-tab="map">🗺️ NAVIGAZIONE</button><button data-tab="missions">🎯 MISSIONI</button><button data-tab="fleet">🛥️ FLOTTA</button><button data-tab="marinas">⚓ MARINE</button><button data-tab="credits" class="me-credits-nav">💳 ACQUISTA CREDITI</button><button data-tab="profile">👤 COMANDANTE / ACCOUNT</button><button data-tab="headquarters">🏝️ ISOLA DELLE ROSE</button></nav><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA TEST CLIENTI</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
