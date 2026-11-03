@@ -57,6 +57,8 @@
   .me-live-vhf-action{margin-top:6px;padding:5px 8px;min-height:0;border-radius:8px;font-size:9px;background:#123b4b;border-color:#5d91a4}
   .me-live-vhf-career{margin-top:6px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:8.5px;color:#9fb8c2}
   .me-live-vhf-career b{color:#f0d29d}
+  .me-live-vhf-preview{margin-top:5px;padding:5px 6px;border-radius:7px;background:rgba(255,255,255,.03);font-size:8.5px;color:#b9cdd4}
+  .me-live-vhf-preview.rare{border:1px solid rgba(240,210,157,.35);background:rgba(240,210,157,.08);color:#f6ddb1;font-weight:700}
   .me-live-community{padding:8px 10px 10px;border-top:1px solid rgba(194,154,96,.18);background:#082431}
   .me-live-community-head{font-size:9px;letter-spacing:.06em;color:#d9c39e;margin-bottom:5px}
   .me-live-community-row{display:grid;grid-template-columns:38px minmax(70px,auto) 1fr;gap:6px;align-items:start;font-size:9px;color:#b9cdd4;padding:3px 0}
@@ -139,6 +141,12 @@
     if(!host)return;
     const box=host.querySelector(".me-live-vhf-text");
     if(box)box.textContent=vhfMessage();
+    const preview=host.querySelector(".me-live-vhf-preview");
+    if(preview&&typeof state!=="undefined"){
+      const job=vhfJob();
+      preview.textContent=(job.rare?(job.badge+" · "):"")+job.label+" · "+job.reward.toLocaleString("it-IT")+" cr · "+job.prestige+" prest.";
+      preview.classList.toggle("rare",!!job.rare);
+    }
     const action=host.querySelector(".me-live-vhf-action");
     if(!action||typeof state==="undefined")return;
     const nowTs=Date.now();
@@ -170,6 +178,19 @@
     const done=Array.isArray(state.vhfJobs)?state.vhfJobs.length:0;
     box.innerHTML='<b>Lv.'+lv.level+' '+lv.label+'</b><span>'+done+' incarichi'+(lv.next>0?' · '+lv.next+' al prossimo livello':' · livello massimo')+'</span>';
   }
+  function rareVhfJob(level,intensity,key){
+    const rare=[
+      {min:3,id:"vip",label:"Priorita VIP in ingresso",reward:520,prestige:7,duration:45,badge:"PRIORITA"},
+      {min:4,id:"storm",label:"Coordinamento traffico meteo",reward:760,prestige:10,duration:55,badge:"URGENTE"},
+      {min:5,id:"superyacht",label:"Assistenza Superyacht Port Control",reward:1100,prestige:15,duration:65,badge:"ELITE"}
+    ].filter(x=>level>=x.min);
+    if(!rare.length)return null;
+    const slot=Math.floor(Date.now()/60000)%5;
+    if(slot!==0)return null;
+    const item=rare[Math.floor(Date.now()/300000)%rare.length];
+    const trafficBonus=intensity.label==="INTENSA"?1.15:1;
+    return {...item,marina:key,reward:Math.round(item.reward*trafficBonus),rare:true};
+  }
   function vhfJob(){
     const intensity=marinaIntensity();
     const key=marinaKey();
@@ -181,8 +202,10 @@
     ];
     const idx=Math.floor(Date.now()/30000)%options.length;
     const lv=vhfLevel();
+    const special=rareVhfJob(lv.level,intensity,key);
+    if(special)return {...special,reward:Math.round(special.reward*(1+lv.bonus)),careerLevel:lv.level};
     const base=options[idx];
-    return {...base,marina:key,reward:Math.round(base.reward*(1+lv.bonus)),careerLevel:lv.level};
+    return {...base,marina:key,reward:Math.round(base.reward*(1+lv.bonus)),careerLevel:lv.level,rare:false};
   }
   function completeVhfJob(){
     if(typeof state==="undefined"||typeof meAtomicPersist!=="function")return false;
@@ -227,7 +250,7 @@
     const endsAt=started+Math.max(15000,Number(job.duration||30)*1000);
     if(typeof meAtomicPersist!=="function")return;
     const ok=meAtomicPersist(()=>{
-      state.vhfActiveJob={id:job.id,label:job.label,marina:job.marina,startedAt:started,endsAt,reward:job.reward,prestige:job.prestige,duration:job.duration};
+      state.vhfActiveJob={id:job.id,label:job.label,marina:job.marina,startedAt:started,endsAt,reward:job.reward,prestige:job.prestige,duration:job.duration,rare:!!job.rare,badge:job.badge||""};
     });
     if(!ok){if(typeof notice==="function")notice("Incarico VHF non salvato.");return}
     if(typeof render==="function")render();
@@ -300,7 +323,7 @@
       <div class="me-live-marina-head"><span><i class="me-live-dot"></i>MARINA LIVE · TRAFFICO ATTIVO</span><span class="me-live-phase">${phase.icon} ${phase.label}</span></div>
       <div class="me-live-player-status">community in ascolto</div>
       <div class="me-live-intensity"></div>
-      <div class="me-live-vhf"><b>VHF 09</b><span class="me-live-vhf-text"></span><div><button type="button" class="me-live-vhf-action">PRENDI INCARICO</button></div><div class="me-live-vhf-career"></div></div>
+      <div class="me-live-vhf"><b>VHF 09</b><span class="me-live-vhf-text"></span><div class="me-live-vhf-preview"></div><div><button type="button" class="me-live-vhf-action">PRENDI INCARICO</button></div><div class="me-live-vhf-career"></div></div>
       <div class="me-live-water" aria-hidden="true">
         <div class="me-live-boat">🛥️<small>${names[0]}</small></div>
         <div class="me-live-boat">⛵<small>${names[1]}</small></div>
