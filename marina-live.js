@@ -207,7 +207,10 @@
     const trust=marinaTrust();
     const done=Array.isArray(state.vhfJobs)?state.vhfJobs.length:0;
     const perks=marinaPerks();
-    box.innerHTML='<b>Lv.'+lv.level+' '+lv.label+'</b><span>'+done+' incarichi'+(lv.next>0?' · '+lv.next+' al prossimo livello':' · livello massimo')+'</span><b>Marina Lv.'+trust.level+' · '+trust.label+'</b><span>'+trust.points+' reputazione'+(trust.next>0?' · '+trust.next+' al prossimo livello':' · massimo')+'</span><b>Vantaggio locale</b><span>'+perks.label+'</span>';
+    const discount=Math.round(perks.serviceDiscount*100);
+    const localProgress=trust.next>0?' · '+trust.next+' punti al prossimo vantaggio':' · livello locale massimo';
+    const serviceText=discount>0?'Sconto servizi marina '+discount+'%':'Sconto servizi non ancora sbloccato';
+    box.innerHTML='<b>VHF Lv.'+lv.level+' · '+lv.label+'</b><span>'+done+' incarichi'+(lv.next>0?' · '+lv.next+' al prossimo livello':' · livello massimo')+'</span><b>Reputazione marina Lv.'+trust.level+' · '+trust.label+'</b><span>'+trust.points+' punti'+localProgress+'</span><b>Vantaggi locali</b><span>'+perks.label+' · '+serviceText+'</span>';
   }
   function rareVhfJob(level,intensity,key){
     const rare=[
