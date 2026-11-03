@@ -675,6 +675,14 @@ padding:5px!important;gap:4px!important;
  html body .shell{padding-left:10px!important;padding-right:10px!important}
 }
 </style>
+<style id="me-mobile-map-ux-v40">
+@media(max-width:740px){
+ #map{padding-bottom:18px}
+ #interactiveMapDisplay{min-height:360px!important;height:min(54vh,520px)!important}
+ #meBetaHelp{right:10px!important;bottom:calc(92px + env(safe-area-inset-bottom,0px))!important;padding:8px 11px!important;font-size:11px!important}
+ #meBetaPanel{bottom:calc(136px + env(safe-area-inset-bottom,0px))!important;max-height:58vh!important}
+}
+</style>
 </head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">PROVA GRATIS · 1 MISSIONE</button><p class="muted" style="font-size:13px;margin:6px 0 14px">Nessuna email richiesta per la prova. Dopo la prima missione registrati gratis per continuare. Acquisti sempre facoltativi.</p><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><nav class="nav" id="navigation" aria-label="Sezioni del gioco"><button data-tab="home" class="on">🏠 HOME</button><button data-tab="office">⚓ DIREZIONE</button><button data-tab="map">🗺️ NAVIGAZIONE</button><button data-tab="missions">🎯 MISSIONI</button><button data-tab="fleet">🛥️ FLOTTA</button><button data-tab="marinas">⚓ MARINE</button><button data-tab="profile">👤 COMANDANTE / ACCOUNT</button><button data-tab="headquarters">🏝️ ISOLA DELLE ROSE</button></nav><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA TEST CLIENTI</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
@@ -1565,7 +1573,23 @@ html body #welcome .welcome{background:linear-gradient(155deg,#061b2be8,#031320e
 #home .hero .luxury-mini-map iframe{height:155px!important;display:block!important}
 #home .hero-copy{z-index:1!important;bottom:17px!important}
 }
-</style><script id="me-mobile-map-resize-v37">(function(){function refresh(){if(window.innerWidth>899)return;window.dispatchEvent(new Event("resize"));setTimeout(()=>window.dispatchEvent(new Event("resize")),350)}document.addEventListener("click",function(e){if(e.target.closest('[data-tab="map"],#homeNavigate'))setTimeout(refresh,100)});window.addEventListener("orientationchange",()=>setTimeout(refresh,350));})();</script><style id="me-home-map-real-v38">
+</style><script id="me-mobile-map-resize-v40">(function(){
+function refresh(){
+ if(window.innerWidth>899)return;
+ const mapScreen=document.getElementById("map");
+ if(mapScreen?.classList.contains("hide"))return;
+ window.dispatchEvent(new Event("resize"));
+ requestAnimationFrame(()=>window.dispatchEvent(new Event("resize")));
+ setTimeout(()=>window.dispatchEvent(new Event("resize")),120);
+ setTimeout(()=>window.dispatchEvent(new Event("resize")),420);
+}
+document.addEventListener("click",function(e){
+ if(e.target.closest('[data-tab="map"],[data-mobile-tab="map"],[data-mobile-more-tab="map"],#homeNavigate'))setTimeout(refresh,40);
+});
+document.querySelectorAll("#map").forEach(screen=>new MutationObserver(()=>{if(!screen.classList.contains("hide"))setTimeout(refresh,40)}).observe(screen,{attributes:true,attributeFilter:["class"]}));
+window.addEventListener("orientationchange",()=>setTimeout(refresh,220));
+window.addEventListener("pageshow",()=>setTimeout(refresh,180));
+})();</script><style id="me-home-map-real-v38">
 #home .hero .luxury-mini-map #homeMediterraneanMap{display:block!important;position:relative!important;width:100%!important;height:250px!important;min-height:250px!important;max-height:none!important;overflow:hidden!important;border:0!important;border-radius:8px!important;background:#0d3a50!important;z-index:0!important}
 #homeMediterraneanMap .leaflet-container{width:100%!important;height:100%!important}
 #homeMediterraneanMap .home-map-loading{position:absolute;inset:0;display:grid;place-items:center;color:#f0d39a;font-size:12px}
