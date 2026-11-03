@@ -325,6 +325,7 @@ async function multiTabConflict(browser,origin) {
   const base={name:'Concorrenza P0',coins:10000,fuel:300,condition:100,port:'rimini',boat:'voyager',owned:['voyager'],completed:[],trip:null,reservations:[],voyages:0};
   const context=await browser.newContext({viewport:{width:1100,height:800}});
   await isolated(context,origin);
+  await context.addInitScript(()=>{window.__meEarlyErrors=[];window.addEventListener('error',event=>{window.__meEarlyErrors.push({message:event.message,filename:event.filename,lineno:event.lineno,colno:event.colno});});});
   await context.addInitScript(({key,raw})=>localStorage.setItem(key,raw),{key:saveKey,raw:JSON.stringify(base)});
   const first=await context.newPage(),stale=await context.newPage(),errors=[];
   stale.on('pageerror',e=>errors.push(e.stack||e.message));
@@ -348,6 +349,7 @@ async function multiTabConflict(browser,origin) {
     assert.equal(await stale.evaluate(()=>window.meCanWriteLocalSave?.()),false,'Stale tab must be write-blocked');
     assert.equal(await stale.evaluate(()=>persist()),false,'Stale tab persistence must fail closed');
     assert.equal(await stale.evaluate(key=>localStorage.getItem(key),saveKey),latest,'Stale tab cannot overwrite the newer save');
+    if(errors.length){const early=await stale.evaluate(()=>window.__meEarlyErrors||[]);errors.push('EARLY_META '+JSON.stringify(early));}
     assert.deepEqual(errors,[],name+': runtime errors');
     console.log('PASS '+name+': storage event/conflict notice/stale write blocked');
   } finally {await context.close();}
