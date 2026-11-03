@@ -3,6 +3,13 @@
 if(window.__ME_WORLD_EVENTS__)return;
 window.__ME_WORLD_EVENTS__=true;
 
+const WEATHER=[
+ {id:"calm",icon:"☀️",label:"CALMO",sea:"Mare calmo",traffic:1.08,duration:1,wear:3},
+ {id:"breeze",icon:"🌤️",label:"BREZZA",sea:"Mare poco mosso",traffic:1,duration:1.05,wear:4},
+ {id:"rain",icon:"🌧️",label:"PIOGGIA",sea:"Visibilità ridotta",traffic:.82,duration:1.08,wear:4},
+ {id:"rough",icon:"🌊",label:"MARE MOSSO",sea:"Mare mosso",traffic:.62,duration:1.12,wear:5}
+];
+
 const EVENTS=[
  {id:"charter_boom",icon:"🛥️",title:"Boom charter",text:"Forte domanda di charter e water toys.",market:{boats:1.03,toys:1.12,tech:1},traffic:1.25,demand:1.18,sectors:["charter","servizi"]},
  {id:"yard_rush",icon:"🔧",title:"Cantiere sotto pressione",text:"Aumentano richieste tecniche, ricambi e manutenzione.",market:{boats:.98,toys:1,tech:1.14},traffic:1.08,demand:1.2,sectors:["tecnica"]},
@@ -19,6 +26,11 @@ function hash(str){
  for(const ch of String(str)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}
  return h>>>0;
 }
+function weatherFor(port,offset=0){
+ const s=slot()+offset,h=hash("weather|"+port+"|"+s);
+ const w=WEATHER[h%WEATHER.length];
+ return {...w,port,slot:s,until:(s+1)*7200000};
+}
 function eventFor(port,offset=0){
  const s=slot()+offset,h=hash(port+"|"+s);
  const e=EVENTS[h%EVENTS.length];
@@ -30,8 +42,8 @@ function currentPort(){
 }
 function current(){return eventFor(currentPort())}
 function modifiers(port=currentPort()){
- const e=eventFor(port),phase=dayPhase();
- return {boats:e.market.boats,toys:e.market.toys,tech:e.market.tech,traffic:e.traffic*phase.traffic,demand:e.demand,event:e,phase};
+ const e=eventFor(port),phase=dayPhase(),weather=weatherFor(port);
+ return {boats:e.market.boats,toys:e.market.toys,tech:e.market.tech,traffic:e.traffic*phase.traffic*weather.traffic,demand:e.demand,event:e,phase,weather,missionDuration:weather.duration,missionWear:weather.wear};
 }
 function dayPhase(){
  const h=new Date().getHours();
@@ -40,7 +52,7 @@ function dayPhase(){
  if(h>=18&&h<21)return {id:"sunset",label:"TRAMONTO",icon:"🌇",traffic:1.05};
  return {id:"night",label:"NOTTE",icon:"🌙",traffic:.55};
 }
-window.MarinaEmpireWorldEvents={current,eventFor,modifiers,slot,dayPhase};
+window.MarinaEmpireWorldEvents={current,eventFor,weatherFor,modifiers,slot,dayPhase};
 
 const style=document.createElement("style");
 style.textContent=".me-world-event{margin:10px 0;padding:10px 12px;border:1px solid rgba(214,181,117,.38);border-radius:12px;background:linear-gradient(135deg,#0b3042,#102739);display:flex;gap:10px;align-items:flex-start}.me-world-event-icon{font-size:22px}.me-world-event strong{display:block;color:#f0cf8a;font-size:12px}.me-world-event p{margin:3px 0;font-size:10px;color:#cbdbe1}.me-world-event small{color:#829fab;font-size:9px}";
@@ -58,7 +70,7 @@ function render(){
  const h=host();if(!h)return false;
  if(!box||!box.isConnected){box=document.createElement("div");box.className="me-world-event";h.prepend(box)}
  const e=current();
- const phase=dayPhase();box.innerHTML='<div class="me-world-event-icon">'+e.icon+'</div><div><strong>EVENTO MONDO · '+e.title+'</strong><p>'+e.text+'</p><small>'+phase.icon+' '+phase.label+' · aggiornamento tra '+timeLeft(e.until)+'</small></div>';
+ const phase=dayPhase(),weather=weatherFor(currentPort());box.innerHTML='<div class="me-world-event-icon">'+e.icon+'</div><div><strong>EVENTO MONDO · '+e.title+'</strong><p>'+e.text+'</p><p>'+weather.icon+' '+weather.label+' · '+weather.sea+'</p><small>'+phase.icon+' '+phase.label+' · aggiornamento tra '+timeLeft(e.until)+'</small></div>';
  window.dispatchEvent(new CustomEvent("marina-world-event",{detail:e}));
  return true;
 }
