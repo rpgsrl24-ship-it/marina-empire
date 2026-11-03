@@ -2,7 +2,7 @@ name: Marina Empire public live UX audit
 on:
   pull_request:
     paths:
-      - 'tests/public-live-ux-audit.test.cjs'
+      - 'scripts/public-live-ux-audit.cjs'
       - '.github/workflows/public-live-ux-audit.yml'
   workflow_dispatch:
 permissions:
@@ -21,7 +21,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Audit deployed public game on desktop and mobile
-        run: node tests/public-live-ux-audit.test.cjs
+        run: node scripts/public-live-ux-audit.cjs
       - name: Upload public live screenshots
         if: always()
         uses: actions/upload-artifact@v4
