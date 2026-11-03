@@ -179,6 +179,14 @@
     if(points>=5)return {level:2,label:"CONOSCIUTO",bonus:.03,points,next:15-points};
     return {level:1,label:"NUOVO OPERATORE",bonus:0,points,next:5-points};
   }
+  function marinaPerks(key=marinaKey()){
+    const trust=marinaTrust(key);
+    const cooldown=[45,42,38,34,30][Math.max(0,trust.level-1)];
+    const duration=[1,.97,.94,.90,.86][Math.max(0,trust.level-1)];
+    const rareBoost=[0,0,.04,.08,.12][Math.max(0,trust.level-1)];
+    const label=trust.level>=5?"Priorita Port Control + accesso elite":trust.level>=4?"Priorita operativa + incarichi rari":trust.level>=3?"Corsia rapida VHF":trust.level>=2?"Tempi VHF ridotti":"Nessun privilegio locale";
+    return {cooldown,duration,rareBoost,label};
+  }
   function updateVhfCareer(){
     if(!host||typeof state==="undefined")return;
     const box=host.querySelector(".me-live-vhf-career");
@@ -186,7 +194,8 @@
     const lv=vhfLevel();
     const trust=marinaTrust();
     const done=Array.isArray(state.vhfJobs)?state.vhfJobs.length:0;
-    box.innerHTML='<b>Lv.'+lv.level+' '+lv.label+'</b><span>'+done+' incarichi'+(lv.next>0?' · '+lv.next+' al prossimo livello':' · livello massimo')+'</span><b>Marina Lv.'+trust.level+' · '+trust.label+'</b><span>'+trust.points+' reputazione'+(trust.next>0?' · '+trust.next+' al prossimo livello':' · massimo')+'</span>';
+    const perks=marinaPerks();
+    box.innerHTML='<b>Lv.'+lv.level+' '+lv.label+'</b><span>'+done+' incarichi'+(lv.next>0?' · '+lv.next+' al prossimo livello':' · livello massimo')+'</span><b>Marina Lv.'+trust.level+' · '+trust.label+'</b><span>'+trust.points+' reputazione'+(trust.next>0?' · '+trust.next+' al prossimo livello':' · massimo')+'</span><b>Vantaggio locale</b><span>'+perks.label+'</span>';
   }
   function rareVhfJob(level,intensity,key){
     const rare=[
@@ -195,8 +204,10 @@
       {min:5,id:"superyacht",label:"Assistenza Superyacht Port Control",reward:1100,prestige:15,duration:65,badge:"ELITE"}
     ].filter(x=>level>=x.min);
     if(!rare.length)return null;
-    const slot=Math.floor(Date.now()/60000)%5;
-    if(slot!==0)return null;
+    const perks=marinaPerks(key);
+    const cycle=Math.floor(Date.now()/60000)%5;
+    const unlocked=cycle===0||(perks.rareBoost>=.08&&cycle===1)||(perks.rareBoost>=.12&&cycle===2);
+    if(!unlocked)return null;
     const item=rare[Math.floor(Date.now()/300000)%rare.length];
     const trafficBonus=intensity.label==="INTENSA"?1.15:1;
     return {...item,marina:key,reward:Math.round(item.reward*trafficBonus),rare:true};
@@ -234,7 +245,8 @@
       const repKey=String(active.marina||marinaKey());
       state.vhfMarinaReputation[repKey]=(Number(state.vhfMarinaReputation[repKey])||0)+(active.rare?3:1);
       state.vhfActiveJob=null;
-      state.vhfCooldownUntil=completedAt+45000;
+      const perks=marinaPerks(repKey);
+      state.vhfCooldownUntil=completedAt+perks.cooldown*1000;
     });
     if(!ok)return false;
     if(typeof render==="function")render();
@@ -260,14 +272,16 @@
     if(cooldown>0){if(typeof notice==="function")notice("Port Control: nuovo incarico tra "+cooldown+"s.");return}
     const job=vhfJob();
     const started=Date.now();
-    const endsAt=started+Math.max(15000,Number(job.duration||30)*1000);
+    const perks=marinaPerks(job.marina);
+    const adjustedDuration=Math.max(15,Math.round(Number(job.duration||30)*perks.duration));
+    const endsAt=started+adjustedDuration*1000;
     if(typeof meAtomicPersist!=="function")return;
     const ok=meAtomicPersist(()=>{
-      state.vhfActiveJob={id:job.id,label:job.label,marina:job.marina,startedAt:started,endsAt,reward:job.reward,prestige:job.prestige,duration:job.duration,rare:!!job.rare,badge:job.badge||""};
+      state.vhfActiveJob={id:job.id,label:job.label,marina:job.marina,startedAt:started,endsAt,reward:job.reward,prestige:job.prestige,duration:adjustedDuration,rare:!!job.rare,badge:job.badge||""};
     });
     if(!ok){if(typeof notice==="function")notice("Incarico VHF non salvato.");return}
     if(typeof render==="function")render();
-    if(typeof notice==="function")notice(job.label+" accettato · durata "+job.duration+"s");
+    if(typeof notice==="function")notice(job.label+" accettato · durata "+adjustedDuration+"s");
     updateVhf();
     updateVhfCareer();
     window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"vhf-job-start"}}));
