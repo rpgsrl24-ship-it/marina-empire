@@ -1685,6 +1685,7 @@ window.meCreditCheckoutReady=async function(){
 let creditReturnInFlight=false;
 async function claimPurchasedCreditsAfterReturn(){
  if(creditReturnInFlight||!client||!account?.id||!account?.email_confirmed_at)return;
+ if(typeof URL!=="function")return;
  const url=new URL(location.href);
  if(url.searchParams.get("credit_purchase")!=="success")return;
  creditReturnInFlight=true;
