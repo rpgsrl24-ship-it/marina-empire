@@ -1386,19 +1386,46 @@ function meAtomicPersist(mutator){
  return false;
 }
 window.MarinaEmpireNpcEconomy={
+ sectorFor(op){
+  const type=String(op?.type||"Servizio").toLowerCase();
+  if(type.includes("charter")||type.includes("sea trial"))return "charter";
+  if(type.includes("tecnica")||type.includes("elettrico")||type.includes("manutenzione")||type.includes("assistenza"))return "tecnica";
+  if(type.includes("broker"))return "broker";
+  if(type.includes("ormeggio")||type.includes("rifornimento"))return "marina";
+  return "servizi";
+ },
+ reputation(){
+  const base={charter:0,marina:0,tecnica:0,broker:0,servizi:0};
+  const saved=state?.sectorReputation&&typeof state.sectorReputation==="object"?state.sectorReputation:{};
+  for(const k of Object.keys(base))base[k]=Math.max(0,Math.floor(Number(saved[k])||0));
+  return base;
+ },
+ sectorLevel(sector){
+  const rep=this.reputation()[sector]||0;
+  if(rep>=500)return 5;
+  if(rep>=250)return 4;
+  if(rep>=100)return 3;
+  if(rep>=40)return 2;
+  return 1;
+ },
  canStart(op){
   const cost=Math.max(0,Math.floor(Number(op?.cost)||0));
+  const sector=this.sectorFor(op),required=Math.max(1,Math.floor(Number(op?.requiredSectorLevel)||1));
+  const sectorLevel=this.sectorLevel(sector);
   if(!state?.name)return {ok:false,message:"Avvia prima la tua partita."};
   if(!window.meRegisteredPlayer)return {ok:false,message:"Registrati gratuitamente per accettare incarichi reali della marina."};
   if(state.trip)return {ok:false,message:"Gli incarichi di marina sono disponibili soltanto quando sei ormeggiato."};
+  if(sectorLevel<required)return {ok:false,message:"Reputazione "+sector+" insufficiente: serve livello settore "+required+"."};
   if(!Number.isSafeInteger(state.coins)||state.coins<cost)return {ok:false,message:"Crediti insufficienti per coprire il costo operativo di "+money(cost)+"."};
-  return {ok:true};
+  return {ok:true,sector,sectorLevel};
  },
  complete(op,jobId){
   const id=String(jobId||"").slice(0,80);
   const cost=Math.max(0,Math.floor(Number(op?.cost)||0));
   const reward=Math.max(0,Math.floor(Number(op?.reward)||0));
   const prestige=Math.max(0,Math.floor(Number(op?.prestige)||Math.max(2,Math.round(reward/40))));
+  const sector=this.sectorFor(op);
+  const repGain=Math.max(1,Math.floor(Number(op?.reputation)||Math.max(3,Math.round(reward/70))));
   if(!id)return {ok:false,message:"Incarico non valido."};
   const pre=this.canStart({...op,cost});if(!pre.ok)return pre;
   const done=Array.isArray(state.npcJobsSettled)?state.npcJobsSettled:[];
@@ -1410,12 +1437,14 @@ window.MarinaEmpireNpcEconomy={
    state.prestige=(Number(state.prestige)||0)+prestige;
    state.earnings=(Number(state.earnings)||0)+reward-cost;
    state.npcJobsCompleted=(Number(state.npcJobsCompleted)||0)+1;
-   state.lastNpcJob={id,type:String(op?.type||"Servizio"),reward,cost,prestige,port:state.port,at:Date.now()};
+   state.sectorReputation=state.sectorReputation&&typeof state.sectorReputation==="object"?state.sectorReputation:{};
+   state.sectorReputation[sector]=Math.max(0,Math.floor(Number(state.sectorReputation[sector])||0))+repGain;
+   state.lastNpcJob={id,type:String(op?.type||"Servizio"),reward,cost,prestige,reputation:repGain,sector,port:state.port,at:Date.now()};
   });
   if(!ok)return {ok:false,message:"Incarico non registrato: salvataggio non confermato."};
   render();
   try{window.MarinaEmpireTraffic?.track("npc_job_complete");window.MarinaEmpireAuthenticatedActivity?.track("npc_job_complete")}catch(e){}
-  return {ok:true,reward,cost,net:reward-cost,prestige,level:level()};
+  return {ok:true,reward,cost,net:reward-cost,prestige,reputation:repGain,sector,sectorLevel:this.sectorLevel(sector),level:level()};
  }
 };
 let meToastTimer=null;function notice(msg,duration=3500){const t=$("toast");if(!t)return;t.textContent=msg;t.classList.remove("hide");if(meToastTimer)clearTimeout(meToastTimer);meToastTimer=setTimeout(()=>{t.classList.add("hide");meToastTimer=null},duration)}
