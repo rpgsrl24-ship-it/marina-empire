@@ -1,0 +1,46 @@
+name: Marina Empire public live UX audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'scripts/public-live-ux-audit.cjs'
+      - '.github/workflows/public-live-ux-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-ux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Wait for GitHub Pages to expose this commit
+        shell: bash
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsSL "https://rpgsrl24-ship-it.github.io/marina-empire/release.json?ts=$(date +%s)" | grep -Fq "$GITHUB_SHA"; then
+              echo "Public deployment matches $GITHUB_SHA"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Public deployment did not expose $GITHUB_SHA in time"
+          exit 1
+      - name: Audit deployed public game on desktop and mobile
+        run: node scripts/public-live-ux-audit.cjs
+      - name: Upload public live screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-live-ux-screenshots
+          path: test-results/live-public
+          if-no-files-found: warn
+          retention-days: 7

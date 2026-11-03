@@ -61,6 +61,23 @@ async function trial(browser,origin,name,viewport,mobile) {
   await page.clock.setFixedTime(new Date('2026-11-02T09:00:00Z'));
   try {
     await page.goto(origin,{waitUntil:'load'});
+    if (mobile) {
+      const mobileNav = page.locator('.mobile-game-nav');
+      const desktopNav = page.locator('#navigation');
+      assert.equal(await mobileNav.isVisible(), true, name+': mobile bottom navigation must be visible');
+      assert.equal(await desktopNav.isVisible(), false, name+': desktop navigation must be hidden on mobile layouts');
+      const navGeometry = await mobileNav.evaluate(el=>{
+        const r=el.getBoundingClientRect();
+        const buttons=[...el.querySelectorAll('button')].map(b=>{const x=b.getBoundingClientRect();return {left:x.left,right:x.right,top:x.top,bottom:x.bottom}});
+        return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:innerWidth,height:innerHeight,buttons};
+      });
+      assert.ok(navGeometry.left>=-2&&navGeometry.right<=navGeometry.width+2,name+': mobile nav stays inside viewport');
+      assert.ok(navGeometry.buttons.every(b=>b.left>=-2&&b.right<=navGeometry.width+2),name+': every mobile nav action stays on screen');
+      if(name==='mobile-portrait'){
+        const rows=new Set(navGeometry.buttons.map(b=>Math.round(b.top)));
+        assert.equal(rows.size,1,name+': all five primary mobile actions stay on one row');
+      }
+    }
     await page.locator('#playerName').fill('Collaudo P0');
     await page.locator('#play').click();
     assert.deepEqual(errors,[],`${name}: new player entry must not throw`);
