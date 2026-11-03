@@ -170,13 +170,23 @@
     if(done>=5)return {level:2,label:"Port Assistant",bonus:.06,next:12-done};
     return {level:1,label:"VHF Cadet",bonus:0,next:5-done};
   }
+  function marinaTrust(key=marinaKey()){
+    const map=state&&state.vhfMarinaReputation&&typeof state.vhfMarinaReputation==="object"?state.vhfMarinaReputation:{};
+    const points=Math.max(0,Math.floor(Number(map[key])||0));
+    if(points>=60)return {level:5,label:"FIDUCIA MASSIMA",bonus:.15,points,next:0};
+    if(points>=30)return {level:4,label:"PARTNER PORTUALE",bonus:.10,points,next:60-points};
+    if(points>=15)return {level:3,label:"OPERATORE FIDATO",bonus:.07,points,next:30-points};
+    if(points>=5)return {level:2,label:"CONOSCIUTO",bonus:.03,points,next:15-points};
+    return {level:1,label:"NUOVO OPERATORE",bonus:0,points,next:5-points};
+  }
   function updateVhfCareer(){
     if(!host||typeof state==="undefined")return;
     const box=host.querySelector(".me-live-vhf-career");
     if(!box)return;
     const lv=vhfLevel();
+    const trust=marinaTrust();
     const done=Array.isArray(state.vhfJobs)?state.vhfJobs.length:0;
-    box.innerHTML='<b>Lv.'+lv.level+' '+lv.label+'</b><span>'+done+' incarichi'+(lv.next>0?' · '+lv.next+' al prossimo livello':' · livello massimo')+'</span>';
+    box.innerHTML='<b>Lv.'+lv.level+' '+lv.label+'</b><span>'+done+' incarichi'+(lv.next>0?' · '+lv.next+' al prossimo livello':' · livello massimo')+'</span><b>Marina Lv.'+trust.level+' · '+trust.label+'</b><span>'+trust.points+' reputazione'+(trust.next>0?' · '+trust.next+' al prossimo livello':' · massimo')+'</span>';
   }
   function rareVhfJob(level,intensity,key){
     const rare=[
@@ -203,9 +213,10 @@
     const idx=Math.floor(Date.now()/30000)%options.length;
     const lv=vhfLevel();
     const special=rareVhfJob(lv.level,intensity,key);
-    if(special)return {...special,reward:Math.round(special.reward*(1+lv.bonus)),careerLevel:lv.level};
+    const trust=marinaTrust(key);
+    if(special)return {...special,reward:Math.round(special.reward*(1+lv.bonus)*(1+trust.bonus)),careerLevel:lv.level,marinaLevel:trust.level};
     const base=options[idx];
-    return {...base,marina:key,reward:Math.round(base.reward*(1+lv.bonus)),careerLevel:lv.level,rare:false};
+    return {...base,marina:key,reward:Math.round(base.reward*(1+lv.bonus)*(1+trust.bonus)),careerLevel:lv.level,marinaLevel:trust.level,rare:false};
   }
   function completeVhfJob(){
     if(typeof state==="undefined"||typeof meAtomicPersist!=="function")return false;
@@ -219,6 +230,9 @@
       state.coins=(Number(state.coins)||0)+(Number(active.reward)||0);
       state.prestige=(Number(state.prestige)||0)+(Number(active.prestige)||0);
       state.earnings=(Number(state.earnings)||0)+(Number(active.reward)||0);
+      state.vhfMarinaReputation=state.vhfMarinaReputation&&typeof state.vhfMarinaReputation==="object"?state.vhfMarinaReputation:{};
+      const repKey=String(active.marina||marinaKey());
+      state.vhfMarinaReputation[repKey]=(Number(state.vhfMarinaReputation[repKey])||0)+(active.rare?3:1);
       state.vhfActiveJob=null;
       state.vhfCooldownUntil=completedAt+45000;
     });
@@ -227,7 +241,6 @@
     if(typeof notice==="function")notice(active.label+" completato · +"+Number(active.reward||0).toLocaleString("it-IT")+" crediti · prestigio +"+Number(active.prestige||0));
     window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"vhf-job-complete"}}));
     updateVhf();
-    updateVhfCareer();
     updateVhfCareer();
     return true;
   }
