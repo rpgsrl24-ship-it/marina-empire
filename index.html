@@ -1433,8 +1433,41 @@ function renderProgressionHub(){
 function render(){if(!state.name)return;const arrivalBox=$("voyageArrivalNotice");if(arrivalBox){const a=state.lastArrival,valid=!!(a&&a.destination&&harborGPS[a.destination]&&!state.trip&&Number.isFinite(Number(a.at))&&Date.now()>=Number(a.at)&&Date.now()-Number(a.at)<86400000);arrivalBox.classList.toggle("hide",!valid);if(valid){arrivalBox.innerHTML="<h2>⚓ Arrivo a "+port(a.destination).name+"</h2><p>Missione completata: "+String(a.mission||"Navigazione").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+" · <strong>+"+money(a.reward)+" crediti</strong> · +"+money(a.prestige)+" prestigio.</p>"+(!window.meRegisteredPlayer&&Number(state.voyages)>=1?"<p><strong>Il tuo impero è appena iniziato!</strong> Registrati gratuitamente per conservare i progressi e continuare a navigare. Nessun acquisto obbligatorio.</p><button type=\"button\" data-tab=\"profile\">REGISTRATI GRATIS</button>":"")+"<div class=\"me-arrival-condition\">⛽ Carburante residuo: <strong>"+Math.max(0,Math.round(Number(state.fuel)||0))+" L</strong> · 🔧 Stato yacht: <strong>"+Math.max(0,Math.min(100,Math.round(Number(state.condition)||0)))+"%</strong></div>"+(window.meRegisteredPlayer?(Number(state.voyages)>=2?"<button type=\"button\" class=\"gold\" data-progress-go=\"activities\">ATTIVITÀ IN MARINA</button><button type=\"button\" data-tab=\"missions\">ALTRA MISSIONE</button>":"<button type=\"button\" class=\"gold\" data-tab=\"missions\">SCEGLI LA PROSSIMA MISSIONE</button>"):"")+"<button type=\"button\" data-dismiss-arrival=\"1\">CHIUDI RIEPILOGO</button>"}}window.dispatchEvent(new Event("marina-empire-updated"));renderSetup();renderOfficeActions();renderOfficeFleet();renderOfficeMissions();renderOffice();renderBusinesses();renderCareer();renderStarterGuide();renderProgressionHub();renderMissionChoices();const autoBox=$("autoCharterSummary");if(autoBox){const working=state.owned.filter(id=>id!==state.boat&&autonomousCharterRates[id]>0);const hourly=working.reduce((sum,id)=>sum+autonomousCharterRates[id],0);autoBox.textContent=working.length+" yacht in charter automatico · "+money(hourly)+" crediti netti/ora · Guadagni accumulati: "+money(state.charterEarnings||0)+" crediti. Acquista una seconda barca per iniziare.";} $("captain").textContent=state.name;$("coins").textContent=money(state.coins);
 const meMobileGoalTitle=$("meMobileGoalTitle"),meMobileGoalText=$("meMobileGoalText"),meMobileGoalProgress=$("meMobileGoalProgress"),meMobileGoalMissing=$("meMobileGoalMissing"),meMobileGoalCount=$("meMobileGoalCount");
 if(meMobileGoalTitle&&meMobileGoalText&&meMobileGoalProgress&&meMobileGoalMissing&&meMobileGoalCount){
- const goalBoat=boats.find(b=>b.id==="open"),goalPrice=Number(goalBoat?.price)||80000,goalCoins=Math.max(0,Number(state.coins)||0),goalOwned=state.owned.includes("open");
- if(goalOwned){
+ const voyages=Math.max(0,Number(state.voyages)||0),goalCoins=Math.max(0,Number(state.coins)||0),registered=!!window.meRegisteredPlayer;
+ const businessesOwned=state.businesses&&typeof state.businesses==="object"?Object.values(state.businesses).filter(Boolean).length:0;
+ const goalBoat=boats.find(b=>b.id==="open"),goalPrice=Number(goalBoat?.price)||80000,goalOwned=state.owned.includes("open");
+ if(voyages===0){
+  meMobileGoalTitle.textContent="Primo obiettivo: completa una missione";
+  meMobileGoalText.textContent="Salpa dalla tua marina e completa il primo viaggio.";
+  meMobileGoalMissing.textContent="Sblocca la carriera del comandante";
+  meMobileGoalCount.textContent="0 / 1 VIAGGIO";
+  meMobileGoalProgress.style.width="8%";
+ }else if(!registered){
+  meMobileGoalTitle.textContent="Salva il tuo impero";
+  meMobileGoalText.textContent="Registrati gratis per continuare dopo la missione di prova.";
+  meMobileGoalMissing.textContent="Nessun acquisto obbligatorio";
+  meMobileGoalCount.textContent="ACCOUNT";
+  meMobileGoalProgress.style.width="25%";
+ }else if(voyages===1){
+  meMobileGoalTitle.textContent="Prossimo sblocco: lavori di marina";
+  meMobileGoalText.textContent="Completa il secondo viaggio per ottenere incarichi locali.";
+  meMobileGoalMissing.textContent="Manca 1 viaggio";
+  meMobileGoalCount.textContent="1 / 2 VIAGGI";
+  meMobileGoalProgress.style.width="50%";
+ }else if(voyages===2){
+  meMobileGoalTitle.textContent="Prossimo sblocco: attività nautiche";
+  meMobileGoalText.textContent="Completa il terzo viaggio e apri la parte gestionale.";
+  meMobileGoalMissing.textContent="Manca 1 viaggio";
+  meMobileGoalCount.textContent="2 / 3 VIAGGI";
+  meMobileGoalProgress.style.width="72%";
+ }else if(businessesOwned===0&&goalCoins<goalPrice){
+  const businessTarget=12000,missingBusiness=Math.max(0,businessTarget-goalCoins),pctBusiness=Math.max(0,Math.min(100,(goalCoins/businessTarget)*100));
+  meMobileGoalTitle.textContent="Avvia il tuo primo business nautico";
+  meMobileGoalText.textContent="Investimento guida: "+money(businessTarget)+" crediti";
+  meMobileGoalMissing.textContent=missingBusiness>0?"Ti mancano "+money(missingBusiness)+" crediti":"Puoi aprire un'attività";
+  meMobileGoalCount.textContent=money(goalCoins)+" / "+money(businessTarget);
+  meMobileGoalProgress.style.width=pctBusiness.toFixed(1)+"%";
+ }else if(goalOwned){
   meMobileGoalTitle.textContent="Obiettivo raggiunto: seconda barca";
   meMobileGoalText.textContent="RPG Open 7 è già nella tua flotta.";
   meMobileGoalMissing.textContent="Continua a far crescere il tuo impero";
