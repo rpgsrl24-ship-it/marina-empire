@@ -49,6 +49,7 @@
   .me-live-marina[data-phase="dawn"] .me-live-water{filter:brightness(.88) sepia(.08)}
   .me-live-marina[data-phase="sunset"] .me-live-water{filter:brightness(.82) sepia(.16) saturate(1.15)}
   .me-live-phase{font-size:9px;color:#9fb9c4}
+  .me-live-player-status{margin:0 10px 7px;display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid rgba(76,225,161,.28);border-radius:999px;background:rgba(76,225,161,.06);font-size:9px;color:#bcebd7}
   .me-live-community{padding:8px 10px 10px;border-top:1px solid rgba(194,154,96,.18);background:#082431}
   .me-live-community-head{font-size:9px;letter-spacing:.06em;color:#d9c39e;margin-bottom:5px}
   .me-live-community-row{display:grid;grid-template-columns:38px minmax(70px,auto) 1fr;gap:6px;align-items:start;font-size:9px;color:#b9cdd4;padding:3px 0}
@@ -107,6 +108,21 @@
     feedRows=feedRows.slice(0,3);
     feed.innerHTML=feedRows.map((r,i)=>`<div class="me-live-feed-row"><span class="me-live-feed-time">${r.t}</span><span>${i===0?"<strong>LIVE</strong> · ":""}${r.text}</span></div>`).join("");
   }
+  function activeCommunityCount(){
+    const source=document.getElementById("communityMessages");
+    if(!source)return 0;
+    const names=[...source.querySelectorAll(".me-community-message strong")]
+      .map(x=>(x.textContent||"").trim())
+      .filter(Boolean);
+    return new Set(names).size;
+  }
+  function updateLiveStatus(){
+    if(!host)return;
+    const badge=host.querySelector(".me-live-player-status");
+    if(!badge)return;
+    const count=activeCommunityCount();
+    badge.textContent=count?count+" comandanti attivi":"community in ascolto";
+  }
   function mirrorCommunity(){
     if(!host)return;
     let box=host.querySelector(".me-live-community");
@@ -140,6 +156,7 @@
     const names=namesFor(key);
     host.innerHTML=`
       <div class="me-live-marina-head"><span><i class="me-live-dot"></i>MARINA LIVE · TRAFFICO ATTIVO</span><span class="me-live-phase">${phase.icon} ${phase.label}</span></div>
+      <div class="me-live-player-status">community in ascolto</div>
       <div class="me-live-water" aria-hidden="true">
         <div class="me-live-boat">🛥️<small>${names[0]}</small></div>
         <div class="me-live-boat">⛵<small>${names[1]}</small></div>
@@ -153,6 +170,7 @@
     addFeed(eventText(key));
     addFeed(eventText(key));
     mirrorCommunity();
+    updateLiveStatus();
     return true;
   }
   function schedule(){
@@ -174,10 +192,10 @@
     if(list) new MutationObserver(()=>setTimeout(build,50)).observe(list,{childList:true,subtree:true});
     const community=document.getElementById("communityMessages");
     if(community&&!communityObserver){
-      communityObserver=new MutationObserver(()=>setTimeout(mirrorCommunity,40));
+      communityObserver=new MutationObserver(()=>setTimeout(()=>{mirrorCommunity();updateLiveStatus()},40));
       communityObserver.observe(community,{childList:true,subtree:true});
     }
-    window.addEventListener("marina-empire-updated",()=>setTimeout(build,60));
+    window.addEventListener("marina-empire-updated",()=>setTimeout(()=>{build();updateLiveStatus()},60));
     window.addEventListener("marina-world-event",()=>setTimeout(()=>{build();schedule();},80));
     document.addEventListener("visibilitychange",()=>{if(!document.hidden)schedule();});
   }
