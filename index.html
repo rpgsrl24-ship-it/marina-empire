@@ -1426,6 +1426,24 @@ window.MarinaEmpireObjectives={
   if(!p||p.key!==key)return null;
   return {key:p.key,base:{...(p.base||{})},claimed:[...(Array.isArray(p.claimed)?p.claimed:[])],metrics:this.metrics()};
  },
+ checkIn(dayKey){
+  dayKey=String(dayKey||"").slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(dayKey))return {ok:false,message:"Data accesso non valida."};
+  const prev=state.dailyStreak&&typeof state.dailyStreak==="object"?state.dailyStreak:{lastDay:"",count:0};
+  if(prev.lastDay===dayKey)return {ok:false,already:true,count:Math.max(1,Number(prev.count)||1),message:"Premio continuità già riscosso oggi."};
+  const parse=k=>{const [y,m,d]=String(k).split("-").map(Number);return Date.UTC(y,m-1,d)};
+  const consecutive=prev.lastDay&&Number.isFinite(parse(prev.lastDay))&&parse(dayKey)-parse(prev.lastDay)===86400000;
+  const count=consecutive?Math.min(30,Math.max(1,Math.floor(Number(prev.count)||0)+1)):1;
+  const reward=200+Math.min(count,7)*100,prestige=Math.min(15,2+count);
+  const ok=meAtomicPersist(()=>{
+   state.dailyStreak={lastDay:dayKey,count,totalDays:Math.max(0,Math.floor(Number(prev.totalDays)||0))+1};
+   state.coins+=reward;
+   state.prestige=(Number(state.prestige)||0)+prestige;
+   state.earnings=(Number(state.earnings)||0)+reward;
+  });
+  if(!ok)return {ok:false,message:"Premio continuità non registrato."};
+  render();return {ok:true,count,reward,prestige,message:"Continuità comandante: "+count+" giorni · +"+money(reward)+" crediti."};
+ },
  claim(kind,key,id,metric,target,reward,prestige){
   kind=kind==="weekly"?"weekly":"daily";key=String(key||"").slice(0,40);id=String(id||"").slice(0,80);metric=String(metric||"");
   target=Math.max(1,Math.floor(Number(target)||1));reward=Math.max(0,Math.floor(Number(reward)||0));prestige=Math.max(0,Math.floor(Number(prestige)||0));
