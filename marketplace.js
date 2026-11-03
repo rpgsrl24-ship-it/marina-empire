@@ -51,6 +51,10 @@ let mode="boats",marketFilter="all",seed=Math.floor(Date.now()/3600000);
 
 function econ(){return window.MarinaEmpireMarketplaceEconomy}
 function snap(){return econ()?.snapshot?.()||{coins:0,owned:[],inventory:{},registered:false,port:"rimini"}}
+function specializationMarketBonus(){
+ const s=window.MarinaEmpireSpecialization?.get?.();
+ return s?.key==="broker"?1.08:1;
+}
 function brokerInfo(){
  const npc=window.MarinaEmpireNpcEconomy;
  const rep=npc?.reputation?.().broker||0;
@@ -187,7 +191,7 @@ function demandOffers(s){
   if(item){
    const premium=1.08+(b.level-1)*.025;
    const demandBoost=window.MarinaEmpireWorldEvents?.modifiers?.(s.port)?.demand||1;
-   const value=Math.round(itemOffer(item,s).buy*premium*demandBoost);
+   const value=Math.round(itemOffer(item,s).buy*premium*demandBoost*specializationMarketBonus());
    offers.push({id:"demand-item-"+s.port+"-"+id+"-"+seed,kind:"item",targetId:id,title:"Cliente cerca "+item.name,detail:"Richiesta urgente a "+p.label,value,repGain:4+b.level});
   }
  }
@@ -196,7 +200,7 @@ function demandOffers(s){
   const boat=sellable[Math.abs(Math.floor(factor("demand-boat-"+s.port,0,sellable.length)))%sellable.length];
   const offer=boatOffer(boat,s);
   const demandBoost=window.MarinaEmpireWorldEvents?.modifiers?.(s.port)?.demand||1;
-  const value=Math.round(offer.marketPrice*(1.03+b.level*.02)*demandBoost);
+  const value=Math.round(offer.marketPrice*(1.03+b.level*.02)*demandBoost*specializationMarketBonus());
   offers.push({id:"demand-boat-"+s.port+"-"+boat.id+"-"+seed,kind:"boat",targetId:boat.id,title:"Armatore cerca "+boat.name,detail:"Acquisto diretto tramite broker locale",value,repGain:7+b.level});
  }
  return offers;
@@ -217,7 +221,8 @@ function marketPulseHTML(s){
   "Nuova richiesta di acquisto da armatore"
  ];
  const idx=Math.abs(Math.floor(factor("pulse-"+s.port,0,events.length)))%events.length;
- const edge=b.level>=5?"Broker Lv 5: sconti massimi e mandati top.":b.level>=4?"Broker Lv 4: offerte esclusive migliorate.":b.level>=3?"Broker Lv 3: accesso alle occasioni esclusive attivo.":"Aumenta la reputazione Broker per ricevere condizioni migliori.";
+ const spec=window.MarinaEmpireSpecialization?.get?.();
+ const edge=(spec?.key==="broker"?"🎯 Broker Nautico attivo · domanda NPC +8%. ":"")+(b.level>=5?"Broker Lv 5: sconti massimi e mandati top.":b.level>=4?"Broker Lv 4: offerte esclusive migliorate.":b.level>=3?"Broker Lv 3: accesso alle occasioni esclusive attivo.":"Aumenta la reputazione Broker per ricevere condizioni migliori.");
  return '<div class="me-market-card"><span class="me-market-badge">MERCATO LIVE</span><h3>📈 '+p.label+'</h3><p>'+(world?(world.icon+" "+world.title+" · "+world.text):events[idx])+'</p><p>'+edge+'</p></div>';
 }
 function render(){
