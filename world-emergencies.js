@@ -46,18 +46,26 @@ function ensure(){
  box=document.createElement("div");box.className="me-emergency-box";
  h.appendChild(box);return true;
 }
+function navigable(em){return em?.type==="SOS"||em?.type==="Recupero"}
 function render(){
  if(!ensure())return;
  if(!current)current=choose();
  const w=world();
- box.innerHTML='<strong>'+current.icon+' EMERGENZA LIVE · '+current.title+'</strong><p>'+current.text+'</p><div class="me-emergency-meta"><span>'+current.type+'</span><span>⏱ '+current.duration+'s</span><span>Costo '+current.cost+'</span><span>Ricompensa '+current.reward+'</span><span>Prestigio +'+current.prestige+'</span><span>Rep. '+current.sector+' +'+current.reputation+'</span><span>Scade tra '+timeLeft()+' min</span>'+(w?.weather?'<span>'+w.weather.icon+' '+w.weather.label+'</span>':'')+'</div><div class="me-emergency-actions"><button type="button" class="me-emergency-accept" '+(job?'disabled':'')+'>ACCETTA EMERGENZA</button></div><div class="me-emergency-progress"><span style="width:'+(job?Math.min(100,job.progress):0)+'%"></span></div><div class="me-emergency-status">'+(job?'Intervento in corso':'Disponibile ora')+'</div>';
+ box.innerHTML='<strong>'+current.icon+' EMERGENZA LIVE · '+current.title+'</strong><p>'+current.text+'</p><div class="me-emergency-meta"><span>'+current.type+'</span><span>⏱ '+current.duration+'s</span><span>Costo '+current.cost+'</span><span>Ricompensa '+current.reward+'</span><span>Prestigio +'+current.prestige+'</span><span>Rep. '+current.sector+' +'+current.reputation+'</span><span>Scade tra '+timeLeft()+' min</span>'+(w?.weather?'<span>'+w.weather.icon+' '+w.weather.label+'</span>':'')+'</div><div class="me-emergency-actions"><button type="button" class="me-emergency-accept" '+(job?'disabled':'')+'>'+(navigable(current)?"SALPA PER SOS":"ACCETTA EMERGENZA")+'</button></div><div class="me-emergency-progress"><span style="width:'+(job?Math.min(100,job.progress):0)+'%"></span></div><div class="me-emergency-status">'+(job?'Intervento in corso':'Disponibile ora')+'</div>';
  box.querySelector(".me-emergency-accept")?.addEventListener("click",accept);
 }
 function accept(){
  if(job||!current)return;
+ const st=box.querySelector(".me-emergency-status");
+ if(navigable(current)){
+  const nav=window.MarinaEmpireEmergencyNavigation;
+  const result=nav?.start?.(current)||{ok:false,message:"Navigazione SOS non disponibile."};
+  st.textContent=result.message||"";
+  if(result.ok){job={...current,navigation:true,progress:0};setTimeout(()=>{box?.remove();box=null;},900);}
+  return;
+ }
  const econ=window.MarinaEmpireEmergencyEconomy;
  const check=econ?.canStart?.(current)||{ok:false,message:"Sistema emergenze non disponibile."};
- const st=box.querySelector(".me-emergency-status");
  if(!check.ok){st.textContent=check.message;return;}
  job={...current,started:Date.now(),progress:0};
  st.textContent="Intervento accettato";
