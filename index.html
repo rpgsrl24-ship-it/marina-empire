@@ -1514,6 +1514,34 @@ window.MarinaEmpireAchievements={
   render();return {ok:true,message:"Titolo attivo: "+title+"."};
  }
 };
+window.MarinaEmpireSeasonRewards={
+ apply(serverReward){
+  const r=serverReward&&typeof serverReward==="object"?serverReward:null;
+  if(!r||r.ok!==true)return {ok:false,message:r?.message||"Premio stagione non disponibile."};
+  const type=r.season_type==="monthly"?"monthly":"weekly";
+  const key=String(r.season_key||"").slice(0,40);
+  const id=type+"|"+key;
+  const coins=Math.max(0,Math.floor(Number(r.reward_coins)||0));
+  const prestige=Math.max(0,Math.floor(Number(r.reward_prestige)||0));
+  const badge=String(r.badge||"").slice(0,80);
+  const applied=Array.isArray(state.seasonRewardsApplied)?state.seasonRewardsApplied:[];
+  if(applied.includes(id))return {ok:false,already:true,message:"Premio stagione già registrato nella partita."};
+  const ok=meAtomicPersist(()=>{
+   state.seasonRewardsApplied=[...applied,id].slice(-60);
+   state.coins+=coins;
+   state.prestige=(Number(state.prestige)||0)+prestige;
+   state.earnings=(Number(state.earnings)||0)+coins;
+   state.seasonBadges=Array.isArray(state.seasonBadges)?state.seasonBadges:[];
+   if(badge&&!state.seasonBadges.includes(badge))state.seasonBadges.push(badge);
+   state.titlesUnlocked=Array.isArray(state.titlesUnlocked)?state.titlesUnlocked:[];
+   if(badge&&!state.titlesUnlocked.includes(badge))state.titlesUnlocked.push(badge);
+   state.lastSeasonReward={type,key,rank:Math.max(1,Math.floor(Number(r.rank_position)||1)),coins,prestige,badge,at:Date.now()};
+  });
+  if(!ok)return {ok:false,message:"Premio stagione riconosciuto online, ma il salvataggio locale non è riuscito."};
+  render();
+  return {ok:true,coins,prestige,badge,message:"Premio stagione riscosso: +"+money(coins)+" crediti · prestigio +"+prestige+(badge?" · "+badge:"")};
+ }
+};
 window.MarinaEmpireMarketplaceEconomy={
  snapshot(){
   return {
