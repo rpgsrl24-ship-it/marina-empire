@@ -55,6 +55,8 @@
   .me-live-vhf{margin:0 10px 8px;padding:7px 8px;border-left:2px solid #7eb9cf;background:rgba(10,48,62,.72);font-size:9px;color:#bfd1d7}
   .me-live-vhf b{color:#9dd7ea;margin-right:5px}.me-live-vhf-text{display:inline}
   .me-live-vhf-action{margin-top:6px;padding:5px 8px;min-height:0;border-radius:8px;font-size:9px;background:#123b4b;border-color:#5d91a4}
+  .me-live-vhf-career{margin-top:6px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:8.5px;color:#9fb8c2}
+  .me-live-vhf-career b{color:#f0d29d}
   .me-live-community{padding:8px 10px 10px;border-top:1px solid rgba(194,154,96,.18);background:#082431}
   .me-live-community-head{font-size:9px;letter-spacing:.06em;color:#d9c39e;margin-bottom:5px}
   .me-live-community-row{display:grid;grid-template-columns:38px minmax(70px,auto) 1fr;gap:6px;align-items:start;font-size:9px;color:#b9cdd4;padding:3px 0}
@@ -152,6 +154,22 @@
     if(cooldown>0){action.textContent="NUOVO INCARICO TRA "+cooldown+"s";action.disabled=true;return}
     action.textContent="PRENDI INCARICO";action.disabled=false;
   }
+  function vhfLevel(){
+    const done=Array.isArray(state?.vhfJobs)?state.vhfJobs.length:0;
+    if(done>=40)return {level:5,label:"Port Control Master",bonus:.25,next:0};
+    if(done>=25)return {level:4,label:"Senior Operator",bonus:.18,next:40-done};
+    if(done>=12)return {level:3,label:"VHF Specialist",bonus:.12,next:25-done};
+    if(done>=5)return {level:2,label:"Port Assistant",bonus:.06,next:12-done};
+    return {level:1,label:"VHF Cadet",bonus:0,next:5-done};
+  }
+  function updateVhfCareer(){
+    if(!host||typeof state==="undefined")return;
+    const box=host.querySelector(".me-live-vhf-career");
+    if(!box)return;
+    const lv=vhfLevel();
+    const done=Array.isArray(state.vhfJobs)?state.vhfJobs.length:0;
+    box.innerHTML='<b>Lv.'+lv.level+' '+lv.label+'</b><span>'+done+' incarichi'+(lv.next>0?' · '+lv.next+' al prossimo livello':' · livello massimo')+'</span>';
+  }
   function vhfJob(){
     const intensity=marinaIntensity();
     const key=marinaKey();
@@ -162,7 +180,9 @@
       {id:"traffic",label:"Supporto Port Control",reward:200+intensity.arrivals*25,prestige:3,duration:32}
     ];
     const idx=Math.floor(Date.now()/30000)%options.length;
-    return {...options[idx],marina:key};
+    const lv=vhfLevel();
+    const base=options[idx];
+    return {...base,marina:key,reward:Math.round(base.reward*(1+lv.bonus)),careerLevel:lv.level};
   }
   function completeVhfJob(){
     if(typeof state==="undefined"||typeof meAtomicPersist!=="function")return false;
@@ -184,6 +204,8 @@
     if(typeof notice==="function")notice(active.label+" completato · +"+Number(active.reward||0).toLocaleString("it-IT")+" crediti · prestigio +"+Number(active.prestige||0));
     window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"vhf-job-complete"}}));
     updateVhf();
+    updateVhfCareer();
+    updateVhfCareer();
     return true;
   }
   function runVhfJob(){
@@ -211,6 +233,7 @@
     if(typeof render==="function")render();
     if(typeof notice==="function")notice(job.label+" accettato · durata "+job.duration+"s");
     updateVhf();
+    updateVhfCareer();
     window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"vhf-job-start"}}));
   }
   function eventText(key){
@@ -277,7 +300,7 @@
       <div class="me-live-marina-head"><span><i class="me-live-dot"></i>MARINA LIVE · TRAFFICO ATTIVO</span><span class="me-live-phase">${phase.icon} ${phase.label}</span></div>
       <div class="me-live-player-status">community in ascolto</div>
       <div class="me-live-intensity"></div>
-      <div class="me-live-vhf"><b>VHF 09</b><span class="me-live-vhf-text"></span><div><button type="button" class="me-live-vhf-action">PRENDI INCARICO</button></div></div>
+      <div class="me-live-vhf"><b>VHF 09</b><span class="me-live-vhf-text"></span><div><button type="button" class="me-live-vhf-action">PRENDI INCARICO</button></div><div class="me-live-vhf-career"></div></div>
       <div class="me-live-water" aria-hidden="true">
         <div class="me-live-boat">🛥️<small>${names[0]}</small></div>
         <div class="me-live-boat">⛵<small>${names[1]}</small></div>
@@ -294,6 +317,7 @@
     updateLiveStatus();
     updateMarinaPulse();
     updateVhf();
+    updateVhfCareer();
     host.querySelector(".me-live-vhf-action")?.addEventListener("click",runVhfJob);
     return true;
   }
