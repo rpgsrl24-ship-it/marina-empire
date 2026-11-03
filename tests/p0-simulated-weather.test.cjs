@@ -14,7 +14,7 @@ vm.runInContext(html.slice(start,end),context);
 test('weather catalogue is finite, bounded and game-only',()=>{
  const profiles=vm.runInContext('simulatedWeather.map(x=>({...x}))',context);
  assert.equal(profiles.length,4);
- assert.deepEqual(profiles.map(x=>x.id).sort(),['breeze','calm','rain','rough']);
+ assert.equal(JSON.stringify(profiles.map(x=>x.id).sort()),JSON.stringify(['breeze','calm','rain','rough']));
  for(const p of profiles){
   assert(Number.isFinite(p.duration)&&p.duration>=1&&p.duration<=1.12,p.id+' duration');
   assert(Number.isInteger(p.wear)&&p.wear>=3&&p.wear<=5,p.id+' wear');
