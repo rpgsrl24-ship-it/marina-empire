@@ -36,10 +36,10 @@ function title(){
 function renderRows(rows,seasonInfo){
  if(!box)return;
  const season=mode!=="absolute";
- const note=season?'<div class="me-season-note">La classifica stagionale misura i <b>punti Empire guadagnati nel periodo</b>, non il totale storico. I nuovi giocatori possono quindi competere subito.'+(seasonInfo?.season_key?' · Periodo '+esc(seasonInfo.season_key):'')+'</div>':'';
+ const note=season?'<div class="me-season-note">La classifica stagionale misura i <b>punti Empire guadagnati nel periodo</b>, non il totale storico. I nuovi giocatori possono quindi competere subito.'+(seasonInfo?.season_key?' · Periodo '+esc(seasonInfo.season_key):'')+'<div style="margin-top:8px"><button type="button" id="meSeasonClaim">🎁 RISCATTA PREMIO STAGIONE PRECEDENTE</button></div><div id="meSeasonClaimStatus" class="me-leaderboard-status"></div></div>':'';
  if(!rows.length){
   box.innerHTML='<h3>'+title()+'</h3>'+tabs()+note+'<p class="me-leaderboard-status">Nessun giocatore classificato in questo periodo.</p>';
-  bindTabs();return;
+  bindTabs();bindSeasonClaim();return;
  }
  box.innerHTML='<h3>'+title()+' · giocatori reali</h3>'+tabs()+note+'<div class="me-leaderboard-list">'+rows.map(r=>{
    const name=r.active_title?(String(r.active_title)+" · "+String(r.captain_name||"Comandante")):String(r.captain_name||"Comandante");
@@ -50,6 +50,27 @@ function renderRows(rows,seasonInfo){
    return '<article class="me-leaderboard-row '+(r.is_me?'me-lb-me':'')+'"><div class="me-leaderboard-rank">#'+esc(r.rank_position)+'</div><div><div class="me-leaderboard-name">'+esc(name)+'</div><div class="me-leaderboard-meta">'+esc(r.empire_tier)+(r.specialization?' · '+esc(specLabel(r.specialization)):'')+' · '+voyages+voyageLabel+'</div></div><div class="me-leaderboard-score">'+score.toLocaleString("it-IT")+suffix+'</div></article>';
  }).join("")+'</div><div class="me-leaderboard-status">Solo dati di gioco pubblici. Nessuna email o informazione privata viene mostrata.</div>';
  bindTabs();
+ bindSeasonClaim();
+}
+async function claimSeasonReward(){
+ if(mode==="absolute"||!client)return;
+ const status=box?.querySelector("#meSeasonClaimStatus"),btn=box?.querySelector("#meSeasonClaim");
+ if(btn)btn.disabled=true;if(status)status.textContent="Verifica premio stagione…";
+ try{
+  const res=await client.rpc("me_claim_season_reward",{p_type:mode});
+  if(res.error)throw res.error;
+  const reward=res.data?.[0];
+  const applied=window.MarinaEmpireSeasonRewards?.apply?.(reward)||{ok:false,message:reward?.message||"Premio non disponibile."};
+  if(status)status.textContent=applied.message||reward?.message||"";
+  if(applied.ok)window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"season-reward"}}));
+ }catch(e){
+  if(status)status.textContent="Premio stagione non disponibile.";
+  console.warn("Marina Empire season reward:",e?.message||e);
+ }finally{if(btn)btn.disabled=false}
+}
+function bindSeasonClaim(){
+ const btn=box?.querySelector("#meSeasonClaim");
+ if(btn)btn.addEventListener("click",claimSeasonReward);
 }
 function bindTabs(){
  box?.querySelectorAll("[data-lb-mode]").forEach(b=>b.addEventListener("click",()=>{if(mode===b.dataset.lbMode)return;mode=b.dataset.lbMode;load(true)}));
@@ -83,7 +104,7 @@ async function load(force=false){
   }
  }catch(e){
   box.innerHTML='<h3>'+title()+'</h3>'+tabs()+'<p class="me-leaderboard-status">Classifica momentaneamente non disponibile.</p>';
-  bindTabs();
+  bindTabs();bindSeasonClaim();
   console.warn("Marina Empire leaderboard:",e?.message||e);
  }finally{loading=false}
 }
