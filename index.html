@@ -1592,6 +1592,28 @@ window.MarinaEmpireSpecialization={
   render();return {ok:true,message:"Specializzazione attiva: "+this.definitions[key].label+"."};
  }
 };
+window.MarinaEmpireSpecializationContracts={
+ catalog:{
+  charter:{title:"Charter VIP esclusivo",type:"Charter",sector:"charter",cost:420,reward:1450,prestige:28,reputation:14,duration:42},
+  broker:{title:"Mandato yacht riservato",type:"Brokerage",sector:"broker",cost:180,reward:980,prestige:18,reputation:12,duration:30},
+  tecnica:{title:"Intervento tecnico avanzato",type:"Tecnica",sector:"tecnica",cost:360,reward:1320,prestige:24,reputation:14,duration:38},
+  marina:{title:"Operazione marina prioritaria",type:"Ormeggio",sector:"marina",cost:280,reward:1080,prestige:20,reputation:12,duration:34},
+  servizi:{title:"Concierge superyacht",type:"Servizio VIP",sector:"servizi",cost:300,reward:1180,prestige:22,reputation:13,duration:36}
+ },
+ current(){
+  const s=window.MarinaEmpireSpecialization?.get?.();
+  if(!s)return null;
+  const base=this.catalog[s.key];if(!base)return null;
+  const lv=window.MarinaEmpireNpcEconomy?.sectorLevel?.(s.sector)||1;
+  const world=window.MarinaEmpireWorldEvents?.modifiers?.(state.port)||null;
+  const worldBoost=world?.event?.sectors?.includes(s.sector)?Math.max(1,Number(world.event.demand)||1):1;
+  return {...base,key:s.key,icon:s.icon,label:s.label,reward:Math.round(base.reward*(1+(lv-2)*.12)*worldBoost),prestige:Math.round(base.prestige*(1+(lv-2)*.08)),requiredSectorLevel:2};
+ },
+ complete(contract,id){
+  const c=contract||this.current();if(!c)return {ok:false,message:"Nessun contratto esclusivo disponibile."};
+  return window.MarinaEmpireNpcEconomy?.complete?.(c,id)||{ok:false,message:"Sistema incarichi non disponibile."};
+ }
+};
 window.MarinaEmpireNpcEconomy={
  sectorFor(op){
   const type=String(op?.type||"Servizio").toLowerCase();
