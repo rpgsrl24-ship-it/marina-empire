@@ -156,6 +156,37 @@ function bind(root){
  root.querySelectorAll("[data-sell-item]").forEach(b=>b.addEventListener("click",()=>{
   const i=ITEMS.find(x=>x.id===b.dataset.sellItem);const r=econ()?.sellItem?.(i,Number(b.dataset.price));setStatus(r?.message);if(r?.ok)setTimeout(render,500);
  }));
+ root.querySelectorAll("[data-fulfill-demand]").forEach(b=>b.addEventListener("click",()=>{
+  const demand={id:b.dataset.fulfillDemand,kind:b.dataset.kind,targetId:b.dataset.target,value:Number(b.dataset.value),repGain:Number(b.dataset.rep)};
+  const r=econ()?.fulfillDemand?.(demand);setStatus(r?.message);if(r?.ok)setTimeout(render,500);
+ }));
+}
+function demandOffers(s){
+ const b=brokerInfo(),p=marinaProfile(s.port);
+ const offers=[];
+ const inv=Object.entries(s.inventory||{}).filter(([,q])=>Number(q)>0);
+ if(inv.length){
+  const [id]=inv[Math.abs(Math.floor(factor("demand-item-"+s.port,0,inv.length)))%inv.length];
+  const item=ITEMS.find(x=>x.id===id);
+  if(item){
+   const premium=1.08+(b.level-1)*.025;
+   const value=Math.round(itemOffer(item,s).buy*premium);
+   offers.push({id:"demand-item-"+s.port+"-"+id+"-"+seed,kind:"item",targetId:id,title:"Cliente cerca "+item.name,detail:"Richiesta urgente a "+p.label,value,repGain:4+b.level});
+  }
+ }
+ const sellable=(econ()?.boats?.()||[]).filter(x=>x.id!=="voyager"&&s.owned.includes(x.id)&&x.id!==s.boat);
+ if(sellable.length){
+  const boat=sellable[Math.abs(Math.floor(factor("demand-boat-"+s.port,0,sellable.length)))%sellable.length];
+  const offer=boatOffer(boat,s);
+  const value=Math.round(offer.marketPrice*(1.03+b.level*.02));
+  offers.push({id:"demand-boat-"+s.port+"-"+boat.id+"-"+seed,kind:"boat",targetId:boat.id,title:"Armatore cerca "+boat.name,detail:"Acquisto diretto tramite broker locale",value,repGain:7+b.level});
+ }
+ return offers;
+}
+function demandHTML(s){
+ const offers=demandOffers(s);
+ if(!offers.length)return '<div class="me-market-card"><span class="me-market-badge">DOMANDA NPC</span><h3>🤝 Richieste clienti</h3><p>Nessuna richiesta compatibile con il tuo inventario in questo momento.</p></div>';
+ return '<div class="me-market-grid">'+offers.map(o=>'<article class="me-market-card"><span class="me-market-badge">DOMANDA NPC · '+marinaProfile(s.port).label+'</span><h3>🤝 '+o.title+'</h3><p>'+o.detail+'</p><div class="me-market-price">'+money(o.value)+' crediti</div><p>Bonus reputazione Broker +'+o.repGain+'</p><div class="me-market-actions"><button type="button" class="gold" data-fulfill-demand="'+o.id+'" data-kind="'+o.kind+'" data-target="'+o.targetId+'" data-value="'+o.value+'" data-rep="'+o.repGain+'">CONCLUDI AFFARE</button></div></article>').join('')+'</div>';
 }
 function marketPulseHTML(s){
  const p=marinaProfile(s.port),b=brokerInfo();
@@ -174,7 +205,7 @@ function render(){
  const root=document.getElementById("meMarketplaceApp");
  if(!root)return;
  const s=snap();
- root.innerHTML=headerHTML(s)+marketPulseHTML(s)+(mode==="boats"?boatsHTML(s):itemsHTML(s));
+ root.innerHTML=headerHTML(s)+marketPulseHTML(s)+demandHTML(s)+(mode==="boats"?boatsHTML(s):itemsHTML(s));
  bind(root);
 }
 function boot(){
