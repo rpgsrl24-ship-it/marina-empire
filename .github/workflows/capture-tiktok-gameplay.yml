@@ -21,6 +21,10 @@ jobs:
         run: npm ci
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Install FFmpeg for authentic TikTok MP4
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
       - name: Record original Marina Empire guest gameplay
         run: node scripts/capture-tiktok-gameplay.cjs
       - name: Verify finished TikTok MP4
