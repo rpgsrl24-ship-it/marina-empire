@@ -94,6 +94,24 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.equal(await page.locator('#meVoucherRedeem').isDisabled(),true,'Paid-credit redemption stays disabled');
     assert.equal(await page.locator('#meVoucherCode').isDisabled(),true,'Paid-credit entry stays disabled');
     if (mobile) {
+      await goTab(page,'home',true);
+      const mobileDashboardChecks=[
+        ['fleet','#fleet'],
+        ['map','#map'],
+        ['missions','#missions'],
+        ['office','#office']
+      ];
+      for(const [tab,screen] of mobileDashboardChecks){
+        const action=page.locator('.me-mobile-home-dashboard [data-tab="'+tab+'"]').first();
+        await action.waitFor({state:'visible'});
+        await action.click();
+        await page.waitForFunction(id=>!document.querySelector(id)?.classList.contains('hide'),screen);
+        await goTab(page,'home',true);
+      }
+      const creditsTop=page.locator('.me-buy-credits-top[data-tab="credits"]');
+      await creditsTop.click();
+      await page.waitForFunction(()=>!document.getElementById('credits')?.classList.contains('hide'));
+      await goTab(page,'home',true);
       await goTab(page,'map',true);
       await page.locator('#interactiveMapDisplay').waitFor({state:'visible'});
       await page.waitForTimeout(500);
