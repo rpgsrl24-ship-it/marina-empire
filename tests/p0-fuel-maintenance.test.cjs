@@ -48,7 +48,8 @@ test('fuel reserve and service guards remain active',()=>{
  assert(html.includes('Manutenzione non disponibile durante la navigazione'));
  assert(html.includes('Math.max(0,Math.min(100,boat(state.boat).tank-state.fuel))'));
  assert(html.includes('state.condition=Math.min(100,state.condition+15)'));
- assert(html.includes('state.condition=Math.max(0,state.condition-3)'));
+ assert(html.includes('state.condition=Math.max(0,state.condition-weather.wear)'));
+ assert(html.includes('wear:3')&&html.includes('wear:4')&&html.includes('wear:5'),'Simulated weather wear must remain bounded to 3-5%');
 });
 
 test('maintenance cost still scales by vessel acquisition class',()=>{
