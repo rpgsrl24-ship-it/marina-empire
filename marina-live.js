@@ -184,9 +184,21 @@
     const cooldown=[45,42,38,34,30][Math.max(0,trust.level-1)];
     const duration=[1,.97,.94,.90,.86][Math.max(0,trust.level-1)];
     const rareBoost=[0,0,.04,.08,.12][Math.max(0,trust.level-1)];
+    const serviceDiscount=[0,.03,.05,.08,.12][Math.max(0,trust.level-1)];
     const label=trust.level>=5?"Priorita Port Control + accesso elite":trust.level>=4?"Priorita operativa + incarichi rari":trust.level>=3?"Corsia rapida VHF":trust.level>=2?"Tempi VHF ridotti":"Nessun privilegio locale";
-    return {cooldown,duration,rareBoost,label};
+    return {cooldown,duration,rareBoost,serviceDiscount,label};
   }
+  window.MarinaEmpireMarinaBenefits={
+    current(){
+      const key=marinaKey(),trust=marinaTrust(key),perks=marinaPerks(key);
+      return {marina:key,level:trust.level,label:trust.label,reputation:trust.points,serviceDiscount:perks.serviceDiscount};
+    },
+    servicePrice(base){
+      const perks=marinaPerks();
+      const raw=Math.max(0,Math.round(Number(base)||0));
+      return Math.max(0,Math.round(raw*(1-perks.serviceDiscount)));
+    }
+  };
   function updateVhfCareer(){
     if(!host||typeof state==="undefined")return;
     const box=host.querySelector(".me-live-vhf-career");
