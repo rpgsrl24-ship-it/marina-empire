@@ -46,6 +46,7 @@ function level(){
  return "BASSA";
 }
 function worldEvent(){return window.MarinaEmpireWorldEvents?.current?.()||null}
+function worldWeather(){return window.MarinaEmpireWorldEvents?.modifiers?.()?.weather||null}
 function worldSector(op){
  const economy=window.MarinaEmpireNpcEconomy;
  return economy?.sectorFor?economy.sectorFor(op):"servizi";
@@ -64,14 +65,20 @@ function adjusted(op){
  };
 }
 function pick(){
- const e=worldEvent();
+ const e=worldEvent(),w=worldWeather();
  const weighted=[];
  for(const op of OPPORTUNITIES){
   const sector=worldSector(op),fav=e&&Array.isArray(e.sectors)&&e.sectors.includes(sector);
   weighted.push(op);
   if(fav){weighted.push(op);weighted.push(op);}
+  const sector=worldSector(op);
+  if(w?.id==="rough"&&(sector==="tecnica"||sector==="marina")){weighted.push(op);weighted.push(op);}
+  if(w?.id==="rain"&&sector==="servizi")weighted.push(op);
  }
- return adjusted(weighted[Math.floor(Math.random()*weighted.length)]);
+ const picked=adjusted(weighted[Math.floor(Math.random()*weighted.length)]);
+ const w=worldWeather();
+ if(w&&w.id==="rough"&&worldSector(picked)==="charter")picked.reward=Math.round(picked.reward*.9);
+ return picked;
 }
 function ensure(){
  const live=document.querySelector(".me-live-marina");
@@ -95,7 +102,7 @@ function renderCurrent(){
  const rep=current.reputation||Math.max(3,Math.round(current.reward/70));
  const req=current.requiredSectorLevel||1;
  box.querySelector(".me-npc-meta").innerHTML='<span>'+current.type+'</span><span>⏱ '+current.duration+'s</span><span>Costo '+current.cost+'</span><span>Ricompensa '+current.reward+'</span><span>Prestigio +'+current.prestige+'</span><span>Rep. '+sector+' +'+rep+'</span><span>Lv settore '+sectorLevel+(req>1?' / richiesto '+req:'')+'</span>'+(current.worldFavored?'<span>🔥 BONUS EVENTO: '+current.worldEvent+'</span>':'');
- box.querySelector(".me-npc-level").textContent="Attività marina: "+level();
+ const w=worldWeather();box.querySelector(".me-npc-level").textContent="Attività marina: "+level()+(w?" · "+w.icon+" "+w.label:"");
  box.querySelector(".me-npc-status").textContent=job?"Attività in corso":"Disponibile ora";
  box.querySelector(".me-npc-progress span").style.width=job?Math.min(100,job.progress)+"%":"0%";
  box.querySelector(".me-npc-accept").disabled=!!job;
