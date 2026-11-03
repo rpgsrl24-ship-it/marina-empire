@@ -55,6 +55,9 @@ function harness(extra = {}) {
     'coastalExit','adriaticSpine','tyrrhenianSpine','missions','fresh','boat','port']) {
     vm.runInContext(declaration(name), context);
   }
+  const weatherStart=html.indexOf('const simulatedWeather=['),weatherEnd=html.indexOf('// Simulated sea-corridor graph',weatherStart);
+  assert(weatherStart>=0&&weatherEnd>weatherStart,'Missing production simulated weather block');
+  vm.runInContext(html.slice(weatherStart,weatherEnd),context);
   for (const name of ['straightNm','seaWaypoints','voyageRoutePoints','seaMiles','planSeaTrip',
     'crewForBoat','charterContract','availableMissions','findAvailableMission','missionBudget',
     'persist','meCloneState','meEconomyStateValid','meAtomicPersist','fuelBurnPerNm','launch','finishVoyage','voyageHeartbeat']) {
@@ -175,7 +178,7 @@ test('First-leg fuel boundary matches budget and rejects one litre below reserve
   assert.equal(h.state.fuel, 60);
   h.nextLeg();
   assert.equal(h.state.fuel, 60);
-  assert.equal(h.state.condition, 97);
+  assert.ok([95,96,97].includes(h.state.condition),'Weather wear must be 3-5%');
 });
 
 test('Maintenance threshold and active-voyage guards prevent extra charges', () => {
@@ -220,7 +223,7 @@ test('Multi-stop budgets equal actual costs and preserve progress after reload',
   assert.equal(stops,planned.length-2);
   assert.equal(h.state.port,candidate.dest);
   assert.equal(h.state.coins,initialCoins-budget.total+candidate.reward);
-  assert.equal(h.state.condition,97);
+  assert.ok([95,96,97].includes(h.state.condition),'Weather wear must be 3-5%');
   assert.equal(h.state.voyages,1);
 });
 
