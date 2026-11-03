@@ -1393,6 +1393,57 @@ function meAtomicPersist(mutator){
  state=previous;
  return false;
 }
+window.MarinaEmpireObjectives={
+ metrics(){
+  const history=Array.isArray(state.marketHistory)?state.marketHistory:[];
+  const marketDeals=history.filter(x=>["sell_boat","sell_item","npc_demand"].includes(x?.action)).length;
+  const chains=state.specializationChains&&typeof state.specializationChains==="object"?state.specializationChains:{};
+  const chainCompleted=Object.values(chains).reduce((sum,x)=>sum+Math.max(0,Math.floor(Number(x?.completed)||0)),0);
+  return {
+   voyages:Math.max(0,Math.floor(Number(state.voyages)||0)),
+   npcJobs:Math.max(0,Math.floor(Number(state.npcJobsCompleted)||0)),
+   emergencies:Math.max(0,Math.floor(Number(state.emergenciesCompleted)||0)),
+   marketDeals,
+   chains:chainCompleted
+  };
+ },
+ ensure(kind,key){
+  kind=kind==="weekly"?"weekly":"daily";key=String(key||"").slice(0,40);
+  if(!key)return null;
+  const periods=state.objectivePeriods&&typeof state.objectivePeriods==="object"?state.objectivePeriods:{};
+  const current=periods[kind];
+  if(current?.key===key)return {key,current:current.base||{},claimed:Array.isArray(current.claimed)?current.claimed:[]};
+  const base=this.metrics();
+  const ok=meAtomicPersist(()=>{
+   state.objectivePeriods=state.objectivePeriods&&typeof state.objectivePeriods==="object"?state.objectivePeriods:{};
+   state.objectivePeriods[kind]={key,base,claimed:[],createdAt:Date.now()};
+  });
+  return ok?{key,current:base,claimed:[]}:null;
+ },
+ status(kind,key){
+  kind=kind==="weekly"?"weekly":"daily";
+  const p=state.objectivePeriods?.[kind];
+  if(!p||p.key!==key)return null;
+  return {key:p.key,base:{...(p.base||{})},claimed:[...(Array.isArray(p.claimed)?p.claimed:[])],metrics:this.metrics()};
+ },
+ claim(kind,key,id,metric,target,reward,prestige){
+  kind=kind==="weekly"?"weekly":"daily";key=String(key||"").slice(0,40);id=String(id||"").slice(0,80);metric=String(metric||"");
+  target=Math.max(1,Math.floor(Number(target)||1));reward=Math.max(0,Math.floor(Number(reward)||0));prestige=Math.max(0,Math.floor(Number(prestige)||0));
+  const p=state.objectivePeriods?.[kind];if(!p||p.key!==key)return {ok:false,message:"Periodo obiettivo non valido."};
+  const claimed=Array.isArray(p.claimed)?p.claimed:[];if(claimed.includes(id))return {ok:false,message:"Premio già riscosso."};
+  const now=this.metrics(),base=Math.max(0,Math.floor(Number(p.base?.[metric])||0)),progress=Math.max(0,Math.floor(Number(now?.[metric])||0)-base);
+  if(progress<target)return {ok:false,message:"Obiettivo non ancora completato.",progress,target};
+  const ok=meAtomicPersist(()=>{
+   state.objectivePeriods[kind].claimed=[...claimed,id].slice(-40);
+   state.coins+=reward;
+   state.prestige=(Number(state.prestige)||0)+prestige;
+   state.earnings=(Number(state.earnings)||0)+reward;
+   state.lastObjectiveReward={kind,key,id,reward,prestige,at:Date.now()};
+  });
+  if(!ok)return {ok:false,message:"Premio non registrato."};
+  render();return {ok:true,reward,prestige,message:"Premio riscosso: +"+money(reward)+" crediti · prestigio +"+prestige+"."};
+ }
+};
 window.MarinaEmpireMarketplaceEconomy={
  snapshot(){
   return {
@@ -3232,4 +3283,4 @@ button.addEventListener("click",async()=>{
  if(marinaList)new MutationObserver(syncCurrentMarina).observe(marinaList,{childList:true});
  window.addEventListener("marina-empire-updated",()=>setTimeout(syncCurrentMarina,0));
 })();
-</script><script src="world-events.js?v=20261103-world1"></script><script src="marina-live.js?v=20261103-live1"></script><script src="marina-npc.js?v=20261103-npc1"></script><script src="world-emergencies.js?v=20261103-emergency1"></script><script src="marketplace.js?v=20261103-market1"></script><script src="specialization-contracts.js?v=20261103-spec1"></script></body></html>
+</script><script src="world-events.js?v=20261103-world1"></script><script src="marina-live.js?v=20261103-live1"></script><script src="marina-npc.js?v=20261103-npc1"></script><script src="world-emergencies.js?v=20261103-emergency1"></script><script src="marketplace.js?v=20261103-market1"></script><script src="specialization-contracts.js?v=20261103-spec1"></script><script src="objectives.js?v=20261103-obj1"></script></body></html>
