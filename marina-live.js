@@ -71,7 +71,7 @@
   style.textContent=css;
   document.head.appendChild(style);
 
-  let timer=null, feedRows=[], host=null,communityObserver=null;
+  let timer=null, feedRows=[], host=null,communityObserver=null,vhfUiTimer=null;
 
   function marinaKey(){
     try{
@@ -138,39 +138,80 @@
     const box=host.querySelector(".me-live-vhf-text");
     if(box)box.textContent=vhfMessage();
     const action=host.querySelector(".me-live-vhf-action");
-    if(action)action.textContent=state&&state.trip?"IN NAVIGAZIONE":"PRENDI INCARICO";
+    if(!action||typeof state==="undefined")return;
+    const nowTs=Date.now();
+    const active=state.vhfActiveJob&&typeof state.vhfActiveJob==="object"?state.vhfActiveJob:null;
+    const cooldown=Math.max(0,Math.ceil(((Number(state.vhfCooldownUntil)||0)-nowTs)/1000));
+    if(state.trip){action.textContent="IN NAVIGAZIONE";action.disabled=true;return}
+    if(active){
+      const remain=Math.max(0,Math.ceil((Number(active.endsAt||0)-nowTs)/1000));
+      action.textContent=remain>0?"IN CORSO · "+remain+"s":"RISCUOTI INCARICO";
+      action.disabled=remain>0;
+      return;
+    }
+    if(cooldown>0){action.textContent="NUOVO INCARICO TRA "+cooldown+"s";action.disabled=true;return}
+    action.textContent="PRENDI INCARICO";action.disabled=false;
   }
   function vhfJob(){
     const intensity=marinaIntensity();
     const key=marinaKey();
     const options=[
-      {id:"berth",label:"Assistenza ormeggio",reward:180+intensity.arrivals*35,prestige:2},
-      {id:"fuel",label:"Supporto rifornimento",reward:160+intensity.departures*30,prestige:2},
-      {id:"tech",label:"Assistenza tecnica rapida",reward:220+(intensity.label==="INTENSA"?90:30),prestige:3},
-      {id:"traffic",label:"Supporto Port Control",reward:200+intensity.arrivals*25,prestige:3}
+      {id:"berth",label:"Assistenza ormeggio",reward:180+intensity.arrivals*35,prestige:2,duration:28},
+      {id:"fuel",label:"Supporto rifornimento",reward:160+intensity.departures*30,prestige:2,duration:24},
+      {id:"tech",label:"Assistenza tecnica rapida",reward:220+(intensity.label==="INTENSA"?90:30),prestige:3,duration:38},
+      {id:"traffic",label:"Supporto Port Control",reward:200+intensity.arrivals*25,prestige:3,duration:32}
     ];
     const idx=Math.floor(Date.now()/30000)%options.length;
     return {...options[idx],marina:key};
+  }
+  function completeVhfJob(){
+    if(typeof state==="undefined"||typeof meAtomicPersist!=="function")return false;
+    const active=state.vhfActiveJob&&typeof state.vhfActiveJob==="object"?state.vhfActiveJob:null;
+    if(!active||Date.now()<Number(active.endsAt||0))return false;
+    const completedAt=Date.now();
+    const ok=meAtomicPersist(()=>{
+      state.vhfJobs=Array.isArray(state.vhfJobs)?state.vhfJobs:[];
+      state.vhfJobs.push({id:active.id,marina:active.marina,at:completedAt,reward:active.reward,prestige:active.prestige,duration:active.duration});
+      state.vhfJobs=state.vhfJobs.slice(-40);
+      state.coins=(Number(state.coins)||0)+(Number(active.reward)||0);
+      state.prestige=(Number(state.prestige)||0)+(Number(active.prestige)||0);
+      state.earnings=(Number(state.earnings)||0)+(Number(active.reward)||0);
+      state.vhfActiveJob=null;
+      state.vhfCooldownUntil=completedAt+45000;
+    });
+    if(!ok)return false;
+    if(typeof render==="function")render();
+    if(typeof notice==="function")notice(active.label+" completato · +"+Number(active.reward||0).toLocaleString("it-IT")+" crediti · prestigio +"+Number(active.prestige||0));
+    window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"vhf-job-complete"}}));
+    updateVhf();
+    return true;
   }
   function runVhfJob(){
     if(typeof state==="undefined")return;
     if(state.trip){if(typeof notice==="function")notice("Completa prima la navigazione in corso.");return}
     if(!window.meRegisteredPlayer){if(typeof notice==="function")notice("Registrati per accettare incarichi VHF.");return}
+    const nowTs=Date.now();
+    const active=state.vhfActiveJob&&typeof state.vhfActiveJob==="object"?state.vhfActiveJob:null;
+    if(active){
+      if(nowTs>=Number(active.endsAt||0)){completeVhfJob();return}
+      const remain=Math.max(1,Math.ceil((Number(active.endsAt||0)-nowTs)/1000));
+      if(typeof notice==="function")notice(active.label+" in corso · "+remain+"s rimanenti");
+      return;
+    }
+    const cooldown=Math.max(0,Math.ceil(((Number(state.vhfCooldownUntil)||0)-nowTs)/1000));
+    if(cooldown>0){if(typeof notice==="function")notice("Port Control: nuovo incarico tra "+cooldown+"s.");return}
     const job=vhfJob();
     const started=Date.now();
+    const endsAt=started+Math.max(15000,Number(job.duration||30)*1000);
     if(typeof meAtomicPersist!=="function")return;
     const ok=meAtomicPersist(()=>{
-      state.vhfJobs=Array.isArray(state.vhfJobs)?state.vhfJobs:[];
-      state.vhfJobs.push({id:job.id,marina:job.marina,at:started,reward:job.reward,prestige:job.prestige});
-      state.vhfJobs=state.vhfJobs.slice(-40);
-      state.coins=(Number(state.coins)||0)+job.reward;
-      state.prestige=(Number(state.prestige)||0)+job.prestige;
-      state.earnings=(Number(state.earnings)||0)+job.reward;
+      state.vhfActiveJob={id:job.id,label:job.label,marina:job.marina,startedAt:started,endsAt,reward:job.reward,prestige:job.prestige,duration:job.duration};
     });
     if(!ok){if(typeof notice==="function")notice("Incarico VHF non salvato.");return}
     if(typeof render==="function")render();
-    if(typeof notice==="function")notice(job.label+" completato · +"+job.reward.toLocaleString("it-IT")+" crediti · prestigio +"+job.prestige);
-    window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"vhf-job"}}));
+    if(typeof notice==="function")notice(job.label+" accettato · durata "+job.duration+"s");
+    updateVhf();
+    window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"vhf-job-start"}}));
   }
   function eventText(key){
     const names=namesFor(key);
@@ -271,6 +312,8 @@
       return;
     }
     schedule();
+    clearInterval(vhfUiTimer);
+    vhfUiTimer=setInterval(()=>{updateVhf();if(typeof state!=="undefined"&&state.vhfActiveJob&&Date.now()>=Number(state.vhfActiveJob.endsAt||0))updateVhf()},1000);
     const list=document.getElementById("marinaList");
     if(list) new MutationObserver(()=>setTimeout(build,50)).observe(list,{childList:true,subtree:true});
     const community=document.getElementById("communityMessages");
