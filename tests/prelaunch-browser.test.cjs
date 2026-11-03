@@ -327,7 +327,7 @@ async function multiTabConflict(browser,origin) {
   await isolated(context,origin);
   await context.addInitScript(({key,raw})=>localStorage.setItem(key,raw),{key:saveKey,raw:JSON.stringify(base)});
   const first=await context.newPage(),stale=await context.newPage(),errors=[];
-  stale.on('pageerror',e=>errors.push(e.message));
+  stale.on('pageerror',e=>errors.push(e.stack||e.message));
   try {
     await first.goto(origin,{waitUntil:'domcontentloaded',timeout:30000});
     await stale.goto(origin,{waitUntil:'domcontentloaded',timeout:30000});
