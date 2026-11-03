@@ -21,6 +21,7 @@ const STAGES=[
   {key:"marinas",label:"1 marina posseduta",target:1,tab:"marinas"},
   {key:"businesses",label:"3 attività nautiche",target:3,tab:"office"},
   {key:"boats",label:"3 yacht in flotta",target:3,tab:"fleet"},
+  {key:"serviceChains",label:"2 catene operative completate",target:2,tab:"marinas"},
   {key:"empireScore",label:"5.000 Empire Score",target:5000,tab:"profile"}
  ]},
  {id:"empire",level:5,title:"MARINA EMPIRE",icon:"👑",focus:"Costruisci un impero nautico multi-marina pronto all'espansione internazionale.",requirements:[
@@ -28,6 +29,7 @@ const STAGES=[
   {key:"marinas",label:"3 marine possedute",target:3,tab:"marinas"},
   {key:"businesses",label:"5 attività nautiche",target:5,tab:"office"},
   {key:"boats",label:"5 yacht in flotta",target:5,tab:"fleet"},
+  {key:"serviceChains",label:"6 catene operative completate",target:6,tab:"marinas"},
   {key:"empireScore",label:"20.000 Empire Score",target:20000,tab:"profile"}
  ]}
 ];
@@ -69,7 +71,7 @@ function countTruthy(obj){
  return Object.values(obj).filter(Boolean).length;
 }
 function metrics(){
- if(typeof state==="undefined"||!state)return {voyages:0,boats:0,prestige:0,businesses:0,npcJobs:0,sectorRep:0,marinas:0,empireScore:0};
+ if(typeof state==="undefined"||!state)return {voyages:0,boats:0,prestige:0,businesses:0,npcJobs:0,sectorRep:0,marinas:0,serviceChains:0,empireScore:0};
  const reps=state.sectorReputation&&typeof state.sectorReputation==="object"?Object.values(state.sectorReputation):[];
  return {
   voyages:Math.max(0,Math.floor(Number(state.voyages)||0)),
@@ -79,6 +81,7 @@ function metrics(){
   npcJobs:Math.max(0,Math.floor(Number(state.npcJobsCompleted)||0)),
   sectorRep:reps.reduce((m,v)=>Math.max(m,Math.max(0,Math.floor(Number(v)||0))),0),
   marinas:Object.entries(state.marinas||{}).filter(([id,v])=>id!=="rose"&&v&&Number.isFinite(Number(v.lastReward))).length,
+  serviceChains:Math.max(0,Math.floor(Number(state.serviceChainsCompleted)||0)),
   empireScore:typeof empireScore==="function"?Math.max(0,Math.floor(Number(empireScore())||0)):0
  };
 }
@@ -116,7 +119,7 @@ function render(){
  const roadmap=s.stages.map(st=>'<div class="me-career-stage '+(st.done?"done ":"")+(st.level===s.current.level?"current":"")+'"><strong>'+st.icon+' '+st.title+'</strong><span>'+(st.done?"RAGGIUNTO":st.level===s.current.level?"FASE ATTUALE":"OBIETTIVO")+'</span></div>').join("");
  const reqs=next?next.requirements.map(r=>'<div class="me-career-requirement '+(r.done?"ok":"")+'"><span>'+(r.done?"✓ ":"○ ")+r.label+'</span><b>'+fmt(r.value)+' / '+fmt(r.target)+'</b><div class="me-career-bar"><span style="width:'+r.pct+'%"></span></div></div>').join(""):'<p>Hai completato tutte le fasi strategiche attualmente disponibili.</p>';
  const action=missing[0]||null;
- box.innerHTML='<div class="me-career-path-head"><div><span class="home-eyebrow">PERCORSO A LUNGO TERMINE</span><h2>'+s.current.icon+' '+s.current.title+'</h2><p>'+s.current.focus+'</p></div><div class="me-career-path-current">FASE '+s.current.level+' / '+STAGES.length+'</div></div><div class="me-career-road">'+roadmap+'</div><div class="me-career-next"><div class="me-career-panel"><strong>'+(next?('PROSSIMA FASE · '+next.icon+' '+next.title):'GRADO MASSIMO ATTUALE')+'</strong><p>'+(next?next.focus:'Continua a far crescere flotta, marine, reputazione e attività in attesa dell’espansione internazionale.')+'</p><div class="me-career-requirements">'+reqs+'</div>'+(action?'<button type="button" class="me-career-action" data-career-go="'+action.tab+'">VAI AL PROSSIMO OBIETTIVO · '+action.label+'</button>':'')+'</div><div class="me-career-panel secondary"><strong>IL TUO IMPERO OGGI</strong><p>Viaggi '+fmt(s.metrics.voyages)+' · Yacht '+fmt(s.metrics.boats)+' · Marine '+fmt(s.metrics.marinas)+' · Attività '+fmt(s.metrics.businesses)+'</p><p>Prestigio '+fmt(s.metrics.prestige)+' · Migliore reputazione settore '+fmt(s.metrics.sectorRep)+' · Empire Score '+fmt(s.metrics.empireScore)+'</p></div></div>';
+ box.innerHTML='<div class="me-career-path-head"><div><span class="home-eyebrow">PERCORSO A LUNGO TERMINE</span><h2>'+s.current.icon+' '+s.current.title+'</h2><p>'+s.current.focus+'</p></div><div class="me-career-path-current">FASE '+s.current.level+' / '+STAGES.length+'</div></div><div class="me-career-road">'+roadmap+'</div><div class="me-career-next"><div class="me-career-panel"><strong>'+(next?('PROSSIMA FASE · '+next.icon+' '+next.title):'GRADO MASSIMO ATTUALE')+'</strong><p>'+(next?next.focus:'Continua a far crescere flotta, marine, reputazione e attività in attesa dell’espansione internazionale.')+'</p><div class="me-career-requirements">'+reqs+'</div>'+(action?'<button type="button" class="me-career-action" data-career-go="'+action.tab+'">VAI AL PROSSIMO OBIETTIVO · '+action.label+'</button>':'')+'</div><div class="me-career-panel secondary"><strong>IL TUO IMPERO OGGI</strong><p>Viaggi '+fmt(s.metrics.voyages)+' · Yacht '+fmt(s.metrics.boats)+' · Marine '+fmt(s.metrics.marinas)+' · Attività '+fmt(s.metrics.businesses)+'</p><p>Catene operative '+fmt(s.metrics.serviceChains)+' · Prestigio '+fmt(s.metrics.prestige)+' · Migliore reputazione settore '+fmt(s.metrics.sectorRep)+' · Empire Score '+fmt(s.metrics.empireScore)+'</p></div></div>';
  box.querySelector("[data-career-go]")?.addEventListener("click",e=>{
   const tab=e.currentTarget.dataset.careerGo;
   const target=document.querySelector('[data-tab="'+tab+'"]');
