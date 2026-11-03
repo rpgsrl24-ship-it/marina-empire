@@ -20,6 +20,10 @@ let current=null,job=null,box=null,timer=null,tick=null;
 function hash(str){let h=2166136261;for(const ch of String(str)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function snap(){return window.MarinaEmpireEmergencyEconomy?.snapshot?.()||{port:"rimini",coins:0,registered:false,trip:false}}
 function world(){return window.MarinaEmpireWorldEvents?.modifiers?.(snap().port)||null}
+function reputationLevel(sector){
+ const npc=window.MarinaEmpireNpcEconomy;
+ return npc?.sectorLevel?npc.sectorLevel(sector):1;
+}
 function slot(){return Math.floor(Date.now()/3600000)}
 function choose(){
  const s=snap(),w=world(),seed=hash(s.port+"|"+slot());
@@ -27,7 +31,11 @@ function choose(){
  if(w?.weather?.id==="rough"){pool.push(BASE[0],BASE[1],BASE[4],BASE[4]);}
  if(w?.weather?.id==="rain"){pool.push(BASE[2],BASE[3]);}
  if(w?.event?.id==="vip_arrivals"){pool.push(BASE[5],BASE[5]);}
- const e={...pool[seed%pool.length]};
+ let e={...pool[seed%pool.length]};
+ const techLv=reputationLevel("tecnica"),marinaLv=reputationLevel("marina"),serviziLv=reputationLevel("servizi");
+ if(techLv>=3&&["SOS","Avaria","Assistenza"].includes(e.type))e={...e,title:e.title+" · PREMIUM",reward:Math.round(e.reward*(1+(techLv-2)*.12)),prestige:Math.round(e.prestige*1.15),reputation:e.reputation+techLv};
+ if(marinaLv>=3&&["Recupero","Ormeggio"].includes(e.type))e={...e,title:e.title+" · PRIORITÀ",reward:Math.round(e.reward*(1+(marinaLv-2)*.10)),prestige:Math.round(e.prestige*1.12),reputation:e.reputation+marinaLv};
+ if(serviziLv>=3&&e.type==="VIP")e={...e,title:e.title+" · CONCIERGE",reward:Math.round(e.reward*(1+(serviziLv-2)*.15)),prestige:Math.round(e.prestige*1.18),reputation:e.reputation+serviziLv};
  const danger=w?.weather?.id==="rough"?1.25:w?.weather?.id==="rain"?1.1:1;
  const eventBoost=w?.event?.demand?Math.max(1,Number(w.event.demand)):1;
  e.reward=Math.round(e.reward*danger*eventBoost);
