@@ -52,6 +52,8 @@
   .me-live-player-status{margin:0 10px 7px;display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid rgba(76,225,161,.28);border-radius:999px;background:rgba(76,225,161,.06);font-size:9px;color:#bcebd7}
   .me-live-intensity{margin:0 10px 8px;display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 8px;border:1px solid rgba(194,154,96,.2);border-radius:9px;background:#0a2d3b;font-size:9px;color:#d6e2e6}
   .me-live-intensity span{font-weight:800;color:#f0d29d}.me-live-intensity small{font-size:9px;color:#91afba}
+  .me-live-vhf{margin:0 10px 8px;padding:7px 8px;border-left:2px solid #7eb9cf;background:rgba(10,48,62,.72);font-size:9px;color:#bfd1d7}
+  .me-live-vhf b{color:#9dd7ea;margin-right:5px}.me-live-vhf-text{display:inline}
   .me-live-community{padding:8px 10px 10px;border-top:1px solid rgba(194,154,96,.18);background:#082431}
   .me-live-community-head{font-size:9px;letter-spacing:.06em;color:#d9c39e;margin-bottom:5px}
   .me-live-community-row{display:grid;grid-template-columns:38px minmax(70px,auto) 1fr;gap:6px;align-items:start;font-size:9px;color:#b9cdd4;padding:3px 0}
@@ -111,6 +113,29 @@
     if(!box)return;
     const jitter=Math.floor(Date.now()/30000)%2;
     box.innerHTML='<span>'+intensity.icon+' '+intensity.label+'</span><small>arrivi '+(intensity.arrivals+jitter)+' · partenze '+intensity.departures+'</small>';
+  }
+  function vhfMessage(){
+    const intensity=marinaIntensity();
+    const key=marinaKey();
+    const names=namesFor(key);
+    const phase=phaseInfo();
+    const pool=[
+      "Port Control: canale 09 operativo · mantenere ascolto in ingresso",
+      names[0]+": autorizzato ingresso · procedere a velocita ridotta",
+      names[1]+": attesa breve al distributore carburante",
+      "Marina Staff: assistenza ormeggio disponibile sul pontile centrale",
+      "Port Control: traffico "+intensity.label.toLowerCase()+" · precedenza alle unita in manovra",
+      "VHF Meteo: fase "+phase.label.toLowerCase()+" · verificare condizioni prima della partenza",
+      "Marina Service: tecnico disponibile per interventi rapidi a bordo",
+      names[2]+": richiesta spazio di manovra in uscita"
+    ];
+    const idx=Math.floor(Date.now()/18000)%pool.length;
+    return pool[idx];
+  }
+  function updateVhf(){
+    if(!host)return;
+    const box=host.querySelector(".me-live-vhf-text");
+    if(box)box.textContent=vhfMessage();
   }
   function eventText(key){
     const names=namesFor(key);
@@ -176,6 +201,7 @@
       <div class="me-live-marina-head"><span><i class="me-live-dot"></i>MARINA LIVE · TRAFFICO ATTIVO</span><span class="me-live-phase">${phase.icon} ${phase.label}</span></div>
       <div class="me-live-player-status">community in ascolto</div>
       <div class="me-live-intensity"></div>
+      <div class="me-live-vhf"><b>VHF 09</b><span class="me-live-vhf-text"></span></div>
       <div class="me-live-water" aria-hidden="true">
         <div class="me-live-boat">🛥️<small>${names[0]}</small></div>
         <div class="me-live-boat">⛵<small>${names[1]}</small></div>
@@ -191,13 +217,14 @@
     mirrorCommunity();
     updateLiveStatus();
     updateMarinaPulse();
+    updateVhf();
     return true;
   }
   function schedule(){
     clearTimeout(timer);
     if(document.hidden){ timer=setTimeout(schedule,15000); return; }
     build();
-    if(host){addFeed(eventText(marinaKey()));updateMarinaPulse();}
+    if(host){addFeed(eventText(marinaKey()));updateMarinaPulse();updateVhf();}
     const tf=Math.max(.45,Math.min(1.6,trafficFactor()));
     const base=Math.round(15000/tf);
     timer=setTimeout(schedule,Math.max(6500,base+Math.floor(Math.random()*7000)));
@@ -212,11 +239,11 @@
     if(list) new MutationObserver(()=>setTimeout(build,50)).observe(list,{childList:true,subtree:true});
     const community=document.getElementById("communityMessages");
     if(community&&!communityObserver){
-      communityObserver=new MutationObserver(()=>setTimeout(()=>{mirrorCommunity();updateLiveStatus();updateMarinaPulse()},40));
+      communityObserver=new MutationObserver(()=>setTimeout(()=>{mirrorCommunity();updateLiveStatus();updateMarinaPulse();updateVhf()},40));
       communityObserver.observe(community,{childList:true,subtree:true});
     }
     window.addEventListener("marina-empire-updated",()=>setTimeout(()=>{build();updateLiveStatus()},60));
-    window.addEventListener("marina-world-event",()=>setTimeout(()=>{build();updateMarinaPulse();schedule();},80));
+    window.addEventListener("marina-world-event",()=>setTimeout(()=>{build();updateMarinaPulse();updateVhf();schedule();},80));
     document.addEventListener("visibilitychange",()=>{if(!document.hidden)schedule();});
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot,{once:true});
