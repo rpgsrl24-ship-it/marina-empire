@@ -45,6 +45,10 @@
   .me-live-feed-row{display:flex;gap:7px;align-items:flex-start}
   .me-live-feed-time{color:#7fa4b3;min-width:38px}
   .me-live-feed strong{color:#f0d29d;font-weight:600}
+  .me-live-marina[data-phase="night"] .me-live-water{filter:brightness(.62) saturate(.82)}
+  .me-live-marina[data-phase="dawn"] .me-live-water{filter:brightness(.88) sepia(.08)}
+  .me-live-marina[data-phase="sunset"] .me-live-water{filter:brightness(.82) sepia(.16) saturate(1.15)}
+  .me-live-phase{font-size:9px;color:#9fb9c4}
   @keyframes meBoatCross{0%{transform:translateX(0)}100%{transform:translateX(calc(100vw + 220px))}}
   @keyframes meWaterShine{to{transform:translateX(100%)}}
   @keyframes meLivePulse{50%{opacity:.35;transform:scale(.8)}}
@@ -78,6 +82,12 @@
   function now(){
     return new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
   }
+  function phaseInfo(){
+    return window.MarinaEmpireWorldEvents?.dayPhase?.()||{id:"day",label:"GIORNO",icon:"☀️",traffic:1};
+  }
+  function trafficFactor(){
+    return window.MarinaEmpireWorldEvents?.modifiers?.(marinaKey())?.traffic||1;
+  }
   function eventText(key){
     const names=namesFor(key);
     const n=names[Math.floor(Math.random()*names.length)];
@@ -101,10 +111,12 @@
     host=document.createElement("div");
     host.className="me-live-marina";
     host.dataset.mar=key;
+    const phase=phaseInfo();
+    host.dataset.phase=phase.id;
     host.setAttribute("aria-label","Attività live della marina");
     const names=namesFor(key);
     host.innerHTML=`
-      <div class="me-live-marina-head"><span><i class="me-live-dot"></i>MARINA LIVE · TRAFFICO ATTIVO</span><span>24/7</span></div>
+      <div class="me-live-marina-head"><span><i class="me-live-dot"></i>MARINA LIVE · TRAFFICO ATTIVO</span><span class="me-live-phase">${phase.icon} ${phase.label}</span></div>
       <div class="me-live-water" aria-hidden="true">
         <div class="me-live-boat">🛥️<small>${names[0]}</small></div>
         <div class="me-live-boat">⛵<small>${names[1]}</small></div>
@@ -123,7 +135,9 @@
     if(document.hidden){ timer=setTimeout(schedule,15000); return; }
     build();
     if(host) addFeed(eventText(marinaKey()));
-    timer=setTimeout(schedule,11000+Math.floor(Math.random()*9000));
+    const tf=Math.max(.45,Math.min(1.6,trafficFactor()));
+    const base=Math.round(15000/tf);
+    timer=setTimeout(schedule,Math.max(6500,base+Math.floor(Math.random()*7000)));
   }
   function boot(){
     if(!build()){
@@ -134,6 +148,7 @@
     const list=document.getElementById("marinaList");
     if(list) new MutationObserver(()=>setTimeout(build,50)).observe(list,{childList:true,subtree:true});
     window.addEventListener("marina-empire-updated",()=>setTimeout(build,60));
+    window.addEventListener("marina-world-event",()=>setTimeout(()=>{build();schedule();},80));
     document.addEventListener("visibilitychange",()=>{if(!document.hidden)schedule();});
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot,{once:true});
