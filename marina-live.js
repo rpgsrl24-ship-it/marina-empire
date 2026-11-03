@@ -188,13 +188,20 @@
     const label=trust.level>=5?"Priorita Port Control + accesso elite":trust.level>=4?"Priorita operativa + incarichi rari":trust.level>=3?"Corsia rapida VHF":trust.level>=2?"Tempi VHF ridotti":"Nessun privilegio locale";
     return {cooldown,duration,rareBoost,serviceDiscount,label};
   }
+  function marinaBenefitSnapshot(key=marinaKey()){
+    const safeKey=String(key||marinaKey()).toLowerCase();
+    const trust=marinaTrust(safeKey),perks=marinaPerks(safeKey);
+    return {marina:safeKey,level:trust.level,label:trust.label,reputation:trust.points,next:trust.next,serviceDiscount:perks.serviceDiscount,perkLabel:perks.label};
+  }
   window.MarinaEmpireMarinaBenefits={
     current(){
-      const key=marinaKey(),trust=marinaTrust(key),perks=marinaPerks(key);
-      return {marina:key,level:trust.level,label:trust.label,reputation:trust.points,serviceDiscount:perks.serviceDiscount};
+      return marinaBenefitSnapshot();
     },
-    servicePrice(base){
-      const perks=marinaPerks();
+    forMarina(key){
+      return marinaBenefitSnapshot(key);
+    },
+    servicePrice(base,key){
+      const perks=marinaPerks(key?String(key).toLowerCase():marinaKey());
       const raw=Math.max(0,Math.round(Number(base)||0));
       return Math.max(0,Math.round(raw*(1-perks.serviceDiscount)));
     }
