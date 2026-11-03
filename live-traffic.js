@@ -57,9 +57,13 @@ function careerLevel(){
 function trust(){
  return window.MarinaEmpireMarinaBenefits?.forMarina?.(portKey())||{level:1,reputation:0,serviceDiscount:0};
 }
+function operation(){
+ return window.MarinaEmpireServiceChains?.operation?.(portKey())||{level:1,completed:0,next:2,label:"OPERATIVITÀ BASE"};
+}
 function trafficSnapshot(){
- const key=portKey(),w=world(),seed=hash(key+"|traffic|"+slot(120000)),base=Math.max(.55,Math.min(1.8,Number(w.traffic)||1));
- const volume=Math.max(3,Math.min(7,Math.round(3+base*2.2)));
+ const key=portKey(),w=world(),op=operation(),seed=hash(key+"|traffic|"+slot(120000)),base=Math.max(.55,Math.min(1.8,Number(w.traffic)||1));
+ const operationBoost=(Math.max(1,Number(op.level)||1)-1)*.35;
+ const volume=Math.max(3,Math.min(10,Math.round(3+base*2.2+operationBoost)));
  const items=[];
  for(let i=0;i<volume;i++){
   const v=VESSELS[(seed+i*7)%VESSELS.length];
@@ -72,21 +76,23 @@ function trafficSnapshot(){
    berth:"P"+(1+((seed+i*5)%12))
   });
  }
- return {items,volume,world:w};
+ return {items,volume,world:w,operation:op};
 }
 function contractSnapshot(){
- const key=portKey(),w=world(),stage=careerLevel(),t=trust(),seed=hash(key+"|contracts|"+slot());
+ const key=portKey(),w=world(),stage=careerLevel(),t=trust(),op=operation(),seed=hash(key+"|contracts|"+slot());
  const order=[...CONTRACTS].sort((a,b)=>(hash(a.id+"|"+seed)%1000)-(hash(b.id+"|"+seed)%1000));
- return order.slice(0,2).map((c,i)=>{
+ const contractCount=Math.min(4,2+(Math.max(1,Number(op.level)||1)>=3?1:0)+(Math.max(1,Number(op.level)||1)>=5?1:0));
+ return order.slice(0,contractCount).map((c,i)=>{
   const demand=Math.max(.85,Math.min(1.45,Number(w.demand)||1));
   const trustBonus=1+(Math.max(1,Number(t.level)||1)-1)*.035;
   const stageBonus=1+(stage-1)*.08;
-  const reward=Math.round(c.reward*demand*trustBonus*stageBonus);
+  const operationBonus=1+(Math.max(1,Number(op.level)||1)-1)*.03;
+  const reward=Math.round(c.reward*demand*trustBonus*stageBonus*operationBonus);
   const prestige=Math.round(c.prestige*(1+(stage-1)*.06));
   const reputation=Math.round(c.reputation*(1+(stage-1)*.05));
   return {...c,reward,prestige,reputation,
     dynamicId:"dyn-"+key+"-"+slot()+"-"+i+"-"+c.id,
-    marina:key,worldEvent:w.event?.title||"Attività ordinaria"};
+    marina:key,worldEvent:w.event?.title||"Attività ordinaria",operationLevel:op.level,operationLabel:op.label};
  });
 }
 function ensure(){
@@ -109,7 +115,7 @@ function render(){
   const disabled=!!active||!check.ok;
   return '<article class="me-contract"><strong>'+c.icon+' '+c.title+'</strong><p>'+c.worldEvent+' · '+formatCredits(c.reward)+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+'</p><button type="button" data-dyn-contract="'+c.dynamicId+'" '+(disabled?'disabled':'')+'>'+(running?'IN CORSO':check.ok?'ACCETTA CONTRATTO':check.message)+'</button><div class="me-contract-progress"><span data-progress="'+c.dynamicId+'"></span></div><div class="me-contract-status">'+(running?'Operazione in corso':('Disponibile ora · '+c.duration+'s'))+'</div></article>';
  }).join("");
- box.innerHTML='<div class="me-traffic-head"><strong>⚓ TRAFFICO 24/7 · '+t.volume+' UNITÀ ATTIVE</strong><span>'+((w.weather?.icon||"🌤️")+" "+(w.weather?.label||""))+'</span></div><div class="me-traffic-grid"><div class="me-traffic-list">'+traffic+'</div><div class="me-contract-list">'+contractHtml+'</div></div>';
+ box.innerHTML='<div class="me-traffic-head"><strong>⚓ TRAFFICO 24/7 · '+t.volume+' UNITÀ ATTIVE</strong><span>'+((w.weather?.icon||"🌤️")+" "+(w.weather?.label||""))+'</span></div><div style="font-size:8px;color:#8fb0bb;margin:-2px 0 7px">Operatività marina Lv.'+t.operation.level+' · '+t.operation.label+(t.operation.next>0?' · '+t.operation.next+' catene al prossimo livello':' · livello massimo')+'</div><div class="me-traffic-grid"><div class="me-traffic-list">'+traffic+'</div><div class="me-contract-list">'+contractHtml+'</div></div>';
  box.querySelectorAll("[data-dyn-contract]").forEach(btn=>btn.addEventListener("click",()=>start(btn.dataset.dynContract)));
 }
 function start(id){
