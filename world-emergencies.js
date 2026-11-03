@@ -20,6 +20,7 @@ let current=null,job=null,box=null,timer=null,tick=null;
 function hash(str){let h=2166136261;for(const ch of String(str)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function snap(){return window.MarinaEmpireEmergencyEconomy?.snapshot?.()||{port:"rimini",coins:0,registered:false,trip:false}}
 function world(){return window.MarinaEmpireWorldEvents?.modifiers?.(snap().port)||null}
+function specializationBonus(sector){return window.MarinaEmpireSpecialization?.bonusFor?.(sector)||1}
 function reputationLevel(sector){
  const npc=window.MarinaEmpireNpcEconomy;
  return npc?.sectorLevel?npc.sectorLevel(sector):1;
@@ -38,8 +39,8 @@ function choose(){
  if(serviziLv>=3&&e.type==="VIP")e={...e,title:e.title+" · CONCIERGE",reward:Math.round(e.reward*(1+(serviziLv-2)*.15)),prestige:Math.round(e.prestige*1.18),reputation:e.reputation+serviziLv};
  const danger=w?.weather?.id==="rough"?1.25:w?.weather?.id==="rain"?1.1:1;
  const eventBoost=w?.event?.demand?Math.max(1,Number(w.event.demand)):1;
- e.reward=Math.round(e.reward*danger*eventBoost);
- e.prestige=Math.round(e.prestige*danger);
+ e.reward=Math.round(e.reward*danger*eventBoost*specializationBonus(e.sector));
+ e.prestige=Math.round(e.prestige*danger);if(specializationBonus(e.sector)>1)e.specializationBonus=true;
  e.id="emergency-"+s.port+"-"+slot()+"-"+e.type.toLowerCase();
  e.expiresAt=(slot()+1)*3600000;
  return e;
