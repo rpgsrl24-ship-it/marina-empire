@@ -1482,6 +1482,7 @@ window.MarinaEmpireAchievements={
   const streak=Math.max(0,Math.floor(Number(state.dailyStreak?.count)||0));
   return {...base,maxRep,streak};
  },
+ activeTitle(){return String(state.activeTitle||"")},
  unlocked(){
   const claimed=new Set(Array.isArray(state.achievementsClaimed)?state.achievementsClaimed:[]);
   const m=this.metrics();
