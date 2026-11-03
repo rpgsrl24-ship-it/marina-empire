@@ -2,7 +2,9 @@
 "use strict";
 const CONFIG={
   enabled:false,
-  shopBase:"https://www.rpgyacht.com",
+  directCheckoutReady:true,
+  supabaseUrl:"https://zrdetqvnjmqkfyajxjgp.supabase.co",
+  publishableKey:"sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw",
   packages:[
     {productId:38090,sku:"ME-CREDITS-50000",credits:50000,price:"4,99"},
     {productId:38091,sku:"ME-CREDITS-120000",credits:120000,price:"9,99"},
@@ -12,39 +14,96 @@ const CONFIG={
   ]
 };
 window.MarinaEmpireCreditShopRC=Object.freeze(CONFIG);
-function mount(){
-  const status=document.getElementById("meVoucherStatus");
-  if(!status)return;
-  const host=status.closest(".item");
-  if(!host||host.querySelector("#meCreditPackagesRC"))return;
-  const box=document.createElement("div");
-  box.id="meCreditPackagesRC";
-  box.className="hide";
-  box.setAttribute("aria-hidden","true");
-  const title=document.createElement("h4");
-  title.textContent="Pacchetti crediti RPG Yacht";
-  box.appendChild(title);
-  for(const p of CONFIG.packages){
-    const row=document.createElement("div");
-    row.className="item";
-    row.style.margin="8px 0";
-    const txt=document.createElement("span");
-    txt.textContent=new Intl.NumberFormat("it-IT").format(p.credits)+" crediti · €"+p.price;
-    const btn=document.createElement("button");
-    btn.type="button";
-    btn.disabled=true;
-    btn.textContent="ACQUISTA · NON ANCORA ATTIVO";
-    btn.dataset.productId=String(p.productId);
-    btn.dataset.sku=p.sku;
-    btn.addEventListener("click",()=>{if(!CONFIG.enabled)return;});
-    row.append(txt,document.createElement("br"),btn);
-    box.appendChild(row);
-  }
-  host.insertBefore(box,status);
-  if(CONFIG.enabled){
-    box.classList.remove("hide");
-    box.removeAttribute("aria-hidden");
+
+const fmt=n=>new Intl.NumberFormat("it-IT").format(Number(n)||0);
+let client=null,busy=false;
+function getClient(){
+  if(client)return client;
+  if(!window.supabase?.createClient)throw new Error("Servizio account non disponibile");
+  client=window.supabase.createClient(CONFIG.supabaseUrl,CONFIG.publishableKey,{
+    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+  });
+  return client;
+}
+async function currentUser(){
+  const c=getClient();
+  const {data,error}=await c.auth.getUser();
+  if(error||!data?.user?.id||!data.user.email_confirmed_at)return null;
+  return data.user;
+}
+async function walletBalance(){
+  const user=await currentUser();
+  if(!user)return null;
+  const c=getClient();
+  const {data,error}=await c.from("me_credit_wallets").select("balance").eq("user_id",user.id).maybeSingle();
+  if(error)throw error;
+  return Number(data?.balance||0);
+}
+function setStatus(message,isError=false){
+  const el=document.getElementById("meCreditPurchaseStatus");
+  if(!el)return;
+  el.textContent=message;
+  el.dataset.error=isError?"1":"0";
+}
+async function startCheckout(productId){
+  if(busy)return;
+  if(!CONFIG.enabled){setStatus("Acquisti in attivazione finale. Nessun addebito viene avviato.",true);return;}
+  const user=await currentUser();
+  if(!user){setStatus("Per acquistare crediti devi prima accedere con un account Marina Empire verificato.",true);document.querySelector('[data-tab="profile"]')?.click();return;}
+  busy=true;
+  document.querySelectorAll("[data-me-credit-product]").forEach(b=>b.disabled=true);
+  setStatus("Preparazione del checkout sicuro RPG Yacht…");
+  try{
+    const c=getClient();
+    const {data,error}=await c.functions.invoke("marina-direct-checkout",{body:{product_id:Number(productId)}});
+    if(error||!data?.checkout_url)throw new Error("checkout_unavailable");
+    window.location.assign(data.checkout_url);
+  }catch(e){
+    console.warn("Marina Empire checkout",e);
+    setStatus("Checkout temporaneamente non disponibile. Riprova tra poco.",true);
+    busy=false;
+    syncButtons();
   }
 }
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mount,{once:true});else mount();
+async function syncButtons(){
+  const buttons=[...document.querySelectorAll("[data-me-credit-product]")];
+  if(!buttons.length)return;
+  let user=null;
+  try{user=await currentUser()}catch{}
+  buttons.forEach(btn=>{
+    btn.disabled=!CONFIG.enabled||!user||busy;
+    btn.textContent=!CONFIG.enabled
+      ?"ACQUISTA · ATTIVAZIONE FINALE"
+      :user?"ACQUISTA ORA":"ACCEDI PER ACQUISTARE";
+  });
+  const loginHint=document.getElementById("meCreditLoginHint");
+  if(loginHint)loginHint.textContent=user
+    ?"Account verificato: il pacchetto acquistato verrà accreditato automaticamente sul tuo saldo Marina Empire."
+    :"Accedi o registrati prima dell'acquisto: così i crediti vengono accreditati direttamente al tuo account.";
+  try{
+    const balance=await walletBalance();
+    const balanceEl=document.getElementById("meCreditWalletSummary");
+    if(balanceEl)balanceEl.textContent=balance===null
+      ?"Saldo crediti acquistati: accedi per visualizzarlo."
+      :"Saldo crediti acquistati: "+fmt(balance);
+  }catch{}
+}
+function bind(){
+  document.querySelectorAll("[data-me-credit-product]").forEach(btn=>{
+    if(btn.dataset.meBound==="1")return;
+    btn.dataset.meBound="1";
+    btn.addEventListener("click",()=>startCheckout(Number(btn.dataset.meCreditProduct)));
+  });
+  const url=new URL(window.location.href);
+  if(url.searchParams.get("credit_purchase")==="success"){
+    setStatus("Ordine ricevuto. Il saldo viene aggiornato automaticamente dopo la conferma del pagamento.");
+    document.querySelector('[data-tab="credits"]')?.click();
+    url.searchParams.delete("credit_purchase");
+    history.replaceState(null,"",url.pathname+(url.search?url.search:"")+url.hash);
+  }
+  syncButtons();
+  window.addEventListener("focus",()=>syncButtons());
+  window.addEventListener("marina-empire-updated",()=>syncButtons());
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind,{once:true});else bind();
 })();
