@@ -660,6 +660,17 @@ padding:5px!important;gap:4px!important;
   font-size:9px!important;line-height:1.1!important
  }
  html body .mobile-game-nav button span{font-size:19px!important;line-height:21px!important}
+ html body .me-mobile-more{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;
+  position:fixed!important;left:8px!important;right:8px!important;bottom:calc(62px + env(safe-area-inset-bottom,0px))!important;
+  z-index:99998!important;padding:8px!important;background:#082536f9!important;border:1px solid #c29a60!important;
+  border-radius:12px!important;box-shadow:0 10px 30px #000b!important
+ }
+ html body .me-mobile-more.hide{display:none!important}
+ html body .me-mobile-more button{
+  display:block!important;min-width:0!important;min-height:42px!important;padding:8px 5px!important;
+  font-size:10px!important;white-space:normal!important
+ }
  html body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))!important}
  html body .shell{padding-left:10px!important;padding-right:10px!important}
 }
