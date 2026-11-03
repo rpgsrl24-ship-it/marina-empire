@@ -33,10 +33,43 @@ function tabs(){
 function title(){
  return mode==="weekly"?"🏁 Classifica Settimanale":mode==="monthly"?"📅 Classifica Mensile":"🏆 Classifica Empire";
 }
+function seasonCountdown(){
+ const now=new Date(),end=new Date(now);
+ if(mode==="weekly"){
+  const day=(now.getUTCDay()+6)%7;
+  end.setUTCDate(now.getUTCDate()-day+7);
+  end.setUTCHours(0,0,0,0);
+ }else{
+  end.setUTCMonth(now.getUTCMonth()+1,1);
+  end.setUTCHours(0,0,0,0);
+ }
+ const ms=Math.max(0,end.getTime()-now.getTime());
+ const d=Math.floor(ms/86400000),h=Math.floor((ms%86400000)/3600000),m=Math.floor((ms%3600000)/60000);
+ return d+"g "+h+"h "+m+"m";
+}
+function seasonPrize(rank){
+ rank=Number(rank)||0;
+ if(mode==="weekly"){
+  if(rank===1)return "4.000 crediti + 80 prestigio";
+  if(rank===2)return "2.500 crediti + 55 prestigio";
+  if(rank===3)return "1.500 crediti + 40 prestigio";
+  if(rank>0&&rank<=10)return "600 crediti + 18 prestigio";
+ }
+ if(mode==="monthly"){
+  if(rank===1)return "12.000 crediti + 250 prestigio";
+  if(rank===2)return "8.000 crediti + 180 prestigio";
+  if(rank===3)return "5.000 crediti + 120 prestigio";
+  if(rank>0&&rank<=10)return "2.000 crediti + 55 prestigio";
+ }
+ return "";
+}
 function renderRows(rows,seasonInfo){
  if(!box)return;
  const season=mode!=="absolute";
- const note=season?'<div class="me-season-note">La classifica stagionale misura i <b>punti Empire guadagnati nel periodo</b>, non il totale storico. I nuovi giocatori possono quindi competere subito.'+(seasonInfo?.season_key?' · Periodo '+esc(seasonInfo.season_key):'')+'<div style="margin-top:8px"><button type="button" id="meSeasonClaim">🎁 RISCATTA PREMIO STAGIONE PRECEDENTE</button></div><div id="meSeasonClaimStatus" class="me-leaderboard-status"></div></div>':'';
+ const me=season?rows.find(r=>r.is_me):null;
+ const prize=seasonPrize(me?.rank_position);
+ const center=season?'<div class="me-season-note"><b>Centro Stagione</b> · chiusura tra '+seasonCountdown()+(me?' · posizione #'+esc(me.rank_position)+' · '+Number(me.season_points||0).toLocaleString("it-IT")+' punti':' · non ancora classificato')+(prize?' · premio potenziale '+prize:'')+'</div>':'';
+ const note=season?center+'<div class="me-season-note">La classifica stagionale misura i <b>punti Empire guadagnati nel periodo</b>, non il totale storico. I nuovi giocatori possono quindi competere subito.'+(seasonInfo?.season_key?' · Periodo '+esc(seasonInfo.season_key):'')+'<div style="margin-top:8px"><button type="button" id="meSeasonClaim">🎁 RISCATTA PREMIO STAGIONE PRECEDENTE</button></div><div id="meSeasonClaimStatus" class="me-leaderboard-status"></div></div>':'';
  if(!rows.length){
   box.innerHTML='<h3>'+title()+'</h3>'+tabs()+note+'<p class="me-leaderboard-status">Nessun giocatore classificato in questo periodo.</p>';
   bindTabs();bindSeasonClaim();return;
