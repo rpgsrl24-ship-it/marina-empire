@@ -41,6 +41,16 @@ function progress(){
   return {key,step:Math.max(0,Math.floor(Number(raw.step)||0)),completed:!!raw.completed};
  }catch(_){return {key:portKey()+"|"+daySlot(),step:0,completed:false}}
 }
+function operationSnapshot(key=portKey()){
+ try{
+  const raw=state?.marinaOperations&&typeof state.marinaOperations==="object"?state.marinaOperations[String(key).toLowerCase()]||{}:{};
+  const completed=Math.max(0,Math.floor(Number(raw.completed)||0));
+  const level=completed>=20?5:completed>=10?4:completed>=5?3:completed>=2?2:1;
+  const next=level===1?Math.max(0,2-completed):level===2?Math.max(0,5-completed):level===3?Math.max(0,10-completed):level===4?Math.max(0,20-completed):0;
+  const label=level===5?"HUB D'ECCELLENZA":level===4?"ALTA OPERATIVITÀ":level===3?"MARINA CONSOLIDATA":level===2?"MARINA ATTIVA":"OPERATIVITÀ BASE";
+  return {marina:String(key).toLowerCase(),completed,level,next,label,lastChain:String(raw.lastChain||""),lastAt:Number(raw.lastAt)||0};
+ }catch(_){return {marina:String(key).toLowerCase(),completed:0,level:1,next:2,label:"OPERATIVITÀ BASE",lastChain:"",lastAt:0}}
+}
 function buildContract(chain,p){
  const base=chain.steps[Math.min(p.step,chain.steps.length-1)];
  if(!base)return null;
@@ -77,7 +87,8 @@ function render(){
  if(!ensure())return;
  const chain=selected(),p=progress();
  if(p.completed){
-  box.innerHTML='<strong style="color:#f0d296;font-size:9px">'+chain.icon+' '+chain.title+' · COMPLETATA</strong><p style="font-size:8.5px;color:#a9bec6;margin:5px 0 0">Catena operativa conclusa. Una nuova situazione arriverà nella prossima finestra marina.</p>';
+  const op=operationSnapshot();
+  box.innerHTML='<strong style="color:#f0d296;font-size:9px">'+chain.icon+' '+chain.title+' · COMPLETATA</strong><p style="font-size:8.5px;color:#a9bec6;margin:5px 0 0">Catena operativa conclusa · Operatività marina Lv.'+op.level+' '+op.label+(op.next>0?' · '+op.next+' catene al prossimo livello':' · livello massimo')+'.</p>';
   return;
  }
  const c=buildContract(chain,p),check=window.MarinaEmpireNpcEconomy?.canStart?.(c)||{ok:false,message:"Sistema incarichi non disponibile"};
@@ -99,13 +110,23 @@ function complete(chain,p,c){
    state.prestige=(Number(state.prestige)||0)+25;
    state.earnings=(Number(state.earnings)||0)+bonus;
    state.serviceChainsCompleted=(Number(state.serviceChainsCompleted)||0)+1;
+   state.marinaOperations=state.marinaOperations&&typeof state.marinaOperations==="object"?state.marinaOperations:{};
+   const marina=portKey(),prev=state.marinaOperations[marina]||{};
+   state.marinaOperations[marina]={
+    completed:Math.max(0,Math.floor(Number(prev.completed)||0))+1,
+    lastChain:chain.id,
+    lastAt:Date.now()
+   };
   }
  }):false;
  if(!ok){if(status)status.textContent="Incarico completato, ma avanzamento catena non salvato.";return}
  if(status)status.textContent=isLast?"Catena completata · bonus +"+bonus.toLocaleString("it-IT")+" crediti · prestigio +25":"Step completato. Nuovo incarico disponibile.";
  try{render()}catch(_){}
 }
-window.MarinaEmpireServiceChains={current:()=>({chain:selected(),progress:progress()})};
+window.MarinaEmpireServiceChains={
+ current:()=>({chain:selected(),progress:progress(),operation:operationSnapshot()}),
+ operation:key=>operationSnapshot(key)
+};
 function boot(){
  if(!ensure()){setTimeout(boot,800);return}
  render();
