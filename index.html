@@ -1481,6 +1481,48 @@ window.MarinaEmpireMarketplaceEconomy={
   });
   if(!ok)return {ok:false,message:"Vendita non registrata."};
   render();return {ok:true,message:String(item.name||"Articolo")+" venduto."};
+ },
+ fulfillDemand(demand){
+  const id=String(demand?.id||"").slice(0,80);
+  const kind=String(demand?.kind||"");
+  const targetId=String(demand?.targetId||"").slice(0,50);
+  const value=Math.max(0,Math.floor(Number(demand?.value)||0));
+  const repGain=Math.max(1,Math.floor(Number(demand?.repGain)||4));
+  if(!id||!targetId||!value)return {ok:false,message:"Richiesta di mercato non valida."};
+  if(!window.meRegisteredPlayer)return {ok:false,message:"Registrati per concludere affari nel Marketplace."};
+  if(state.trip)return {ok:false,message:"Le richieste di mercato si concludono soltanto quando sei in marina."};
+  const settled=Array.isArray(state.marketDemandSettled)?state.marketDemandSettled:[];
+  if(settled.includes(id))return {ok:false,message:"Richiesta già conclusa."};
+  if(kind==="item"){
+   const qty=Math.max(0,Math.floor(Number(state.marketInventory?.[targetId])||0));
+   if(qty<1)return {ok:false,message:"Non possiedi l'articolo richiesto."};
+  }else if(kind==="boat"){
+   if(!state.owned.includes(targetId))return {ok:false,message:"Non possiedi l'imbarcazione richiesta."};
+   if(state.boat===targetId)return {ok:false,message:"Seleziona un'altra barca prima di venderla."};
+   if(targetId==="voyager"||state.owned.length<=1)return {ok:false,message:"Questa imbarcazione non può essere ceduta."};
+  }else return {ok:false,message:"Tipo di richiesta non supportato."};
+  const ok=meAtomicPersist(()=>{
+   state.marketDemandSettled=[...settled,id].slice(-150);
+   state.coins+=value;
+   if(kind==="item"){
+    const qty=Math.max(0,Math.floor(Number(state.marketInventory[targetId])||0));
+    state.marketInventory[targetId]=qty-1;
+    if(state.marketInventory[targetId]<=0)delete state.marketInventory[targetId];
+   }else{
+    state.owned=state.owned.filter(x=>x!==targetId);
+    if(state.fleetFuel)delete state.fleetFuel[targetId];
+    if(state.fleetCondition)delete state.fleetCondition[targetId];
+    if(state.fleetPorts)delete state.fleetPorts[targetId];
+   }
+   state.sectorReputation=state.sectorReputation&&typeof state.sectorReputation==="object"?state.sectorReputation:{};
+   state.sectorReputation.broker=Math.max(0,Math.floor(Number(state.sectorReputation.broker)||0))+repGain;
+   state.marketHistory=Array.isArray(state.marketHistory)?state.marketHistory:[];
+   state.marketHistory.push({action:"npc_demand",kind,id:targetId,price:value,at:Date.now()});
+   state.marketHistory=state.marketHistory.slice(-100);
+  });
+  if(!ok)return {ok:false,message:"Affare non registrato: salvataggio non confermato."};
+  render();
+  return {ok:true,message:"Affare concluso: +"+money(value)+" crediti · reputazione Broker +"+repGain+"."};
  }
 };
 window.MarinaEmpireNpcEconomy={
