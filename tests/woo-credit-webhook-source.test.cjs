@@ -10,7 +10,9 @@ for(const token of [
  'ME-CREDITS-50000','ME-CREDITS-2000000','priceCents:499','priceCents:9999',
  'gross!==pack.priceCents*qty','subGross!==pack.priceCents*qty',
  'me_issue_voucher_with_outbox_internal','me_credit_vouchers','stored.code_hash===codeHash',
- 'Too many credit units','Payload too large'
+ 'Too many credit units','Payload too large',
+ '_refunded_item_id','/refunds?per_page=100','me_handle_refunded_voucher_internal',
+ 'revoked_cancelled','redeemed_review','Refund protection unavailable'
 ]) assert(src.includes(token),'Missing webhook safeguard: '+token);
 assert(!src.includes('console.log(voucherCode)'));
 assert(!src.includes('return reply({ok:true,code:'));
