@@ -59,6 +59,46 @@ css.textContent=`
   .me-command-rail button{width:31px;height:40px;min-height:40px;font-size:18px}
   .me-command-bottom{left:46px;right:46px}
 }
+@media(min-width:741px) and (max-width:899px) and (orientation:landscape){
+  body{padding-bottom:0!important}
+  html body .mobile-game-nav,html body #meMobileMore{display:none!important}
+  #meGameGuide{display:none!important}
+  .shell{padding-left:98px!important;padding-right:98px!important;padding-top:54px!important}
+  .me-command-rail{
+    position:fixed;top:56px;bottom:12px;z-index:9996;
+    display:flex;flex-direction:column;gap:8px;justify-content:center;
+    width:78px;padding:6px;background:rgba(3,20,32,.90);
+    border:1px solid rgba(194,154,96,.45);backdrop-filter:blur(10px);
+    box-shadow:0 8px 22px rgba(0,0,0,.36)
+  }
+  .me-command-rail.left{left:8px;border-radius:14px}
+  .me-command-rail.right{right:8px;border-radius:14px}
+  .me-command-rail button{
+    width:64px;height:58px;min-height:58px;padding:0;border:0;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;background:transparent;
+    font-size:22px;color:#e7edf0;box-shadow:none
+  }
+  .me-command-rail button.on{background:#23485a;color:#f4d796;box-shadow:inset 0 0 0 1px rgba(214,181,117,.55)}
+  .me-command-bottom{
+    position:fixed;left:180px;right:180px;bottom:8px;z-index:9997;
+    display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;
+    padding:7px 10px;background:rgba(6,29,43,.96);border:1px solid #b89458;border-radius:13px;
+    box-shadow:0 7px 24px rgba(0,0,0,.48);backdrop-filter:blur(12px)
+  }
+  .me-command-bottom small{display:block;color:#e0bd7b;font-size:8px;font-weight:900;letter-spacing:.08em}
+  .me-command-bottom strong{display:block;margin-top:2px;color:#fff3d0;font-size:11px;line-height:1.18}
+  .me-command-bottom button{min-height:38px;padding:7px 11px;font-size:9px;font-weight:900;border-color:#d1a95e;background:linear-gradient(135deg,#d9b465,#9e6d27);color:#10202b}
+  .me-command-drawer{
+    position:fixed;top:60px;right:94px;z-index:9998;width:min(270px,36vw);
+    padding:9px;background:#071f2ded;border:1px solid #b89458;border-radius:13px;
+    box-shadow:0 12px 28px rgba(0,0,0,.55);backdrop-filter:blur(12px)
+  }
+  .me-command-drawer.open{display:grid;gap:6px}
+  .me-command-drawer button{
+    min-height:40px;text-align:left;padding:8px 10px;background:#0b3141;border:1px solid rgba(184,148,82,.35);
+    color:#f5e4bc;font-size:10px;font-weight:800
+  }
+}
 `;document.head.appendChild(css);
 
 const left=document.createElement("nav");
