@@ -155,17 +155,22 @@ function contractSnapshot(){
  const serviceLoad=Math.max(.8,Math.min(1.3,Number(memory.serviceLoad)||1));
  const pressureExtra=pressure>=1.18?1:0;
  const contractCount=Math.min(4,2+(Math.max(1,Number(op.level)||1)>=3?1:0)+(Math.max(1,Number(op.level)||1)>=5?1:0)+pressureExtra);
+ const feature=featuredVessel();
+ const relation=feature?.id?vesselRelation(feature,key):null;
  return order.slice(0,contractCount).map((c,i)=>{
   const demand=Math.max(.85,Math.min(1.65,(Number(w.demand)||1)*(Number(local.demand)||1)*serviceLoad));
   const trustBonus=1+(Math.max(1,Number(t.level)||1)-1)*.035;
   const stageBonus=1+(stage-1)*.08;
   const operationBonus=1+(Math.max(1,Number(op.level)||1)-1)*.03;
-  const reward=Math.round(c.reward*demand*trustBonus*stageBonus*operationBonus);
-  const prestige=Math.round(c.prestige*(1+(stage-1)*.06));
-  const reputation=Math.round(c.reputation*(1+(stage-1)*.05));
+  const relationBonus=i===0&&relation?1+(Math.max(1,Number(relation.level)||1)-1)*.06:1;
+  const reward=Math.round(c.reward*demand*trustBonus*stageBonus*operationBonus*relationBonus);
+  const prestige=Math.round(c.prestige*(1+(stage-1)*.06)*relationBonus);
+  const reputation=Math.round(c.reputation*(1+(stage-1)*.05)*relationBonus);
   return {...c,reward,prestige,reputation,
     dynamicId:"dyn-"+key+"-"+slot()+"-"+i+"-"+c.id,
-    marina:key,worldEvent:w.event?.title||"Attività ordinaria",localEvent:local.event?.title||"Attività locale ordinaria",operationLevel:op.level,operationLabel:op.label};
+    marina:key,worldEvent:w.event?.title||"Attività ordinaria",localEvent:local.event?.title||"Attività locale ordinaria",operationLevel:op.level,operationLabel:op.label,
+    clientVessel:i===0&&feature?.id?{id:feature.id,name:feature.name,length:feature.length,profile:feature.profile}:null,
+    relationLevel:i===0&&relation?relation.level:1,relationLabel:i===0&&relation?relation.label:"NUOVO CLIENTE"};
  });
 }
 function ensure(){
@@ -186,7 +191,7 @@ function render(){
   const running=active?.id===c.dynamicId;
   const check=window.MarinaEmpireNpcEconomy?.canStart?.(c)||{ok:false,message:"Sistema incarichi non disponibile"};
   const disabled=!!active||!check.ok;
-  return '<article class="me-contract"><strong>'+c.icon+' '+c.title+'</strong><p>'+c.worldEvent+' · '+formatCredits(c.reward)+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+'</p><button type="button" data-dyn-contract="'+c.dynamicId+'" '+(disabled?'disabled':'')+'>'+(running?'IN CORSO':check.ok?'ACCETTA CONTRATTO':check.message)+'</button><div class="me-contract-progress"><span data-progress="'+c.dynamicId+'"></span></div><div class="me-contract-status">'+(running?'Operazione in corso':('Disponibile ora · '+c.duration+'s'))+'</div></article>';
+  return '<article class="me-contract"><strong>'+c.icon+' '+c.title+(c.clientVessel?' · '+c.clientVessel.name:'')+'</strong><p>'+c.worldEvent+' · '+formatCredits(c.reward)+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+(c.clientVessel?' · '+c.relationLabel:'')+'</p><button type="button" data-dyn-contract="'+c.dynamicId+'" '+(disabled?'disabled':'')+'>'+(running?'IN CORSO':check.ok?'ACCETTA CONTRATTO':check.message)+'</button><div class="me-contract-progress"><span data-progress="'+c.dynamicId+'"></span></div><div class="me-contract-status">'+(running?'Operazione in corso':('Disponibile ora · '+c.duration+'s'))+'</div></article>';
  }).join("");
  const mem=window.MarinaEmpireMarinaMemory?.current?.()||null;
  const memText=mem?' · memoria traffico '+(mem.pressure>=1.2?'alta':mem.pressure>=1.02?'attiva':mem.pressure<.88?'bassa':'normale'):'';
@@ -210,7 +215,22 @@ function start(id){
    clearInterval(tickTimer);tickTimer=null;
    const finished=active;active=null;
    const r=window.MarinaEmpireNpcEconomy?.complete?.(finished.contract,finished.id)||{ok:false,message:"Incarico non registrato"};
-   if(status)status.textContent=r.ok?("Completato · netto +"+formatCredits(r.net)+" cr · rep. "+r.sector+" +"+r.reputation):(r.message||"Incarico non registrato");
+   if(r.ok&&finished.contract.clientVessel?.id&&typeof meAtomicPersist==="function"){
+    meAtomicPersist(()=>{
+     const marina=String(finished.contract.marina||portKey()).toLowerCase();
+     state.vesselRelations=state.vesselRelations&&typeof state.vesselRelations==="object"?state.vesselRelations:{};
+     state.vesselRelations[marina]=state.vesselRelations[marina]&&typeof state.vesselRelations[marina]==="object"?state.vesselRelations[marina]:{};
+     const id=finished.contract.clientVessel.id,vr=state.vesselRelations[marina][id]||{};
+     state.vesselRelations[marina][id]={
+      visits:Math.max(0,Math.floor(Number(vr.visits)||0))+1,
+      services:Math.max(0,Math.floor(Number(vr.services)||0))+1,
+      lastContract:finished.contract.id,
+      lastAt:Date.now(),
+      name:finished.contract.clientVessel.name
+     };
+    });
+   }
+   if(status)status.textContent=r.ok?("Completato · netto +"+formatCredits(r.net)+" cr · rep. "+r.sector+" +"+r.reputation+(finished.contract.clientVessel?" · rapporto cliente aggiornato":"")):(r.message||"Incarico non registrato");
    setTimeout(render,r.ok?2600:4200);
   }
  },400);
