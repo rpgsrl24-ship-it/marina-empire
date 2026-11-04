@@ -234,11 +234,17 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.equal(arrived.lastArrival.reward,launched.trip.mission.reward,'The advertised mission reward is recorded');
     assert.ok(arrived.coins>=launched.coins+launched.trip.mission.reward,'Reward is credited');
     assert.ok(arrived.fuel>=0 && arrived.condition>=0,'Arrival cannot underflow fuel or condition');
-    assert.equal(await page.locator('#voyageCinema').isVisible(),true,'The console remains after arrival');
     assert.equal(await page.locator('#voyageArrivalNotice').isVisible(),true,'Arrival summary is visible');
-    const arrivalIdentity=await page.evaluate(()=>({title:document.getElementById('cinemaTitle')?.textContent||'',route:document.getElementById('meBridgeRoute')?.textContent||'',yacht:boat(state.boat).name,port:port(state.port).name}));
-    assert.ok(arrivalIdentity.title.includes(arrivalIdentity.yacht)&&arrivalIdentity.title.includes(arrivalIdentity.port),name+': docked console shows yacht and actual arrival marina');
-    assert.ok(arrivalIdentity.route.includes(arrivalIdentity.port),name+': docked route indicator uses the saved arrival marina');
+    if (mobile && viewport.width<=740) {
+      assert.equal(await page.locator('#voyageCinema').isVisible(),false,name+': mobile command deck removes the travel console after arrival');
+      assert.equal(await page.locator('.me-command-rail.left').isVisible(),true,name+': mobile command deck stays available after arrival');
+      assert.equal(await page.locator('#meCommandBottom').isVisible(),true,name+': contextual action remains available after arrival');
+    } else {
+      assert.equal(await page.locator('#voyageCinema').isVisible(),true,'The console remains after arrival');
+      const arrivalIdentity=await page.evaluate(()=>({title:document.getElementById('cinemaTitle')?.textContent||'',route:document.getElementById('meBridgeRoute')?.textContent||'',yacht:boat(state.boat).name,port:port(state.port).name}));
+      assert.ok(arrivalIdentity.title.includes(arrivalIdentity.yacht)&&arrivalIdentity.title.includes(arrivalIdentity.port),name+': docked console shows yacht and actual arrival marina');
+      assert.ok(arrivalIdentity.route.includes(arrivalIdentity.port),name+': docked route indicator uses the saved arrival marina');
+    }
     await page.reload({waitUntil:'load'});
     await page.waitForFunction(key=>JSON.parse(localStorage.getItem(key))?.trip===null,saveKey);
     const reloaded=await save(page);
