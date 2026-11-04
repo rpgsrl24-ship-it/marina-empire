@@ -1204,6 +1204,14 @@ padding:5px!important;gap:4px!important;
 .me-special-foot strong{color:#f5d18b;font-size:11px}
 .me-special-foot button{min-height:40px;padding:8px 11px;font-size:10px;font-weight:900;border-color:#e0b45d;background:#5b3b17;color:#ffe6ae}
 @media(max-width:740px){.me-marina-special{padding:12px}.me-special-foot button{width:100%}.me-special-top h3{font-size:17px!important}}
+</style><style id="me-marina-special-choices-v6">
+.me-special-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.me-special-choice button{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:68px;padding:10px 11px;text-align:left;border:1px solid #cda861;background:#0b2b38;color:#f6e5bf}
+.me-special-choice button strong{font-size:11px;color:#f0ca80}
+.me-special-choice button small{display:block;margin-top:4px;font-size:9px;line-height:1.3;color:#c8d7da}
+.me-special-choice button:nth-child(2){background:#2e251b;border-color:#e0b96d}
+.me-special-complete{margin-top:10px;padding:10px;border:1px solid #5aa77d;border-radius:8px;background:#0d342b;color:#8ee3b2;font-size:10px;font-weight:900;text-align:center;letter-spacing:.7px}
+@media(max-width:520px){.me-special-choice{grid-template-columns:1fr}.me-special-choice button{min-height:60px}}
 </style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">PROVA GRATIS · 1 MISSIONE</button><p class="muted" style="font-size:13px;margin:6px 0 14px">Nessuna email richiesta per la prova. Dopo la prima missione registrati gratis per continuare. Acquisti sempre facoltativi.</p><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><nav class="nav" id="navigation" aria-label="Sezioni del gioco"><button data-tab="home" class="on">🏠 HOME</button><button data-tab="office">⚓ DIREZIONE</button><button data-tab="map">🗺️ NAVIGAZIONE</button><button data-tab="missions">🎯 MISSIONI</button><button data-tab="fleet">🛥️ FLOTTA</button><button data-tab="marinas">⚓ MARINE</button><button data-tab="marketplace">🛒 MARKETPLACE</button><button data-tab="credits" class="me-credits-nav">💳 ACQUISTA CREDITI</button><button data-tab="profile">👤 COMANDANTE / ACCOUNT</button><button data-tab="headquarters">🏝️ ISOLA DELLE ROSE</button></nav><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA TEST CLIENTI</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
@@ -3679,37 +3687,46 @@ button.addEventListener("click",async()=>{
     else{
      const done=claimedEvents().includes(ev.id),mins=Math.max(1,Math.ceil(ev.remaining/60000));
      specialBox.classList.remove("hide");
-     specialBox.innerHTML='<div class="me-special-top"><span class="me-special-icon">'+ev.icon+'</span><div><span>EVENTO SPECIALE · '+mins+' MIN</span><h3>'+ev.name+'</h3></div></div><p>'+ev.desc+'</p><div class="me-special-foot"><strong>+'+ev.reward.toLocaleString("it-IT")+' crediti · +'+ev.prestige+' prestigio</strong><button type="button" data-live-special '+(done||state.trip||!state.setupComplete?'disabled':'')+'>'+(done?'COMPLETATO':state.trip?'IN NAVIGAZIONE':!state.setupComplete?'CONFIGURA BASE':'GESTISCI EVENTO')+'</button></div>';
+     const blocked=done||state.trip||!state.setupComplete;
+     const econReward=Math.round(ev.reward*1.2),econPrestige=Math.max(1,Math.round(ev.prestige*.8));
+     const repReward=Math.round(ev.reward*.8),repPrestige=Math.max(1,Math.round(ev.prestige*1.6));
+     specialBox.innerHTML='<div class="me-special-top"><span class="me-special-icon">'+ev.icon+'</span><div><span>EVENTO SPECIALE · '+mins+' MIN</span><h3>'+ev.name+'</h3></div></div><p>'+ev.desc+'</p>'+(done?'<div class="me-special-complete">✓ EVENTO COMPLETATO</div>':'<div class="me-special-choice"><button type="button" data-live-special-choice="economy" '+(blocked?'disabled':'')+'><strong>💰 EFFICIENZA</strong><small>+'+econReward.toLocaleString("it-IT")+' crediti · +'+econPrestige+' prestigio · +1 operatività</small></button><button type="button" data-live-special-choice="reputation" '+(blocked?'disabled':'')+'><strong>👑 REPUTAZIONE</strong><small>+'+repReward.toLocaleString("it-IT")+' crediti · +'+repPrestige+' prestigio · +3 operatività</small></button></div>');
     }
    }
    const mobile=document.getElementById("meMobileLiveStatus");
    if(mobile&&!state.trip)mobile.textContent=name+" · "+traffic+" movimenti · "+requests+" richieste";
   }catch(e){}
  }
- function completeSpecial(){
+ function completeSpecial(choice){
   try{
    if(typeof state==="undefined"||state.trip)return typeof notice==="function"&&notice("Evento non disponibile mentre sei in navigazione.");
    if(!state.setupComplete)return typeof notice==="function"&&notice("Configura prima la tua base operativa.");
+   choice=choice==="reputation"?"reputation":"economy";
    const name=(typeof port==="function"&&state.port?port(state.port)?.name:null)||"Marina",marinaId=String(state.port||"").toLowerCase();
    const operational=typeof marinaOperationalSnapshot==="function"?marinaOperationalSnapshot(marinaId):{level:1};
    const ev=specialEventFor(name,operational.level);
    if(!ev)return typeof notice==="function"&&notice("L'evento speciale è terminato.");
    if(claimedEvents().includes(ev.id))return typeof notice==="function"&&notice("Evento già completato.");
+   const reward=choice==="reputation"?Math.round(ev.reward*.8):Math.round(ev.reward*1.2);
+   const prestige=choice==="reputation"?Math.max(1,Math.round(ev.prestige*1.6)):Math.max(1,Math.round(ev.prestige*.8));
+   const operationGain=choice==="reputation"?3:1;
+   const beforeLevel=operational.level;
    const ok=typeof meAtomicPersist==="function"&&meAtomicPersist(()=>{
     state.marinaSpecialClaims=Array.isArray(state.marinaSpecialClaims)?state.marinaSpecialClaims:[];
     state.marinaSpecialClaims.push(ev.id);
     if(state.marinaSpecialClaims.length>20)state.marinaSpecialClaims=state.marinaSpecialClaims.slice(-20);
-    state.coins=Math.max(0,Math.floor(Number(state.coins)||0))+ev.reward;
-    state.prestige=Math.max(0,Math.floor(Number(state.prestige)||0))+ev.prestige;
-    state.earnings=Math.max(0,Math.floor(Number(state.earnings)||0))+ev.reward;
+    state.coins=Math.max(0,Math.floor(Number(state.coins)||0))+reward;
+    state.prestige=Math.max(0,Math.floor(Number(state.prestige)||0))+prestige;
+    state.earnings=Math.max(0,Math.floor(Number(state.earnings)||0))+reward;
     state.emergenciesCompleted=Math.max(0,Math.floor(Number(state.emergenciesCompleted)||0))+1;
     state.marinaOperations=state.marinaOperations&&typeof state.marinaOperations==="object"&&!Array.isArray(state.marinaOperations)?state.marinaOperations:{};
     const current=state.marinaOperations[marinaId]&&typeof state.marinaOperations[marinaId]==="object"?state.marinaOperations[marinaId]:{};
-    state.marinaOperations[marinaId]={...current,completed:Math.max(0,Math.floor(Number(current.completed)||0))+2,lastEventAt:Date.now()};
+    state.marinaOperations[marinaId]={...current,completed:Math.max(0,Math.floor(Number(current.completed)||0))+operationGain,lastEventAt:Date.now(),lastEventStrategy:choice};
    });
    if(!ok)return typeof notice==="function"&&notice("Evento non registrato: nessun premio applicato.");
    if(typeof render==="function")render();renderLive();
-   if(typeof notice==="function")notice(ev.name+" completato · +"+ev.reward.toLocaleString("it-IT")+" crediti · +"+ev.prestige+" prestigio");
+   const after=typeof marinaOperationalSnapshot==="function"?marinaOperationalSnapshot(marinaId):{level:beforeLevel,service:"Servizi Standard"};
+   if(typeof notice==="function"){const label=choice==="reputation"?"Reputazione":"Efficienza";const levelUp=after.level>beforeLevel?" · MARINA LIVELLO "+after.level+" SBLOCCATO: "+after.service:"";notice(ev.name+" · "+label+" · +"+reward.toLocaleString("it-IT")+" crediti · +"+prestige+" prestigio"+levelUp);}
   }catch(e){}
  }
  function completeJob(index){
@@ -3740,7 +3757,7 @@ button.addEventListener("click",async()=>{
     setTimeout(function(){document.getElementById("meMarinaLivePanel")?.scrollIntoView({behavior:"smooth",block:"start"})},100);
     return;
    }
-   const special=e.target.closest("[data-live-special]");if(special){completeSpecial();return;}const job=e.target.closest("[data-live-job]");
+   const special=e.target.closest("[data-live-special-choice]");if(special){completeSpecial(special.dataset.liveSpecialChoice);return;}const job=e.target.closest("[data-live-job]");
    if(job){completeJob(job.dataset.liveJob);return;}
  });
  window.meRenderMarinaLive=renderLive;
