@@ -116,7 +116,9 @@ function trafficSnapshot(){
  const profileBias=Math.max(.75,Math.min(1.3,Number(profile.trafficBias)||1));
  const localBias=Math.max(.7,Math.min(1.4,Number(local.traffic)||1));
  const memoryTraffic=Math.max(.75,Math.min(1.3,Number(window.MarinaEmpireMarinaMemory?.trafficMultiplier?.(key))||1));
- const volume=Math.max(3,Math.min(10,Math.round(3+base*profileBias*localBias*memoryTraffic*2.2+operationBoost)));
+ const shift=window.MarinaEmpireShiftCycle?.modifiers?.(key)||{traffic:1,demand:1,service:1};
+ const shiftTraffic=Math.max(.55,Math.min(1.5,Number(shift.traffic)||1));
+ const volume=Math.max(3,Math.min(10,Math.round(3+base*profileBias*localBias*memoryTraffic*shiftTraffic*2.2+operationBoost)));
  const feature=featuredVessel(),items=[{
   ...feature,
   action:feature.serviceState,
@@ -153,12 +155,16 @@ function contractSnapshot(){
  const memory=window.MarinaEmpireMarinaMemory?.current?.()||{pressure:1,serviceLoad:1};
  const pressure=Math.max(.75,Math.min(1.35,Number(memory.pressure)||1));
  const serviceLoad=Math.max(.8,Math.min(1.3,Number(memory.serviceLoad)||1));
+ const shift=window.MarinaEmpireShiftCycle?.modifiers?.(key)||{traffic:1,demand:1,service:1,phase:{label:"OPERATIVITÀ REGOLARE"}};
+ const shiftDemand=Math.max(.75,Math.min(1.35,Number(shift.demand)||1));
+ const shiftService=Math.max(.75,Math.min(1.4,Number(shift.service)||1));
  const pressureExtra=pressure>=1.18?1:0;
- const contractCount=Math.min(4,2+(Math.max(1,Number(op.level)||1)>=3?1:0)+(Math.max(1,Number(op.level)||1)>=5?1:0)+pressureExtra);
+ const shiftExtra=shift.phase?.id==="rush"?1:0;
+ const contractCount=Math.min(4,2+(Math.max(1,Number(op.level)||1)>=3?1:0)+(Math.max(1,Number(op.level)||1)>=5?1:0)+pressureExtra+shiftExtra);
  const feature=featuredVessel();
  const relation=feature?.id?vesselRelation(feature,key):null;
  return order.slice(0,contractCount).map((c,i)=>{
-  const demand=Math.max(.85,Math.min(1.65,(Number(w.demand)||1)*(Number(local.demand)||1)*serviceLoad));
+  const demand=Math.max(.85,Math.min(1.7,(Number(w.demand)||1)*(Number(local.demand)||1)*serviceLoad*shiftDemand*shiftService));
   const trustBonus=1+(Math.max(1,Number(t.level)||1)-1)*.035;
   const stageBonus=1+(stage-1)*.08;
   const operationBonus=1+(Math.max(1,Number(op.level)||1)-1)*.03;
