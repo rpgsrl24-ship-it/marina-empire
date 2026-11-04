@@ -2509,8 +2509,9 @@ async function refreshPurchasedWallet(){
   if(progress.error)throw progress.error;
   const pending=Number(wallet.data?.balance||0);
   const onlineCoins=Number(progress.data?.game_state?.coins||0);
-  const localCoins=Number(state?.coins||0);
-  if(progress.data?.game_state&&validState(progress.data.game_state)&&onlineCoins>localCoins){
+  const hasGameState=typeof state!=="undefined"&&state;
+  const localCoins=hasGameState?Number(state.coins||0):0;
+  if(hasGameState&&progress.data?.game_state&&validState(progress.data.game_state)&&onlineCoins>localCoins){
    state.coins=onlineCoins;
    persist();
    render();
