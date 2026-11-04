@@ -46,7 +46,7 @@ st.textContent=`
   .me-command-drawer button{min-height:45px;text-align:left;padding:10px 12px;background:#0b3141;border:1px solid rgba(184,148,82,.35);color:#f5e4bc;font-size:11px;font-weight:800}
   .me-command-bottom{
     position:fixed;left:50%;right:auto;bottom:12px;z-index:9997;transform:translateX(-50%);
-    width:min(62vw,920px);
+    width:min(54vw,800px);
     display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;
     padding:9px 11px;background:rgba(6,29,43,.96);border:1px solid #b89458;border-radius:14px;
     box-shadow:0 7px 24px rgba(0,0,0,.48);backdrop-filter:blur(12px)
@@ -58,7 +58,7 @@ st.textContent=`
   #home .cards,#home #meProgressionHub,#home .luxury-mini-map,#home .hero-copy{display:none!important}
   #home .hero{
     position:relative!important;overflow:hidden!important;
-    width:min(68vw,1100px)!important;max-width:1100px!important;
+    width:min(58vw,900px)!important;max-width:900px!important;
     aspect-ratio:16/9!important;height:auto!important;min-height:0!important;max-height:calc(100vh - 102px)!important;
     margin:0 auto!important;
     border:1px solid #b99557!important;border-radius:18px!important;
@@ -100,19 +100,19 @@ st.textContent=`
   .me-live-home-boat{font-size:28px!important}
   body.me-pc-panel-open #home .game-lux-home{justify-content:flex-start!important}
   body.me-pc-panel-open #home .hero{
-    width:min(50vw,820px)!important;
+    width:min(40vw,650px)!important;
     margin-left:0!important;margin-right:auto!important
   }
   body.me-pc-panel-open .me-command-bottom{
-    left:calc(112px + min(25vw,410px))!important;
-    width:min(44vw,700px)!important
+    left:calc(112px + min(20vw,325px))!important;
+    width:min(36vw,590px)!important
   }
 }
 @media(min-width:900px) and (max-width:1199px){
-  body.me-pc-panel-open #home .hero{width:42vw!important}
+  body.me-pc-panel-open #home .hero{width:36vw!important}
   body.me-pc-panel-open .me-command-bottom{
-    left:calc(112px + 21vw)!important;
-    width:38vw!important
+    left:calc(112px + 18vw)!important;
+    width:32vw!important
   }
 }
 `;
