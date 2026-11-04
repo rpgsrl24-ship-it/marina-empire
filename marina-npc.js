@@ -106,7 +106,16 @@ function pick(){
 function ensure(){
  const live=document.querySelector(".me-live-marina");
  if(!live)return false;
- if(box&&box.parentNode===live)return true;
+ const existing=[...live.querySelectorAll(".me-npc-box")];
+ if(box&&box.parentNode===live){
+  existing.forEach((el,i)=>{if(el!==box&&i>=0)el.remove()});
+  return true;
+ }
+ if(existing.length){
+  box=existing[0];
+  existing.slice(1).forEach(el=>el.remove());
+  return true;
+ }
  box=document.createElement("div");
  box.className="me-npc-box";
  box.innerHTML='<div class="me-npc-title">OPPORTUNITÀ DAL PORTO</div><div class="me-npc-row"></div><div class="me-npc-meta"></div><div class="me-npc-actions"><button type="button" class="me-npc-accept">ACCETTA</button><button type="button" class="me-npc-skip">PASSA</button></div><div class="me-npc-progress"><span></span></div><div class="me-npc-status"></div><div class="me-npc-level"></div>';
