@@ -1230,6 +1230,114 @@ padding:5px!important;gap:4px!important;
 .me-marina-identity small{display:block;color:#d8bc83;font-size:8px;letter-spacing:1.1px;font-weight:900}
 .me-marina-identity strong{display:block;margin:3px 0;color:#ffe0a0;font-size:15px}
 .me-marina-identity p{margin:0!important;color:#cbd9dc;font-size:10px!important;line-height:1.4!important}
+</style><style id="me-mobile-general-cleanup-v10">
+@media(max-width:740px){
+  /* GLOBAL MOBILE QA */
+  html,body{overflow-x:hidden!important}
+  body{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important}
+  .screen.me-mobile-home-sheet{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))!important}
+  .screen.me-mobile-home-sheet button,.screen.me-mobile-home-sheet a{touch-action:manipulation}
+  .screen.me-mobile-home-sheet .muted,.screen.me-mobile-home-sheet small,.screen.me-mobile-home-sheet p{color:#b9cbd2!important}
+
+  /* MARINA LIVE: WORLD EVENT COMPACT */
+  #marinas .me-world-event{
+    margin:7px 8px!important;padding:9px 10px!important;gap:8px!important;border-radius:10px!important;
+    align-items:center!important
+  }
+  #marinas .me-world-event-icon{font-size:19px!important;line-height:1!important}
+  #marinas .me-world-event strong{font-size:10.5px!important;line-height:1.15!important}
+  #marinas .me-world-event p{margin:2px 0!important;font-size:9px!important;line-height:1.25!important}
+  #marinas .me-world-event p:first-of-type{display:none!important}
+  #marinas .me-world-event small{font-size:8px!important}
+
+  /* MARINA LIVE: REDUCE VISUAL NOISE */
+  #marinas:not(.me-mobile-expanded) .me-live-water{display:none!important}
+  #marinas:not(.me-mobile-expanded) .me-live-intensity{margin-top:7px!important}
+  #marinas:not(.me-mobile-expanded) .me-live-feed{
+    max-height:58px!important;overflow:hidden!important;padding:5px 9px!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-live-feed-row:nth-child(n+3){display:none!important}
+  #marinas:not(.me-mobile-expanded) .me-live-community{display:none!important}
+
+  /* VHF becomes a compact status block */
+  #marinas .me-live-vhf{
+    margin:6px 9px 8px!important;padding:8px 9px!important;border-radius:9px!important;
+    font-size:9px!important;line-height:1.3!important
+  }
+  #marinas .me-live-vhf b{display:inline!important;font-size:9px!important}
+  #marinas .me-live-vhf-text{font-size:9px!important}
+  #marinas .me-live-vhf-preview{
+    margin:5px 0 0!important;padding:5px 6px!important;font-size:8.5px!important;line-height:1.2!important
+  }
+  #marinas .me-live-vhf-action{
+    width:100%!important;min-height:38px!important;margin-top:6px!important;padding:7px 8px!important;
+    border-radius:8px!important;font-size:9.5px!important
+  }
+
+  /* OPPORTUNITY: ONE PRIMARY CARD ONLY */
+  #marinas:not(.me-mobile-expanded) .me-npc-box{
+    margin:8px 9px!important;padding:10px!important;border-radius:11px!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-npc-title{font-size:8.5px!important;letter-spacing:.1em!important}
+  #marinas:not(.me-mobile-expanded) .me-npc-row{
+    display:grid!important;grid-template-columns:28px minmax(0,1fr)!important;gap:7px!important;
+    font-size:11px!important;line-height:1.28!important;margin-top:6px!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-npc-role{font-size:11px!important}
+  #marinas:not(.me-mobile-expanded) .me-npc-meta{
+    display:flex!important;gap:5px 8px!important;flex-wrap:wrap!important;margin:7px 0!important;
+    font-size:8.5px!important;line-height:1.25!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-npc-meta span{color:#b9cbd2!important}
+  #marinas:not(.me-mobile-expanded) .me-npc-meta span:nth-child(n+6){display:none!important}
+  #marinas:not(.me-mobile-expanded) .me-npc-actions{
+    display:grid!important;grid-template-columns:1.4fr .8fr!important;gap:7px!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-npc-actions button{
+    min-height:42px!important;padding:8px!important;font-size:10px!important;font-weight:900!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-npc-status,
+  #marinas:not(.me-mobile-expanded) .me-npc-level{
+    font-size:8.5px!important;line-height:1.25!important;margin-top:5px!important;color:#9eb6bf!important
+  }
+
+  /* HIDE SECONDARY LIVE TRAFFIC CONTRACT GRID IN COLLAPSED MODE */
+  #marinas:not(.me-mobile-expanded) .me-traffic-board{
+    margin:7px 9px!important;padding:8px!important;border-radius:10px!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-traffic-grid{display:block!important}
+  #marinas:not(.me-mobile-expanded) .me-traffic-list{display:none!important}
+  #marinas:not(.me-mobile-expanded) .me-contract-list{display:block!important}
+  #marinas:not(.me-mobile-expanded) .me-contract{display:none!important}
+  #marinas:not(.me-mobile-expanded) .me-contract:first-child{display:block!important}
+  #marinas:not(.me-mobile-expanded) .me-traffic-head{margin-bottom:5px!important}
+  #marinas:not(.me-mobile-expanded) .me-traffic-head strong{font-size:8.5px!important}
+  #marinas:not(.me-mobile-expanded) .me-traffic-head span{font-size:8px!important}
+  #marinas:not(.me-mobile-expanded) .me-contract strong{font-size:9.5px!important}
+  #marinas:not(.me-mobile-expanded) .me-contract p{font-size:8.5px!important;line-height:1.3!important}
+  #marinas:not(.me-mobile-expanded) .me-contract button{min-height:39px!important;font-size:9px!important}
+  #marinas:not(.me-mobile-expanded) .me-traffic-board>div[style*="font-size:8px"],
+  #marinas:not(.me-mobile-expanded) .me-traffic-board>div[style*="font-size:8.5px"]{display:none!important}
+
+  /* MISSIONS: LESS DENSITY */
+  #missions #firstVoyageGuide{padding:11px!important}
+  #missions #firstVoyageGuide p:nth-of-type(2){display:none!important}
+  #missions #missionList .item p{font-size:9.5px!important;line-height:1.35!important}
+  #missions #missionList .item p:nth-of-type(n+5){display:none!important}
+  #missions #missionList .item button{min-height:42px!important}
+
+  /* FLEET: keep selected vessel focused */
+  #fleet #fleetList .yacht-detail p{color:#b9cbd2!important}
+  #fleet #fleetList .yacht-card{box-shadow:none!important}
+
+  /* CREDITS / PROFILE */
+  #credits .me-credit-pack p,#credits .small,#profile .small{color:#b9cbd2!important}
+  #credits .me-credit-pack button,#profile button{min-height:42px!important}
+
+  /* BOTTOM NAV MUST STAY ABOVE CONTENT */
+  .mobile-game-nav{z-index:100000!important}
+  .me-mobile-more{z-index:100010!important}
+}
 </style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">PROVA GRATIS · 1 MISSIONE</button><p class="muted" style="font-size:13px;margin:6px 0 14px">Nessuna email richiesta per la prova. Dopo la prima missione registrati gratis per continuare. Acquisti sempre facoltativi.</p><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><nav class="nav" id="navigation" aria-label="Sezioni del gioco"><button data-tab="home" class="on">🏠 HOME</button><button data-tab="office">⚓ DIREZIONE</button><button data-tab="map">🗺️ NAVIGAZIONE</button><button data-tab="missions">🎯 MISSIONI</button><button data-tab="fleet">🛥️ FLOTTA</button><button data-tab="marinas">⚓ MARINE</button><button data-tab="marketplace">🛒 MARKETPLACE</button><button data-tab="credits" class="me-credits-nav">💳 ACQUISTA CREDITI</button><button data-tab="profile">👤 COMANDANTE / ACCOUNT</button><button data-tab="headquarters">🏝️ ISOLA DELLE ROSE</button></nav><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA TEST CLIENTI</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
@@ -3789,5 +3897,46 @@ button.addEventListener("click",async()=>{
    if(job){completeJob(job.dataset.liveJob);return;}
  });
  window.meRenderMarinaLive=renderLive;
+})();
+</script><script id="me-mobile-general-cleanup-v10-script">
+(()=>{
+  if(window.__ME_MOBILE_GENERAL_CLEANUP_V10__)return;
+  window.__ME_MOBILE_GENERAL_CLEANUP_V10__=true;
+
+  function dedupe(selector){
+    const nodes=[...document.querySelectorAll(selector)];
+    nodes.slice(1).forEach(n=>n.remove());
+  }
+  function clean(){
+    if(innerWidth>740)return;
+    dedupe("#marinas .me-world-event");
+    dedupe("#marinas .me-npc-box");
+    dedupe("#marinas .me-traffic-board");
+
+    const npc=document.querySelector("#marinas .me-npc-box");
+    if(npc){
+      const status=npc.querySelector(".me-npc-status");
+      const running=/in corso/i.test(status?.textContent||"");
+      npc.classList.toggle("me-npc-running",running);
+    }
+
+    const vhf=document.querySelector("#marinas .me-live-vhf");
+    if(vhf){
+      const action=vhf.querySelector(".me-live-vhf-action");
+      const active=/IN CORSO/i.test(action?.textContent||"");
+      vhf.classList.toggle("me-vhf-running",active);
+    }
+  }
+
+  function boot(){
+    clean();
+    const marinas=document.getElementById("marinas");
+    if(marinas)new MutationObserver(()=>setTimeout(clean,25)).observe(marinas,{childList:true,subtree:true,characterData:true});
+    window.addEventListener("marina-empire-updated",()=>setTimeout(clean,25));
+    window.addEventListener("marina-world-event",()=>setTimeout(clean,25));
+    window.addEventListener("resize",clean);
+    setInterval(clean,1500);
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
 </script></body></html>
