@@ -30,7 +30,7 @@ st.textContent=`
   .me-compact-hud b{display:block;margin-top:4px;color:#f0cd8b;font-size:11px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .shell{padding-top:4px!important}
   #home .hero{min-height:calc(100svh - 174px)!important;height:calc(100svh - 174px)!important}
-  #marinas .me-live-marina{min-height:calc(100svh - 174px)!important}
+  #marinas .me-live-marina{min-height:0!important;height:auto!important}
   #map.me-trip-active #voyageCinema{min-height:calc(100svh - 174px)!important}
 }
 `;

@@ -68,7 +68,36 @@
   @keyframes meWaterShine{to{transform:translateX(100%)}}
   @keyframes meLivePulse{50%{opacity:.35;transform:scale(.8)}}
   @media (prefers-reduced-motion:reduce){.me-live-boat,.me-live-water:after,.me-live-dot{animation:none!important}.me-live-boat{left:12%!important}}
-  @media (max-width:740px){.me-live-marina{margin:8px 0 10px}.me-live-water{height:64px}.me-live-marina-head{font-size:10px}.me-live-feed{font-size:9.5px}}
+  @media (max-width:740px){
+    #marinas .me-live-marina{
+      min-height:0!important;height:auto!important;
+      display:flex!important;flex-direction:column!important;
+      margin:8px 0 10px!important;border-radius:13px!important;
+      overflow:hidden!important
+    }
+    #marinas .me-live-marina-head{order:0;padding:9px 10px!important;font-size:10px!important}
+    #marinas .me-live-intensity{order:1;margin:0 9px 7px!important;padding:7px 8px!important}
+    #marinas .me-live-player-status{order:2;margin:0 9px 7px!important}
+    #marinas .me-live-water{order:3;height:76px!important;min-height:76px!important}
+    #marinas .me-live-feed{order:4;padding:8px 9px!important;font-size:9px!important;gap:5px!important}
+    #marinas .me-live-feed-row:nth-child(n+4){display:none!important}
+    #marinas .me-live-vhf{
+      order:5;margin:0 9px 8px!important;padding:9px!important;
+      border:1px solid rgba(126,185,207,.35)!important;border-left:3px solid #7eb9cf!important;
+      border-radius:10px!important;background:#0a3040!important;font-size:9px!important
+    }
+    #marinas .me-live-vhf-preview{margin-top:6px!important;padding:6px!important}
+    #marinas .me-live-vhf-action{
+      width:100%!important;min-height:42px!important;margin-top:7px!important;
+      font-size:10px!important;font-weight:900!important
+    }
+    #marinas .me-live-vhf-career{display:none!important}
+    #marinas .me-live-community{
+      order:6;padding:8px 9px 9px!important;
+      max-height:92px!important;overflow:hidden!important
+    }
+    #marinas .me-live-community-row:nth-child(n+3){display:none!important}
+  }
   `;
   const style=document.createElement("style");
   style.id="me-marina-live-style";
