@@ -45,19 +45,22 @@ st.textContent=`
   .me-command-drawer.open{display:grid!important;gap:7px}
   .me-command-drawer button{min-height:45px;text-align:left;padding:10px 12px;background:#0b3141;border:1px solid rgba(184,148,82,.35);color:#f5e4bc;font-size:11px;font-weight:800}
   .me-command-bottom{
-    position:fixed;left:250px;right:250px;bottom:12px;z-index:9997;
+    position:fixed;left:50%;right:auto;bottom:12px;z-index:9997;transform:translateX(-50%);
+    width:min(62vw,920px);
     display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;
-    padding:10px 12px;background:rgba(6,29,43,.96);border:1px solid #b89458;border-radius:14px;
+    padding:9px 11px;background:rgba(6,29,43,.96);border:1px solid #b89458;border-radius:14px;
     box-shadow:0 7px 24px rgba(0,0,0,.48);backdrop-filter:blur(12px)
   }
   .me-command-bottom small{font-size:9px!important}.me-command-bottom strong{font-size:13px!important}
   .me-command-bottom button{min-height:43px;padding:9px 15px!important;font-size:10px!important}
 
-  #home .game-lux-home{display:block!important}
+  #home .game-lux-home{display:flex!important;height:100%!important;align-items:center!important;justify-content:center!important}
   #home .cards,#home #meProgressionHub,#home .luxury-mini-map,#home .hero-copy{display:none!important}
   #home .hero{
     position:relative!important;overflow:hidden!important;
-    height:calc(100vh - 78px)!important;min-height:560px!important;margin:0!important;
+    width:min(68vw,1100px)!important;max-width:1100px!important;
+    aspect-ratio:16/9!important;height:auto!important;min-height:0!important;max-height:calc(100vh - 102px)!important;
+    margin:0 auto!important;
     border:1px solid #b99557!important;border-radius:18px!important;
     background-image:linear-gradient(180deg,rgba(2,16,27,.05),rgba(2,16,27,.10)),var(--me-bridge-bg)!important;
     background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;
@@ -87,7 +90,7 @@ st.textContent=`
   }
   .me-live-home-traffic b{font-size:10px!important}
   .me-live-home-contract{
-    position:absolute!important;left:50%!important;bottom:18px!important;transform:translateX(-50%)!important;width:min(72%,900px)!important;
+    position:absolute!important;left:50%!important;bottom:18px!important;transform:translateX(-50%)!important;width:min(68%,760px)!important;
     padding:11px 13px!important;border-radius:14px!important;border:1px solid #c29a60!important;background:rgba(4,29,43,.92)!important;
     backdrop-filter:blur(11px)!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:10px!important;
     align-items:center!important;pointer-events:auto!important
@@ -95,6 +98,22 @@ st.textContent=`
   .me-live-home-contract small{font-size:9px!important}.me-live-home-contract strong{font-size:13px!important}
   .me-live-home-contract button{min-height:43px!important;padding:9px 14px!important;font-size:10px!important}
   .me-live-home-boat{font-size:28px!important}
+  body.me-pc-panel-open #home .game-lux-home{justify-content:flex-start!important}
+  body.me-pc-panel-open #home .hero{
+    width:min(50vw,820px)!important;
+    margin-left:0!important;margin-right:auto!important
+  }
+  body.me-pc-panel-open .me-command-bottom{
+    left:calc(112px + min(25vw,410px))!important;
+    width:min(44vw,700px)!important
+  }
+}
+@media(min-width:900px) and (max-width:1199px){
+  body.me-pc-panel-open #home .hero{width:42vw!important}
+  body.me-pc-panel-open .me-command-bottom{
+    left:calc(112px + 21vw)!important;
+    width:38vw!important
+  }
 }
 `;
 document.head.appendChild(st);
