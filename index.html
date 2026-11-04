@@ -2812,6 +2812,7 @@ async function initialize(){
     const userId=account.id;
     setTimeout(()=>{if(account?.id===userId&&window.meRegisteredPlayer&&!passwordRecoveryMode&&!busy)void reconcileAccountProgress()},1100);
     setTimeout(()=>{if(account?.id===userId&&window.meRegisteredPlayer)void claimPurchasedCreditsAfterReturn()},1800);
+    setTimeout(()=>{if(account?.id===userId&&window.meRegisteredPlayer)void refreshPurchasedWallet()},2200);
    }
    if(!passwordRecoveryMode)status(account?"Account connesso: "+(account.email||"comandante")+". Salva online per sincronizzare i progressi di questo account.":"Partita locale attiva. Nessun account connesso.");
   }
