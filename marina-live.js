@@ -122,6 +122,8 @@
     box.innerHTML='<span>'+intensity.icon+' '+intensity.label+'</span><small>arrivi '+(intensity.arrivals+jitter)+' · partenze '+intensity.departures+'</small>';
   }
   function vhfMessage(){
+    const chain=window.MarinaEmpireEventChains?.current?.();
+    if(chain?.stage?.vhf)return chain.stage.vhf;
     const intensity=marinaIntensity();
     const key=marinaKey();
     const names=namesFor(key);
