@@ -1187,6 +1187,12 @@ padding:5px!important;gap:4px!important;
 .me-marina-live-progressfoot{font-size:9.5px;color:#aebfc5}
 .me-marina-live-progressfoot b{color:#e7c98b}
 @media(max-width:740px){.me-marina-live-progress{padding:10px}.me-marina-live-progressfoot{align-items:flex-start;flex-direction:column;gap:3px}}
+</style><style id="me-marina-live-tier-jobs-v4">
+.me-live-tier{display:inline-block;padding:2px 5px;border-radius:5px;border:1px solid #667f89;font-size:8px;font-weight:900;letter-spacing:.5px;color:#d7e5e7}
+.me-live-tier-prioritario{border-color:#c79a55;color:#efd09a}
+.me-live-tier-tecnico{border-color:#62a5b5;color:#9edce8}
+.me-live-tier-vip{border-color:#d1aa62;color:#ffe2a5;background:#6f532622}
+.me-live-tier-superyacht{border-color:#f0c675;color:#ffe6ac;background:#a876202e;box-shadow:0 0 10px #f0c67522}
 </style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">PROVA GRATIS · 1 MISSIONE</button><p class="muted" style="font-size:13px;margin:6px 0 14px">Nessuna email richiesta per la prova. Dopo la prima missione registrati gratis per continuare. Acquisti sempre facoltativi.</p><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><nav class="nav" id="navigation" aria-label="Sezioni del gioco"><button data-tab="home" class="on">🏠 HOME</button><button data-tab="office">⚓ DIREZIONE</button><button data-tab="map">🗺️ NAVIGAZIONE</button><button data-tab="missions">🎯 MISSIONI</button><button data-tab="fleet">🛥️ FLOTTA</button><button data-tab="marinas">⚓ MARINE</button><button data-tab="marketplace">🛒 MARKETPLACE</button><button data-tab="credits" class="me-credits-nav">💳 ACQUISTA CREDITI</button><button data-tab="profile">👤 COMANDANTE / ACCOUNT</button><button data-tab="headquarters">🏝️ ISOLA DELLE ROSE</button></nav><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA TEST CLIENTI</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
@@ -3566,23 +3572,46 @@ button.addEventListener("click",async()=>{
 (function(){
  const vessels=["M/Y Aurora","M/Y Stella","S/Y Levante","RIB Delta","M/Y Adriatica","Tender Blue","M/Y Riviera","S/Y Libeccio"];
  const actions=["in ingresso","in uscita","richiede ormeggio","al fuel dock","in manovra","servizio tecnico"];
- const jobs=[
-  {name:"Assistenza ormeggio",icon:"⚓",reward:320,prestige:2},
-  {name:"Consegna cambusa",icon:"📦",reward:420,prestige:2},
-  {name:"Supporto fuel dock",icon:"⛽",reward:360,prestige:2},
-  {name:"Transfer ospiti",icon:"👥",reward:540,prestige:3},
-  {name:"Controllo tecnico",icon:"🔧",reward:480,prestige:3},
-  {name:"Servizio tender",icon:"🚤",reward:390,prestige:2},
-  {name:"Concierge banchina",icon:"📡",reward:610,prestige:3}
- ];
+ const jobsByLevel={
+  1:[
+   {name:"Assistenza ormeggio",icon:"⚓",reward:320,prestige:2,tier:"STANDARD"},
+   {name:"Consegna cambusa",icon:"📦",reward:420,prestige:2,tier:"STANDARD"},
+   {name:"Servizio tender",icon:"🚤",reward:390,prestige:2,tier:"STANDARD"}
+  ],
+  2:[
+   {name:"Supporto fuel dock prioritario",icon:"⛽",reward:560,prestige:3,tier:"PRIORITARIO"},
+   {name:"Transfer ospiti",icon:"👥",reward:620,prestige:3,tier:"PRIORITARIO"},
+   {name:"Rifornimento express yacht",icon:"⛽",reward:680,prestige:4,tier:"PRIORITARIO"}
+  ],
+  3:[
+   {name:"Controllo tecnico prioritario",icon:"🔧",reward:820,prestige:5,tier:"TECNICO"},
+   {name:"Intervento elettronica di bordo",icon:"🧰",reward:940,prestige:5,tier:"TECNICO"},
+   {name:"Assistenza propulsione",icon:"⚙️",reward:1020,prestige:6,tier:"TECNICO"}
+  ],
+  4:[
+   {name:"Concierge VIP",icon:"📡",reward:1350,prestige:8,tier:"VIP"},
+   {name:"Accoglienza armatore premium",icon:"👑",reward:1480,prestige:9,tier:"VIP"},
+   {name:"Transfer ospiti VIP",icon:"🚘",reward:1590,prestige:9,tier:"VIP"}
+  ],
+  5:[
+   {name:"Coordinamento superyacht",icon:"🛳️",reward:2200,prestige:14,tier:"SUPERYACHT"},
+   {name:"Operazione banchina maxi yacht",icon:"⚓",reward:2450,prestige:15,tier:"SUPERYACHT"},
+   {name:"Servizio completo comandante",icon:"🎖️",reward:2650,prestige:16,tier:"SUPERYACHT"}
+  ]
+ };
  const icons=["🛥️","⛵","🚤","⚓","⛽","🔧"];
  function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
  function pick(arr,n){return arr[Math.abs(n)%arr.length]}
  function jobBucket(){return Math.floor(Date.now()/300000)}
  function claimedJobs(){return Array.isArray(state?.marinaLiveClaims)?state.marinaLiveClaims:[]}
- function jobFor(index,name,bucket){
-  const seed=hash(name+"|"+bucket+"|job|"+index),base=pick(jobs,seed>>3);
-  return {...base,id:name+"|"+bucket+"|"+index,sector:String.fromCharCode(65+(seed%4)),seed};
+ function jobFor(index,name,bucket,level=1){
+  const seed=hash(name+"|"+bucket+"|job|"+index+"|"+level);
+  const unlocked=[];
+  for(let l=1;l<=Math.max(1,Math.min(5,level));l++)unlocked.push(...(jobsByLevel[l]||[]));
+  const current=jobsByLevel[Math.max(1,Math.min(5,level))]||jobsByLevel[1];
+  const pool=index===0&&level>1?current:unlocked;
+  const base=pick(pool,seed>>3);
+  return {...base,id:name+"|"+bucket+"|"+index+"|L"+level,sector:String.fromCharCode(65+(seed%4)),seed};
  }
  function renderLive(){
   try{
@@ -3609,8 +3638,8 @@ button.addEventListener("click",async()=>{
     const bucket=jobBucket(),claimed=new Set(claimedJobs());
     let html="";
     for(let i=0;i<3;i++){
-      const job=jobFor(i,name,bucket),done=claimed.has(job.id),blocked=!!state.trip||!state.setupComplete;
-      html+='<div class="me-live-row me-live-job"><span class="me-live-icon">'+job.icon+'</span><div><strong>'+job.name+'</strong><small>Settore '+job.sector+' · +'+job.reward.toLocaleString("it-IT")+' crediti · +'+job.prestige+' prestigio</small></div><button type="button" data-live-job="'+i+'" '+(done||blocked?'disabled':'')+'>'+(done?'COMPLETATO':state.trip?'IN NAVIGAZIONE':!state.setupComplete?'CONFIGURA BASE':'ACCETTA')+'</button></div>';
+      const job=jobFor(i,name,bucket,operational.level),done=claimed.has(job.id),blocked=!!state.trip||!state.setupComplete;
+      html+='<div class="me-live-row me-live-job"><span class="me-live-icon">'+job.icon+'</span><div><strong>'+job.name+'</strong><small><span class="me-live-tier me-live-tier-'+job.tier.toLowerCase()+'">'+job.tier+'</span> · Settore '+job.sector+' · +'+job.reward.toLocaleString("it-IT")+' crediti · +'+job.prestige+' prestigio</small></div><button type="button" data-live-job="'+i+'" '+(done||blocked?'disabled':'')+'>'+(done?'COMPLETATO':state.trip?'IN NAVIGAZIONE':!state.setupComplete?'CONFIGURA BASE':'ACCETTA')+'</button></div>';
     }
     box.innerHTML=html;
    }
@@ -3623,7 +3652,7 @@ button.addEventListener("click",async()=>{
    if(typeof state==="undefined"||state.trip)return typeof notice==="function"&&notice("Non puoi accettare incarichi Marina Live mentre sei in navigazione.");
    if(!state.setupComplete)return typeof notice==="function"&&notice("Configura prima la tua base operativa.");
    const name=(typeof port==="function"&&state.port?port(state.port)?.name:null)||"Marina";const marinaId=String(state.port||"").toLowerCase();const beforeLevel=typeof marinaOperationalSnapshot==="function"?marinaOperationalSnapshot(marinaId).level:1;
-   const bucket=jobBucket(),job=jobFor(Number(index)||0,name,bucket);
+   const bucket=jobBucket(),currentOperational=typeof marinaOperationalSnapshot==="function"?marinaOperationalSnapshot(marinaId):{level:1},job=jobFor(Number(index)||0,name,bucket,currentOperational.level);
    if(claimedJobs().includes(job.id))return typeof notice==="function"&&notice("Incarico già completato.");
    const ok=typeof meAtomicPersist==="function"&&meAtomicPersist(()=>{
     state.marinaLiveClaims=Array.isArray(state.marinaLiveClaims)?state.marinaLiveClaims:[];
