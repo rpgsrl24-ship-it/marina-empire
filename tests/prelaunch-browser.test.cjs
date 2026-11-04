@@ -42,24 +42,27 @@ async function isolated(context,origin,traffic=[]) {
 
 async function save(page) {return page.evaluate(key => JSON.parse(localStorage.getItem(key)), saveKey);}
 async function goTab(page,id,mobile) {
-  if (mobile) {
-    const deck=page.locator(`[data-deck-tab="${id}"]`).first();
-    if (await deck.isVisible()) await deck.click();
-    else {
-      const menu=page.locator('[data-deck-menu]').first();
-      if (await menu.isVisible()) {
-        await menu.click();
-        const drawer=page.locator(`#meCommandDrawer [data-deck-tab="${id}"]`).first();
-        if (await drawer.isVisible()) await drawer.click();
-        else await page.locator(`#navigation [data-tab="${id}"]`).click();
-      } else {
+  const deck=page.locator(`[data-deck-tab="${id}"]`).first();
+  if (await deck.isVisible()) await deck.click();
+  else {
+    const menu=page.locator('[data-deck-menu]').first();
+    if (await menu.isVisible()) {
+      await menu.click();
+      const drawer=page.locator(`#meCommandDrawer [data-deck-tab="${id}"]`).first();
+      if (await drawer.isVisible()) await drawer.click();
+      else if (mobile) {
         const quick=page.locator(`[data-mobile-tab="${id}"]`);
         if (await quick.isVisible()) await quick.click();
         else if(await page.locator('#meMobileMoreToggle').isVisible()) {await page.locator('#meMobileMoreToggle').click(); await page.locator(`[data-mobile-more-tab="${id}"]`).click();}
         else await page.locator(`#navigation [data-tab="${id}"]`).click();
-      }
-    }
-  } else await page.locator(`#navigation [data-tab="${id}"]`).click();
+      } else await page.locator(`#navigation [data-tab="${id}"]`).click();
+    } else if (mobile) {
+      const quick=page.locator(`[data-mobile-tab="${id}"]`);
+      if (await quick.isVisible()) await quick.click();
+      else if(await page.locator('#meMobileMoreToggle').isVisible()) {await page.locator('#meMobileMoreToggle').click(); await page.locator(`[data-mobile-more-tab="${id}"]`).click();}
+      else await page.locator(`#navigation [data-tab="${id}"]`).click();
+    } else await page.locator(`#navigation [data-tab="${id}"]`).click();
+  }
   await page.waitForFunction(id => !document.getElementById(id).classList.contains('hide'),id);
 }
 
