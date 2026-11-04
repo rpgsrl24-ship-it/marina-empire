@@ -9,12 +9,12 @@ st.textContent=`
 @media(min-width:900px){
   #home .game-lux-home{display:block!important;height:100%!important}
   #mePcFinalHome{display:grid!important;grid-template-rows:42px minmax(0,1fr)!important;gap:14px!important;height:100%!important}
-  #mePcFinalTicker{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;align-items:center!important;overflow:hidden!important;border:1px solid rgba(201,164,98,.55)!important;border-radius:11px!important;background:rgba(5,27,40,.95)!important}
-  #mePcFinalTicker .label{height:100%!important;display:flex!important;align-items:center!important;padding:0 14px!important;border-right:1px solid rgba(201,164,98,.4)!important;background:#0b3041!important;color:#f0d29d!important;font-size:9px!important;font-weight:900!important;white-space:nowrap!important;cursor:pointer!important}
+  #mePcFinalTicker{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;align-items:center!important;overflow:hidden!important;pointer-events:auto!important;position:relative!important;z-index:10000!important;border:1px solid rgba(201,164,98,.55)!important;border-radius:11px!important;background:rgba(5,27,40,.95)!important}
+  #mePcFinalTicker .label{height:100%!important;display:flex!important;pointer-events:auto!important;align-items:center!important;padding:0 14px!important;border-right:1px solid rgba(201,164,98,.4)!important;background:#0b3041!important;color:#f0d29d!important;font-size:9px!important;font-weight:900!important;white-space:nowrap!important;cursor:pointer!important}
   #mePcFinalTicker .window{overflow:hidden!important;white-space:nowrap!important}
   #mePcFinalTicker .track{display:flex!important;width:max-content!important;animation:meFinalTicker 34s linear infinite!important}
   #mePcFinalTicker .copy{display:flex!important;align-items:center!important;flex-shrink:0!important}
-  #mePcFinalTicker .item{padding:0 16px!important;color:#dce8ec!important;font-size:10px!important;font-weight:700!important;cursor:pointer!important}
+  #mePcFinalTicker .item{padding:0 16px!important;pointer-events:auto!important;color:#dce8ec!important;font-size:10px!important;font-weight:700!important;cursor:pointer!important}
   #mePcFinalTicker .sep{color:#caa96a!important;font-size:8px!important}
   #mePcFinalPanels{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;min-height:0!important;height:100%!important}
   #mePcCommandPanel,#mePcCareerPanel{min-width:0!important;min-height:0!important;height:100%!important;border:1px solid rgba(201,164,98,.55)!important;border-radius:16px!important;background:rgba(5,27,40,.96)!important;overflow:hidden!important;box-shadow:0 14px 30px rgba(0,0,0,.35)!important}
@@ -28,7 +28,7 @@ st.textContent=`
   #mePcCareerPanel{overflow:auto!important}
   #mePcCareerPanel #meLongTermCareer{display:block!important;width:100%!important;height:100%!important;margin:0!important;border:0!important;border-radius:0!important}
   #home>.me-command-bottom,.me-command-bottom{z-index:9997!important}
-  #meWorldLivePanel{display:none!important;position:absolute!important;inset:56px 5% 34px!important;z-index:9998!important;border:1px solid rgba(201,164,98,.75)!important;border-radius:16px!important;background:rgba(4,22,34,.98)!important;box-shadow:0 22px 60px rgba(0,0,0,.62)!important;overflow:hidden!important}
+  #meWorldLivePanel{display:none!important;position:absolute!important;pointer-events:auto!important;inset:56px 5% 34px!important;z-index:9998!important;border:1px solid rgba(201,164,98,.75)!important;border-radius:16px!important;background:rgba(4,22,34,.98)!important;box-shadow:0 22px 60px rgba(0,0,0,.62)!important;overflow:hidden!important}
   #meWorldLivePanel.open{display:grid!important;grid-template-rows:auto minmax(0,1fr)!important}
   #meWorldLiveHead{display:flex!important;align-items:center!important;justify-content:space-between!important;padding:12px 16px!important;border-bottom:1px solid rgba(201,164,98,.38)!important;background:#0b3041!important}
   #meWorldLiveHead strong{color:#f0d29d!important;font-size:16px!important}
@@ -89,14 +89,13 @@ function openWorld(){
 function closeWorld(){document.getElementById("meWorldLivePanel")?.classList.remove("open")}
 function bindWorldActions(){
  const ticker=document.getElementById("mePcFinalTicker");
- if(ticker&&!ticker.dataset.bound){
-   ticker.dataset.bound="1";
-   ticker.addEventListener("click",e=>{
-     if(e.target.closest(".label")){openWorld();return}
-     const item=e.target.closest(".item");
-     if(item)openWorld();
-   });
+ const label=ticker?.querySelector(".label");
+ if(label){
+   label.onclick=e=>{e.preventDefault();e.stopPropagation();openWorld();};
  }
+ ticker?.querySelectorAll(".item").forEach(item=>{
+   item.onclick=e=>{e.preventDefault();e.stopPropagation();openWorld();};
+ });
  const panel=document.getElementById("meWorldLivePanel");
  if(panel&&!panel.dataset.bound){
    panel.dataset.bound="1";
@@ -137,6 +136,10 @@ function build(){
  const track=document.getElementById("mePcFinalTickerTrack");
  if(track)track.innerHTML=tickerHtml();
  bindWorldActions();
+ const label=document.querySelector("#mePcFinalTicker .label");
+ if(label){label.setAttribute("role","button");label.setAttribute("tabindex","0");label.title="Apri Mondo Vivo";}
+ document.querySelectorAll("#mePcFinalTicker .item").forEach(el=>{el.setAttribute("role","button");el.setAttribute("tabindex","0");});
+
  return true;
 }
 function boot(){
