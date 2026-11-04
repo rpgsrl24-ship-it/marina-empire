@@ -32,11 +32,16 @@ st.textContent=`
   .me-command-rail.left{left:12px;border-radius:16px}
   .me-command-rail.right{right:12px;border-radius:16px}
   .me-command-rail button{
-    width:74px;height:68px;min-height:68px;padding:0;border:0;border-radius:12px;
-    display:flex!important;align-items:center;justify-content:center;background:transparent;
-    font-size:27px;color:#e7edf0;box-shadow:none
+    width:74px;height:68px;min-height:68px;padding:4px 2px;border:0;border-radius:12px;
+    display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:transparent;
+    font-size:25px;color:#e7edf0;box-shadow:none
+  }
+  .me-command-rail button::after{
+    content:attr(title);display:block;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-size:8px;line-height:1;color:#b9cad1;font-weight:800;letter-spacing:.03em
   }
   .me-command-rail button.on{background:#23485a;color:#f4d796;box-shadow:inset 0 0 0 1px rgba(214,181,117,.6)}
+  .me-command-rail button.on::after{color:#f4d796}
   .me-command-drawer{
     position:fixed;top:78px;right:112px;z-index:9998;width:300px;
     padding:10px;background:#071f2df2;border:1px solid #b89458;border-radius:14px;
@@ -64,7 +69,7 @@ st.textContent=`
     border:1px solid #b99557!important;border-radius:18px!important;
     background-image:linear-gradient(180deg,rgba(2,16,27,.05),rgba(2,16,27,.10)),var(--me-bridge-bg)!important;
     background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;
-    box-shadow:0 14px 36px rgba(0,0,0,.42)!important
+    box-shadow:0 14px 36px rgba(0,0,0,.42),0 0 0 10px rgba(4,23,34,.55),0 0 0 11px rgba(185,149,87,.28)!important
   }
   #home .hero:before,#home .hero:after{display:none!important}
   .me-live-home-overlay{display:block!important;position:absolute!important;inset:0!important;z-index:5!important;pointer-events:none}
