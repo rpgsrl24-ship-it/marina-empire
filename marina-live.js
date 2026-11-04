@@ -101,9 +101,12 @@
     return window.MarinaEmpireWorldEvents?.dayPhase?.()||{id:"day",label:"GIORNO",icon:"☀️",traffic:1};
   }
   function trafficFactor(){
-    const base=window.MarinaEmpireWorldEvents?.modifiers?.(marinaKey())?.traffic||1;
-    const memory=window.MarinaEmpireMarinaMemory?.trafficMultiplier?.(marinaKey())||1;
-    return base*memory;
+    const key=marinaKey();
+    const base=window.MarinaEmpireWorldEvents?.modifiers?.(key)?.traffic||1;
+    const memory=window.MarinaEmpireMarinaMemory?.trafficMultiplier?.(key)||1;
+    const shift=window.MarinaEmpireShiftCycle?.modifiers?.(key)?.traffic||1;
+    const chain=window.MarinaEmpireEventChains?.modifiers?.()?.traffic||1;
+    return base*memory*shift*chain;
   }
   function marinaIntensity(){
     const tf=Math.max(.45,Math.min(1.6,trafficFactor()));
