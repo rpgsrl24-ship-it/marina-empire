@@ -12,6 +12,8 @@ st.textContent=`
   html body .me-command-bottom,
   html body .me-command-drawer{display:none!important}
   html body .mobile-game-nav{display:grid!important}
+  html body #meMobileMore{display:grid!important}
+  html body #meMobileMore.hide{display:none!important}
   html body{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important}
   html body .shell{padding-left:10px!important;padding-right:10px!important}
 
