@@ -169,7 +169,7 @@ async function trial(browser,origin,name,viewport,mobile) {
       await goTab(page,'home',false);
       assert.ok(await page.locator('#meHomeMarinaFrame, #mePcMarinaFrame').count()>=1,name+': live marina viewport is mounted on desktop Home');
     }
-    await goTab(page,'missions',false);
+    await goTab(page,'missions',mobile);
     const before=await save(page);
     await page.locator('#missionList [data-mission]:enabled').first().click();
     await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key))?.trip,saveKey);
