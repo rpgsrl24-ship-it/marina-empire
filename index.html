@@ -1338,7 +1338,86 @@ padding:5px!important;gap:4px!important;
   .mobile-game-nav{z-index:100000!important}
   .me-mobile-more{z-index:100010!important}
 }
-</style></head><body>
+<style id="me-mobile-final-polish-v11">
+@media(max-width:740px){
+  /* One actionable opportunity at a time */
+  #marinas:not(.me-mobile-expanded) .me-traffic-board{display:none!important}
+
+  /* Compact running VHF: status bar, not a large card */
+  #marinas:not(.me-mobile-expanded) .me-live-vhf.me-vhf-running{
+    position:sticky!important;
+    top:56px!important;
+    z-index:25!important;
+    margin:6px 9px!important;
+    padding:7px 9px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:6px!important;
+    align-items:center!important;
+    background:#082d3e!important;
+    box-shadow:0 7px 18px rgba(0,0,0,.28)!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-live-vhf.me-vhf-running .me-live-vhf-preview{display:none!important}
+  #marinas:not(.me-mobile-expanded) .me-live-vhf.me-vhf-running .me-live-vhf-text{
+    display:block!important;
+    white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+    font-size:8.5px!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-live-vhf.me-vhf-running>div{
+    margin:0!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-live-vhf.me-vhf-running .me-live-vhf-action{
+    width:auto!important;
+    min-width:94px!important;
+    min-height:34px!important;
+    margin:0!important;
+    padding:6px 8px!important;
+    white-space:nowrap!important
+  }
+
+  /* Running NPC opportunity also collapses */
+  #marinas:not(.me-mobile-expanded) .me-npc-box.me-npc-running .me-npc-meta,
+  #marinas:not(.me-mobile-expanded) .me-npc-box.me-npc-running .me-npc-actions,
+  #marinas:not(.me-mobile-expanded) .me-npc-box.me-npc-running .me-npc-level{
+    display:none!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-npc-box.me-npc-running{
+    padding:8px 10px!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-npc-box.me-npc-running .me-npc-row{
+    margin-top:4px!important;font-size:10px!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-npc-box.me-npc-running .me-npc-status{
+    margin-top:5px!important;padding:6px 8px!important;border-radius:7px!important;
+    background:#0b3444!important;color:#d9ecf1!important;font-size:9px!important;font-weight:800!important
+  }
+
+  /* Cleaner hierarchy */
+  #marinas:not(.me-mobile-expanded) #meMobileMarinasMore{
+    order:99!important;margin-top:8px!important
+  }
+  #marinas:not(.me-mobile-expanded) .me-live-marina-head{padding-bottom:7px!important}
+  #marinas:not(.me-mobile-expanded) .me-live-player-status{display:none!important}
+
+  /* Bottom nav slightly shorter to regain vertical space */
+  .mobile-game-nav{
+    padding-top:5px!important;
+    padding-bottom:calc(5px + env(safe-area-inset-bottom,0px))!important
+  }
+  .mobile-game-nav button{min-height:50px!important;padding:5px 2px!important;font-size:9px!important}
+  .mobile-game-nav button span{font-size:20px!important;line-height:22px!important}
+  body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}
+  .screen.me-mobile-home-sheet{inset-bottom:calc(58px + env(safe-area-inset-bottom,0px))!important}
+
+  /* Mobile page headers: keep context but save space */
+  .screen.me-mobile-home-sheet .me-lux-page-head{
+    min-height:0!important;padding:11px 12px!important;margin-bottom:8px!important
+  }
+  .screen.me-mobile-home-sheet .me-lux-page-head span{font-size:8px!important}
+  .screen.me-mobile-home-sheet .me-lux-page-head h1{font-size:23px!important;margin:3px 0!important}
+  .screen.me-mobile-home-sheet .me-lux-page-head p{font-size:10px!important;margin:2px 0!important}
+}
+</style></style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">PROVA GRATIS · 1 MISSIONE</button><p class="muted" style="font-size:13px;margin:6px 0 14px">Nessuna email richiesta per la prova. Dopo la prima missione registrati gratis per continuare. Acquisti sempre facoltativi.</p><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
 <div class="shell"><nav class="nav" id="navigation" aria-label="Sezioni del gioco"><button data-tab="home" class="on">🏠 HOME</button><button data-tab="office">⚓ DIREZIONE</button><button data-tab="map">🗺️ NAVIGAZIONE</button><button data-tab="missions">🎯 MISSIONI</button><button data-tab="fleet">🛥️ FLOTTA</button><button data-tab="marinas">⚓ MARINE</button><button data-tab="marketplace">🛒 MARKETPLACE</button><button data-tab="credits" class="me-credits-nav">💳 ACQUISTA CREDITI</button><button data-tab="profile">👤 COMANDANTE / ACCOUNT</button><button data-tab="headquarters">🏝️ ISOLA DELLE ROSE</button></nav><header class="top"><div><div class="brand">MARINA EMPIRE</div><small class="muted">RPG YACHT · BETA TEST CLIENTI</small></div><div class="row"><span id="captain">Comandante</span><button id="menu">MENU</button></div></header>
 <div class="stats"><span>MONETE: <b id="coins">10.000</b></span><span>PRESTIGIO: <b id="prestige">0</b></span><span>LIVELLO: <b id="level">1</b></span><span class="me-resource-stat">⛽ CARBURANTE: <b><span id="fuel">300</span> L</b><button id="meQuickFuel" type="button" aria-label="Effettua rifornimento in marina">+ RIFORNIMENTO</button></span><span class="me-resource-stat">🔧 MANUTENZIONE: <b id="meCondition">100%</b><button id="meQuickRepair" type="button" aria-label="Effettua manutenzione in marina">+ RIPARA</button></span><button id="meMobileHudToggle" type="button" aria-expanded="false">☰ DATI</button><button type="button" class="me-buy-credits-top gold" data-tab="credits">💳 ACQUISTA CREDITI</button></div><div class="me-top-onboarding"><div id="starterGuide" class="hide" style="padding:14px 16px;margin:12px 0;border:1px solid #d6b575;border-radius:13px;background:#113647"><strong>🎓 PRIMI PASSI · Comandante</strong><p id="starterGuideText" style="margin:8px 0;color:#dce8e8">Benvenuto a Rimini! Inizia dalla tua prima missione e osserva lo yacht partire dalla marina.</p><button id="starterGuideAction" class="gold" type="button">VAI ALLA PRIMA MISSIONE</button><button id="starterGuideDismiss" type="button">NASCONDI</button></div></div>
