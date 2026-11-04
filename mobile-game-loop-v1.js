@@ -357,10 +357,35 @@ function reassertSheet(){
 }
 document.addEventListener("click",e=>{
   if(innerWidth>740)return;
-  const homeButton=e.target.closest("[data-mobile-tab='home']");
-  if(homeButton&&currentPanel){
-    e.preventDefault();e.stopImmediatePropagation();closePanel();return;
+
+  const mobileTab=e.target.closest("[data-mobile-tab]");
+  if(mobileTab){
+    const id=mobileTab.dataset.mobileTab;
+    e.preventDefault();e.stopImmediatePropagation();
+    if(id==="home")closePanel();
+    else if(id&&document.getElementById(id))openPanel(id);
+    return;
   }
+
+  const mobileMore=e.target.closest("[data-mobile-more-tab]");
+  if(mobileMore){
+    const id=mobileMore.dataset.mobileMoreTab;
+    e.preventDefault();e.stopImmediatePropagation();
+    document.getElementById("meMobileMore")?.classList.add("hide");
+    document.getElementById("meMobileMoreToggle")?.setAttribute("aria-expanded","false");
+    if(id&&document.getElementById(id))openPanel(id);
+    return;
+  }
+
+  const community=e.target.closest("[data-open-community]");
+  if(community){
+    e.preventDefault();e.stopImmediatePropagation();
+    document.getElementById("meMobileMore")?.classList.add("hide");
+    document.getElementById("meMobileMoreToggle")?.setAttribute("aria-expanded","false");
+    openPanel("office",{community:true});
+    return;
+  }
+
   const panelButton=e.target.closest("#home [data-tab],.me-mobile-home-sheet [data-tab]");
   if(panelButton){
     const id=panelButton.dataset.tab;
@@ -368,10 +393,12 @@ document.addEventListener("click",e=>{
       e.preventDefault();e.stopImmediatePropagation();openPanel(id);return;
     }
   }
+
   const consoleButton=e.target.closest("#meMobileConsoleHome [data-console-go]");
   if(consoleButton){
     e.preventDefault();e.stopImmediatePropagation();openPanel(consoleButton.dataset.consoleGo);return;
   }
+
   const creditButton=e.target.closest("#meMobileCreditsHero button");
   if(creditButton){
     e.preventDefault();e.stopImmediatePropagation();openPanel("credits");return;
