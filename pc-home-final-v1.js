@@ -8,16 +8,16 @@ st.id="me-pc-home-final-v1-style";
 st.textContent=`
 @media(min-width:900px){
   #home .game-lux-home{display:block!important;height:100%!important}
-  #mePcFinalHome{display:grid!important;grid-template-columns:140px minmax(0,1fr)!important;grid-template-rows:52px minmax(0,1fr)!important;gap:14px!important;height:100%!important}
-  #mePcLiveButton{grid-column:1!important;grid-row:1!important;display:flex!important;align-items:center!important;justify-content:center!important;pointer-events:auto!important;position:relative!important;z-index:10001!important;border:1px solid rgba(232,188,102,.82)!important;border-radius:13px!important;background:linear-gradient(135deg,#133c50,#0b3041)!important;color:#ffe2a3!important;font-size:12px!important;font-weight:900!important;letter-spacing:.06em!important;cursor:pointer!important;box-shadow:0 0 0 1px rgba(232,188,102,.18),0 0 24px rgba(232,188,102,.18)!important;animation:meLivePulse 1.5s ease-in-out infinite!important}
-  #mePcFinalTicker{grid-column:2!important;grid-row:1!important;display:block!important;align-items:center!important;overflow:hidden!important;pointer-events:auto!important;position:relative!important;z-index:10000!important;border:1px solid rgba(232,188,102,.55)!important;border-radius:13px!important;background:rgba(5,27,40,.98)!important;box-shadow:0 0 0 1px rgba(232,188,102,.10)!important}
+  #mePcFinalHome{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:52px minmax(0,1fr)!important;gap:14px!important;height:100%!important}
+  #mePcLiveButton{display:flex!important;align-items:center!important;justify-content:center!important;pointer-events:auto!important;position:fixed!important;left:18px!important;top:214px!important;width:96px!important;height:96px!important;z-index:10001!important;border:1px solid rgba(232,188,102,.82)!important;border-radius:18px!important;background:linear-gradient(135deg,#133c50,#0b3041)!important;color:#ffe2a3!important;font-size:11px!important;line-height:1.15!important;text-align:center!important;font-weight:900!important;letter-spacing:.04em!important;cursor:pointer!important;box-shadow:0 0 0 1px rgba(232,188,102,.18),0 0 24px rgba(232,188,102,.18)!important;animation:meLivePulse 1.5s ease-in-out infinite!important}
+  #mePcFinalTicker{grid-column:1!important;grid-row:1!important;display:block!important;align-items:center!important;overflow:hidden!important;pointer-events:auto!important;position:relative!important;z-index:10000!important;border:1px solid rgba(232,188,102,.55)!important;border-radius:13px!important;background:rgba(5,27,40,.98)!important;box-shadow:0 0 0 1px rgba(232,188,102,.10)!important}
   #mePcFinalTicker .label{display:none!important}
-  #mePcFinalTicker .window{overflow:hidden!important;white-space:nowrap!important}
-  #mePcFinalTicker .track{display:flex!important;width:max-content!important;animation:meFinalTicker 34s linear infinite!important}
-  #mePcFinalTicker .copy{display:flex!important;align-items:center!important;flex-shrink:0!important}
-  #mePcFinalTicker .item{padding:0 16px!important;pointer-events:auto!important;color:#dce8ec!important;font-size:10px!important;font-weight:700!important;cursor:pointer!important}
+  #mePcFinalTicker .window{height:100%!important;display:flex!important;align-items:center!important;overflow:hidden!important;white-space:nowrap!important}
+  #mePcFinalTicker .track{display:flex!important;align-items:center!important;width:max-content!important;min-width:max-content!important;animation:meFinalTicker 28s linear infinite!important}
+  #mePcFinalTicker .copy{display:flex!important;align-items:center!important;flex-shrink:0!important;visibility:visible!important;opacity:1!important}
+  #mePcFinalTicker .item{display:inline-flex!important;align-items:center!important;padding:0 18px!important;pointer-events:auto!important;color:#dce8ec!important;font-size:10px!important;font-weight:700!important;cursor:pointer!important}
   #mePcFinalTicker .sep{color:#caa96a!important;font-size:8px!important}
-  #mePcFinalPanels{grid-column:1 / -1!important;grid-row:2!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;min-height:0!important;height:100%!important}
+  #mePcFinalPanels{grid-column:1!important;grid-row:2!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;min-height:0!important;height:100%!important}
   #mePcCommandPanel,#mePcCareerPanel{min-width:0!important;min-height:0!important;height:100%!important;border:1px solid rgba(201,164,98,.55)!important;border-radius:16px!important;background:rgba(5,27,40,.96)!important;overflow:hidden!important;box-shadow:0 14px 30px rgba(0,0,0,.35)!important}
   #mePcCommandPanel{display:grid!important;grid-template-rows:46px minmax(0,1fr)!important}
   #mePcCommandTitle{display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 16px!important;border-bottom:1px solid rgba(201,164,98,.35)!important;background:#0b3041!important;color:#f2d59a!important}
@@ -136,7 +136,7 @@ function build(){
  if(!final){
    final=document.createElement("div");
    final.id="mePcFinalHome";
-   final.innerHTML='<button type="button" id="mePcLiveButton">⚓ MARINA LIVE</button><div id="mePcFinalTicker"><div class="window"><div class="track" id="mePcFinalTickerTrack"></div></div></div><div id="mePcFinalPanels"><section id="mePcCommandPanel"><div id="mePcCommandTitle"><strong>🧭 PLANCIA DI COMANDO</strong><span>MARINA EMPIRE</span></div><div id="mePcCommandBody"></div></section><section id="mePcCareerPanel"></section></div><section id="meWorldLivePanel"><div id="meWorldLiveHead"><strong>⚓ MONDO VIVO · CENTRALE OPERATIVA</strong><button type="button" id="meWorldLiveClose">×</button></div><div id="meWorldLiveBody"></div></section>';
+   final.innerHTML='<button type="button" id="mePcLiveButton">⚓<br>MARINA<br>LIVE</button><div id="mePcFinalTicker"><div class="window"><div class="track" id="mePcFinalTickerTrack"></div></div></div><div id="mePcFinalPanels"><section id="mePcCommandPanel"><div id="mePcCommandTitle"><strong>🧭 PLANCIA DI COMANDO</strong><span>MARINA EMPIRE</span></div><div id="mePcCommandBody"></div></section><section id="mePcCareerPanel"></section></div><section id="meWorldLivePanel"><div id="meWorldLiveHead"><strong>⚓ MONDO VIVO · CENTRALE OPERATIVA</strong><button type="button" id="meWorldLiveClose">×</button></div><div id="meWorldLiveBody"></div></section>';
    home.innerHTML="";
    home.appendChild(final);
  }
