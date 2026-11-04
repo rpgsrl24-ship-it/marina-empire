@@ -3544,21 +3544,34 @@ button.addEventListener("click",async()=>{
  document.addEventListener("DOMContentLoaded",function(){updateHub();setInterval(updateHub,1200)});
  window.meUpdateMobileHomeHub=updateHub;
 })();
-</script><script id="me-marina-live-logic-v1">
+</script><script id="me-marina-live-logic-v2">
 (function(){
  const vessels=["M/Y Aurora","M/Y Stella","S/Y Levante","RIB Delta","M/Y Adriatica","Tender Blue","M/Y Riviera","S/Y Libeccio"];
  const actions=["in ingresso","in uscita","richiede ormeggio","al fuel dock","in manovra","servizio tecnico"];
- const ops=["Richiesta rifornimento","Assistenza ormeggio","Pulizia yacht","Consegna cambusa","Controllo tecnico","Transfer ospiti","Prenotazione tender","Supporto concierge"];
+ const jobs=[
+  {name:"Assistenza ormeggio",icon:"⚓",reward:320,prestige:2},
+  {name:"Consegna cambusa",icon:"📦",reward:420,prestige:2},
+  {name:"Supporto fuel dock",icon:"⛽",reward:360,prestige:2},
+  {name:"Transfer ospiti",icon:"👥",reward:540,prestige:3},
+  {name:"Controllo tecnico",icon:"🔧",reward:480,prestige:3},
+  {name:"Servizio tender",icon:"🚤",reward:390,prestige:2},
+  {name:"Concierge banchina",icon:"📡",reward:610,prestige:3}
+ ];
  const icons=["🛥️","⛵","🚤","⚓","⛽","🔧"];
  function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
  function pick(arr,n){return arr[Math.abs(n)%arr.length]}
+ function jobBucket(){return Math.floor(Date.now()/300000)}
+ function claimedJobs(){return Array.isArray(state?.marinaLiveClaims)?state.marinaLiveClaims:[]}
+ function jobFor(index,name,bucket){
+  const seed=hash(name+"|"+bucket+"|job|"+index),base=pick(jobs,seed>>3);
+  return {...base,id:name+"|"+bucket+"|"+index,sector:String.fromCharCode(65+(seed%4)),seed};
+ }
  function renderLive(){
   try{
    if(typeof state==="undefined")return;
    const place=typeof port==="function"&&state.port?port(state.port):null;
    const name=place?.name||"Marina";
-   const bucket=Math.floor(Date.now()/15000);
-   const seed=hash(name+"|"+bucket);
+   const liveBucket=Math.floor(Date.now()/15000),seed=hash(name+"|"+liveBucket);
    const traffic=4+(seed%9),berths=48+((seed>>3)%43),requests=1+((seed>>7)%6);
    const placeEl=document.getElementById("meMarinaLivePlace");
    if(placeEl)placeEl.textContent=name+" · attività simulata aggiornata automaticamente";
@@ -3575,10 +3588,11 @@ button.addEventListener("click",async()=>{
    }
    const box=document.getElementById("meMarinaLiveOps");
    if(box){
+    const bucket=jobBucket(),claimed=new Set(claimedJobs());
     let html="";
     for(let i=0;i<3;i++){
-      const s=seed+i*131,status=i===0?"PRIORITÀ":i===1?"IN CODA":"PROGRAMMATA";
-      html+='<div class="me-live-row"><span class="me-live-icon">'+pick(["📡","🧰","👥","📦","⛽"],s)+'</span><div><strong>'+pick(ops,s>>4)+'</strong><small>Richiesta simulata · '+name+'</small></div><b>'+status+'</b></div>';
+      const job=jobFor(i,name,bucket),done=claimed.has(job.id),blocked=!!state.trip||!state.setupComplete;
+      html+='<div class="me-live-row me-live-job"><span class="me-live-icon">'+job.icon+'</span><div><strong>'+job.name+'</strong><small>Settore '+job.sector+' · +'+job.reward.toLocaleString("it-IT")+' crediti · +'+job.prestige+' prestigio</small></div><button type="button" data-live-job="'+i+'" '+(done||blocked?'disabled':'')+'>'+(done?'COMPLETATO':state.trip?'IN NAVIGAZIONE':!state.setupComplete?'CONFIGURA BASE':'ACCETTA')+'</button></div>';
     }
     box.innerHTML=html;
    }
@@ -3586,11 +3600,38 @@ button.addEventListener("click",async()=>{
    if(mobile&&!state.trip)mobile.textContent=name+" · "+traffic+" movimenti · "+requests+" richieste";
   }catch(e){}
  }
+ function completeJob(index){
+  try{
+   if(typeof state==="undefined"||state.trip)return typeof notice==="function"&&notice("Non puoi accettare incarichi Marina Live mentre sei in navigazione.");
+   if(!state.setupComplete)return typeof notice==="function"&&notice("Configura prima la tua base operativa.");
+   const name=(typeof port==="function"&&state.port?port(state.port)?.name:null)||"Marina";
+   const bucket=jobBucket(),job=jobFor(Number(index)||0,name,bucket);
+   if(claimedJobs().includes(job.id))return typeof notice==="function"&&notice("Incarico già completato.");
+   const ok=typeof meAtomicPersist==="function"&&meAtomicPersist(()=>{
+    state.marinaLiveClaims=Array.isArray(state.marinaLiveClaims)?state.marinaLiveClaims:[];
+    state.marinaLiveClaims.push(job.id);
+    if(state.marinaLiveClaims.length>30)state.marinaLiveClaims=state.marinaLiveClaims.slice(-30);
+    state.coins=Math.max(0,Math.floor(Number(state.coins)||0))+job.reward;
+    state.prestige=Math.max(0,Math.floor(Number(state.prestige)||0))+job.prestige;
+    state.earnings=Math.max(0,Math.floor(Number(state.earnings)||0))+job.reward;
+    state.npcJobsCompleted=Math.max(0,Math.floor(Number(state.npcJobsCompleted)||0))+1;
+   });
+   if(!ok)return typeof notice==="function"&&notice("Incarico non registrato: nessun premio applicato.");
+   if(typeof render==="function")render();
+   renderLive();
+   if(typeof notice==="function")notice(job.name+" completato · +"+job.reward.toLocaleString("it-IT")+" crediti · +"+job.prestige+" prestigio");
+  }catch(e){}
+ }
  document.addEventListener("DOMContentLoaded",function(){renderLive();setInterval(renderLive,15000)});
  document.addEventListener("click",function(e){
-   if(!e.target.closest("#meMobileMarinaLive"))return;
-   if(typeof showTab==="function")showTab("office");
-   setTimeout(function(){document.getElementById("meMarinaLivePanel")?.scrollIntoView({behavior:"smooth",block:"start"})},100);
+   const live=e.target.closest("#meMobileMarinaLive");
+   if(live){
+    if(typeof showTab==="function")showTab("office");
+    setTimeout(function(){document.getElementById("meMarinaLivePanel")?.scrollIntoView({behavior:"smooth",block:"start"})},100);
+    return;
+   }
+   const job=e.target.closest("[data-live-job]");
+   if(job){completeJob(job.dataset.liveJob);return;}
  });
  window.meRenderMarinaLive=renderLive;
 })();
