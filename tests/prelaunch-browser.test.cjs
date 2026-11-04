@@ -102,11 +102,12 @@ async function trial(browser,origin,name,viewport,mobile) {
         ['office','#office']
       ];
       for(const [tab,screen] of mobileDashboardChecks){
-        const action=page.locator('.me-mobile-home-dashboard [data-tab="'+tab+'"]').first();
+        const action=page.locator('[data-deck-tab="'+tab+'"]').first();
         await action.waitFor({state:'visible'});
         await action.click();
         await page.waitForFunction(id=>!document.querySelector(id)?.classList.contains('hide'),screen);
-        await goTab(page,'home',true);
+        await page.locator('[data-deck-tab="home"]').first().click();
+        await page.waitForFunction(()=>!document.getElementById('home')?.classList.contains('hide'));
       }
       const creditsTop=page.locator('.me-buy-credits-top[data-tab="credits"]');
       await creditsTop.click();
