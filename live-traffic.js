@@ -115,7 +115,8 @@ function trafficSnapshot(){
  const operationBoost=(Math.max(1,Number(op.level)||1)-1)*.35;
  const profileBias=Math.max(.75,Math.min(1.3,Number(profile.trafficBias)||1));
  const localBias=Math.max(.7,Math.min(1.4,Number(local.traffic)||1));
- const volume=Math.max(3,Math.min(10,Math.round(3+base*profileBias*localBias*2.2+operationBoost)));
+ const memoryTraffic=Math.max(.75,Math.min(1.3,Number(window.MarinaEmpireMarinaMemory?.trafficMultiplier?.(key))||1));
+ const volume=Math.max(3,Math.min(10,Math.round(3+base*profileBias*localBias*memoryTraffic*2.2+operationBoost)));
  const feature=featuredVessel(),items=[{
   ...feature,
   action:feature.serviceState,
@@ -149,9 +150,13 @@ function contractSnapshot(){
   const la=window.MarinaEmpireLocalEvents?.contractWeight?.(a,key)||1,lb=window.MarinaEmpireLocalEvents?.contractWeight?.(b,key)||1;
   return (hash(b.id+"|"+seed)%1000)*pb*lb-(hash(a.id+"|"+seed)%1000)*pa*la;
  });
- const contractCount=Math.min(4,2+(Math.max(1,Number(op.level)||1)>=3?1:0)+(Math.max(1,Number(op.level)||1)>=5?1:0));
+ const memory=window.MarinaEmpireMarinaMemory?.current?.()||{pressure:1,serviceLoad:1};
+ const pressure=Math.max(.75,Math.min(1.35,Number(memory.pressure)||1));
+ const serviceLoad=Math.max(.8,Math.min(1.3,Number(memory.serviceLoad)||1));
+ const pressureExtra=pressure>=1.18?1:0;
+ const contractCount=Math.min(4,2+(Math.max(1,Number(op.level)||1)>=3?1:0)+(Math.max(1,Number(op.level)||1)>=5?1:0)+pressureExtra);
  return order.slice(0,contractCount).map((c,i)=>{
-  const demand=Math.max(.85,Math.min(1.55,(Number(w.demand)||1)*(Number(local.demand)||1)));
+  const demand=Math.max(.85,Math.min(1.65,(Number(w.demand)||1)*(Number(local.demand)||1)*serviceLoad));
   const trustBonus=1+(Math.max(1,Number(t.level)||1)-1)*.035;
   const stageBonus=1+(stage-1)*.08;
   const operationBonus=1+(Math.max(1,Number(op.level)||1)-1)*.03;
@@ -183,7 +188,9 @@ function render(){
   const disabled=!!active||!check.ok;
   return '<article class="me-contract"><strong>'+c.icon+' '+c.title+'</strong><p>'+c.worldEvent+' · '+formatCredits(c.reward)+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+'</p><button type="button" data-dyn-contract="'+c.dynamicId+'" '+(disabled?'disabled':'')+'>'+(running?'IN CORSO':check.ok?'ACCETTA CONTRATTO':check.message)+'</button><div class="me-contract-progress"><span data-progress="'+c.dynamicId+'"></span></div><div class="me-contract-status">'+(running?'Operazione in corso':('Disponibile ora · '+c.duration+'s'))+'</div></article>';
  }).join("");
- box.innerHTML='<div class="me-traffic-head"><strong>⚓ TRAFFICO 24/7 · '+t.volume+' UNITÀ ATTIVE</strong><span>'+((w.weather?.icon||"🌤️")+" "+(w.weather?.label||""))+'</span></div><div style="font-size:8px;color:#d6b575;margin:-2px 0 3px">Profilo marina · '+t.profile.label+'</div><div style="font-size:8.5px;color:#f0cf8a;margin:0 0 3px">'+(t.local.event?.icon||"⚓")+' EVENTO LOCALE SIMULATO · '+(t.local.event?.title||"Attività ordinaria")+'</div><div style="font-size:8px;color:#8fb0bb;margin:0 0 7px">'+(t.local.event?.text||t.profile.description)+' · Operatività Lv.'+t.operation.level+' · '+t.operation.label+(t.operation.next>0?' · '+t.operation.next+' catene al prossimo livello':' · livello massimo')+'</div><div class="me-traffic-grid"><div class="me-traffic-list">'+traffic+'</div><div class="me-contract-list">'+contractHtml+'</div></div>';
+ const mem=window.MarinaEmpireMarinaMemory?.current?.()||null;
+ const memText=mem?' · memoria traffico '+(mem.pressure>=1.2?'alta':mem.pressure>=1.02?'attiva':mem.pressure<.88?'bassa':'normale'):'';
+ box.innerHTML='<div class="me-traffic-head"><strong>⚓ TRAFFICO 24/7 · '+t.volume+' UNITÀ ATTIVE</strong><span>'+((w.weather?.icon||"🌤️")+" "+(w.weather?.label||""))+'</span></div><div style="font-size:8px;color:#d6b575;margin:-2px 0 3px">Profilo marina · '+t.profile.label+memText+'</div><div style="font-size:8.5px;color:#f0cf8a;margin:0 0 3px">'+(t.local.event?.icon||"⚓")+' EVENTO LOCALE SIMULATO · '+(t.local.event?.title||"Attività ordinaria")+'</div><div style="font-size:8px;color:#8fb0bb;margin:0 0 7px">'+(t.local.event?.text||t.profile.description)+' · Operatività Lv.'+t.operation.level+' · '+t.operation.label+(t.operation.next>0?' · '+t.operation.next+' catene al prossimo livello':' · livello massimo')+'</div><div class="me-traffic-grid"><div class="me-traffic-list">'+traffic+'</div><div class="me-contract-list">'+contractHtml+'</div></div>';
  box.querySelectorAll("[data-dyn-contract]").forEach(btn=>btn.addEventListener("click",()=>start(btn.dataset.dynContract)));
 }
 function start(id){
