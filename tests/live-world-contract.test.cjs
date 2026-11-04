@@ -41,4 +41,16 @@ assert.match(chains,/state\.vesselRelations/);
 assert.match(chains,/visits:Math\.max\(0,Math\.floor\(Number\(vr\.visits\)\|\|0\)\)\+1/);
 assert.match(chains,/services:Math\.max\(0,Math\.floor\(Number\(vr\.services\)\|\|0\)\)\+chain\.steps\.length/);
 
+
+const profiles=fs.readFileSync("marina-profiles.js","utf8");
+assert.doesNotThrow(()=>new Function(profiles),"marina-profiles.js must remain valid JavaScript");
+assert.match(profiles,/portocervo:\{label:"SUPERYACHT & VIP"/);
+assert.match(profiles,/ancona:\{label:"PORTO TECNICO & COMMERCIALE"/);
+assert.match(profiles,/cervia:\{label:"SPORT & REGATTA"/);
+assert.match(profiles,/function vesselWeight\(vessel,id\)/);
+assert.match(profiles,/function contractWeight\(contract,id\)/);
+assert.match(traffic,/function marinaProfile\(\)/);
+assert.match(traffic,/MarinaEmpireMarinaProfiles\?\.vesselWeight/);
+assert.match(traffic,/MarinaEmpireMarinaProfiles\?\.contractWeight/);
+
 console.log("live world contract: ok");
