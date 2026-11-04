@@ -8,15 +8,16 @@ st.id="me-pc-home-final-v1-style";
 st.textContent=`
 @media(min-width:900px){
   #home .game-lux-home{display:block!important;height:100%!important}
-  #mePcFinalHome{display:grid!important;grid-template-rows:52px minmax(0,1fr)!important;gap:14px!important;height:100%!important}
-  #mePcFinalTicker{display:grid!important;grid-template-columns:180px minmax(0,1fr)!important;align-items:center!important;overflow:hidden!important;pointer-events:auto!important;position:relative!important;z-index:10000!important;border:1px solid rgba(232,188,102,.82)!important;border-radius:13px!important;background:rgba(5,27,40,.98)!important;box-shadow:0 0 0 1px rgba(232,188,102,.18),0 0 24px rgba(232,188,102,.18)!important}
-  #mePcFinalTicker .label{height:100%!important;display:flex!important;pointer-events:auto!important;align-items:center!important;justify-content:center!important;padding:0 14px!important;border-right:1px solid rgba(232,188,102,.55)!important;background:linear-gradient(135deg,#133c50,#0b3041)!important;color:#ffe2a3!important;font-size:12px!important;font-weight:900!important;letter-spacing:.06em!important;white-space:nowrap!important;cursor:pointer!important;animation:meLivePulse 1.5s ease-in-out infinite!important}
+  #mePcFinalHome{display:grid!important;grid-template-columns:140px minmax(0,1fr)!important;grid-template-rows:52px minmax(0,1fr)!important;gap:14px!important;height:100%!important}
+  #mePcLiveButton{grid-column:1!important;grid-row:1!important;display:flex!important;align-items:center!important;justify-content:center!important;pointer-events:auto!important;position:relative!important;z-index:10001!important;border:1px solid rgba(232,188,102,.82)!important;border-radius:13px!important;background:linear-gradient(135deg,#133c50,#0b3041)!important;color:#ffe2a3!important;font-size:12px!important;font-weight:900!important;letter-spacing:.06em!important;cursor:pointer!important;box-shadow:0 0 0 1px rgba(232,188,102,.18),0 0 24px rgba(232,188,102,.18)!important;animation:meLivePulse 1.5s ease-in-out infinite!important}
+  #mePcFinalTicker{grid-column:2!important;grid-row:1!important;display:block!important;align-items:center!important;overflow:hidden!important;pointer-events:auto!important;position:relative!important;z-index:10000!important;border:1px solid rgba(232,188,102,.55)!important;border-radius:13px!important;background:rgba(5,27,40,.98)!important;box-shadow:0 0 0 1px rgba(232,188,102,.10)!important}
+  #mePcFinalTicker .label{display:none!important}
   #mePcFinalTicker .window{overflow:hidden!important;white-space:nowrap!important}
   #mePcFinalTicker .track{display:flex!important;width:max-content!important;animation:meFinalTicker 34s linear infinite!important}
   #mePcFinalTicker .copy{display:flex!important;align-items:center!important;flex-shrink:0!important}
   #mePcFinalTicker .item{padding:0 16px!important;pointer-events:auto!important;color:#dce8ec!important;font-size:10px!important;font-weight:700!important;cursor:pointer!important}
   #mePcFinalTicker .sep{color:#caa96a!important;font-size:8px!important}
-  #mePcFinalPanels{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;min-height:0!important;height:100%!important}
+  #mePcFinalPanels{grid-column:1 / -1!important;grid-row:2!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;min-height:0!important;height:100%!important}
   #mePcCommandPanel,#mePcCareerPanel{min-width:0!important;min-height:0!important;height:100%!important;border:1px solid rgba(201,164,98,.55)!important;border-radius:16px!important;background:rgba(5,27,40,.96)!important;overflow:hidden!important;box-shadow:0 14px 30px rgba(0,0,0,.35)!important}
   #mePcCommandPanel{display:grid!important;grid-template-rows:46px minmax(0,1fr)!important}
   #mePcCommandTitle{display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 16px!important;border-bottom:1px solid rgba(201,164,98,.35)!important;background:#0b3041!important;color:#f2d59a!important}
@@ -25,13 +26,12 @@ st.textContent=`
   #mePcCommandBody{min-height:0!important;position:relative!important;overflow:hidden!important}
   #mePcCommandBody .hero{width:100%!important;max-width:none!important;height:100%!important;min-height:0!important;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important;aspect-ratio:auto!important}
   #mePcCommandBody .hero *{pointer-events:none!important}
-  #mePcCommandBody .me-home-vessel,
-  #mePcCommandBody .me-home-status,
-  #mePcCommandBody .hero-copy,
-  #mePcCommandBody .luxury-mini-map,
-  #mePcCommandBody .me-live-home-overlay,
-  #mePcCommandBody [class*="status"],
-  #mePcCommandBody [class*="label"]{display:none!important}
+  #mePcCommandBody .hero>div,
+  #mePcCommandBody .hero>span,
+  #mePcCommandBody .hero>strong,
+  #mePcCommandBody .hero>small{display:none!important}
+  #mePcCommandBody .hero::before,
+  #mePcCommandBody .hero::after{display:none!important}
   #mePcCommandBody .me-live-home-loc,#mePcCommandBody .me-live-home-vhf,#mePcCommandBody .me-live-home-traffic,#mePcCommandBody .me-live-home-contract{display:none!important}
   #mePcCareerPanel{overflow:auto!important}
   #mePcCareerPanel #meLongTermCareer{display:block!important;width:100%!important;height:100%!important;margin:0!important;border:0!important;border-radius:0!important}
@@ -98,9 +98,9 @@ function openWorld(){
 function closeWorld(){document.getElementById("meWorldLivePanel")?.classList.remove("open")}
 function bindWorldActions(){
  const ticker=document.getElementById("mePcFinalTicker");
- const label=ticker?.querySelector(".label");
- if(label){
-   label.onclick=e=>{e.preventDefault();e.stopPropagation();openWorld();};
+ const liveButton=document.getElementById("mePcLiveButton");
+ if(liveButton){
+   liveButton.onclick=e=>{e.preventDefault();e.stopPropagation();openWorld();};
  }
  ticker?.querySelectorAll(".item").forEach(item=>{
    item.onclick=e=>{e.preventDefault();e.stopPropagation();openWorld();};
@@ -136,7 +136,7 @@ function build(){
  if(!final){
    final=document.createElement("div");
    final.id="mePcFinalHome";
-   final.innerHTML='<div id="mePcFinalTicker"><div class="label">⚓ MARINA LIVE · APRI</div><div class="window"><div class="track" id="mePcFinalTickerTrack"></div></div></div><div id="mePcFinalPanels"><section id="mePcCommandPanel"><div id="mePcCommandTitle"><strong>🧭 PLANCIA DI COMANDO</strong><span>MARINA EMPIRE</span></div><div id="mePcCommandBody"></div></section><section id="mePcCareerPanel"></section></div><section id="meWorldLivePanel"><div id="meWorldLiveHead"><strong>⚓ MONDO VIVO · CENTRALE OPERATIVA</strong><button type="button" id="meWorldLiveClose">×</button></div><div id="meWorldLiveBody"></div></section>';
+   final.innerHTML='<button type="button" id="mePcLiveButton">⚓ MARINA LIVE</button><div id="mePcFinalTicker"><div class="window"><div class="track" id="mePcFinalTickerTrack"></div></div></div><div id="mePcFinalPanels"><section id="mePcCommandPanel"><div id="mePcCommandTitle"><strong>🧭 PLANCIA DI COMANDO</strong><span>MARINA EMPIRE</span></div><div id="mePcCommandBody"></div></section><section id="mePcCareerPanel"></section></div><section id="meWorldLivePanel"><div id="meWorldLiveHead"><strong>⚓ MONDO VIVO · CENTRALE OPERATIVA</strong><button type="button" id="meWorldLiveClose">×</button></div><div id="meWorldLiveBody"></div></section>';
    home.innerHTML="";
    home.appendChild(final);
  }
@@ -152,8 +152,8 @@ function build(){
  const track=document.getElementById("mePcFinalTickerTrack");
  if(track)track.innerHTML=tickerHtml();
  bindWorldActions();
- const label=document.querySelector("#mePcFinalTicker .label");
- if(label){label.setAttribute("role","button");label.setAttribute("tabindex","0");label.title="Apri Mondo Vivo";}
+ const liveButton=document.getElementById("mePcLiveButton");
+ if(liveButton){liveButton.title="Apri Mondo Vivo";}
  document.querySelectorAll("#mePcFinalTicker .item").forEach(el=>{el.setAttribute("role","button");el.setAttribute("tabindex","0");});
 
  return true;
