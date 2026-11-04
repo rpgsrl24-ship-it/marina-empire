@@ -15,7 +15,11 @@ const OPPORTUNITIES=[
  {role:"Armatore",icon:"👤",type:"Manutenzione",text:"chiede preventivo manutenzione",duration:32,cost:210,reward:620,prestige:16,reputation:9,requiredSectorLevel:2},
  {role:"Tecnico",icon:"🔧",type:"Elettrico",text:"intervento su batterie di bordo",duration:26,cost:150,reward:450,prestige:12},
  {role:"Broker",icon:"💼",type:"Brokerage",text:"organizza visita a uno yacht in vendita",duration:20,cost:60,reward:260,prestige:7},
- {role:"Broker",icon:"💼",type:"Sea Trial",text:"cerca disponibilità per prova in mare",duration:30,cost:140,reward:500,prestige:13,reputation:8,requiredSectorLevel:2}
+ {role:"Broker",icon:"💼",type:"Sea Trial",text:"cerca disponibilità per prova in mare",duration:30,cost:140,reward:500,prestige:13,reputation:8,requiredSectorLevel:2},
+ {role:"Purser",icon:"📋",type:"Provisioning",text:"richiede cambusa premium e forniture ospiti",duration:26,cost:150,reward:520,prestige:11,reputation:7},
+ {role:"Deck Crew",icon:"🏄",type:"Water Toys",text:"prepara Seabob, SUP ed e-foil per gli ospiti",duration:28,cost:160,reward:580,prestige:12,reputation:7},
+ {role:"Security",icon:"🛡️",type:"Security",text:"coordina accessi e sicurezza per ospiti VIP",duration:30,cost:180,reward:670,prestige:14,reputation:8,requiredSectorLevel:2},
+ {role:"Concierge",icon:"🚐",type:"Transfer VIP",text:"organizza transfer marina-aeroporto per gli ospiti",duration:27,cost:170,reward:620,prestige:13,reputation:8}
 ];
 
 const style=document.createElement("style");
