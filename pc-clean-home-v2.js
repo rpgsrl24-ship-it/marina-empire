@@ -47,24 +47,102 @@ st.textContent=`
   #home .game-lux-home{
     width:100%!important;
     height:100%!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    grid-template-rows:38px minmax(0,1fr)!important;
+    gap:14px!important;
+    align-items:stretch!important;
+    justify-content:stretch!important;
   }
 
   #home .hero{
-    width:min(46vw,740px)!important;
-    max-width:740px!important;
-    aspect-ratio:16/9!important;
-    height:auto!important;
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:none!important;
+    aspect-ratio:auto!important;
+    height:100%!important;
     min-height:0!important;
-    max-height:calc(100vh - 116px)!important;
-    margin:0 auto!important;
+    max-height:none!important;
+    margin:0!important;
   }
 
+  #home #meLongTermCareer{
+    grid-column:2!important;
+    grid-row:2!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    margin:0!important;
+    overflow:auto!important;
+  }
+
+  #home .me-pc-live-ticker{
+    grid-column:1 / -1!important;
+    grid-row:1!important;
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:10px!important;
+    min-width:0!important;
+    height:38px!important;
+    border:1px solid rgba(201,164,98,.55)!important;
+    border-radius:11px!important;
+    background:rgba(5,27,40,.94)!important;
+    overflow:hidden!important;
+    box-shadow:0 6px 18px rgba(0,0,0,.28)!important;
+  }
+  #home .me-pc-live-ticker-label{
+    align-self:stretch!important;
+    display:flex!important;
+    align-items:center!important;
+    padding:0 12px!important;
+    border-right:1px solid rgba(201,164,98,.42)!important;
+    color:#f0d29d!important;
+    font-size:9px!important;
+    font-weight:900!important;
+    letter-spacing:.08em!important;
+    white-space:nowrap!important;
+    background:#0b3041!important;
+  }
+  #home .me-pc-live-ticker-window{
+    min-width:0!important;
+    overflow:hidden!important;
+    white-space:nowrap!important;
+  }
+  #home .me-pc-live-ticker-track{
+    display:flex!important;
+    width:max-content!important;
+    animation:mePcLiveTicker 32s linear infinite!important;
+    will-change:transform!important;
+  }
+  #home .me-pc-live-ticker-copy{
+    display:flex!important;
+    align-items:center!important;
+    flex-shrink:0!important;
+  }
+  #home .me-pc-live-ticker-item{
+    padding:0 14px!important;
+    color:#dce8ec!important;
+    font-size:10px!important;
+    font-weight:700!important;
+  }
+  #home .me-pc-live-ticker-sep{
+    color:#caa96a!important;
+    font-size:8px!important;
+  }
+
+  @keyframes mePcLiveTicker{
+    from{transform:translateX(0)}
+    to{transform:translateX(-50%)}
+  }
+
+  body.me-pc-panel-open #home .game-lux-home{
+    grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;
+  }
   body.me-pc-panel-open #home .hero{
-    width:min(34vw,540px)!important;
-    max-width:540px!important;
+    width:100%!important;
+    max-width:none!important;
   }
 
   .me-compact-hud{
@@ -83,56 +161,12 @@ st.textContent=`
     width:min(46vw,740px)!important;
   }
 
-  /* FINAL OVERRIDE: keep the bridge/command console visible */
-  #home .me-live-home-loc{
-    left:12px!important;
-    top:12px!important;
-    width:170px!important;
-    padding:7px 9px!important;
-    font-size:10px!important;
-    background:rgba(4,31,44,.68)!important;
-  }
-
-  #home .me-live-home-vhf{
-    top:12px!important;
-    right:12px!important;
-    left:auto!important;
-    transform:none!important;
-    width:220px!important;
-    padding:8px 10px!important;
-    background:rgba(4,31,44,.68)!important;
-  }
-
-  #home .me-live-home-traffic{
-    left:12px!important;
-    right:auto!important;
-    top:82px!important;
-    bottom:auto!important;
-    width:185px!important;
-    display:flex!important;
-    flex-direction:column!important;
-    gap:6px!important;
-  }
-
-  #home .me-live-home-traffic>div{
-    padding:6px 8px!important;
-    font-size:8px!important;
-    background:rgba(3,28,41,.62)!important;
-  }
-
-  #home .me-live-home-traffic>div:nth-child(n+3){
-    display:none!important;
-  }
-
+  /* PC: all live messages live in the ticker, never over the command deck */
+  #home .me-live-home-loc,
+  #home .me-live-home-vhf,
+  #home .me-live-home-traffic,
   #home .me-live-home-contract{
-    left:12px!important;
-    right:auto!important;
-    bottom:12px!important;
-    transform:none!important;
-    width:310px!important;
-    max-width:calc(100% - 24px)!important;
-    padding:8px 10px!important;
-    background:rgba(4,29,43,.72)!important;
+    display:none!important;
   }
 }
 `;
