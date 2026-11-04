@@ -8,9 +8,9 @@ st.id="me-pc-home-final-v1-style";
 st.textContent=`
 @media(min-width:900px){
   #home .game-lux-home{display:block!important;height:100%!important}
-  #mePcFinalHome{display:grid!important;grid-template-rows:42px minmax(0,1fr)!important;gap:14px!important;height:100%!important}
-  #mePcFinalTicker{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;align-items:center!important;overflow:hidden!important;pointer-events:auto!important;position:relative!important;z-index:10000!important;border:1px solid rgba(201,164,98,.55)!important;border-radius:11px!important;background:rgba(5,27,40,.95)!important}
-  #mePcFinalTicker .label{height:100%!important;display:flex!important;pointer-events:auto!important;align-items:center!important;padding:0 14px!important;border-right:1px solid rgba(201,164,98,.4)!important;background:#0b3041!important;color:#f0d29d!important;font-size:9px!important;font-weight:900!important;white-space:nowrap!important;cursor:pointer!important}
+  #mePcFinalHome{display:grid!important;grid-template-rows:52px minmax(0,1fr)!important;gap:14px!important;height:100%!important}
+  #mePcFinalTicker{display:grid!important;grid-template-columns:180px minmax(0,1fr)!important;align-items:center!important;overflow:hidden!important;pointer-events:auto!important;position:relative!important;z-index:10000!important;border:1px solid rgba(232,188,102,.82)!important;border-radius:13px!important;background:rgba(5,27,40,.98)!important;box-shadow:0 0 0 1px rgba(232,188,102,.18),0 0 24px rgba(232,188,102,.18)!important}
+  #mePcFinalTicker .label{height:100%!important;display:flex!important;pointer-events:auto!important;align-items:center!important;justify-content:center!important;padding:0 14px!important;border-right:1px solid rgba(232,188,102,.55)!important;background:linear-gradient(135deg,#133c50,#0b3041)!important;color:#ffe2a3!important;font-size:12px!important;font-weight:900!important;letter-spacing:.06em!important;white-space:nowrap!important;cursor:pointer!important;animation:meLivePulse 1.5s ease-in-out infinite!important}
   #mePcFinalTicker .window{overflow:hidden!important;white-space:nowrap!important}
   #mePcFinalTicker .track{display:flex!important;width:max-content!important;animation:meFinalTicker 34s linear infinite!important}
   #mePcFinalTicker .copy{display:flex!important;align-items:center!important;flex-shrink:0!important}
@@ -24,6 +24,14 @@ st.textContent=`
   #mePcCommandTitle span{font-size:9px!important;color:#b9cbd2!important}
   #mePcCommandBody{min-height:0!important;position:relative!important;overflow:hidden!important}
   #mePcCommandBody .hero{width:100%!important;max-width:none!important;height:100%!important;min-height:0!important;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important;aspect-ratio:auto!important}
+  #mePcCommandBody .hero *{pointer-events:none!important}
+  #mePcCommandBody .me-home-vessel,
+  #mePcCommandBody .me-home-status,
+  #mePcCommandBody .hero-copy,
+  #mePcCommandBody .luxury-mini-map,
+  #mePcCommandBody .me-live-home-overlay,
+  #mePcCommandBody [class*="status"],
+  #mePcCommandBody [class*="label"]{display:none!important}
   #mePcCommandBody .me-live-home-loc,#mePcCommandBody .me-live-home-vhf,#mePcCommandBody .me-live-home-traffic,#mePcCommandBody .me-live-home-contract{display:none!important}
   #mePcCareerPanel{overflow:auto!important}
   #mePcCareerPanel #meLongTermCareer{display:block!important;width:100%!important;height:100%!important;margin:0!important;border:0!important;border-radius:0!important}
@@ -42,6 +50,7 @@ st.textContent=`
   .me-world-item small{display:block!important;margin-top:3px!important;color:#b9cbd2!important;font-size:9px!important}
   .me-world-item button{min-height:36px!important;padding:7px 10px!important;font-size:9px!important}
   @keyframes meFinalTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes meLivePulse{0%,100%{box-shadow:inset 0 0 0 0 rgba(255,218,143,0),0 0 0 rgba(255,218,143,0);filter:brightness(1)}50%{box-shadow:inset 0 0 0 2px rgba(255,218,143,.28),0 0 18px rgba(255,218,143,.30);filter:brightness(1.18)}}
 }
 `;
 document.head.appendChild(st);
@@ -127,11 +136,18 @@ function build(){
  if(!final){
    final=document.createElement("div");
    final.id="mePcFinalHome";
-   final.innerHTML='<div id="mePcFinalTicker"><div class="label">⚓ MARINA LIVE</div><div class="window"><div class="track" id="mePcFinalTickerTrack"></div></div></div><div id="mePcFinalPanels"><section id="mePcCommandPanel"><div id="mePcCommandTitle"><strong>🧭 PLANCIA DI COMANDO</strong><span>MARINA EMPIRE</span></div><div id="mePcCommandBody"></div></section><section id="mePcCareerPanel"></section></div><section id="meWorldLivePanel"><div id="meWorldLiveHead"><strong>⚓ MONDO VIVO · CENTRALE OPERATIVA</strong><button type="button" id="meWorldLiveClose">×</button></div><div id="meWorldLiveBody"></div></section>';
+   final.innerHTML='<div id="mePcFinalTicker"><div class="label">⚓ MARINA LIVE · APRI</div><div class="window"><div class="track" id="mePcFinalTickerTrack"></div></div></div><div id="mePcFinalPanels"><section id="mePcCommandPanel"><div id="mePcCommandTitle"><strong>🧭 PLANCIA DI COMANDO</strong><span>MARINA EMPIRE</span></div><div id="mePcCommandBody"></div></section><section id="mePcCareerPanel"></section></div><section id="meWorldLivePanel"><div id="meWorldLiveHead"><strong>⚓ MONDO VIVO · CENTRALE OPERATIVA</strong><button type="button" id="meWorldLiveClose">×</button></div><div id="meWorldLiveBody"></div></section>';
    home.innerHTML="";
    home.appendChild(final);
  }
  document.getElementById("mePcCommandBody")?.appendChild(hero);
+ hero.querySelectorAll(".me-home-vessel,.me-home-status,.hero-copy,.luxury-mini-map,.me-live-home-overlay").forEach(el=>el.remove());
+ hero.querySelectorAll("div,span,strong,small").forEach(el=>{
+   const tx=(el.textContent||"").trim();
+   if(/RPG Academy|M\/Y|S\/Y|ORMEGGIATO|CARBURANTE|STATO YACHT|MONDO VIVO|VHF/i.test(tx) && !el.closest("#mePcCommandTitle")) {
+     if(el.children.length===0 || el.classList.contains("me-home-status")) el.style.display="none";
+   }
+ });
  document.getElementById("mePcCareerPanel")?.appendChild(career);
  const track=document.getElementById("mePcFinalTickerTrack");
  if(track)track.innerHTML=tickerHtml();
