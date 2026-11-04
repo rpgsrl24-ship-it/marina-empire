@@ -82,6 +82,58 @@ st.textContent=`
     bottom:10px!important;
     width:min(46vw,740px)!important;
   }
+
+  /* FINAL OVERRIDE: keep the bridge/command console visible */
+  #home .me-live-home-loc{
+    left:12px!important;
+    top:12px!important;
+    width:170px!important;
+    padding:7px 9px!important;
+    font-size:10px!important;
+    background:rgba(4,31,44,.68)!important;
+  }
+
+  #home .me-live-home-vhf{
+    top:12px!important;
+    right:12px!important;
+    left:auto!important;
+    transform:none!important;
+    width:220px!important;
+    padding:8px 10px!important;
+    background:rgba(4,31,44,.68)!important;
+  }
+
+  #home .me-live-home-traffic{
+    left:12px!important;
+    right:auto!important;
+    top:82px!important;
+    bottom:auto!important;
+    width:185px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    gap:6px!important;
+  }
+
+  #home .me-live-home-traffic>div{
+    padding:6px 8px!important;
+    font-size:8px!important;
+    background:rgba(3,28,41,.62)!important;
+  }
+
+  #home .me-live-home-traffic>div:nth-child(n+3){
+    display:none!important;
+  }
+
+  #home .me-live-home-contract{
+    left:12px!important;
+    right:auto!important;
+    bottom:12px!important;
+    transform:none!important;
+    width:310px!important;
+    max-width:calc(100% - 24px)!important;
+    padding:8px 10px!important;
+    background:rgba(4,29,43,.72)!important;
+  }
 }
 `;
 document.head.appendChild(st);
