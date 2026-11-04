@@ -2711,9 +2711,9 @@ window.meCreditCheckoutReady=async function(){
   }
   if(!validState(remote.data.game_state)){status("La partita online non è valida: acquisto sospeso per proteggere i progressi.");return false;}
   if(!sameGameState(remote.data.game_state,snapshot)){
-   status("Prima di acquistare, sincronizza la partita: usa SALVA ONLINE oppure CARICA PARTITA ONLINE.");
-   showTab("profile");
-   return false;
+   const saved=await client.from("player_progress").update({game_state:snapshot,updated_at:new Date().toISOString()}).eq("user_id",userId);
+   if(saved.error)throw saved.error;
+   status("Partita sincronizzata automaticamente. Apertura checkout sicuro…");
   }
   return true;
  }catch(e){
