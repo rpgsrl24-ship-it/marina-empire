@@ -64,13 +64,26 @@ function portKey(){
 }
 function slot(ms=300000){return Math.floor(Date.now()/ms)}
 function chainSlot(){return Math.floor(Date.now()/21600000)}
+function vesselRelation(vessel,key=portKey()){
+ try{
+  const raw=state?.vesselRelations?.[String(key).toLowerCase()]?.[String(vessel?.id||"")]||{};
+  const visits=Math.max(0,Math.floor(Number(raw.visits)||0));
+  const services=Math.max(0,Math.floor(Number(raw.services)||0));
+  const level=visits>=7?5:visits>=4?4:visits>=2?3:visits>=1?2:1;
+  const label=level===5?"CLIENTE VIP":level===4?"CLIENTE PREFERITO":level===3?"CLIENTE ABITUALE":level===2?"DI RITORNO":"NUOVO CLIENTE";
+  return {visits,services,level,label,lastAt:Number(raw.lastAt)||0,lastChain:String(raw.lastChain||"")};
+ }catch(_){return {visits:0,services:0,level:1,label:"NUOVO CLIENTE",lastAt:0,lastChain:""}}
+}
 function featuredVessel(){
  const key=portKey(),eligible=VESSELS.filter(v=>["superyacht","charter","regatta"].includes(v.profile));
- const seed=hash(key+"|featured|"+chainSlot()),v=eligible[seed%eligible.length];
+ const seed=hash(key+"|featured|"+chainSlot());
+ const known=eligible.filter(v=>vesselRelation(v,key).visits>0);
+ const useKnown=known.length>0&&(seed%100)<60;
+ const v=useKnown?known[seed%known.length]:eligible[seed%eligible.length];
  let raw={};
  try{raw=state?.serviceChains?.[key+"|"+chainSlot()]||{}}catch(_){}
- const step=Math.max(0,Math.floor(Number(raw.step)||0)),completed=!!raw.completed;
- return {...v,featured:true,serviceState:completed?"IN PARTENZA":step>0?"ORMEGGIATO":"IN ARRIVO",chainStep:step,chainCompleted:completed};
+ const step=Math.max(0,Math.floor(Number(raw.step)||0)),completed=!!raw.completed,relation=vesselRelation(v,key);
+ return {...v,featured:true,relation,serviceState:completed?"IN PARTENZA":step>0?"ORMEGGIATO":"IN ARRIVO",chainStep:step,chainCompleted:completed};
 }
 function world(){
  return window.MarinaEmpireWorldEvents?.modifiers?.(portKey())||{traffic:1,demand:1,event:{title:"Attività ordinaria"},weather:{label:"CALMO",icon:"☀️"}};
@@ -139,7 +152,7 @@ function formatCredits(n){return Math.max(0,Math.round(Number(n)||0)).toLocaleSt
 function render(){
  if(!ensure())return;
  const t=trafficSnapshot(),contracts=contractSnapshot(),w=t.world;
- const traffic=t.items.slice(0,5).map(x=>'<div class="me-traffic-row"><span>'+x.action+'</span><b>'+(x.featured?'★ ':'')+x.name+'</b><em>'+x.kind+' · '+x.berth+(x.eta>0?' · '+x.eta+' min':'')+'</em></div>').join("");
+ const traffic=t.items.slice(0,5).map(x=>'<div class="me-traffic-row"><span>'+x.action+'</span><b>'+(x.featured?'★ ':'')+x.name+(x.featured&&x.relation?.level>1?' · '+x.relation.label:'')+'</b><em>'+x.kind+' · '+x.berth+(x.eta>0?' · '+x.eta+' min':'')+'</em></div>').join("");
  const contractHtml=contracts.map(c=>{
   const running=active?.id===c.dynamicId;
   const check=window.MarinaEmpireNpcEconomy?.canStart?.(c)||{ok:false,message:"Sistema incarichi non disponibile"};
@@ -172,7 +185,7 @@ function start(id){
  },400);
  render();
 }
-window.MarinaEmpireLiveTraffic={snapshot:trafficSnapshot,contracts:contractSnapshot,featuredVessel};
+window.MarinaEmpireLiveTraffic={snapshot:trafficSnapshot,contracts:contractSnapshot,featuredVessel,vesselRelation};
 
 function boot(){
  if(!ensure()){setTimeout(boot,700);return}
