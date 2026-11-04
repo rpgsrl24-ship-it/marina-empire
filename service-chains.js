@@ -7,17 +7,22 @@ const CHAINS=[
  {id:"superyacht",title:"ARRIVO SUPERYACHT",icon:"🛥️",steps:[
   {type:"Ormeggio",title:"Assegna l'ormeggio",cost:80,reward:300,prestige:7,reputation:5},
   {type:"Rifornimento",title:"Coordina il rifornimento",cost:130,reward:460,prestige:9,reputation:6},
-  {type:"Tecnica",title:"Verifica assistenza tecnica",cost:170,reward:620,prestige:13,reputation:8,requiredSectorLevel:2},
-  {type:"Servizio VIP",title:"Accoglienza ospiti VIP",cost:180,reward:690,prestige:15,reputation:9,requiredSectorLevel:2}
+  {type:"Provisioning",title:"Organizza provisioning e cambusa",cost:150,reward:560,prestige:11,reputation:7},
+  {type:"Water Toys",title:"Prepara water toys e tender",cost:160,reward:610,prestige:12,reputation:7},
+  {type:"Servizio VIP",title:"Accoglienza ospiti VIP",cost:180,reward:690,prestige:15,reputation:9,requiredSectorLevel:2},
+  {type:"Transfer VIP",title:"Coordina transfer e partenza ospiti",cost:170,reward:640,prestige:13,reputation:8}
  ]},
  {id:"charter",title:"TURNAROUND CHARTER",icon:"⚓",steps:[
   {type:"Ormeggio",title:"Gestisci il rientro charter",cost:70,reward:270,prestige:6,reputation:4},
   {type:"Tecnica",title:"Controllo rapido yacht",cost:150,reward:540,prestige:11,reputation:7},
-  {type:"Servizio VIP",title:"Prepara i nuovi ospiti",cost:160,reward:610,prestige:13,reputation:8}
+  {type:"Provisioning",title:"Ripristina cambusa e dotazioni",cost:140,reward:520,prestige:10,reputation:7},
+  {type:"Water Toys",title:"Prepara toys per i nuovi ospiti",cost:150,reward:570,prestige:11,reputation:7},
+  {type:"Servizio VIP",title:"Accoglienza nuovi ospiti",cost:160,reward:610,prestige:13,reputation:8}
  ]},
  {id:"regatta",title:"OPERAZIONE REGATA",icon:"⛵",steps:[
   {type:"Ormeggio",title:"Accoglienza equipaggio",cost:60,reward:250,prestige:6,reputation:4},
   {type:"Rifornimento",title:"Supporto logistico",cost:110,reward:400,prestige:8,reputation:5},
+  {type:"Security",title:"Gestisci area tecnica e sicurezza",cost:130,reward:470,prestige:10,reputation:6},
   {type:"Charter",title:"Servizio hospitality",cost:170,reward:650,prestige:14,reputation:8}
  ]}
 ];
@@ -30,8 +35,14 @@ function portKey(){
 function daySlot(){return Math.floor(Date.now()/21600000)}
 function hash(str){let h=7;for(const ch of String(str))h=(Math.imul(h,31)+ch.charCodeAt(0))>>>0;return h}
 function selected(){
+ const feature=window.MarinaEmpireLiveTraffic?.featuredVessel?.();
+ if(feature?.profile){
+  const byProfile={superyacht:"superyacht",charter:"charter",regatta:"regatta"};
+  const match=CHAINS.find(c=>c.id===byProfile[feature.profile]);
+  if(match)return {...match,vessel:feature};
+ }
  const key=portKey(),idx=hash(key+"|"+daySlot())%CHAINS.length;
- return CHAINS[idx];
+ return {...CHAINS[idx],vessel:feature||null};
 }
 function progress(){
  try{
@@ -88,12 +99,12 @@ function render(){
  const chain=selected(),p=progress();
  if(p.completed){
   const op=operationSnapshot();
-  box.innerHTML='<strong style="color:#f0d296;font-size:9px">'+chain.icon+' '+chain.title+' · COMPLETATA</strong><p style="font-size:8.5px;color:#a9bec6;margin:5px 0 0">Catena operativa conclusa · Operatività marina Lv.'+op.level+' '+op.label+(op.next>0?' · '+op.next+' catene al prossimo livello':' · livello massimo')+'.</p>';
+  box.innerHTML='<strong style="color:#f0d296;font-size:9px">'+chain.icon+' '+chain.title+(chain.vessel?' · '+chain.vessel.name:'')+' · COMPLETATA</strong><p style="font-size:8.5px;color:#a9bec6;margin:5px 0 0">Catena operativa conclusa · Operatività marina Lv.'+op.level+' '+op.label+(op.next>0?' · '+op.next+' catene al prossimo livello':' · livello massimo')+'.</p>';
   return;
  }
  const c=buildContract(chain,p),check=window.MarinaEmpireNpcEconomy?.canStart?.(c)||{ok:false,message:"Sistema incarichi non disponibile"};
  const steps=chain.steps.map((s,i)=>'<span style="font-size:8px;color:'+(i<p.step?'#96d7bb':i===p.step?'#f0d296':'#78949f')+'">'+(i<p.step?'✓ ':i===p.step?'● ':'○ ')+(i+1)+'</span>').join(' · ');
- box.innerHTML='<strong style="color:#f0d296;font-size:9px">'+chain.icon+' CATENA LIVE · '+chain.title+'</strong><p style="font-size:8.5px;color:#b9ccd2;margin:5px 0">'+steps+' · STEP '+(p.step+1)+'/'+chain.steps.length+'</p><p style="font-size:9px;margin:5px 0;color:#e1e9ec"><b>'+c.title+'</b> · '+Math.round(c.reward).toLocaleString("it-IT")+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+(c.localBonusPct>0?' · bonus marina +'+c.localBonusPct+'%':'')+'</p><button type="button" data-chain-start style="width:100%;padding:7px;border:1px solid rgba(214,181,117,.45);border-radius:8px;background:#17475a;color:#fff;font-size:8.5px" '+(!check.ok?'disabled':'')+'>'+(check.ok?'COMPLETA STEP':check.message)+'</button><p data-chain-status style="font-size:8px;color:#8ca8b2;margin:5px 0 0">Completando tutti gli step ottieni un bonus finale.</p>';
+ box.innerHTML='<strong style="color:#f0d296;font-size:9px">'+chain.icon+' CATENA LIVE · '+chain.title+(chain.vessel?' · '+chain.vessel.name+' '+chain.vessel.length+' m':'')+'</strong><p style="font-size:8.5px;color:#b9ccd2;margin:5px 0">'+steps+' · STEP '+(p.step+1)+'/'+chain.steps.length+'</p><p style="font-size:9px;margin:5px 0;color:#e1e9ec"><b>'+c.title+'</b> · '+Math.round(c.reward).toLocaleString("it-IT")+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+(c.localBonusPct>0?' · bonus marina +'+c.localBonusPct+'%':'')+'</p><button type="button" data-chain-start style="width:100%;padding:7px;border:1px solid rgba(214,181,117,.45);border-radius:8px;background:#17475a;color:#fff;font-size:8.5px" '+(!check.ok?'disabled':'')+'>'+(check.ok?'COMPLETA STEP':check.message)+'</button><p data-chain-status style="font-size:8px;color:#8ca8b2;margin:5px 0 0">Completando tutti gli step ottieni un bonus finale.</p>';
  box.querySelector("[data-chain-start]")?.addEventListener("click",()=>complete(chain,p,c));
 }
 function complete(chain,p,c){
