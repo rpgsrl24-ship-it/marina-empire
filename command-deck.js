@@ -99,6 +99,46 @@ css.textContent=`
     color:#f5e4bc;font-size:10px;font-weight:800
   }
 }
+
+@media(min-width:900px){
+  body.me-home-panel-open{overflow:hidden!important}
+  body.me-home-panel-open #home{display:block!important}
+  .screen.me-home-panel{
+    display:block!important;
+    position:fixed!important;
+    z-index:10020!important;
+    top:76px!important;
+    left:132px!important;
+    right:132px!important;
+    bottom:62px!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:auto!important;
+    border:1px solid rgba(215,177,108,.72)!important;
+    border-radius:18px!important;
+    background:linear-gradient(155deg,rgba(4,25,38,.985),rgba(7,40,55,.985))!important;
+    box-shadow:0 24px 70px rgba(0,0,0,.72)!important;
+    backdrop-filter:blur(14px)!important;
+  }
+  .screen.me-home-panel>.me-home-panel-close{
+    position:sticky!important;
+    top:10px!important;
+    float:right!important;
+    z-index:10030!important;
+    width:42px!important;
+    height:42px!important;
+    min-height:42px!important;
+    margin:10px 12px -52px 0!important;
+    padding:0!important;
+    border:1px solid #d7b16c!important;
+    border-radius:50%!important;
+    background:#092d3f!important;
+    color:#f7d99c!important;
+    font-size:24px!important;
+    line-height:1!important;
+  }
+  .screen.me-home-panel>.me-lux-page-head{padding-right:70px!important}
+}
 `;document.head.appendChild(css);
 
 const left=document.createElement("nav");
@@ -136,9 +176,53 @@ bottom.innerHTML='<div><small>AZIONE CONSIGLIATA</small><strong id="meCommandBot
 
 document.body.append(left,right,drawer,bottom);
 
-function active(){return document.querySelector(".screen:not(.hide)")?.id||"home"}
+let homePanelTab=null;
+function active(){return homePanelTab||document.querySelector(".screen:not(.hide)")?.id||"home"}
+function closeHomePanel(){
+ if(innerWidth<900)return false;
+ document.querySelectorAll(".screen.me-home-panel").forEach(s=>{
+   s.classList.remove("me-home-panel");
+   s.querySelector(":scope > .me-home-panel-close")?.remove();
+   if(s.id!=="home")s.classList.add("hide");
+ });
+ document.body.classList.remove("me-home-panel-open");
+ homePanelTab=null;
+ const home=document.getElementById("home");
+ if(home)home.classList.remove("hide");
+ setTimeout(sync,20);
+ return true;
+}
+function openHomePanel(tab){
+ if(innerWidth<900||tab==="home")return false;
+ const target=document.getElementById(tab),home=document.getElementById("home");
+ if(!target||!home||typeof showTab!=="function")return false;
+ showTab(tab);
+ home.classList.remove("hide");
+ target.classList.remove("hide");
+ target.classList.add("me-home-panel");
+ document.body.classList.add("me-home-panel-open");
+ homePanelTab=tab;
+ let close=target.querySelector(":scope > .me-home-panel-close");
+ if(!close){
+   close=document.createElement("button");
+   close.type="button";
+   close.className="me-home-panel-close";
+   close.setAttribute("aria-label","Chiudi pannello e torna alla marina");
+   close.textContent="×";
+   target.prepend(close);
+ }
+ close.onclick=closeHomePanel;
+ target.scrollTop=0;
+ setTimeout(sync,20);
+ return true;
+}
+window.MarinaEmpireHomePanels={open:openHomePanel,close:closeHomePanel,current:()=>homePanelTab};
 function go(tab){
  drawer.classList.remove("open");
+ if(innerWidth>=900){
+   if(tab==="home"){closeHomePanel();return}
+   if(openHomePanel(tab))return;
+ }
  if(typeof showTab==="function")showTab(tab);
  setTimeout(sync,40);
 }
@@ -175,7 +259,7 @@ right.addEventListener("click",e=>{
  const b=e.target.closest("[data-deck-tab]");if(b){go(b.dataset.deckTab);return}
  if(e.target.closest("[data-deck-community]")){
    drawer.classList.remove("open");go("office");
-   setTimeout(()=>document.getElementById("marinaCommunity")?.scrollIntoView({behavior:"smooth",block:"start"}),120);return;
+   setTimeout(()=>document.getElementById("marinaCommunity")?.scrollIntoView({behavior:"smooth",block:"start"}),160);return;
  }
  if(e.target.closest("[data-deck-menu]"))drawer.classList.toggle("open");
 });
@@ -192,6 +276,7 @@ document.addEventListener("click",e=>{
 });
 document.querySelectorAll(".screen").forEach(s=>new MutationObserver(sync).observe(s,{attributes:true,attributeFilter:["class"]}));
 window.addEventListener("marina-empire-updated",sync);
-window.addEventListener("resize",sync);
+window.addEventListener("resize",()=>{if(innerWidth<900&&homePanelTab)closeHomePanel();sync()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&homePanelTab)closeHomePanel()});
 setTimeout(sync,250);
 })();
