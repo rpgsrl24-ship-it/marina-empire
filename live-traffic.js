@@ -117,8 +117,10 @@ function trafficSnapshot(){
  const localBias=Math.max(.7,Math.min(1.4,Number(local.traffic)||1));
  const memoryTraffic=Math.max(.75,Math.min(1.3,Number(window.MarinaEmpireMarinaMemory?.trafficMultiplier?.(key))||1));
  const shift=window.MarinaEmpireShiftCycle?.modifiers?.(key)||{traffic:1,demand:1,service:1};
+ const chain=window.MarinaEmpireEventChains?.modifiers?.()||{traffic:1,demand:1,service:1};
  const shiftTraffic=Math.max(.55,Math.min(1.5,Number(shift.traffic)||1));
- const volume=Math.max(3,Math.min(10,Math.round(3+base*profileBias*localBias*memoryTraffic*shiftTraffic*2.2+operationBoost)));
+ const chainTraffic=Math.max(.55,Math.min(1.5,Number(chain.traffic)||1));
+ const volume=Math.max(3,Math.min(10,Math.round(3+base*profileBias*localBias*memoryTraffic*shiftTraffic*chainTraffic*2.2+operationBoost)));
  const feature=featuredVessel(),items=[{
   ...feature,
   action:feature.serviceState,
