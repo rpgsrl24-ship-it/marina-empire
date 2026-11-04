@@ -63,7 +63,7 @@ st.textContent=`
   #home .cards,#home #meProgressionHub,#home .luxury-mini-map,#home .hero-copy{display:none!important}
   #home .hero{
     position:relative!important;overflow:hidden!important;
-    width:min(58vw,900px)!important;max-width:900px!important;
+    width:min(46vw,740px)!important;max-width:740px!important;
     aspect-ratio:16/9!important;height:auto!important;min-height:0!important;max-height:calc(100vh - 102px)!important;
     margin:0 auto!important;
     border:1px solid #b99557!important;border-radius:18px!important;
@@ -74,30 +74,31 @@ st.textContent=`
   #home .hero:before,#home .hero:after{display:none!important}
   .me-live-home-overlay{display:block!important;position:absolute!important;inset:0!important;z-index:5!important;pointer-events:none}
   .me-live-home-loc{
-    position:absolute!important;left:20px!important;top:22px!important;padding:9px 12px!important;
-    border:1px solid rgba(214,181,117,.58)!important;border-radius:11px!important;background:rgba(4,31,44,.80)!important;
-    backdrop-filter:blur(9px)!important;font-size:11px!important;color:#dce7eb!important
+    position:absolute!important;left:12px!important;top:12px!important;width:170px!important;padding:7px 9px!important;
+    border:1px solid rgba(214,181,117,.58)!important;border-radius:10px!important;background:rgba(4,31,44,.72)!important;
+    backdrop-filter:blur(8px)!important;font-size:10px!important;color:#dce7eb!important
   }
   .me-live-home-loc b{display:block!important;color:#f3d595!important;font-size:14px!important}
   .me-live-home-vhf{
-    position:absolute!important;top:22px!important;left:50%!important;transform:translateX(-50%)!important;width:min(46%,620px)!important;
-    padding:11px 13px!important;border:1px solid rgba(214,181,117,.56)!important;border-radius:13px!important;
-    background:rgba(4,31,44,.82)!important;backdrop-filter:blur(11px)!important;pointer-events:auto!important
+    position:absolute!important;top:12px!important;right:12px!important;left:auto!important;transform:none!important;width:220px!important;
+    padding:8px 10px!important;border:1px solid rgba(214,181,117,.56)!important;border-radius:11px!important;
+    background:rgba(4,31,44,.72)!important;backdrop-filter:blur(9px)!important;pointer-events:auto!important
   }
   .me-live-home-vhf small{font-size:9px!important}.me-live-home-vhf strong{font-size:14px!important}
   .me-live-home-traffic{
-    position:absolute!important;left:22px!important;right:22px!important;bottom:102px!important;
-    display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important
+    position:absolute!important;left:12px!important;right:auto!important;top:76px!important;bottom:auto!important;width:185px!important;
+    display:flex!important;flex-direction:column!important;gap:6px!important
   }
+  .me-live-home-traffic>div:nth-child(n+3){display:none!important}
   .me-live-home-traffic>div{
     padding:8px 10px!important;border-radius:10px!important;background:rgba(3,28,41,.72)!important;
     border:1px solid rgba(255,255,255,.1)!important;backdrop-filter:blur(7px)!important;font-size:9px!important;color:#b8ccd3!important
   }
   .me-live-home-traffic b{font-size:10px!important}
   .me-live-home-contract{
-    position:absolute!important;left:50%!important;bottom:18px!important;transform:translateX(-50%)!important;width:min(68%,760px)!important;
-    padding:11px 13px!important;border-radius:14px!important;border:1px solid #c29a60!important;background:rgba(4,29,43,.92)!important;
-    backdrop-filter:blur(11px)!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:10px!important;
+    position:absolute!important;left:12px!important;bottom:12px!important;transform:none!important;width:320px!important;max-width:calc(100% - 24px)!important;
+    padding:8px 10px!important;border-radius:12px!important;border:1px solid #c29a60!important;background:rgba(4,29,43,.78)!important;
+    backdrop-filter:blur(9px)!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important;
     align-items:center!important;pointer-events:auto!important
   }
   .me-live-home-contract small{font-size:9px!important}.me-live-home-contract strong{font-size:13px!important}
