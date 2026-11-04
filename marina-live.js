@@ -101,7 +101,9 @@
     return window.MarinaEmpireWorldEvents?.dayPhase?.()||{id:"day",label:"GIORNO",icon:"☀️",traffic:1};
   }
   function trafficFactor(){
-    return window.MarinaEmpireWorldEvents?.modifiers?.(marinaKey())?.traffic||1;
+    const base=window.MarinaEmpireWorldEvents?.modifiers?.(marinaKey())?.traffic||1;
+    const memory=window.MarinaEmpireMarinaMemory?.trafficMultiplier?.(marinaKey())||1;
+    return base*memory;
   }
   function marinaIntensity(){
     const tf=Math.max(.45,Math.min(1.6,trafficFactor()));
