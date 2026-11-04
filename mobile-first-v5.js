@@ -7,6 +7,12 @@ const style=document.createElement("style");
 style.id="me-mobile-first-v5-style";
 style.textContent=`
 @media(max-width:740px){
+  /* Mobile-first cleanup: one HUD, one credit CTA, no desktop service panels */
+  html body .stats{display:none!important}
+  html body #meFuelPanel,
+  html body #meMaintenancePanel{display:none!important}
+  html body .me-buy-credits-top{display:none!important}
+
   #home .game-lux-home{display:none!important}
   #home .me-beta-launch-notice{margin-bottom:7px!important;padding:9px 10px!important;font-size:10px!important}
   #home .me-mobile-home-dashboard{
@@ -56,8 +62,9 @@ style.textContent=`
   #home .me-mobile-home-tile{
     min-height:96px!important;padding:11px!important;border-radius:13px!important;text-align:left!important
   }
-  #home .me-mobile-home-tile strong{font-size:11px!important;line-height:1.15!important}
+  #home .me-mobile-home-tile strong{font-size:11px!important;line-height:1.15!important;overflow-wrap:normal!important;word-break:normal!important}
   #home .me-mobile-home-tile small{font-size:9px!important;line-height:1.2!important}
+  #home .me-mobile-home-tile[data-tab="map"] strong{font-size:10px!important;letter-spacing:0!important}
   #home .me-mobile-home-icon{font-size:21px!important}
 
   #meMobileEmpireActions{
