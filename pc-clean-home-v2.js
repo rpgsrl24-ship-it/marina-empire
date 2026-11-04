@@ -53,8 +53,8 @@ st.textContent=`
   }
 
   #home .hero{
-    width:min(56vw,880px)!important;
-    max-width:880px!important;
+    width:min(46vw,740px)!important;
+    max-width:740px!important;
     aspect-ratio:16/9!important;
     height:auto!important;
     min-height:0!important;
@@ -63,8 +63,8 @@ st.textContent=`
   }
 
   body.me-pc-panel-open #home .hero{
-    width:min(39vw,620px)!important;
-    max-width:620px!important;
+    width:min(34vw,540px)!important;
+    max-width:540px!important;
   }
 
   .me-compact-hud{
@@ -80,6 +80,7 @@ st.textContent=`
 
   .me-command-bottom{
     bottom:10px!important;
+    width:min(46vw,740px)!important;
   }
 }
 `;
