@@ -34,7 +34,7 @@ st.textContent=`
     right:118px!important;
     bottom:78px!important;
     left:auto!important;
-    width:min(620px,46vw)!important;
+    width:min(520px,36vw)!important;
     max-width:none!important;
     overflow-y:auto!important;
     overflow-x:hidden!important;
@@ -67,14 +67,14 @@ st.textContent=`
   #map.screen .grid>.panel:last-child{display:none!important}
   #map.screen #interactiveMapDisplay{min-height:430px!important}
   
-  #missions.screen{width:min(560px,42vw)!important}
-  #fleet.screen{width:min(640px,47vw)!important}
-  #marinas.screen{width:min(680px,50vw)!important}
-  #office.screen{width:min(680px,50vw)!important}
-  #marketplace.screen{width:min(720px,52vw)!important}
-  #profile.screen{width:min(560px,42vw)!important}
-  #credits.screen{width:min(520px,40vw)!important}
-  #headquarters.screen{width:min(680px,50vw)!important}
+  #missions.screen{width:min(500px,34vw)!important}
+  #fleet.screen{width:min(540px,36vw)!important}
+  #marinas.screen{width:min(560px,37vw)!important}
+  #office.screen{width:min(560px,37vw)!important}
+  #marketplace.screen{width:min(580px,38vw)!important}
+  #profile.screen{width:min(500px,34vw)!important}
+  #credits.screen{width:min(460px,32vw)!important}
+  #headquarters.screen{width:min(560px,37vw)!important}
 
   .me-pc-panel-close{
     position:fixed;z-index:9999;top:82px;right:128px;
@@ -85,6 +85,16 @@ st.textContent=`
     box-shadow:0 4px 14px rgba(0,0,0,.35)!important
   }
   #map:not(.hide)~.me-pc-panel-close{right:170px}
+}
+@media(min-width:900px) and (max-width:1199px){
+  .screen:not(#home){
+    right:108px!important;
+    width:min(430px,39vw)!important;
+  }
+  #missions.screen,#profile.screen{width:min(400px,36vw)!important}
+  #fleet.screen,#marinas.screen,#office.screen,#headquarters.screen{width:min(430px,39vw)!important}
+  #marketplace.screen{width:min(450px,40vw)!important}
+  #credits.screen{width:min(380px,34vw)!important}
 }
 `;
 document.head.appendChild(st);
