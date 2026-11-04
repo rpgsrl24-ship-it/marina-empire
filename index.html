@@ -2752,11 +2752,12 @@ window.meCreditCheckoutReady=async function(){
 };
 
 let creditReturnInFlight=false;
-async function claimPurchasedCreditsAfterReturn(){
+async function claimPurchasedCreditsAfterReturn(forceCheck=false){
  if(creditReturnInFlight||!client||!account?.id||!account?.email_confirmed_at)return;
  if(typeof URL!=="function")return;
  const url=new URL(location.href);
- if(url.searchParams.get("credit_purchase")!=="success")return;
+ const returning=url.searchParams.get("credit_purchase")==="success";
+ if(!returning&&!forceCheck)return;
  creditReturnInFlight=true;
  const userId=account.id;
  try{
@@ -2811,7 +2812,7 @@ async function initialize(){
    if(window.meRegisteredPlayer&&["SIGNED_IN","INITIAL_SESSION"].includes(event)){
     const userId=account.id;
     setTimeout(()=>{if(account?.id===userId&&window.meRegisteredPlayer&&!passwordRecoveryMode&&!busy)void reconcileAccountProgress()},1100);
-    setTimeout(()=>{if(account?.id===userId&&window.meRegisteredPlayer)void claimPurchasedCreditsAfterReturn()},1800);
+    setTimeout(()=>{if(account?.id===userId&&window.meRegisteredPlayer)void claimPurchasedCreditsAfterReturn(true)},1800);
     setTimeout(()=>{if(account?.id===userId&&window.meRegisteredPlayer)void refreshPurchasedWallet()},2200);
    }
    if(!passwordRecoveryMode)status(account?"Account connesso: "+(account.email||"comandante")+". Salva online per sincronizzare i progressi di questo account.":"Partita locale attiva. Nessun account connesso.");
