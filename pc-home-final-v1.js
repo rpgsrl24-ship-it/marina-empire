@@ -19,20 +19,17 @@ st.textContent=`
   #mePcFinalTicker .sep{color:#caa96a!important;font-size:8px!important}
   #mePcFinalPanels{grid-column:1!important;grid-row:2!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;min-height:0!important;height:100%!important}
   #mePcCommandPanel,#mePcCareerPanel{min-width:0!important;min-height:0!important;height:100%!important;border:1px solid rgba(201,164,98,.55)!important;border-radius:16px!important;background:rgba(5,27,40,.96)!important;overflow:hidden!important;box-shadow:0 14px 30px rgba(0,0,0,.35)!important}
-  #mePcCommandPanel{display:grid!important;grid-template-rows:46px minmax(0,1fr)!important}
+  #mePcCommandPanel{display:grid!important;grid-template-rows:46px minmax(0,1fr)!important 50px!important}
   #mePcCommandTitle{display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 16px!important;border-bottom:1px solid rgba(201,164,98,.35)!important;background:#0b3041!important;color:#f2d59a!important}
   #mePcCommandTitle strong{font-size:16px!important;letter-spacing:.05em!important}
   #mePcCommandTitle span{font-size:9px!important;color:#b9cbd2!important}
-  #mePcCommandBody{min-height:0!important;position:relative!important;overflow:hidden!important}
-  #mePcCommandBody .hero{width:100%!important;max-width:none!important;height:100%!important;min-height:0!important;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important;aspect-ratio:auto!important}
-  #mePcCommandBody .hero *{pointer-events:none!important}
-  #mePcCommandBody .hero>div,
-  #mePcCommandBody .hero>span,
-  #mePcCommandBody .hero>strong,
-  #mePcCommandBody .hero>small{display:none!important}
-  #mePcCommandBody .hero::before,
-  #mePcCommandBody .hero::after{display:none!important}
-  #mePcCommandBody .me-live-home-loc,#mePcCommandBody .me-live-home-vhf,#mePcCommandBody .me-live-home-traffic,#mePcCommandBody .me-live-home-contract{display:none!important}
+  #mePcCommandBody{min-height:0!important;position:relative!important;overflow:hidden!important;background:#062838!important}
+  #mePcMarinaFrame{width:100%!important;height:100%!important;border:0!important;display:block!important;background:#062838!important}
+  #mePcMarinaControls{display:grid!important;grid-template-columns:46px minmax(0,1fr) 46px auto!important;gap:8px!important;align-items:center!important;padding:6px 8px!important;border-top:1px solid rgba(201,164,98,.35)!important;background:#0b3041!important}
+  #mePcMarinaControls button{height:36px!important;min-height:36px!important;padding:6px 10px!important;font-size:10px!important}
+  #mePcMarinaName{text-align:center!important;color:#f1d292!important;font-size:12px!important;font-weight:900!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  #mePcEnterMarina{padding:6px 14px!important}
+
   #mePcCareerPanel{overflow:auto!important}
   #mePcCareerPanel #meLongTermCareer{display:block!important;width:100%!important;height:100%!important;margin:0!important;border:0!important;border-radius:0!important}
   #home>.me-command-bottom,.me-command-bottom{z-index:9997!important}
@@ -55,6 +52,42 @@ st.textContent=`
 `;
 document.head.appendChild(st);
 
+const HOME_MARINAS=[
+ {id:"rimini",name:"Marina di Rimini"},
+ {id:"cervia",name:"Marina di Cervia"},
+ {id:"ravenna",name:"Marina di Ravenna"},
+ {id:"ancona",name:"Marina di Ancona"},
+ {id:"pescara",name:"Marina di Pescara"},
+ {id:"bari",name:"Marina di Bari"},
+ {id:"brindisi",name:"Marina di Brindisi"},
+ {id:"salerno",name:"Marina di Salerno"},
+ {id:"nettuno",name:"Marina di Nettuno"},
+ {id:"scarlino",name:"Marina di Scarlino"},
+ {id:"loano",name:"Marina di Loano"},
+ {id:"portocervo",name:"Porto Cervo"},
+ {id:"lignano",name:"Marina di Lignano"}
+];
+let homeMarinaIndex=0;
+function currentHomeMarina(){
+ const id=String(state?.port||"rimini");
+ const idx=HOME_MARINAS.findIndex(x=>x.id===id);
+ if(idx>=0&&document.getElementById("mePcMarinaFrame")?.dataset.userSelected!=="1")homeMarinaIndex=idx;
+ return HOME_MARINAS[homeMarinaIndex]||HOME_MARINAS[0];
+}
+function updateHomeMarina(force=false){
+ const frame=document.getElementById("mePcMarinaFrame"), label=document.getElementById("mePcMarinaName");
+ if(!frame)return;
+ const m=currentHomeMarina();
+ const src="./marine-deluxe-originali.html?marina="+encodeURIComponent(m.id)+"&home=1";
+ if(force||!frame.src.includes("marina="+encodeURIComponent(m.id)))frame.src=src;
+ if(label)label.textContent="⚓ "+m.name;
+}
+function shiftHomeMarina(dir){
+ homeMarinaIndex=(homeMarinaIndex+dir+HOME_MARINAS.length)%HOME_MARINAS.length;
+ const frame=document.getElementById("mePcMarinaFrame");
+ if(frame)frame.dataset.userSelected="1";
+ updateHomeMarina(true);
+}
 function marinaName(){
  try{return typeof port==="function"?(port(state?.port||"rimini")?.name||"Rimini"):String(state?.port||"Rimini")}catch(_){return"Rimini"}
 }
@@ -136,18 +169,16 @@ function build(){
  if(!final){
    final=document.createElement("div");
    final.id="mePcFinalHome";
-   final.innerHTML='<button type="button" id="mePcLiveButton">⚓<br>MARINA<br>LIVE</button><div id="mePcFinalTicker"><div class="window"><div class="track" id="mePcFinalTickerTrack"></div></div></div><div id="mePcFinalPanels"><section id="mePcCommandPanel"><div id="mePcCommandTitle"><strong>🧭 PLANCIA DI COMANDO</strong><span>MARINA EMPIRE</span></div><div id="mePcCommandBody"></div></section><section id="mePcCareerPanel"></section></div><section id="meWorldLivePanel"><div id="meWorldLiveHead"><strong>⚓ MONDO VIVO · CENTRALE OPERATIVA</strong><button type="button" id="meWorldLiveClose">×</button></div><div id="meWorldLiveBody"></div></section>';
+   final.innerHTML='<button type="button" id="mePcLiveButton">⚓<br>MARINA<br>LIVE</button><div id="mePcFinalTicker"><div class="window"><div class="track" id="mePcFinalTickerTrack"></div></div></div><div id="mePcFinalPanels"><section id="mePcCommandPanel"><div id="mePcCommandTitle"><strong>⚓ MARINA ATTUALE</strong><span>MONDO VIVO</span></div><div id="mePcCommandBody"><iframe id="mePcMarinaFrame" title="Marina viva selezionata" loading="eager"></iframe></div><div id="mePcMarinaControls"><button type="button" id="mePcMarinaPrev">‹</button><div id="mePcMarinaName">Marina</div><button type="button" id="mePcMarinaNext">›</button><button type="button" id="mePcEnterMarina">ENTRA NELLA MARINA</button></div></section><section id="mePcCareerPanel"></section></div><section id="meWorldLivePanel"><div id="meWorldLiveHead"><strong>⚓ MONDO VIVO · CENTRALE OPERATIVA</strong><button type="button" id="meWorldLiveClose">×</button></div><div id="meWorldLiveBody"></div></section>';
    home.innerHTML="";
    home.appendChild(final);
  }
- document.getElementById("mePcCommandBody")?.appendChild(hero);
- hero.querySelectorAll(".me-home-vessel,.me-home-status,.hero-copy,.luxury-mini-map,.me-live-home-overlay").forEach(el=>el.remove());
- hero.querySelectorAll("div,span,strong,small").forEach(el=>{
-   const tx=(el.textContent||"").trim();
-   if(/RPG Academy|M\/Y|S\/Y|ORMEGGIATO|CARBURANTE|STATO YACHT|MONDO VIVO|VHF/i.test(tx) && !el.closest("#mePcCommandTitle")) {
-     if(el.children.length===0 || el.classList.contains("me-home-status")) el.style.display="none";
-   }
- });
+ hero.remove();
+ updateHomeMarina();
+ const prev=document.getElementById("mePcMarinaPrev"), next=document.getElementById("mePcMarinaNext"), enter=document.getElementById("mePcEnterMarina");
+ if(prev&&!prev.dataset.bound){prev.dataset.bound="1";prev.onclick=()=>shiftHomeMarina(-1);}
+ if(next&&!next.dataset.bound){next.dataset.bound="1";next.onclick=()=>shiftHomeMarina(1);}
+ if(enter&&!enter.dataset.bound){enter.dataset.bound="1";enter.onclick=()=>{const m=currentHomeMarina();location.href="./marine-deluxe-originali.html?marina="+encodeURIComponent(m.id);};}
  document.getElementById("mePcCareerPanel")?.appendChild(career);
  const track=document.getElementById("mePcFinalTickerTrack");
  if(track)track.innerHTML=tickerHtml();
