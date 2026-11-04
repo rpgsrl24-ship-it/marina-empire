@@ -78,12 +78,21 @@ style.textContent=`
 `;
 document.head.appendChild(style);
 
-let root=null,currentIndex=0,lastKey="";
+let root=null,ticker=null,currentIndex=0,lastKey="";
 function marinaName(){
  try{return typeof port==="function"?(port(state?.port||"rimini")?.name||"Marina di Rimini"):String(state?.port||"Rimini")}catch(_){return"Marina di Rimini"}
 }
 function ensure(){
- const hero=document.querySelector("#home .hero");if(!hero)return false;
+ const home=document.querySelector("#home .game-lux-home");
+ const hero=document.querySelector("#home .hero");if(!hero||!home)return false;
+ if(!ticker||!ticker.isConnected){
+   ticker=document.createElement("div");
+   ticker.className="me-pc-live-ticker";
+   ticker.id="mePcLiveTicker";
+   ticker.setAttribute("aria-label","Richieste e comunicazioni live della marina");
+   ticker.innerHTML='<div class="me-pc-live-ticker-label">⚓ MARINA LIVE</div><div class="me-pc-live-ticker-window"><div class="me-pc-live-ticker-track" id="mePcLiveTickerTrack"></div></div>';
+   home.insertBefore(ticker,hero);
+ }
  if(root&&root.isConnected)return true;
  root=document.createElement("div");root.className="me-live-home-overlay";root.innerHTML=
  '<div class="me-live-home-marina" id="meLiveHomeMarina"></div>'+
@@ -119,6 +128,17 @@ function renderTraffic(t){
  const items=(t?.items||[]).slice(0,3);
  box.innerHTML=items.map(v=>'<div><b>'+v.name+'</b><span>'+v.action+(v.berth?' · '+v.berth:'')+(v.eta>0?' · '+v.eta+' min':'')+'</span></div>').join("");
 }
+function renderTicker(t){
+ const track=document.getElementById("mePcLiveTickerTrack");if(!track)return;
+ const items=[];
+ items.push('📍 '+marinaName()+' · '+(state?.trip?'IN NAVIGAZIONE':'MONDO VIVO'));
+ items.push('📻 VHF · '+vhfText());
+ (t?.items||[]).slice(0,4).forEach(v=>items.push('🛥️ '+v.name+' · '+v.action+(v.berth?' · '+v.berth:'')+(v.eta>0?' · '+v.eta+' min':'')));
+ const cs=safeContracts();
+ if(cs[0])items.push('🎯 RICHIESTA · '+cs[0].title+(cs[0].clientVessel?.name?' · '+cs[0].clientVessel.name:'')+' · '+Math.round(cs[0].reward).toLocaleString("it-IT")+' cr');
+ const html=items.map(x=>'<span class="me-pc-live-ticker-item">'+x+'</span>').join('<span class="me-pc-live-ticker-sep">◆</span>');
+ track.innerHTML='<div class="me-pc-live-ticker-copy">'+html+'</div><div class="me-pc-live-ticker-copy" aria-hidden="true">'+html+'</div>';
+}
 function renderContract(){
  const box=document.getElementById("meLiveHomeContract");if(!box)return;
  const contracts=safeContracts();
@@ -144,7 +164,7 @@ function render(){
  if(key===lastKey)return;lastKey=key;
  document.getElementById("meLiveHomeLoc").innerHTML='<b>📍 '+marinaName()+'</b><span>'+(state.trip?'IN NAVIGAZIONE':'MONDO VIVO · '+(t?.volume||0)+' UNITÀ ATTIVE')+'</span>';
  document.getElementById("meLiveHomeVhf").innerHTML='<small>📻 VHF · IN DIRETTA</small><strong>'+vhfText()+'</strong>';
- renderBoats(t);renderTraffic(t);renderContract();
+ renderBoats(t);renderTraffic(t);renderContract();renderTicker(t);
 }
 function rotate(){
  const cs=safeContracts();if(cs.length){currentIndex=(currentIndex+1)%cs.length;renderContract()}
