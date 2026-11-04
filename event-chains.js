@@ -17,7 +17,24 @@ const CHAINS=[
 {id:"departures",label:"ONDATA PARTENZE",text:"Nuove partenze aumentano il traffico in uscita.",traffic:1.24,demand:1.08,service:1.02,vhf:"Port Control: ondata partenze charter, mantenere libero il canale di uscita."}]}];
 const st=document.createElement("style");st.id="me-event-chain-style";st.textContent=".me-event-chain{margin:8px 0;padding:9px 10px;border:1px solid rgba(214,181,117,.32);border-radius:10px;background:#0b2935}.me-event-chain-head{display:flex;justify-content:space-between;gap:8px}.me-event-chain-head strong{font-size:9px;color:#f1d397}.me-event-chain-head span{font-size:8px;color:#8faab4}.me-event-chain p{margin:5px 0;font-size:8.5px;color:#bdd0d6}.me-event-chain small{font-size:8px;color:#829da7}";document.head.appendChild(st);
 let box=null;function port(){try{return String(state?.port||"rimini").toLowerCase()}catch(_){return"rimini"}}
-function choose(){const w=window.MarinaEmpireWorldEvents?.modifiers?.(port())||{},eventId=w.event?.id,weatherId=w.weather?.id;let chain=CHAINS.find(c=>c.trigger.includes(eventId))||CHAINS.find(c=>c.trigger.includes(weatherId));if(!chain)return null;const start=Math.floor(Date.now()/chain.duration)*chain.duration,stageDur=chain.duration/chain.stages.length,idx=Math.min(chain.stages.length-1,Math.floor((Date.now()-start)/stageDur));return {...chain,start,until:start+chain.duration,stage:{...chain.stages[idx],index:idx,until:start+(idx+1)*stageDur}}}
+function store(){if(typeof state==="undefined"||!state)return null;if(!state.marinaEventChains||typeof state.marinaEventChains!=="object")state.marinaEventChains={};return state.marinaEventChains}
+function chainById(id){return CHAINS.find(c=>c.id===id)||null}
+function choose(key=port()){
+ const now=Date.now(),s=store(),saved=s?.[key];
+ if(saved&&Number(saved.until)>now){
+  const chain=chainById(saved.id);
+  if(chain){
+   const stageDur=chain.duration/chain.stages.length,idx=Math.min(chain.stages.length-1,Math.max(0,Math.floor((now-Number(saved.start))/stageDur)));
+   return {...chain,start:Number(saved.start),until:Number(saved.until),stage:{...chain.stages[idx],index:idx,until:Number(saved.start)+(idx+1)*stageDur}};
+  }
+ }
+ const w=window.MarinaEmpireWorldEvents?.modifiers?.(key)||{},eventId=w.event?.id,weatherId=w.weather?.id;
+ const chain=CHAINS.find(c=>c.trigger.includes(eventId))||CHAINS.find(c=>c.trigger.includes(weatherId));
+ if(!chain){if(saved&&s){delete s[key];try{if(typeof persist==="function")persist()}catch(_){}}return null}
+ const start=now,until=start+chain.duration;
+ if(s){s[key]={id:chain.id,start,until,trigger:eventId||weatherId||"",createdAt:now};try{if(typeof persist==="function")persist()}catch(_){}}
+ return {...chain,start,until,stage:{...chain.stages[0],index:0,until:start+chain.duration/chain.stages.length}};
+}
 function modifiers(){const c=choose();return c?{traffic:c.stage.traffic,demand:c.stage.demand,service:c.stage.service,chain:c}:{traffic:1,demand:1,service:1,chain:null}}
 function left(until){const m=Math.max(0,Math.ceil((until-Date.now())/60000));return m>=60?Math.floor(m/60)+"h "+(m%60)+"m":m+" min"}
 function ensure(){const host=document.querySelector(".me-live-marina");if(!host)return false;if(box&&box.isConnected)return true;box=document.createElement("div");box.className="me-event-chain";box.id="meEventChain";host.appendChild(box);return true}
