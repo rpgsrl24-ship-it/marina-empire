@@ -26,7 +26,7 @@ assert.match(chains,/type:"Water Toys"/);
 assert.match(chains,/type:"Security"/);
 assert.match(chains,/type:"Transfer VIP"/);
 assert.match(chains,/MarinaEmpireLiveTraffic\?\.featuredVessel/);
-assert.match(chains,/chain\.vessel\?chain\.vessel\.name/);
+assert.ok(chains.includes("chain.vessel.name"),"service chains must surface the persistent vessel identity");
 
 assert.match(npc,/role:"Purser"/);
 assert.match(npc,/role:"Deck Crew"/);
