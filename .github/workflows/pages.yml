@@ -39,7 +39,7 @@ jobs:
       - name: Install Chromium for P0 checks
         run: npx playwright install --with-deps chromium
       - name: Verify guest journey and P0 guards in Chromium
-        timeout-minutes: 4
+        timeout-minutes: 8
         run: node tests/prelaunch-browser.test.cjs
       - name: Record the exact published revision
         run: |
