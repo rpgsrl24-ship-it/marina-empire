@@ -158,15 +158,18 @@ function contractSnapshot(){
  const pressure=Math.max(.75,Math.min(1.35,Number(memory.pressure)||1));
  const serviceLoad=Math.max(.8,Math.min(1.3,Number(memory.serviceLoad)||1));
  const shift=window.MarinaEmpireShiftCycle?.modifiers?.(key)||{traffic:1,demand:1,service:1,phase:{label:"OPERATIVITÀ REGOLARE"}};
+ const chain=window.MarinaEmpireEventChains?.modifiers?.()||{traffic:1,demand:1,service:1,chain:null};
  const shiftDemand=Math.max(.75,Math.min(1.35,Number(shift.demand)||1));
  const shiftService=Math.max(.75,Math.min(1.4,Number(shift.service)||1));
+ const chainDemand=Math.max(.75,Math.min(1.35,Number(chain.demand)||1));
+ const chainService=Math.max(.75,Math.min(1.4,Number(chain.service)||1));
  const pressureExtra=pressure>=1.18?1:0;
  const shiftExtra=shift.phase?.id==="rush"?1:0;
  const contractCount=Math.min(4,2+(Math.max(1,Number(op.level)||1)>=3?1:0)+(Math.max(1,Number(op.level)||1)>=5?1:0)+pressureExtra+shiftExtra);
  const feature=featuredVessel();
  const relation=feature?.id?vesselRelation(feature,key):null;
  return order.slice(0,contractCount).map((c,i)=>{
-  const demand=Math.max(.85,Math.min(1.7,(Number(w.demand)||1)*(Number(local.demand)||1)*serviceLoad*shiftDemand*shiftService));
+  const demand=Math.max(.85,Math.min(1.8,(Number(w.demand)||1)*(Number(local.demand)||1)*serviceLoad*shiftDemand*shiftService*chainDemand*chainService));
   const trustBonus=1+(Math.max(1,Number(t.level)||1)-1)*.035;
   const stageBonus=1+(stage-1)*.08;
   const operationBonus=1+(Math.max(1,Number(op.level)||1)-1)*.03;
