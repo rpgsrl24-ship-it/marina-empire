@@ -253,9 +253,10 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.ok(arrived.fuel>=0 && arrived.condition>=0,'Arrival cannot underflow fuel or condition');
     assert.equal(await page.locator('#voyageArrivalNotice').isVisible(),true,'Arrival summary is visible');
     if (mobile && viewport.width<=740) {
-      assert.equal(await page.locator('#voyageCinema').isVisible(),false,name+': mobile command deck removes the travel console after arrival');
-      assert.equal(await page.locator('.me-command-rail.left').isVisible(),true,name+': mobile command deck stays available after arrival');
-      assert.equal(await page.locator('#meCommandBottom').isVisible(),true,name+': contextual action remains available after arrival');
+      assert.equal(await page.locator('#voyageCinema').isVisible(),false,name+': mobile layout removes the travel console after arrival');
+      assert.equal(await page.locator('.mobile-game-nav').isVisible(),true,name+': mobile bottom navigation stays available after arrival');
+      assert.equal(await page.locator('[data-mobile-tab="home"]').isVisible(),true,name+': Home remains reachable after arrival');
+      assert.equal(await page.locator('[data-mobile-tab="missions"]').isVisible(),true,name+': Missions remains reachable after arrival');
     } else {
       assert.equal(await page.locator('#voyageCinema').isVisible(),true,'The console remains after arrival');
       const arrivalIdentity=await page.evaluate(()=>({title:document.getElementById('cinemaTitle')?.textContent||'',route:document.getElementById('meBridgeRoute')?.textContent||'',yacht:boat(state.boat).name,port:port(state.port).name}));
