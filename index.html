@@ -2492,7 +2492,36 @@ window.MarinaEmpireAuthenticatedActivity={track:async function(eventType){
 }};
 function status(msg){const e=el("cloudStatus");if(e)e.textContent=msg;}
 let walletRequestVersion=0;
-async function refreshPurchasedWallet(){const version=++walletRequestVersion,userId=account?.id;const current=()=>version===walletRequestVersion&&account?.id===userId;const e=el("meWalletBalance");if(!e)return;if(!account||!client){e.textContent="Saldo crediti acquistati: accedi al tuo account per visualizzarlo.";return;}e.textContent="Saldo crediti acquistati: verifica in corso…";try{const r=await client.from("me_credit_wallets").select("balance").eq("user_id",userId).maybeSingle();if(!current())return;if(r.error)throw r.error;if(!account)return;e.textContent="Saldo crediti acquistati in attesa di trasferimento: "+Number(r.data?.balance||0).toLocaleString("it-IT")+".";}catch(_){if(!current())return;e.textContent="Saldo crediti acquistati: lettura non disponibile. Riprova più tardi.";}}
+async function refreshPurchasedWallet(){
+ const version=++walletRequestVersion,userId=account?.id;
+ const current=()=>version===walletRequestVersion&&account?.id===userId;
+ const e=el("meWalletBalance");
+ if(!e)return;
+ if(!account||!client){e.textContent="Saldo crediti acquistati: accedi al tuo account per visualizzarlo.";return;}
+ e.textContent="Saldo account: verifica in corso…";
+ try{
+  const [wallet,progress]=await Promise.all([
+   client.from("me_credit_wallets").select("balance").eq("user_id",userId).maybeSingle(),
+   client.from("player_progress").select("game_state,updated_at").eq("user_id",userId).maybeSingle()
+  ]);
+  if(!current())return;
+  if(wallet.error)throw wallet.error;
+  if(progress.error)throw progress.error;
+  const pending=Number(wallet.data?.balance||0);
+  const onlineCoins=Number(progress.data?.game_state?.coins||0);
+  const localCoins=Number(state?.coins||0);
+  if(progress.data?.game_state&&validState(progress.data.game_state)&&onlineCoins>localCoins){
+   state.coins=onlineCoins;
+   persist();
+   render();
+   tick();
+  }
+  e.textContent="Crediti nella partita online: "+onlineCoins.toLocaleString("it-IT")+(pending>0?" · In attesa di trasferimento: "+pending.toLocaleString("it-IT"):"")+".";
+ }catch(_){
+  if(!current())return;
+  e.textContent="Saldo account: lettura non disponibile. Riprova più tardi.";
+ }
+}
 
 let adminRequestVersion=0;
 async function refreshRoseAdmin(){const version=++adminRequestVersion,userId=account?.id;const current=()=>version===adminRequestVersion&&account?.id===userId;const panel=el("roseAdminPanel"),info=el("roseAdminStatus"),stats=el("roseAdminStats");if(panel)panel.classList.add("hide");if(stats)stats.replaceChildren();if(info)info.textContent="";const accessHint=el("roseAdminAccessHint");if(accessHint)accessHint.classList.remove("hide");if(!panel||!client||!account){if(panel)panel.classList.add("hide");return;}try{const membership=await client.from("me_admin_users").select("user_id").eq("user_id",account.id).maybeSingle();if(!current())return;if(membership.error||!membership.data){panel.classList.add("hide");return;}panel.classList.remove("hide");const hint=el("roseAdminAccessHint");if(hint)hint.classList.add("hide");info.textContent="Account amministratore RPG Yacht verificato.";const [profiles,progress]=await Promise.all([client.from("player_profiles").select("user_id,captain_name,created_at",{count:"exact"}).limit(20),client.from("player_progress").select("user_id,updated_at",{count:"exact"}).limit(1)]);if(!current())return;if(profiles.error||progress.error)throw new Error("Lettura dati amministrativi non disponibile");stats.textContent="Account con profilo: "+profiles.count+" · Partite salvate online: "+progress.count+".";const recentProgress=await client.from("player_progress").select("user_id,updated_at").gte("updated_at",new Date(Date.now()-30*86400000).toISOString()).order("updated_at",{ascending:false}).limit(1000);if(!current())return;const activityNote=document.createElement("p");activityNote.className="small";activityNote.setAttribute("aria-live","polite");activityNote.setAttribute("role","status");if(recentProgress.error){activityNote.textContent="Attività degli account: dato non disponibile. Verificare i permessi di lettura amministrativi senza rendere pubblici i salvataggi.";console.warn("Marina Empire: account activity stats unavailable",recentProgress.error.code||"query_failed");}else{const entries=recentProgress.data||[],now=Date.now(),within=days=>new Set(entries.filter(x=>x.user_id&&Number.isFinite(Date.parse(x.updated_at))&&now-Date.parse(x.updated_at)>=0&&now-Date.parse(x.updated_at)<days*86400000).map(x=>x.user_id)).size;activityNote.textContent="Account con salvataggi aggiornati: ultimi 7 giorni "+within(7)+" · ultimi 30 giorni "+within(30)+(entries.length===1000?" · limite 1.000 record: stima minima":"")+". Il conteggio considera l’ultimo salvataggio disponibile per account; non misura il tempo online, gli accessi senza salvataggio o la retention per coorte."; }stats.appendChild(activityNote);
