@@ -16,12 +16,10 @@ st.textContent=`
 @media(min-width:900px){
  #meHomeMarinaV2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;height:100%!important;min-height:0!important}
  #meHomeMarinaCard,#meHomeCareerCard{min-width:0!important;min-height:0!important;height:100%!important;border:1px solid rgba(201,164,98,.55)!important;border-radius:16px!important;background:#061f2d!important;overflow:hidden!important}
- #meHomeMarinaCard{display:grid!important;grid-template-rows:46px minmax(0,1fr) 50px!important}
- #meHomeMarinaHead{display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 16px!important;background:#0b3041!important;border-bottom:1px solid rgba(201,164,98,.35)!important}
- #meHomeMarinaHead strong{color:#f2d59a!important;font-size:16px!important}
- #meHomeMarinaHead span{color:#b9cbd2!important;font-size:9px!important}
- #meHomeMarinaFrame{width:100%!important;height:100%!important;border:0!important;background:#062838!important}
- #meHomeMarinaControls{display:grid!important;grid-template-columns:46px minmax(0,1fr) 46px auto!important;gap:8px!important;align-items:center!important;padding:6px 8px!important;background:#0b3041!important;border-top:1px solid rgba(201,164,98,.35)!important}
+ #meHomeMarinaCard{display:block!important;position:relative!important}
+ #meHomeMarinaHead{display:none!important}
+ #meHomeMarinaFrame{display:block!important;width:100%!important;height:100%!important;min-height:100%!important;border:0!important;background:#062838!important}
+ #meHomeMarinaControls{display:none!important}
  #meHomeMarinaControls button{height:36px!important;min-height:36px!important;padding:6px 10px!important;font-size:10px!important}
  #meHomeMarinaLabel{text-align:center!important;color:#f1d292!important;font-weight:900!important;font-size:12px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
  #meHomeCareerCard{overflow:auto!important}
