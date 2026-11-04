@@ -247,7 +247,7 @@ function start(id){
  },400);
  render();
 }
-window.MarinaEmpireLiveTraffic={snapshot:trafficSnapshot,contracts:contractSnapshot,featuredVessel,vesselRelation};
+window.MarinaEmpireLiveTraffic={snapshot:trafficSnapshot,contracts:contractSnapshot,featuredVessel,vesselRelation,startContract:start};
 
 function boot(){
  if(!ensure()){setTimeout(boot,700);return}
