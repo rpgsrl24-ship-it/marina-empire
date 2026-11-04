@@ -166,8 +166,12 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.ok(transitionAudit.length>=6,name+': primary navigation screens are present');
     for(const item of transitionAudit){
       assert.equal(item.visible,true,name+': '+item.tab+' screen is visible after navigation');
-      const budget=item.tab==='home'?1800:500;
-      assert.ok(item.elapsed<budget,name+': '+item.tab+' transition completes within '+budget+' ms');
+      const budget=500;
+      assert.ok(item.elapsed<budget,name+': '+item.tab+' screen becomes visible within '+budget+' ms');
+    }
+    if(!mobile){
+      await goTab(page,'home',false);
+      assert.ok(await page.locator('#meHomeMarinaFrame, #mePcMarinaFrame').count()>=1,name+': live marina viewport is mounted on desktop Home');
     }
     const before=await save(page);
     await page.locator('#missionList [data-mission]:enabled').first().click();
