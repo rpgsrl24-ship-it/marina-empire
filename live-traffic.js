@@ -187,7 +187,16 @@ function contractSnapshot(){
 function ensure(){
  const host=document.querySelector(".me-live-marina");
  if(!host)return false;
- if(box&&box.isConnected&&box.closest(".me-live-marina")===host)return true;
+ const existing=[...host.querySelectorAll(".me-traffic-board")];
+ if(box&&box.isConnected&&box.closest(".me-live-marina")===host){
+  existing.forEach(el=>{if(el!==box)el.remove()});
+  return true;
+ }
+ if(existing.length){
+  box=existing[0];
+  existing.slice(1).forEach(el=>el.remove());
+  return true;
+ }
  box=document.createElement("section");box.className="me-traffic-board";box.setAttribute("aria-label","Traffico e contratti marina");
  const vhf=host.querySelector(".me-live-vhf");
  if(vhf&&vhf.nextSibling)host.insertBefore(box,vhf.nextSibling);else host.appendChild(box);
