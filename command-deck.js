@@ -9,7 +9,7 @@ css.textContent=`
 .me-command-rail,.me-command-bottom,.me-command-drawer{display:none}
 @media(max-width:740px){
   body{padding-bottom:76px!important}
-  .mobile-game-nav,#meMobileMore{display:none!important}
+  html body .mobile-game-nav,html body #meMobileMore{display:none!important}
   #meGameGuide{display:none!important}
   .shell{padding-left:49px!important;padding-right:49px!important}
   .stats{margin-left:-41px!important;margin-right:-41px!important}
