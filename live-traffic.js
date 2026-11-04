@@ -4,10 +4,22 @@ if(window.__ME_LIVE_TRAFFIC__)return;
 window.__ME_LIVE_TRAFFIC__=true;
 
 const VESSELS=[
- ["M/Y Aurora","superyacht"],["S/Y Levante","vela"],["Riva 56","motor yacht"],
- ["M/Y Blue Star","yacht"],["Tender 18","tender"],["S/Y Maestrale","vela"],
- ["M/Y Riviera","superyacht"],["Pilot 07","pilotina"],["M/Y Adriatica","yacht"],
- ["S/Y Bora","vela"],["M/Y Serenissima","yacht"],["Riva 44","motor yacht"]
+ {id:"aurora",name:"M/Y Aurora",kind:"superyacht",length:62,profile:"superyacht"},
+ {id:"levante",name:"S/Y Levante",kind:"vela",length:24,profile:"regatta"},
+ {id:"riva56",name:"Riva 56",kind:"motor yacht",length:17,profile:"charter"},
+ {id:"blue-star",name:"M/Y Blue Star",kind:"yacht",length:34,profile:"charter"},
+ {id:"tender18",name:"Tender 18",kind:"tender",length:8,profile:"service"},
+ {id:"maestrale",name:"S/Y Maestrale",kind:"vela",length:21,profile:"regatta"},
+ {id:"riviera",name:"M/Y Riviera",kind:"superyacht",length:55,profile:"superyacht"},
+ {id:"pilot07",name:"Pilot 07",kind:"pilotina",length:14,profile:"port"},
+ {id:"adriatica",name:"M/Y Adriatica",kind:"yacht",length:29,profile:"charter"},
+ {id:"bora",name:"S/Y Bora",kind:"vela",length:18,profile:"regatta"},
+ {id:"serenissima",name:"M/Y Serenissima",kind:"yacht",length:41,profile:"superyacht"},
+ {id:"riva44",name:"Riva 44",kind:"motor yacht",length:13,profile:"charter"},
+ {id:"ferry-adriatico",name:"Adriatico Express",kind:"traghetto",length:96,profile:"commercial"},
+ {id:"cargo-venere",name:"M/V Venere",kind:"cargo",length:138,profile:"commercial"},
+ {id:"fishing-nettuno",name:"Nettuno 5",kind:"peschereccio",length:19,profile:"commercial"},
+ {id:"rescue01",name:"Rescue 01",kind:"SAR",length:16,profile:"rescue"}
 ];
 const CONTRACTS=[
  {id:"arrival",icon:"⚓",type:"Ormeggio",title:"Assistenza arrivo yacht",sector:"marina",cost:90,reward:330,prestige:8,reputation:5,duration:24},
@@ -15,7 +27,11 @@ const CONTRACTS=[
  {id:"tech",icon:"🔧",type:"Tecnica",title:"Intervento tecnico rapido",sector:"tecnica",cost:170,reward:610,prestige:14,reputation:8,duration:34,requiredSectorLevel:2},
  {id:"charter",icon:"🛥️",type:"Charter",title:"Preparazione charter urgente",sector:"charter",cost:210,reward:760,prestige:16,reputation:9,duration:38},
  {id:"vip",icon:"✨",type:"Servizio VIP",title:"Accoglienza ospiti premium",sector:"servizi",cost:180,reward:680,prestige:15,reputation:8,duration:32,requiredSectorLevel:2},
- {id:"broker",icon:"💼",type:"Brokerage",title:"Sea trial riservato",sector:"broker",cost:140,reward:570,prestige:13,reputation:7,duration:30,requiredSectorLevel:2}
+ {id:"broker",icon:"💼",type:"Brokerage",title:"Sea trial riservato",sector:"broker",cost:140,reward:570,prestige:13,reputation:7,duration:30,requiredSectorLevel:2},
+ {id:"provisioning",icon:"🥂",type:"Provisioning",title:"Provisioning e cambusa premium",sector:"servizi",cost:150,reward:540,prestige:11,reputation:7,duration:28},
+ {id:"toys",icon:"🏄",type:"Water Toys",title:"Preparazione water toys",sector:"servizi",cost:160,reward:590,prestige:12,reputation:7,duration:30},
+ {id:"security",icon:"🛡️",type:"Security",title:"Coordinamento security ospiti",sector:"servizi",cost:190,reward:710,prestige:15,reputation:8,duration:34,requiredSectorLevel:2},
+ {id:"transfer",icon:"🚐",type:"Transfer VIP",title:"Transfer VIP marina-aeroporto",sector:"servizi",cost:170,reward:640,prestige:13,reputation:8,duration:31}
 ];
 
 const style=document.createElement("style");
@@ -47,6 +63,15 @@ function portKey(){
  return document.querySelector(".me-current-marina-card")?.dataset?.marinaCard||"rimini";
 }
 function slot(ms=300000){return Math.floor(Date.now()/ms)}
+function chainSlot(){return Math.floor(Date.now()/21600000)}
+function featuredVessel(){
+ const key=portKey(),eligible=VESSELS.filter(v=>["superyacht","charter","regatta"].includes(v.profile));
+ const seed=hash(key+"|featured|"+chainSlot()),v=eligible[seed%eligible.length];
+ let raw={};
+ try{raw=state?.serviceChains?.[key+"|"+chainSlot()]||{}}catch(_){}
+ const step=Math.max(0,Math.floor(Number(raw.step)||0)),completed=!!raw.completed;
+ return {...v,featured:true,serviceState:completed?"IN PARTENZA":step>0?"ORMEGGIATO":"IN ARRIVO",chainStep:step,chainCompleted:completed};
+}
 function world(){
  return window.MarinaEmpireWorldEvents?.modifiers?.(portKey())||{traffic:1,demand:1,event:{title:"Attività ordinaria"},weather:{label:"CALMO",icon:"☀️"}};
 }
@@ -64,19 +89,25 @@ function trafficSnapshot(){
  const key=portKey(),w=world(),op=operation(),seed=hash(key+"|traffic|"+slot(120000)),base=Math.max(.55,Math.min(1.8,Number(w.traffic)||1));
  const operationBoost=(Math.max(1,Number(op.level)||1)-1)*.35;
  const volume=Math.max(3,Math.min(10,Math.round(3+base*2.2+operationBoost)));
- const items=[];
- for(let i=0;i<volume;i++){
+ const feature=featuredVessel(),items=[{
+  ...feature,
+  action:feature.serviceState,
+  eta:feature.chainCompleted?4:feature.chainStep>0?0:3+seed%9,
+  berth:"P"+(1+(hash(feature.id+"|"+key)%12))
+ }];
+ for(let i=0;i<volume-1;i++){
   const v=VESSELS[(seed+i*7)%VESSELS.length];
+  if(v.id===feature.id)continue;
   const mode=((seed>>>((i%4)*4))+i)%3;
   const eta=3+((seed+i*13)%22);
   items.push({
-   name:v[0],kind:v[1],
+   ...v,featured:false,
    action:mode===0?"IN ARRIVO":mode===1?"IN PARTENZA":"IN MANOVRA",
    eta,
    berth:"P"+(1+((seed+i*5)%12))
   });
  }
- return {items,volume,world:w,operation:op};
+ return {items:items.slice(0,volume),volume,world:w,operation:op,featured:feature};
 }
 function contractSnapshot(){
  const key=portKey(),w=world(),stage=careerLevel(),t=trust(),op=operation(),seed=hash(key+"|contracts|"+slot());
@@ -108,7 +139,7 @@ function formatCredits(n){return Math.max(0,Math.round(Number(n)||0)).toLocaleSt
 function render(){
  if(!ensure())return;
  const t=trafficSnapshot(),contracts=contractSnapshot(),w=t.world;
- const traffic=t.items.slice(0,4).map(x=>'<div class="me-traffic-row"><span>'+x.action+'</span><b>'+x.name+'</b><em>'+x.berth+' · '+x.eta+' min</em></div>').join("");
+ const traffic=t.items.slice(0,5).map(x=>'<div class="me-traffic-row"><span>'+x.action+'</span><b>'+(x.featured?'★ ':'')+x.name+'</b><em>'+x.kind+' · '+x.berth+(x.eta>0?' · '+x.eta+' min':'')+'</em></div>').join("");
  const contractHtml=contracts.map(c=>{
   const running=active?.id===c.dynamicId;
   const check=window.MarinaEmpireNpcEconomy?.canStart?.(c)||{ok:false,message:"Sistema incarichi non disponibile"};
@@ -141,7 +172,7 @@ function start(id){
  },400);
  render();
 }
-window.MarinaEmpireLiveTraffic={snapshot:trafficSnapshot,contracts:contractSnapshot};
+window.MarinaEmpireLiveTraffic={snapshot:trafficSnapshot,contracts:contractSnapshot,featuredVessel};
 
 function boot(){
  if(!ensure()){setTimeout(boot,700);return}
