@@ -33,4 +33,12 @@ assert.match(npc,/role:"Deck Crew"/);
 assert.match(npc,/role:"Security"/);
 assert.match(npc,/role:"Concierge"/);
 
+
+assert.match(traffic,/function vesselRelation\(vessel,key=portKey\(\)\)/);
+assert.match(traffic,/CLIENTE VIP/);
+assert.match(traffic,/useKnown=known\.length>0&&\(seed%100\)<60/);
+assert.match(chains,/state\.vesselRelations/);
+assert.match(chains,/visits:Math\.max\(0,Math\.floor\(Number\(vr\.visits\)\|\|0\)\)\+1/);
+assert.match(chains,/services:Math\.max\(0,Math\.floor\(Number\(vr\.services\)\|\|0\)\)\+chain\.steps\.length/);
+
 console.log("live world contract: ok");
