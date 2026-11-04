@@ -71,16 +71,20 @@ function buildContract(chain,p){
  const localTrust=window.MarinaEmpireMarinaBenefits?.forMarina?.(portKey())||{level:1,reputation:0};
  const trustLevel=Math.max(1,Math.min(5,Number(localTrust.level)||1));
  const localBonus=1+(trustLevel-1)*.04;
+ const relation=chain.vessel?window.MarinaEmpireLiveTraffic?.vesselRelation?.(chain.vessel,portKey()):null;
+ const relationBonus=relation?1+(Math.max(1,Number(relation.level)||1)-1)*.05:1;
  return {
   ...base,
   id:"chain-"+p.key+"-"+p.step,
   icon:chain.icon,
   reward:Math.round(base.reward*demand*(1+(career-1)*.06)*localBonus),
-  prestige:Math.round(base.prestige*(1+(career-1)*.04)),
-  reputation:Math.round(base.reputation*(1+(career-1)*.04)),
+  prestige:Math.round(base.prestige*(1+(career-1)*.04)*relationBonus),
+  reputation:Math.round(base.reputation*(1+(career-1)*.04)*relationBonus),
   localTrustLevel:trustLevel,
   localTrustReputation:Math.max(0,Math.floor(Number(localTrust.reputation)||0)),
   localBonusPct:Math.round((localBonus-1)*100),
+  relationLevel:relation?.level||1,
+  relationLabel:relation?.label||"NUOVO CLIENTE",
   requiredSectorLevel:Math.max(1,Number(base.requiredSectorLevel)||1)
  };
 }
@@ -104,7 +108,7 @@ function render(){
  }
  const c=buildContract(chain,p),check=window.MarinaEmpireNpcEconomy?.canStart?.(c)||{ok:false,message:"Sistema incarichi non disponibile"};
  const steps=chain.steps.map((s,i)=>'<span style="font-size:8px;color:'+(i<p.step?'#96d7bb':i===p.step?'#f0d296':'#78949f')+'">'+(i<p.step?'✓ ':i===p.step?'● ':'○ ')+(i+1)+'</span>').join(' · ');
- box.innerHTML='<strong style="color:#f0d296;font-size:9px">'+chain.icon+' CATENA LIVE · '+chain.title+(chain.vessel?' · '+chain.vessel.name+' '+chain.vessel.length+' m':'')+'</strong><p style="font-size:8.5px;color:#b9ccd2;margin:5px 0">'+steps+' · STEP '+(p.step+1)+'/'+chain.steps.length+'</p><p style="font-size:9px;margin:5px 0;color:#e1e9ec"><b>'+c.title+'</b> · '+Math.round(c.reward).toLocaleString("it-IT")+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+(c.localBonusPct>0?' · bonus marina +'+c.localBonusPct+'%':'')+'</p><button type="button" data-chain-start style="width:100%;padding:7px;border:1px solid rgba(214,181,117,.45);border-radius:8px;background:#17475a;color:#fff;font-size:8.5px" '+(!check.ok?'disabled':'')+'>'+(check.ok?'COMPLETA STEP':check.message)+'</button><p data-chain-status style="font-size:8px;color:#8ca8b2;margin:5px 0 0">Completando tutti gli step ottieni un bonus finale.</p>';
+ box.innerHTML='<strong style="color:#f0d296;font-size:9px">'+chain.icon+' CATENA LIVE · '+chain.title+(chain.vessel?' · '+chain.vessel.name+' '+chain.vessel.length+' m':'')+'</strong><p style="font-size:8.5px;color:#b9ccd2;margin:5px 0">'+steps+' · STEP '+(p.step+1)+'/'+chain.steps.length+'</p><p style="font-size:9px;margin:5px 0;color:#e1e9ec"><b>'+c.title+'</b> · '+Math.round(c.reward).toLocaleString("it-IT")+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+(c.localBonusPct>0?' · bonus marina +'+c.localBonusPct+'%':'')+(c.relationLevel>1?' · '+c.relationLabel:'')+'</p><button type="button" data-chain-start style="width:100%;padding:7px;border:1px solid rgba(214,181,117,.45);border-radius:8px;background:#17475a;color:#fff;font-size:8.5px" '+(!check.ok?'disabled':'')+'>'+(check.ok?'COMPLETA STEP':check.message)+'</button><p data-chain-status style="font-size:8px;color:#8ca8b2;margin:5px 0 0">Completando tutti gli step ottieni un bonus finale.</p>';
  box.querySelector("[data-chain-start]")?.addEventListener("click",()=>complete(chain,p,c));
 }
 function complete(chain,p,c){
@@ -128,6 +132,17 @@ function complete(chain,p,c){
     lastChain:chain.id,
     lastAt:Date.now()
    };
+   if(chain.vessel?.id){
+    state.vesselRelations=state.vesselRelations&&typeof state.vesselRelations==="object"?state.vesselRelations:{};
+    state.vesselRelations[marina]=state.vesselRelations[marina]&&typeof state.vesselRelations[marina]==="object"?state.vesselRelations[marina]:{};
+    const vr=state.vesselRelations[marina][chain.vessel.id]||{};
+    state.vesselRelations[marina][chain.vessel.id]={
+     visits:Math.max(0,Math.floor(Number(vr.visits)||0))+1,
+     services:Math.max(0,Math.floor(Number(vr.services)||0))+chain.steps.length,
+     lastChain:chain.id,
+     lastAt:Date.now()
+    };
+   }
   }
  }):false;
  if(!ok){if(status)status.textContent="Incarico completato, ma avanzamento catena non salvato.";return}
