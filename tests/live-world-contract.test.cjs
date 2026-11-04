@@ -53,4 +53,20 @@ assert.match(traffic,/function marinaProfile\(\)/);
 assert.match(traffic,/MarinaEmpireMarinaProfiles\?\.vesselWeight/);
 assert.match(traffic,/MarinaEmpireMarinaProfiles\?\.contractWeight/);
 
+
+const localEvents=fs.readFileSync("marina-local-events.js","utf8");
+assert.doesNotThrow(()=>new Function(localEvents),"marina-local-events.js must remain valid JavaScript");
+assert.match(localEvents,/portocervo:\[/);
+assert.match(localEvents,/Arrivi megayacht simulati/);
+assert.match(localEvents,/ravenna:\[/);
+assert.match(localEvents,/Turno cantiere/);
+assert.match(localEvents,/rimini:\[/);
+assert.match(localEvents,/Weekend water toys/);
+assert.match(localEvents,/function contractWeight\(contract,port\)/);
+assert.match(localEvents,/function vesselWeight\(vessel,port\)/);
+assert.match(traffic,/function localEvent\(\)/);
+assert.match(traffic,/MarinaEmpireLocalEvents\?\.contractWeight/);
+assert.match(traffic,/MarinaEmpireLocalEvents\?\.vesselWeight/);
+assert.match(traffic,/EVENTO LOCALE SIMULATO/);
+
 console.log("live world contract: ok");
