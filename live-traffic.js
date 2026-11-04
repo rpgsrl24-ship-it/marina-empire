@@ -79,11 +79,19 @@ function featuredVessel(){
  const seed=hash(key+"|featured|"+chainSlot());
  const known=eligible.filter(v=>vesselRelation(v,key).visits>0);
  const useKnown=known.length>0&&(seed%100)<60;
- const v=useKnown?known[seed%known.length]:eligible[seed%eligible.length];
+ const pool=useKnown?known:eligible;
+ const ranked=[...pool].sort((a,b)=>{
+  const wa=window.MarinaEmpireMarinaProfiles?.vesselWeight?.(a,key)||1,wb=window.MarinaEmpireMarinaProfiles?.vesselWeight?.(b,key)||1;
+  return (hash(b.id+"|"+seed)%1000)*wb-(hash(a.id+"|"+seed)%1000)*wa;
+ });
+ const v=ranked[0]||pool[0];
  let raw={};
  try{raw=state?.serviceChains?.[key+"|"+chainSlot()]||{}}catch(_){}
  const step=Math.max(0,Math.floor(Number(raw.step)||0)),completed=!!raw.completed,relation=vesselRelation(v,key);
  return {...v,featured:true,relation,serviceState:completed?"IN PARTENZA":step>0?"ORMEGGIATO":"IN ARRIVO",chainStep:step,chainCompleted:completed};
+}
+function marinaProfile(){
+ return window.MarinaEmpireMarinaProfiles?.profile?.(portKey())||{label:"MARINA POLIVALENTE",description:"Traffico misto e servizi generali.",trafficBias:1};
 }
 function world(){
  return window.MarinaEmpireWorldEvents?.modifiers?.(portKey())||{traffic:1,demand:1,event:{title:"Attività ordinaria"},weather:{label:"CALMO",icon:"☀️"}};
@@ -99,9 +107,10 @@ function operation(){
  return window.MarinaEmpireServiceChains?.operation?.(portKey())||{level:1,completed:0,next:2,label:"OPERATIVITÀ BASE"};
 }
 function trafficSnapshot(){
- const key=portKey(),w=world(),op=operation(),seed=hash(key+"|traffic|"+slot(120000)),base=Math.max(.55,Math.min(1.8,Number(w.traffic)||1));
+ const key=portKey(),w=world(),op=operation(),profile=marinaProfile(),seed=hash(key+"|traffic|"+slot(120000)),base=Math.max(.55,Math.min(1.8,Number(w.traffic)||1));
  const operationBoost=(Math.max(1,Number(op.level)||1)-1)*.35;
- const volume=Math.max(3,Math.min(10,Math.round(3+base*2.2+operationBoost)));
+ const profileBias=Math.max(.75,Math.min(1.3,Number(profile.trafficBias)||1));
+ const volume=Math.max(3,Math.min(10,Math.round(3+base*profileBias*2.2+operationBoost)));
  const feature=featuredVessel(),items=[{
   ...feature,
   action:feature.serviceState,
@@ -109,8 +118,13 @@ function trafficSnapshot(){
   berth:"P"+(1+(hash(feature.id+"|"+key)%12))
  }];
  for(let i=0;i<volume-1;i++){
-  const v=VESSELS[(seed+i*7)%VESSELS.length];
-  if(v.id===feature.id)continue;
+  const candidates=VESSELS.filter(v=>v.id!==feature.id);
+  candidates.sort((a,b)=>{
+   const wa=window.MarinaEmpireMarinaProfiles?.vesselWeight?.(a,key)||1,wb=window.MarinaEmpireMarinaProfiles?.vesselWeight?.(b,key)||1;
+   return (hash(b.id+"|"+seed+"|"+i)%1000)*wb-(hash(a.id+"|"+seed+"|"+i)%1000)*wa;
+  });
+  const v=candidates[i%candidates.length];
+  if(!v)continue;
   const mode=((seed>>>((i%4)*4))+i)%3;
   const eta=3+((seed+i*13)%22);
   items.push({
@@ -120,11 +134,14 @@ function trafficSnapshot(){
    berth:"P"+(1+((seed+i*5)%12))
   });
  }
- return {items:items.slice(0,volume),volume,world:w,operation:op,featured:feature};
+ return {items:items.slice(0,volume),volume,world:w,operation:op,featured:feature,profile};
 }
 function contractSnapshot(){
  const key=portKey(),w=world(),stage=careerLevel(),t=trust(),op=operation(),seed=hash(key+"|contracts|"+slot());
- const order=[...CONTRACTS].sort((a,b)=>(hash(a.id+"|"+seed)%1000)-(hash(b.id+"|"+seed)%1000));
+ const order=[...CONTRACTS].sort((a,b)=>{
+  const wa=window.MarinaEmpireMarinaProfiles?.contractWeight?.(a,key)||1,wb=window.MarinaEmpireMarinaProfiles?.contractWeight?.(b,key)||1;
+  return (hash(b.id+"|"+seed)%1000)*wb-(hash(a.id+"|"+seed)%1000)*wa;
+ });
  const contractCount=Math.min(4,2+(Math.max(1,Number(op.level)||1)>=3?1:0)+(Math.max(1,Number(op.level)||1)>=5?1:0));
  return order.slice(0,contractCount).map((c,i)=>{
   const demand=Math.max(.85,Math.min(1.45,Number(w.demand)||1));
@@ -159,7 +176,7 @@ function render(){
   const disabled=!!active||!check.ok;
   return '<article class="me-contract"><strong>'+c.icon+' '+c.title+'</strong><p>'+c.worldEvent+' · '+formatCredits(c.reward)+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+'</p><button type="button" data-dyn-contract="'+c.dynamicId+'" '+(disabled?'disabled':'')+'>'+(running?'IN CORSO':check.ok?'ACCETTA CONTRATTO':check.message)+'</button><div class="me-contract-progress"><span data-progress="'+c.dynamicId+'"></span></div><div class="me-contract-status">'+(running?'Operazione in corso':('Disponibile ora · '+c.duration+'s'))+'</div></article>';
  }).join("");
- box.innerHTML='<div class="me-traffic-head"><strong>⚓ TRAFFICO 24/7 · '+t.volume+' UNITÀ ATTIVE</strong><span>'+((w.weather?.icon||"🌤️")+" "+(w.weather?.label||""))+'</span></div><div style="font-size:8px;color:#8fb0bb;margin:-2px 0 7px">Operatività marina Lv.'+t.operation.level+' · '+t.operation.label+(t.operation.next>0?' · '+t.operation.next+' catene al prossimo livello':' · livello massimo')+'</div><div class="me-traffic-grid"><div class="me-traffic-list">'+traffic+'</div><div class="me-contract-list">'+contractHtml+'</div></div>';
+ box.innerHTML='<div class="me-traffic-head"><strong>⚓ TRAFFICO 24/7 · '+t.volume+' UNITÀ ATTIVE</strong><span>'+((w.weather?.icon||"🌤️")+" "+(w.weather?.label||""))+'</span></div><div style="font-size:8px;color:#d6b575;margin:-2px 0 3px">Profilo marina · '+t.profile.label+'</div><div style="font-size:8px;color:#8fb0bb;margin:0 0 7px">'+t.profile.description+' · Operatività Lv.'+t.operation.level+' · '+t.operation.label+(t.operation.next>0?' · '+t.operation.next+' catene al prossimo livello':' · livello massimo')+'</div><div class="me-traffic-grid"><div class="me-traffic-list">'+traffic+'</div><div class="me-contract-list">'+contractHtml+'</div></div>';
  box.querySelectorAll("[data-dyn-contract]").forEach(btn=>btn.addEventListener("click",()=>start(btn.dataset.dynContract)));
 }
 function start(id){
