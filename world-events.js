@@ -68,7 +68,13 @@ function host(){
 }
 function render(){
  const h=host();if(!h)return false;
- if(!box||!box.isConnected){box=document.createElement("div");box.className="me-world-event";h.prepend(box)}
+ const existing=[...h.querySelectorAll(":scope > .me-world-event")];
+ if(!box||!box.isConnected||box.parentNode!==h){
+  box=existing[0]||document.createElement("div");
+  box.className="me-world-event";
+  if(!box.isConnected)h.prepend(box);
+ }
+ existing.forEach(el=>{if(el!==box)el.remove()});
  const e=current();
  const phase=dayPhase(),weather=weatherFor(currentPort());box.innerHTML='<div class="me-world-event-icon">'+e.icon+'</div><div><strong>EVENTO MONDO · '+e.title+'</strong><p>'+e.text+'</p><p>'+weather.icon+' '+weather.label+' · '+weather.sea+'</p><small>'+phase.icon+' '+phase.label+' · aggiornamento tra '+timeLeft(e.until)+'</small></div>';
  window.dispatchEvent(new CustomEvent("marina-world-event",{detail:e}));
