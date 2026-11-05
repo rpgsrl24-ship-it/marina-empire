@@ -1,6 +1,7 @@
 (()=>{
 "use strict";
 if(window.__ME_MOBILE_GAME_LOOP_V1__)return;
+function meViewportWidth(){return typeof globalThis!=="undefined"&&Number.isFinite(Number(globalThis.innerWidth))?Number(globalThis.innerWidth):1024}
 window.__ME_MOBILE_GAME_LOOP_V1__=true;
 
 const style=document.createElement("style");
@@ -208,7 +209,7 @@ function clearSheetClasses(){
   document.querySelectorAll(".screen.me-mobile-home-sheet").forEach(el=>el.classList.remove("me-mobile-home-sheet"));
 }
 function closePanel(){
-  if(innerWidth>740)return;
+  if(meViewportWidth()>740)return;
   clearSheetClasses();
   currentPanel=null;
   document.body.classList.remove("me-mobile-home-sheet-open");
@@ -222,7 +223,7 @@ function normalizedPanel(id){
   return id;
 }
 function openPanel(id,opts){
-  if(innerWidth>740){if(typeof showTab==="function")showTab(id);return}
+  if(meViewportWidth()>740){if(typeof showTab==="function")showTab(id);return}
   id=normalizedPanel(id);
   if(id==="home"){closePanel();return}
   const target=document.getElementById(id);
@@ -260,7 +261,7 @@ function runPrimary(){
   openPanel(action.target);
 }
 function ensureHome(){
-  if(innerWidth>740)return;
+  if(meViewportWidth()>740)return;
   const home=document.querySelector("#home .me-mobile-home-dashboard");
   if(!home)return;
 
@@ -321,7 +322,7 @@ function ensureHome(){
   }
 }
 function sync(){
-  if(innerWidth>740)return;
+  if(meViewportWidth()>740)return;
   ensureHome();
   const s=gameState();
   const action=nextAction();
@@ -347,7 +348,7 @@ function sync(){
   serviceButtons.forEach(b=>b.disabled=!!s?.trip);
 }
 function reassertSheet(){
-  if(innerWidth>740||!currentPanel)return;
+  if(meViewportWidth()>740||!currentPanel)return;
   const target=document.getElementById(currentPanel),home=document.getElementById("home");
   if(!target||!home)return;
   home.classList.remove("hide");
@@ -356,7 +357,7 @@ function reassertSheet(){
   document.body.classList.add("me-mobile-home-sheet-open");
 }
 document.addEventListener("click",e=>{
-  if(innerWidth>740)return;
+  if(meViewportWidth()>740)return;
 
   const mobileTab=e.target.closest("[data-mobile-tab]");
   if(mobileTab){
@@ -410,7 +411,7 @@ window.addEventListener("marina-empire-updated",()=>{
   setTimeout(()=>{sync();reassertSheet()},30);
 });
 window.addEventListener("resize",()=>{
-  if(innerWidth>740&&currentPanel){
+  if(meViewportWidth()>740&&currentPanel){
     clearSheetClasses();currentPanel=null;document.body.classList.remove("me-mobile-home-sheet-open");
   }else sync();
 });
