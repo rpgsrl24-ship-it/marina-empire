@@ -185,7 +185,7 @@ function nextAction(){
       return {stage:4,label:"TOUR GRATUITO COMPLETATO",title:"Salva il tuo impero",desc:"Hai provato missioni e Marina Live. Registrati gratis per conservare i progressi e continuare la carriera.",action:"REGISTRATI",target:"profile"};
     }
     if(voyages>=1&&guestJobs<1){
-      return {stage:3,label:"PROVA ESTESA · MARINA LIVE",title:"Completa un incarico gratuito",desc:"Apri Marina Live e accetta 1 opportunità dal porto per provare le attività operative.",action:"MARINA LIVE",target:"marinas"};
+      return {stage:3,label:"PROVA ESTESA · MARINA LIVE",title:"Completa un incarico gratuito",desc:"Apri Marina Live e accetta 1 opportunità dal porto per provare le attività operative.",action:"MARINA LIVE",target:"marinaLive"};
     }
     if(voyages>=1&&guestJobs>=1){
       return {stage:1,label:"PROVA ESTESA · SECONDA MISSIONE",title:"Completa la seconda missione",desc:"Scegli una nuova tratta e prova ancora navigazione, consumi e ricompense.",action:"MISSIONI",target:"missions"};
@@ -254,6 +254,10 @@ function openPanel(id,opts){
     target.classList.add("me-mobile-expanded");
     setTimeout(()=>document.getElementById("marinaCommunity")?.scrollIntoView({behavior:"smooth",block:"start"}),120);
   }
+  if(id==="office"&&opts?.marinaLive){
+    target.classList.add("me-mobile-expanded");
+    setTimeout(()=>document.getElementById("meMarinaLivePanel")?.scrollIntoView({behavior:"smooth",block:"start"}),120);
+  }
   if(id==="map")setTimeout(()=>{try{if(typeof voyageLeafletMap!=="undefined"&&voyageLeafletMap)voyageLeafletMap.invalidateSize()}catch(_){}},180);
 }
 function runService(which){
@@ -264,6 +268,7 @@ function runService(which){
 }
 function runPrimary(){
   const action=nextAction();
+  if(action.target==="marinaLive"){openPanel("office",{marinaLive:true});return}
   if(action.target==="services"){
     document.getElementById("meMobileHomeServices")?.scrollIntoView({behavior:"smooth",block:"center"});
     return;
