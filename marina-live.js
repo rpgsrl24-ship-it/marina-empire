@@ -294,7 +294,7 @@
     const completedAt=Date.now();
     const ok=meAtomicPersist(()=>{
       state.vhfJobs=Array.isArray(state.vhfJobs)?state.vhfJobs:[];
-      state.vhfJobs.push({id:active.id,marina:active.marina,at:completedAt,reward:active.reward,prestige:active.prestige,duration:active.duration});
+      state.vhfJobs.push({id:active.id,marina:active.marina,at:completedAt,reward:active.reward,prestige:active.prestige,duration:active.duration});if(!window.meRegisteredPlayer)state.guestTrialVhfUsed=(Number(state.guestTrialVhfUsed)||0)+1;
       state.vhfJobs=state.vhfJobs.slice(-40);
       state.coins=(Number(state.coins)||0)+(Number(active.reward)||0);
       state.prestige=(Number(state.prestige)||0)+(Number(active.prestige)||0);
@@ -317,7 +317,7 @@
   function runVhfJob(){
     if(typeof state==="undefined")return;
     if(state.trip){if(typeof notice==="function")notice("Completa prima la navigazione in corso.");return}
-    if(!window.meRegisteredPlayer){if(typeof notice==="function")notice("Registrati per accettare incarichi VHF.");return}
+    if(!window.meRegisteredPlayer){const used=Math.max(0,Math.floor(Number(state.guestTrialVhfUsed)||0));if((Number(state.voyages)||0)<1){if(typeof notice==="function")notice("Completa prima la missione iniziale per sbloccare l’incarico VHF gratuito.");return}if(used>=1){if(typeof notice==="function")notice("Hai già completato l’incarico VHF gratuito. Prova la seconda missione e poi registrati per continuare.");return}}
     const nowTs=Date.now();
     const active=state.vhfActiveJob&&typeof state.vhfActiveJob==="object"?state.vhfActiveJob:null;
     if(active){
