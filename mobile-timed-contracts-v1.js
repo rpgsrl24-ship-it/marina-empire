@@ -169,7 +169,11 @@ function fmtTime(ms){
 }
 function renderCard(){
  if((typeof innerWidth!=="undefined"&&innerWidth>740)||typeof state==="undefined"||!state?.name)return;
- const box=ensure(),c=current();if(!box||!c)return;
+ const box=ensure();if(!box)return;
+ const tutorialDone=!!window.meRegisteredPlayer||(Number(state.voyages)||0)>=2;
+ box.style.display=tutorialDone?"":"none";
+ if(!tutorialDone)return;
+ const c=current();if(!c)return;
  const p=progress(c),done=p>=c.target,expired=Date.now()>Number(c.expiresAt||0),remain=Number(c.expiresAt||0)-Date.now();
  const st=streak(),pct=Math.max(0,Math.min(100,Math.round(p/c.target*100)));
  const bonusPreview=st.count>=2?Math.round(c.reward*(0.15*Math.min(4,st.count-1))):0;
