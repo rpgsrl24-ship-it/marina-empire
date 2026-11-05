@@ -168,7 +168,7 @@ function fmtTime(ms){
  return String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");
 }
 function renderCard(){
- if(innerWidth>740||typeof state==="undefined"||!state?.name)return;
+ if((typeof innerWidth!=="undefined"&&innerWidth>740)||typeof state==="undefined"||!state?.name)return;
  const box=ensure(),c=current();if(!box||!c)return;
  const p=progress(c),done=p>=c.target,expired=Date.now()>Number(c.expiresAt||0),remain=Number(c.expiresAt||0)-Date.now();
  const st=streak(),pct=Math.max(0,Math.min(100,Math.round(p/c.target*100)));
