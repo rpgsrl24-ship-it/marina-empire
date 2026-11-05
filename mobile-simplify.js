@@ -57,10 +57,14 @@ style.textContent=`
   #marinas.me-show-business .marina-business-heading+p,
   #marinas.me-show-business #businessList{display:block!important}
 
-  /* DIREZIONE: lascia davanti solo operatività, il resto più compatto */
+  /* DIREZIONE: mobile = configurazione e operatività, economia avanzata dietro le quinte */
   #office>.panel>h2,
   #office>.panel>p:first-of-type{display:none!important}
   #office #meCreditsPreview{display:none!important}
+  #office .berth-grid{display:none!important}
+  #office .booking-note{display:none!important}
+  #office .marina-extra{padding-top:7px!important;margin-top:7px!important}
+  #office button:disabled{display:none!important}
   #office #marinaCommunity{margin-top:10px!important}
 
   /* MARKETPLACE: header compatto */
@@ -115,11 +119,27 @@ style.textContent=`
 `;
 document.head.appendChild(style);
 
+function compactNpcCards(){
+ if(typeof innerWidth!=="undefined"&&innerWidth>740)return;
+ const cards=[...document.querySelectorAll(".me-npc-box")];
+ const seen=new Set();
+ let kept=0;
+ for(const card of cards){
+   const key=String(card.innerText||"").replace(/\d+[\s.,:]*/g,"").replace(/\s+/g," ").trim().slice(0,180);
+   const duplicate=key&&seen.has(key);
+   if(key)seen.add(key);
+   const hide=duplicate||kept>=5;
+   card.style.display=hide?"none":"";
+   if(!hide)kept++;
+ }
+}
+
 function sync(){
  if(typeof state==="undefined")return;
  document.getElementById("map")?.classList.toggle("me-trip-active",!!state.trip);
  document.getElementById("missions")?.classList.toggle("me-has-voyages",(Number(state.voyages)||0)>0);
  document.getElementById("profile")?.classList.toggle("me-account-ready",!!window.meRegisteredPlayer);
+ compactNpcCards();
  const marinas=document.getElementById("marinas");
  if(marinas){
    const guide=window.__ME_MOBILE_SHOW_BUSINESS__;
@@ -132,7 +152,7 @@ window.meShowMarinaBusinesses=function(){
  if(typeof showTab==="function")showTab("marinas");
  setTimeout(()=>document.querySelector(".marina-business-heading")?.scrollIntoView({behavior:"smooth",block:"start"}),120);
 };
-window.addEventListener("marina-empire-updated",sync);
+window.addEventListener("marina-empire-updated",()=>setTimeout(sync,40));
 document.addEventListener("visibilitychange",sync);
 setInterval(sync,30000);
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",sync,{once:true});else sync();
