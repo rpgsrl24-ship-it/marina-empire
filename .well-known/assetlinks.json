@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.rpgyacht.marinaempire",
+      "sha256_cert_fingerprints": [
+        "7E:23:31:B5:D2:F9:6D:60:E6:0A:5C:71:9A:BE:F0:39:9B:30:56:45:46:7C:B4:F7:2A:BD:5E:B6:67:4C:B8:6E"
+      ]
+    }
+  }
+]
