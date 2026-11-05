@@ -1,6 +1,7 @@
 (()=>{
 "use strict";
 if(window.__ME_MOBILE_HOME_CLEAN_V4__)return;
+function meViewportWidth(){return typeof globalThis!=="undefined"&&Number.isFinite(Number(globalThis.innerWidth))?Number(globalThis.innerWidth):1024}
 window.__ME_MOBILE_HOME_CLEAN_V4__=true;
 
 const st=document.createElement("style");
@@ -100,7 +101,7 @@ function liveSummary(){
   }catch(_){return portName()+" · MONDO VIVO"}
 }
 function ensure(){
-  if(innerWidth>740)return;
+  if(meViewportWidth()>740)return;
   const hud=document.getElementById("meCompactHud");
   const home=document.getElementById("home");
   if(!home)return;
@@ -122,7 +123,7 @@ function sync(){
   ensure();
   const card=document.getElementById("meMobileMarinaLiveCard");
   const home=document.getElementById("home");
-  if(card)card.style.display=(innerWidth<=740&&home&&!home.classList.contains("hide"))?"grid":"none";
+  if(card)card.style.display=(meViewportWidth()<=740&&home&&!home.classList.contains("hide"))?"grid":"none";
   const text=document.getElementById("meMobileMarinaLiveText");
   if(text)text.textContent=liveSummary();
 }
