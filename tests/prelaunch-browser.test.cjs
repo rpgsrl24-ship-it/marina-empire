@@ -284,16 +284,35 @@ async function trial(browser,origin,name,viewport,mobile) {
       assert.equal(Object.hasOwn(entry.body,'visitor_id'),false,name+': analytics must not send persistent visitor_id');
       assert.equal(entry.body.source,'direct',name+': local QA traffic defaults to direct source');
     }
+    await goTab(page,'marinas',mobile);
+    const guestJob=page.locator('[data-live-job]:enabled').first();
+    await guestJob.waitFor({state:'visible'});
+    await guestJob.click();
+    await page.waitForFunction(key=>(JSON.parse(localStorage.getItem(key))?.guestTrialJobsUsed||0)===1,saveKey);
+    const afterGuestJob=await save(page);
+    assert.equal(afterGuestJob.guestTrialJobsUsed,1,'Guest can complete exactly one Marina Live trial job after the first mission');
+
     await goTab(page,'missions',mobile);
-    assert.ok((await page.locator('#missionList').innerText()).includes('REGISTRATI GRATIS E CONTINUA'),'Guest receives the signup invitation after trial');
-    assert.equal(await page.locator('#missionList [data-mission]:enabled').count(),0,'Guest cannot start a second mission');
+    assert.equal((await page.locator('#missionList').innerText()).includes('REGISTRATI GRATIS E CONTINUA'),false,'Guest is not forced to signup after the first mission');
+    assert.ok(await page.locator('#missionList [data-mission]:enabled').count()>0,'Guest can start a second mission');
+    await page.locator('#missionList [data-mission]:enabled').first().click();
+    await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key))?.trip,saveKey);
+    const secondLaunch=await save(page);
+    await page.clock.setFixedTime(new Date(secondLaunch.trip.until+1000));
+    await page.waitForFunction(key=>(JSON.parse(localStorage.getItem(key))?.voyages||0)===2,saveKey);
+    const secondArrival=await save(page);
+    assert.equal(secondArrival.voyages,2,'The extended guest tour counts the second mission once');
+
+    await goTab(page,'missions',mobile);
+    assert.ok((await page.locator('#missionList').innerText()).includes('REGISTRATI GRATIS E CONTINUA'),'Guest receives the signup invitation after the extended tour');
+    assert.equal(await page.locator('#missionList [data-mission]:enabled').count(),0,'Guest cannot start a third mission before registration');
     await goTab(page,'profile',mobile);
     await page.locator('#cloudEmail').waitFor({state:'visible'});
-    assert.ok((await page.locator('#profileText').innerText()).includes('1 viaggi'),'Profile reports the completed trial');
+    assert.ok((await page.locator('#profileText').innerText()).includes('2 viaggi'),'Profile reports the two completed guest missions');
     assert.deepEqual(errors,[],`${name}: runtime errors`);
     assert.deepEqual(missing,[],`${name}: missing local assets`);
     await page.screenshot({path:path.join(output,`${name}-account.png`),fullPage:false,animations:'disabled'});
-    console.log(`PASS ${name}: guest/setup/mission/refresh/arrival/no duplicate rewards/signup/payments/headquarters/GPS`);
+    console.log(`PASS ${name}: guest/setup/2 missions/Marina Live trial/refresh/arrival/no duplicate rewards/signup/payments/headquarters/GPS`);
   } catch(e) {
     await page.screenshot({path:path.join(output,`${name}-failure.png`),fullPage:false,animations:'disabled'}).catch(()=>{});
     console.error(JSON.stringify({scenario:name,runtimeErrors:errors,missingLocalAssets:missing}));
