@@ -1345,15 +1345,15 @@ padding:5px!important;gap:4px!important;
 
   /* Compact running VHF: status bar, not a large card */
   #marinas:not(.me-mobile-expanded) .me-live-vhf.me-vhf-running{
-    position:sticky!important;
-    top:56px!important;
-    z-index:25!important;
-    margin:6px 9px!important;
-    padding:7px 9px!important;
-    display:grid!important;
-    grid-template-columns:minmax(0,1fr) auto!important;
-    gap:6px!important;
-    align-items:center!important;
+    position:static!important;
+    top:auto!important;
+    z-index:2!important;
+    margin:6px 9px 8px!important;
+    padding:8px 9px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    gap:7px!important;
+    align-items:stretch!important;
     background:#082d3e!important;
     box-shadow:0 7px 18px rgba(0,0,0,.28)!important
   }
@@ -1367,12 +1367,14 @@ padding:5px!important;gap:4px!important;
     margin:0!important
   }
   #marinas:not(.me-mobile-expanded) .me-live-vhf.me-vhf-running .me-live-vhf-action{
-    width:auto!important;
-    min-width:94px!important;
-    min-height:34px!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:44px!important;
     margin:0!important;
-    padding:6px 8px!important;
-    white-space:nowrap!important
+    padding:8px 10px!important;
+    white-space:normal!important;
+    position:relative!important;
+    z-index:3!important
   }
 
   /* Running NPC opportunity also collapses */
