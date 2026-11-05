@@ -4,7 +4,7 @@ if(window.__ME_SPEC_CONTRACTS__)return;
 window.__ME_SPEC_CONTRACTS__=true;
 
 const style=document.createElement("style");
-style.textContent=".me-spec-contract{margin:10px 0;padding:11px 12px;border:1px solid rgba(214,181,117,.42);border-radius:12px;background:linear-gradient(135deg,#0d3040,#172a36)}.me-spec-contract strong{color:#f2d293}.me-spec-contract p{margin:4px 0;font-size:10px}.me-spec-contract-meta{display:flex;gap:7px;flex-wrap:wrap;font-size:9px;color:#a8bec7}.me-spec-contract button{margin-top:8px;padding:8px 10px;border-radius:9px;border:1px solid rgba(214,181,117,.5);background:#1e4656;color:#fff}.me-spec-contract-progress{height:5px;background:#173543;border-radius:99px;overflow:hidden;margin-top:8px}.me-spec-contract-progress span{display:block;height:100%;width:0;background:#d6b575}";
+style.textContent=".me-spec-contract{margin:10px 0;padding:11px 12px;border:1px solid rgba(214,181,117,.42);border-radius:12px;background:linear-gradient(135deg,#0d3040,#172a36);position:relative;z-index:2;pointer-events:auto}.me-spec-contract strong{color:#f2d293}.me-spec-contract p{margin:4px 0;font-size:10px}.me-spec-contract-meta{display:flex;gap:7px;flex-wrap:wrap;font-size:9px;color:#a8bec7}.me-spec-contract button{margin-top:8px;padding:8px 10px;border-radius:9px;border:1px solid rgba(214,181,117,.5);background:#1e4656;color:#fff;pointer-events:auto;position:relative;z-index:3}.me-spec-contract-progress{height:5px;background:#173543;border-radius:99px;overflow:hidden;margin-top:8px}.me-spec-contract-progress span{display:block;height:100%;width:0;background:#d6b575}@media(max-width:740px){.me-spec-contract{margin:8px 9px!important;padding:10px!important;clear:both}.me-spec-contract button{display:block;width:100%;min-height:44px;margin-top:8px!important;white-space:normal}}";
 document.head.appendChild(style);
 
 let box=null,job=null,tick=null;
@@ -14,11 +14,18 @@ function ensure(){const h=host();if(!h)return false;if(box&&box.isConnected)retu
 function render(){
  if(!ensure())return;
  const c=contract();
- if(!c){box.innerHTML="<strong>🎯 CONTRATTO SPECIALIZZAZIONE</strong><p>Scegli una specializzazione di carriera per ricevere incarichi esclusivi.</p>";return;}
+ if(!c){box.innerHTML="<strong>🎯 CONTRATTO SPECIALIZZAZIONE</strong><p>Scegli una specializzazione di carriera per ricevere incarichi esclusivi. Serve almeno reputazione 40 (Livello 2) in un settore.</p><button type=\"button\" class=\"me-spec-open-career\">SCEGLI / SBLOCCA SPECIALIZZAZIONE</button>";box.querySelector(".me-spec-open-career")?.addEventListener("click",openCareer);return;}
  const rarity=c.rank?.label||"Junior";
  const availability=c.available!==false;
  box.innerHTML='<strong>'+c.icon+' CONTRATTO ESCLUSIVO · '+c.label+'</strong><p>'+c.title+'</p><div class="me-spec-contract-meta"><span>CATENA · STEP '+c.stage+'/3</span><span>RARITÀ · '+rarity.toUpperCase()+'</span><span>'+c.type+'</span><span>⏱ '+c.duration+'s</span><span>Costo '+c.cost+'</span><span>Ricompensa '+c.reward+'</span><span>Prestigio +'+c.prestige+'</span><span>Rep. '+c.sector+' +'+c.reputation+'</span></div>'+(availability?'<button type="button" '+(job?'disabled':'')+'>'+(c.stage===3?'CHIUDI CONTRATTO FINALE':'ACCETTA STEP '+c.stage)+'</button>':'<p style="color:#f0c58e"><b>Nessun contratto '+rarity+' disponibile in questa finestra.</b> Controlla più tardi o cambia marina.</p>')+'<div class="me-spec-contract-progress"><span></span></div><p class="me-spec-contract-status">'+(job?'In corso':(c.stage===3?'Finale della catena disponibile':'Catena in corso · prossimo step '+c.stage))+'</p>';
  box.querySelector("button")?.addEventListener("click",accept);
+}
+function openCareer(){
+ try{
+  if(window.MarinaEmpireMobileHome?.open)window.MarinaEmpireMobileHome.open("office");
+  else if(typeof showTab==="function")showTab("office");
+  setTimeout(()=>{const t=document.querySelector("[data-career-spec]")?.closest(".item")||document.getElementById("careerSpecStatus");t?.scrollIntoView({behavior:"smooth",block:"center"});},180);
+ }catch(_){if(typeof showTab==="function")showTab("office")}
 }
 function accept(){
  if(job)return;
