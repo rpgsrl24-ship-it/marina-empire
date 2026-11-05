@@ -149,7 +149,7 @@ function claim(){
  }
 }
 function ensure(){
- if(innerWidth>740)return null;
+ if(typeof innerWidth!=="undefined"&&innerWidth>740)return null;
  const home=document.querySelector("#home .me-mobile-home-dashboard");if(!home)return null;
  let box=document.getElementById("meMobileFlashContract");if(box)return box;
  box=document.createElement("section");box.id="meMobileFlashContract";
