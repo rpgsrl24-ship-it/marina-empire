@@ -180,7 +180,7 @@
     const preview=host.querySelector(".me-live-vhf-preview");
     if(preview&&typeof state!=="undefined"){
       const job=vhfJob();
-      preview.textContent=(job.rare?(job.badge+" · "):"")+job.label+" · "+job.reward.toLocaleString("it-IT")+" cr · "+job.prestige+" prest.";
+      preview.textContent=((job.rare||job.badge)?(job.badge+" · "):"")+job.label+" · "+job.reward.toLocaleString("it-IT")+" cr · "+job.prestige+" prest.";
       preview.classList.toggle("rare",!!job.rare);
     }
     const action=host.querySelector(".me-live-vhf-action");
@@ -274,23 +274,29 @@
     const intensity=marinaIntensity();
     const key=marinaKey();
     const options=[
-      {id:"berth",label:"Assistenza ormeggio",reward:180+intensity.arrivals*35,prestige:2,duration:28},
-      {id:"fuel",label:"Supporto rifornimento",reward:160+intensity.departures*30,prestige:2,duration:24},
-      {id:"tech",label:"Assistenza tecnica rapida",reward:220+(intensity.label==="INTENSA"?90:30),prestige:3,duration:38},
-      {id:"traffic",label:"Supporto Port Control",reward:200+intensity.arrivals*25,prestige:3,duration:32},
-      {id:"guest",label:"Accoglienza equipaggio ospiti",reward:210+intensity.arrivals*20,prestige:3,duration:30},
-      {id:"water",label:"Preparazione water toys",reward:240+intensity.departures*20,prestige:4,duration:34},
-      {id:"provision",label:"Consegna cambusa urgente",reward:260+(intensity.label==="INTENSA"?80:20),prestige:4,duration:36},
-      {id:"tender",label:"Coordinamento tender e transfer",reward:230+intensity.arrivals*25,prestige:3,duration:31}
+      {id:"berth",label:"Assistenza ormeggio",reward:180+intensity.arrivals*35,prestige:2,duration:28,sector:"marina"},
+      {id:"fuel",label:"Supporto rifornimento",reward:160+intensity.departures*30,prestige:2,duration:24,sector:"marina"},
+      {id:"tech",label:"Assistenza tecnica rapida",reward:220+(intensity.label==="INTENSA"?90:30),prestige:3,duration:38,sector:"tecnica"},
+      {id:"traffic",label:"Supporto Port Control",reward:200+intensity.arrivals*25,prestige:3,duration:32,sector:"marina"},
+      {id:"guest",label:"Accoglienza equipaggio ospiti",reward:210+intensity.arrivals*20,prestige:3,duration:30,sector:"servizi"},
+      {id:"water",label:"Preparazione water toys",reward:240+intensity.departures*20,prestige:4,duration:34,sector:"servizi"},
+      {id:"provision",label:"Consegna cambusa urgente",reward:260+(intensity.label==="INTENSA"?80:20),prestige:4,duration:36,sector:"servizi"},
+      {id:"tender",label:"Coordinamento tender e transfer",reward:230+intensity.arrivals*25,prestige:3,duration:31,sector:"charter"}
     ];
     const marinaSeed=[...key].reduce((sum,ch)=>sum+ch.charCodeAt(0),0);
     const idx=(Math.floor(Date.now()/30000)+marinaSeed)%options.length;
     const lv=vhfLevel();
     const special=rareVhfJob(lv.level,intensity,key);
     const trust=marinaTrust(key);
+    const world=window.MarinaEmpireWorldEvents?.current?.()||null;
+    const chain=window.MarinaEmpireEventChains?.current?.()||null;
     if(special)return {...special,reward:Math.round(special.reward*(1+lv.bonus)*(1+trust.bonus)),careerLevel:lv.level,marinaLevel:trust.level};
     const base=options[idx];
-    return {...base,marina:key,reward:Math.round(base.reward*(1+lv.bonus)*(1+trust.bonus)),careerLevel:lv.level,marinaLevel:trust.level,rare:false};
+    const eventMatch=Array.isArray(world?.sectors)&&world.sectors.includes(base.sector);
+    const chainBoost=chain?.stage?.demand>1.15?1.08:1;
+    const eventBoost=eventMatch?1.18:1;
+    const badge=eventMatch?(world?.icon||"⚡")+" EVENTO MONDO":chainBoost>1?"⚡ FASE OPERATIVA":"";
+    return {...base,marina:key,reward:Math.round(base.reward*(1+lv.bonus)*(1+trust.bonus)*eventBoost*chainBoost),prestige:Math.max(base.prestige,base.prestige+(eventMatch?1:0)),careerLevel:lv.level,marinaLevel:trust.level,rare:false,badge,eventLinked:!!eventMatch};
   }
   function completeVhfJob(){
     if(typeof state==="undefined"||typeof meAtomicPersist!=="function")return false;
