@@ -171,7 +171,7 @@ function lowServiceState(s){
 function nextAction(){
   const s=gameState();
   if(!s||!s.name)return {stage:0,label:"NUOVA PARTITA",title:"Crea il tuo comandante",desc:"Entra nel gioco e costruisci il tuo impero nautico.",action:"INIZIA",target:"profile"};
-  if(!s.setupComplete&&!s.trip&&(Number(s.voyages)||0)===0)return {stage:0,label:"FASE 1 · PREPARAZIONE",title:"Configura base e yacht",desc:"Scegli imbarcazione e marina di partenza.",action:"CONFIGURA",target:"office"};
+  if(!s.setupComplete&&!s.trip&&(Number(s.voyages)||0)===0)return {stage:0,label:"FASE 1 · PARTENZA RAPIDA",title:"RPG Academy 8 + Rimini",desc:"Un tocco e la base demo è pronta. Potrai cambiare yacht e marina più avanti.",action:"PARTI SUBITO",target:"quickSetup"};
   if(s.trip){
     return {stage:2,label:"FASE 3 · NAVIGAZIONE",title:"Rotta verso "+marinaName(s.trip.dest),desc:"Segui viaggio, GPS, carburante e arrivo.",action:"SEGUI ROTTA",target:"map"};
   }
@@ -268,6 +268,14 @@ function runService(which){
 }
 function runPrimary(){
   const action=nextAction();
+  if(action.target==="quickSetup"){
+    try{
+      if(typeof confirmSetup==="function"){confirmSetup();return}
+    }catch(_){}
+    openPanel("office");
+    setTimeout(()=>document.getElementById("meQuickStart")?.click(),160);
+    return;
+  }
   if(action.target==="marinaLive"){openPanel("office",{marinaLive:true});return}
   if(action.target==="services"){
     document.getElementById("meMobileHomeServices")?.scrollIntoView({behavior:"smooth",block:"center"});
