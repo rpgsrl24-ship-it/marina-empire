@@ -33,12 +33,12 @@ Le percentuali sono stime di maturità progettuale, non metriche automatiche.
 |---|---:|---|
 | Stabilità tecnica / test | 90% | Deploy, smoke, mission regression, UX audit e Credit Release Gate verdi sulla baseline |
 | Home / UI generale | 85% | Struttura consolidata, ancora da alleggerire quando cresceranno i nuovi sistemi |
-| Mobile | 82% | Molto migliorato; necessario continuare test reali dopo ogni blocco |
+| Mobile | 88% | Mobile-first consolidato; quick start ospite, flusso iniziale semplificato e test reali continui |
 | Navigazione | 82% | Rotte, carburante, meteo simulato, plancia e viaggio funzionanti |
 | Flotta / yacht | 80% | Acquisto, selezione, carburante, condizione, rendite charter automatiche |
 | Missioni | 78% | Funzionanti, con eventi e varianti; da rendere meno ripetitive |
 | Economia | 82% | Crediti, costi, rendite, marina, attività, manutenzione e controlli atomici |
-| Progressione carriera | 75% | 5 fasi attive e collegate a viaggi, flotta, attività, reputazione e catene |
+| Progressione carriera | 82% | Fasi attive, specializzazioni, ranghi, contratti a catena e occasione giornaliera di carriera |
 | Marine vive | 75% | Traffico 24/7, VHF, NPC, eventi, livelli operativi e catene |
 | Reputazione locale | 80% | Benefici e sconti per marina, collegati ai servizi |
 | Contratti dinamici | 70% | Bacheca dinamica e catene operative presenti; varietà ancora limitata |
@@ -52,7 +52,7 @@ Le percentuali sono stime di maturità progettuale, non metriche automatiche.
 | Multiplayer persistente | 45% | Account/cloud/leaderboard presenti, economia condivisa ancora parziale |
 | Prenotazione posti barca reale | 35% | Schema e protezioni presenti, mapping visuale/database non validato |
 | Monetizzazione crediti | 70% | Infrastruttura e release gate presenti; ogni modifica richiede verifica specifica |
-| Equipaggi | 5% | Non esiste ancora un vero sistema crew |
+| Equipaggi | 30% | V1 attiva: esperienza, morale, addestramento, livelli e bonus missione; manca ancora reclutamento per ruolo e stipendi completi |
 | Charter completo | 25% | Charter economico presente, manca il ciclo cliente-equipaggio-ospiti-itinerario-rating |
 | Cantieri / refit | 5% | Mancante come sistema gestionale |
 | Economia a terra | 30% | Alcune attività nautiche presenti, manca ecosistema completo |
@@ -62,11 +62,26 @@ Le percentuali sono stime di maturità progettuale, non metriche automatiche.
 
 ### Valutazione complessiva
 
-- **Beta pubblica attuale:** circa 80%
-- **Gestionale nautico italiano completo:** circa 55–60%
-- **Visione internazionale Marina Empire:** circa 40–45%
+- **Beta pubblica attuale:** circa 82–85%
+- **Gestionale nautico italiano completo:** circa 62–65%
+- **Visione internazionale Marina Empire:** circa 45–50%
 
 Il problema principale non è più la quantità di funzioni: è integrare i sistemi in cicli di gioco profondi e durevoli.
+
+## Aggiornamento operativo — 6 novembre 2026
+
+Dopo la baseline del 4 novembre sono stati aggiunti:
+- quick start mobile ospite con base demo e primo accesso semplificato;
+- progressione mobile esplicita fino alla carriera avanzata;
+- reputazione settoriale tramite incarichi VHF;
+- specializzazioni collegate a contratti esclusivi e ranghi;
+- opportunità giornaliera per la specializzazione attiva;
+- equipaggio V1 con esperienza, morale, addestramento e bonus economico sulle missioni;
+- riepilogo arrivo con bonus equipaggio;
+- tracciamento UTM per campagne marketing;
+- ulteriori test reali mobile e correzioni al primo flusso.
+
+Il prossimo obiettivo non è aggiungere menu, ma portare il loop giocabile stabile da circa 20–30 minuti a 1–2 ore senza ripetizione e completare la V1 degli equipaggi.
 
 ## 4. Priorità strategiche
 
