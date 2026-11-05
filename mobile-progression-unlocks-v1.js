@@ -37,6 +37,12 @@ function bestSectorRep(){
 }
 function vhfCount(){return Array.isArray(state?.vhfJobs)?state.vhfJobs.length:0}
 function boats(){return Array.isArray(state?.owned)?new Set(state.owned).size:0}
+function specializationLabel(){
+ const s=window.MarinaEmpireSpecialization?.get?.();
+ if(!s)return "";
+ const rank=window.MarinaEmpireSpecialization?.rankFor?.(s.key);
+ return s.icon+" "+s.label+(rank?.label?" · "+rank.label:"");
+}
 function milestone(){
  const voyages=num(state?.voyages),jobs=vhfCount(),rep=bestSectorRep(),prestige=num(state?.prestige),fleet=boats();
  if(voyages<2)return {step:1,title:"Completa il tour iniziale",desc:"Concludi 2 missioni e prova Marina Live.",value:voyages,target:2,label:voyages+" / 2 missioni",action:"MISSIONI",panel:"missions"};
@@ -45,7 +51,8 @@ function milestone(){
  if(!String(state?.specialization||""))return {step:3,title:"Scegli la tua carriera",desc:"Hai raggiunto la reputazione richiesta. Ora scegli una specializzazione e sblocca i contratti esclusivi.",value:1,target:1,label:"Specializzazione disponibile",action:"SCEGLI SPECIALIZZAZIONE",panel:"office"};
  const armatureScore=Math.min(3,(voyages>=6?1:0)+(fleet>=2?1:0)+(prestige>=1000?1:0));
  if(armatureScore<3)return {step:4,title:"Diventa Armatore",desc:"Obiettivo carriera: 6 viaggi, 2 yacht e 1.000 prestigio.",value:armatureScore,target:3,label:(voyages>=6?"✓":"○")+" 6 viaggi · "+(fleet>=2?"✓":"○")+" 2 yacht · "+(prestige>=1000?"✓":"○")+" 1.000 prestigio",action:fleet<2?"FLOTTA":"MISSIONI",panel:fleet<2?"fleet":"missions"};
- return {step:5,title:"Espandi il tuo impero",desc:"Ora alterna missioni, mercato, attività e reputazione per salire verso Operatore Nautico.",value:1,target:1,label:"Carriera avanzata attiva",action:"DIREZIONE",panel:"office"};
+ const spec=specializationLabel();
+ return {step:5,title:"Espandi il tuo impero",desc:(spec?spec+" attivo. ":"")+"Alterna missioni, Marina Live, mercato e attività per avanzare verso Operatore Nautico.",value:1,target:1,label:spec||"Carriera avanzata attiva",action:"DIREZIONE",panel:"office"};
 }
 function openPanel(id){
  if(window.MarinaEmpireMobileHome?.open){window.MarinaEmpireMobileHome.open(id);return}
