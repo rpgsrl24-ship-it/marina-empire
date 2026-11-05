@@ -106,7 +106,7 @@ function openPanel(id){
  if(typeof showTab==="function")showTab(id);
 }
 function ensure(){
- if(innerWidth>740)return null;
+ if(typeof innerWidth!=="undefined"&&innerWidth>740)return null;
  const home=document.querySelector("#home .me-mobile-home-dashboard");
  if(!home)return null;
  let box=document.getElementById("meMobileDailyOps");
@@ -145,7 +145,7 @@ function ensure(){
  return box;
 }
 function render(){
- if(innerWidth>740)return;
+ if(typeof innerWidth!=="undefined"&&innerWidth>740)return;
  const box=ensure(),a=api();
  if(!box||!a||typeof state==="undefined"||!state?.name)return;
  a.ensure("daily",dayKey());
