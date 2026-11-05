@@ -1,6 +1,7 @@
 (()=>{
 "use strict";
 if(window.__ME_MOBILE_MARINA_LIVE_V2__)return;
+function meViewportWidth(){return typeof globalThis!=="undefined"&&Number.isFinite(Number(globalThis.innerWidth))?Number(globalThis.innerWidth):1024}
 window.__ME_MOBILE_MARINA_LIVE_V2__=true;
 
 const style=document.createElement("style");
@@ -173,7 +174,7 @@ style.textContent=`
 document.head.appendChild(style);
 
 function normalize(){
-  if(innerWidth>740)return;
+  if(meViewportWidth()>740)return;
   const section=document.getElementById("marinas");
   const list=document.getElementById("marinaList");
   if(!section||!list)return;
