@@ -284,8 +284,8 @@ async function trial(browser,origin,name,viewport,mobile) {
       assert.equal(Object.hasOwn(entry.body,'visitor_id'),false,name+': analytics must not send persistent visitor_id');
       assert.equal(entry.body.source,'direct',name+': local QA traffic defaults to direct source');
     }
-    await goTab(page,'marinas',mobile);
-    const guestJob=page.locator('[data-live-job]:enabled').first();
+    await goTab(page,'office',mobile);
+    const guestJob=page.locator('#meMarinaLiveOps [data-live-job]:enabled').first();
     await guestJob.waitFor({state:'visible'});
     await guestJob.click();
     await page.waitForFunction(key=>(JSON.parse(localStorage.getItem(key))?.guestTrialJobsUsed||0)===1,saveKey);
