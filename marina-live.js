@@ -257,9 +257,9 @@
   }
   function rareVhfJob(level,intensity,key){
     const rare=[
-      {min:3,id:"vip",label:"Priorita VIP in ingresso",reward:520,prestige:7,duration:45,badge:"PRIORITA"},
-      {min:4,id:"storm",label:"Coordinamento traffico meteo",reward:760,prestige:10,duration:55,badge:"URGENTE"},
-      {min:5,id:"superyacht",label:"Assistenza Superyacht Port Control",reward:1100,prestige:15,duration:65,badge:"ELITE"}
+      {min:3,id:"vip",label:"Priorita VIP in ingresso",reward:520,prestige:7,duration:45,badge:"PRIORITA",sector:"servizi"},
+      {min:4,id:"storm",label:"Coordinamento traffico meteo",reward:760,prestige:10,duration:55,badge:"URGENTE",sector:"tecnica"},
+      {min:5,id:"superyacht",label:"Assistenza Superyacht Port Control",reward:1100,prestige:15,duration:65,badge:"ELITE",sector:"marina"}
     ].filter(x=>level>=x.min);
     if(!rare.length)return null;
     const perks=marinaPerks(key);
@@ -305,11 +305,15 @@
     const completedAt=Date.now();
     const ok=meAtomicPersist(()=>{
       state.vhfJobs=Array.isArray(state.vhfJobs)?state.vhfJobs:[];
-      state.vhfJobs.push({id:active.id,marina:active.marina,at:completedAt,reward:active.reward,prestige:active.prestige,duration:active.duration});if(!window.meRegisteredPlayer)state.guestTrialJobsUsed=(Number(state.guestTrialJobsUsed)||0)+1;
+      const sector=String(active.sector||"marina");
+      const repGain=Math.max(1,Number(active.reputationGain)||((active.rare?6:3)+(active.eventLinked?2:0)));
+      state.vhfJobs.push({id:active.id,marina:active.marina,sector,at:completedAt,reward:active.reward,prestige:active.prestige,reputation:repGain,duration:active.duration});if(!window.meRegisteredPlayer)state.guestTrialJobsUsed=(Number(state.guestTrialJobsUsed)||0)+1;
       state.vhfJobs=state.vhfJobs.slice(-40);
       state.coins=(Number(state.coins)||0)+(Number(active.reward)||0);
       state.prestige=(Number(state.prestige)||0)+(Number(active.prestige)||0);
       state.earnings=(Number(state.earnings)||0)+(Number(active.reward)||0);
+      state.sectorReputation=state.sectorReputation&&typeof state.sectorReputation==="object"?state.sectorReputation:{};
+      state.sectorReputation[sector]=(Number(state.sectorReputation[sector])||0)+repGain;
       state.vhfMarinaReputation=state.vhfMarinaReputation&&typeof state.vhfMarinaReputation==="object"?state.vhfMarinaReputation:{};
       const repKey=String(active.marina||marinaKey());
       state.vhfMarinaReputation[repKey]=(Number(state.vhfMarinaReputation[repKey])||0)+(active.rare?3:1);
@@ -319,7 +323,8 @@
     });
     if(!ok)return false;
     if(typeof render==="function")render();
-    if(typeof notice==="function")notice(active.label+" completato · +"+Number(active.reward||0).toLocaleString("it-IT")+" crediti · prestigio +"+Number(active.prestige||0));
+    const earnedRep=Math.max(1,Number(active.reputationGain)||((active.rare?6:3)+(active.eventLinked?2:0)));
+    if(typeof notice==="function")notice(active.label+" completato · +"+Number(active.reward||0).toLocaleString("it-IT")+" crediti · prestigio +"+Number(active.prestige||0)+" · reputazione "+String(active.sector||"marina")+" +"+earnedRep);
     window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"vhf-job-complete"}}));
     updateVhf();
     updateVhfCareer();
@@ -346,7 +351,7 @@
     const endsAt=started+adjustedDuration*1000;
     if(typeof meAtomicPersist!=="function")return;
     const ok=meAtomicPersist(()=>{
-      state.vhfActiveJob={id:job.id,label:job.label,marina:job.marina,startedAt:started,endsAt,reward:job.reward,prestige:job.prestige,duration:adjustedDuration,rare:!!job.rare,badge:job.badge||""};
+      state.vhfActiveJob={id:job.id,label:job.label,marina:job.marina,sector:job.sector||"marina",startedAt:started,endsAt,reward:job.reward,prestige:job.prestige,reputationGain:(job.rare?6:3)+(job.eventLinked?2:0),duration:adjustedDuration,rare:!!job.rare,eventLinked:!!job.eventLinked,badge:job.badge||""};
     });
     if(!ok){if(typeof notice==="function")notice("Incarico VHF non salvato.");return}
     if(typeof render==="function")render();
