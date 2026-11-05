@@ -178,8 +178,18 @@ function nextAction(){
   if(recentArrival(s)){
     return {stage:3,label:"FASE 4 · ARRIVO",title:"Sei arrivato a "+marinaName(s.port),desc:"Controlla Marina Live, eventi, VHF e nuove opportunità.",action:"MARINA LIVE",target:"marinas"};
   }
-  if((Number(s.voyages)||0)>=1&&!window.meRegisteredPlayer){
-    return {stage:4,label:"FASE 5 · CRESCITA",title:"Salva il tuo impero",desc:"Registrati gratis per conservare progressi e continuare la carriera.",action:"SALVA",target:"profile"};
+  if(!window.meRegisteredPlayer){
+    const voyages=Math.max(0,Number(s.voyages)||0);
+    const guestJobs=Math.max(0,Number(s.guestTrialJobsUsed)||0);
+    if(voyages>=2){
+      return {stage:4,label:"TOUR GRATUITO COMPLETATO",title:"Salva il tuo impero",desc:"Hai provato missioni e Marina Live. Registrati gratis per conservare i progressi e continuare la carriera.",action:"REGISTRATI",target:"profile"};
+    }
+    if(voyages>=1&&guestJobs<1){
+      return {stage:3,label:"PROVA ESTESA · MARINA LIVE",title:"Completa un incarico gratuito",desc:"Apri Marina Live e accetta 1 opportunità dal porto per provare le attività operative.",action:"MARINA LIVE",target:"marinas"};
+    }
+    if(voyages>=1&&guestJobs>=1){
+      return {stage:1,label:"PROVA ESTESA · SECONDA MISSIONE",title:"Completa la seconda missione",desc:"Scegli una nuova tratta e prova ancora navigazione, consumi e ricompense.",action:"MISSIONI",target:"missions"};
+    }
   }
   const service=lowServiceState(s);
   if(service.fuel||service.condition){
