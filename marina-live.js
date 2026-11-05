@@ -277,9 +277,14 @@
       {id:"berth",label:"Assistenza ormeggio",reward:180+intensity.arrivals*35,prestige:2,duration:28},
       {id:"fuel",label:"Supporto rifornimento",reward:160+intensity.departures*30,prestige:2,duration:24},
       {id:"tech",label:"Assistenza tecnica rapida",reward:220+(intensity.label==="INTENSA"?90:30),prestige:3,duration:38},
-      {id:"traffic",label:"Supporto Port Control",reward:200+intensity.arrivals*25,prestige:3,duration:32}
+      {id:"traffic",label:"Supporto Port Control",reward:200+intensity.arrivals*25,prestige:3,duration:32},
+      {id:"guest",label:"Accoglienza equipaggio ospiti",reward:210+intensity.arrivals*20,prestige:3,duration:30},
+      {id:"water",label:"Preparazione water toys",reward:240+intensity.departures*20,prestige:4,duration:34},
+      {id:"provision",label:"Consegna cambusa urgente",reward:260+(intensity.label==="INTENSA"?80:20),prestige:4,duration:36},
+      {id:"tender",label:"Coordinamento tender e transfer",reward:230+intensity.arrivals*25,prestige:3,duration:31}
     ];
-    const idx=Math.floor(Date.now()/30000)%options.length;
+    const marinaSeed=[...key].reduce((sum,ch)=>sum+ch.charCodeAt(0),0);
+    const idx=(Math.floor(Date.now()/30000)+marinaSeed)%options.length;
     const lv=vhfLevel();
     const special=rareVhfJob(lv.level,intensity,key);
     const trust=marinaTrust(key);
