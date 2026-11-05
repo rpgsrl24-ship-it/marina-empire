@@ -1,6 +1,7 @@
 (()=>{
 "use strict";
 if(window.__ME_MOBILE_FIRST_V5__)return;
+function meViewportWidth(){return typeof globalThis!=="undefined"&&Number.isFinite(Number(globalThis.innerWidth))?Number(globalThis.innerWidth):1024}
 window.__ME_MOBILE_FIRST_V5__=true;
 
 const style=document.createElement("style");
@@ -99,7 +100,7 @@ function go(id){
 }
 
 function ensure(){
-  if(innerWidth>740)return;
+  if(meViewportWidth()>740)return;
   const home=document.querySelector("#home .me-mobile-home-dashboard");
   if(!home)return;
 
