@@ -113,7 +113,7 @@ style.textContent=`
     gap:5px!important;
     font-size:9px!important;
   }
-  #marinas:not(.me-mobile-expanded) .me-live-feed-row:nth-child(n+4){
+  #marinas:not(.me-mobile-expanded) .me-live-feed-row:nth-child(n+3){
     display:none!important;
   }
   #marinas:not(.me-mobile-expanded) .me-live-vhf{
@@ -139,9 +139,31 @@ style.textContent=`
   }
   #marinas:not(.me-mobile-expanded) .me-live-community{
     order:6!important;
-    max-height:78px!important;
-    padding:8px 9px!important;
+    max-height:70px!important;
+    padding:7px 9px!important;
     overflow:hidden!important;
+  }
+
+  /* Keep Marina Live compact on small phones: one primary live card, no repeated secondary cards. */
+  #marinas:not(.me-mobile-expanded) .me-live-marina ~ .me-live-marina,
+  #marinas:not(.me-mobile-expanded) .me-current-marina-card .item .item:nth-of-type(n+4){
+    display:none!important;
+  }
+
+  @media(max-width:390px){
+    #marinas:not(.me-mobile-expanded) .me-live-water{
+      height:72px!important;
+      min-height:72px!important;
+      max-height:72px!important;
+      flex-basis:72px!important;
+    }
+    #marinas:not(.me-mobile-expanded) .me-live-vhf{
+      margin-bottom:6px!important;
+      padding:8px!important;
+    }
+    #marinas:not(.me-mobile-expanded) .me-live-vhf-preview{
+      display:none!important;
+    }
   }
   #marinas:not(.me-mobile-expanded) .me-live-community-row:nth-child(n+2){
     display:none!important;
