@@ -148,6 +148,9 @@ function render(){
  if(typeof innerWidth!=="undefined"&&innerWidth>740)return;
  const box=ensure(),a=api();
  if(!box||!a||typeof state==="undefined"||!state?.name)return;
+ const tutorialDone=!!window.meRegisteredPlayer||(Number(state.voyages)||0)>=2;
+ box.style.display=tutorialDone?"":"none";
+ if(!tutorialDone)return;
  a.ensure("daily",dayKey());
  const st=a.status("daily",dayKey());
  if(!st)return;
