@@ -4079,14 +4079,13 @@ button.addEventListener("click",async()=>{
        before applying mobile-only compact state. */
     dedupe("#marinas .me-world-event");
     dedupe(".me-traffic-board");
-    dedupe(".me-npc-box");
-    const seenNpc=new Set();
+    /* Legacy standalone NPC renderer is disabled: remove every stale NPC card
+       wherever an older cached script tries to recreate it. Marina Live/VHF is
+       the supported live-world loop. */
+    document.querySelectorAll(".me-npc-box,#meMobileNpcOpportunityHost").forEach(el=>el.remove());
     document.querySelectorAll(".me-npc-role").forEach(role=>{
-      const card=role.closest(".me-npc-box")||role.closest(".item")||role.parentElement;
-      if(!card)return;
-      const sig=(role.textContent||"").trim()+"|"+((card.querySelector(".me-npc-meta")?.textContent||"").trim());
-      if(seenNpc.has(sig)){card.remove();return}
-      seenNpc.add(sig);
+      const card=role.closest(".item")||role.parentElement;
+      if(card)card.remove();
     });
     if(window.innerWidth>899)return;
 
@@ -4107,8 +4106,8 @@ button.addEventListener("click",async()=>{
 
   function boot(){
     clean();
-    const marinas=document.getElementById("marinas");
-    if(marinas)new MutationObserver(()=>setTimeout(clean,25)).observe(marinas,{childList:true,subtree:true,characterData:true});
+    const root=document.body;
+    if(root)new MutationObserver(()=>setTimeout(clean,25)).observe(root,{childList:true,subtree:true,characterData:true});
     window.addEventListener("marina-empire-updated",()=>setTimeout(clean,25));
     window.addEventListener("marina-world-event",()=>setTimeout(clean,25));
     window.addEventListener("resize",clean);
