@@ -131,6 +131,17 @@ style.textContent=`
     border-color:#67b7cc!important;color:#bfe8f1!important
   }
 
+  #meMobileHomePulse{
+    order:-18!important;display:grid!important;grid-template-columns:auto minmax(0,1fr) auto!important;
+    gap:8px!important;align-items:center!important;padding:9px 10px!important;margin:0!important;
+    border:1px solid rgba(101,187,204,.45)!important;border-radius:11px!important;
+    background:linear-gradient(135deg,#082d3d,#0a3a4c)!important
+  }
+  #meMobileHomePulse .dot{width:9px;height:9px;border-radius:50%;background:#62e1a0;box-shadow:0 0 0 4px rgba(98,225,160,.13),0 0 12px rgba(98,225,160,.55)}
+  #meMobileHomePulse strong{display:block!important;color:#dff6f1!important;font-size:10px!important;line-height:1.2!important}
+  #meMobileHomePulse small{display:block!important;margin-top:2px!important;color:#9fc0c9!important;font-size:8px!important}
+  #meMobileHomePulse button{min-height:36px!important;padding:6px 9px!important;font-size:8px!important;font-weight:900!important}
+
   #meMobileCreditsHero{order:-20!important}
   #home .me-mobile-home-goal{order:0!important}
 
@@ -288,6 +299,14 @@ function ensureHome(){
   const home=document.querySelector("#home .me-mobile-home-dashboard");
   if(!home)return;
 
+  if(!document.getElementById("meMobileHomePulse")){
+    const pulse=document.createElement("div");
+    pulse.id="meMobileHomePulse";
+    pulse.innerHTML='<span class="dot" aria-hidden="true"></span><div><strong id="meMobilePulseTitle">Marina operativa</strong><small id="meMobilePulseText">Controllo traffico e richieste in corso…</small></div><button type="button" id="meMobilePulseAction">APRI LIVE</button>';
+    pulse.querySelector("#meMobilePulseAction").addEventListener("click",()=>openPanel("marinas"));
+    home.prepend(pulse);
+  }
+
   if(!document.getElementById("meMobileGameLoop")){
     const card=document.createElement("section");
     card.id="meMobileGameLoop";
@@ -376,6 +395,23 @@ function sync(){
   const conditionText=document.getElementById("meMobileServiceCondition");
   if(fuelText)fuelText.textContent=fuel+" / "+Math.round(tank)+" L";
   if(conditionText)conditionText.textContent=condition+"%";
+  const pulseTitle=document.getElementById("meMobilePulseTitle");
+  const pulseText=document.getElementById("meMobilePulseText");
+  try{
+    const snap=window.MarinaEmpireLiveTraffic?.snapshot?.();
+    const contracts=window.MarinaEmpireLiveTraffic?.contracts?.()||[];
+    const count=Math.max(0,Number(snap?.volume)||((snap?.items||[]).length));
+    if(pulseTitle)pulseTitle.textContent=(s?.trip?"Navigazione in corso":"Marina Live · "+marinaName(s?.port));
+    if(pulseText){
+      if(s?.trip)pulseText.textContent="Rotta attiva · segui GPS, carburante e arrivo.";
+      else if(contracts.length)pulseText.textContent=count+" unità attive · "+contracts.length+" richieste disponibili.";
+      else pulseText.textContent=count+" unità attive · nessuna richiesta urgente.";
+    }
+  }catch(_){
+    if(pulseTitle)pulseTitle.textContent="Marina operativa";
+    if(pulseText)pulseText.textContent="Traffico e attività in aggiornamento.";
+  }
+
   const serviceButtons=document.querySelectorAll("#meMobileHomeServices button");
   serviceButtons.forEach(b=>b.disabled=!!s?.trip);
 }
