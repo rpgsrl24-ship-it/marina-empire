@@ -111,17 +111,7 @@ function pick(){
  return picked;
 }
 function npcHost(){
- if(window.innerWidth<=740){
-  let host=document.getElementById("meMobileNpcOpportunityHost");
-  if(!host){
-   host=document.createElement("section");
-   host.id="meMobileNpcOpportunityHost";
-   host.style.cssText="margin:8px 0";
-   const home=document.querySelector("#home .me-mobile-home-dashboard")||document.getElementById("home");
-   if(home)home.appendChild(host);else document.body.appendChild(host);
-  }
-  return host;
- }
+ if(window.innerWidth<=740)return null;
  return document.querySelector(".me-live-marina");
 }
 function ensure(){
@@ -211,6 +201,10 @@ function scheduleRefresh(delay=120){
  },delay);
 }
 function boot(){
+ if(window.innerWidth<=740){
+  document.querySelectorAll(".me-npc-box,#meMobileNpcOpportunityHost").forEach(el=>el.remove());
+  return;
+ }
  if(!ensure()){setTimeout(boot,700);return;}
  cleanupDuplicates();
  current=pick();renderCurrent();loop();
