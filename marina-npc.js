@@ -2,6 +2,10 @@
 "use strict";
 if(window.__ME_MARINA_NPC__) return;
 window.__ME_MARINA_NPC__=true;
+// Temporarily disabled globally on 2026-11-06: Marina Live/VHF provide the live-world loop
+// while the standalone NPC opportunity renderer is being rebuilt without DOM duplication.
+document.querySelectorAll(".me-npc-box,#meMobileNpcOpportunityHost").forEach(el=>el.remove());
+return;
 
 const OPPORTUNITIES=[
  {role:"Comandante",icon:"🧑‍✈️",type:"Rifornimento",text:"richiede rifornimento prima della partenza",duration:18,cost:120,reward:320,prestige:8},
