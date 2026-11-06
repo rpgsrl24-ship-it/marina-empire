@@ -110,22 +110,33 @@ function pick(){
  if(w&&w.id==="rough"&&worldSector(picked)==="charter")picked.reward=Math.round(picked.reward*.9);
  return picked;
 }
-function ensure(){
- const live=document.querySelector(".me-live-marina");
- if(!live)return false;
- const global=[...document.querySelectorAll(".me-npc-box")];
- global.forEach(el=>{if(!live.contains(el))el.remove()});
- const existing=[...live.querySelectorAll(".me-npc-box")];
- if(box&&box.parentNode===live){
-  existing.forEach((el,i)=>{if(el!==box&&i>=0)el.remove()});
-  return true;
+function npcHost(){
+ if(window.innerWidth<=740){
+  let host=document.getElementById("meMobileNpcOpportunityHost");
+  if(!host){
+   host=document.createElement("section");
+   host.id="meMobileNpcOpportunityHost";
+   host.style.cssText="margin:8px 0";
+   const home=document.querySelector("#home .me-mobile-home-dashboard")||document.getElementById("home");
+   if(home)home.appendChild(host);else document.body.appendChild(host);
+  }
+  return host;
  }
- if(existing.length){
-  box=existing[0];
-  existing.slice(1).forEach(el=>el.remove());
+ return document.querySelector(".me-live-marina");
+}
+function ensure(){
+ const live=npcHost();
+ if(!live)return false;
+ const all=[...document.querySelectorAll(".me-npc-box")];
+ let existing=document.getElementById("meNpcOpportunitySingleton");
+ if(existing&&existing.parentNode!==live)live.appendChild(existing);
+ all.forEach(el=>{if(el!==existing)el.remove()});
+ if(existing){
+  box=existing;
   return true;
  }
  box=document.createElement("div");
+ box.id="meNpcOpportunitySingleton";
  box.className="me-npc-box";
  box.innerHTML='<div class="me-npc-title">OPPORTUNITÀ DAL PORTO</div><div class="me-npc-row"></div><div class="me-npc-meta"></div><div class="me-npc-actions"><button type="button" class="me-npc-accept">ACCETTA</button><button type="button" class="me-npc-skip">PASSA</button></div><div class="me-npc-progress"><span></span></div><div class="me-npc-status"></div><div class="me-npc-level"></div>';
  live.appendChild(box);
@@ -181,12 +192,13 @@ function loop(){
  timer=setTimeout(loop,26000+Math.floor(Math.random()*16000));
 }
 function cleanupDuplicates(){
- const live=document.querySelector(".me-live-marina");
+ const live=npcHost();
  const all=[...document.querySelectorAll(".me-npc-box")];
- if(!live||!all.length)return;
- let keep=all.find(el=>live.contains(el))||all[0];
+ if(!live)return;
+ let keep=document.getElementById("meNpcOpportunitySingleton")||all[0]||null;
  all.forEach(el=>{if(el!==keep)el.remove()});
- if(keep!==box)box=keep;
+ if(keep&&keep.parentNode!==live)live.appendChild(keep);
+ if(keep)box=keep;
 }
 let refreshTimer=null;
 function scheduleRefresh(delay=120){
