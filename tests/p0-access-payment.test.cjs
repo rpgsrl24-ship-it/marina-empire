@@ -69,7 +69,7 @@ test('A late wallet response cannot show the previous account balance',async()=>
 });
 function guestHarness(){
  const base='marina_empire_beta_test_session',guest={name:'Guest captain',owned:['voyager'],completed:['trial'],coins:10420,fuel:350,voyages:1};const ui=dom(),saved=storage({[base]:JSON.stringify(guest)});
- const context={KEY:base,state:JSON.parse(JSON.stringify(guest)),window:{MarinaSaveProtection:require('../save-state-guard.js')},localStorage:saved,$:ui.get,document:ui.document,ports:[{id:'rimini'},{id:'cervia'}],boats:[{id:'voyager'}],console,fresh:()=>({name:'',owned:['voyager'],completed:[],coins:10000,fuel:400,voyages:0}),render(){},showTab(){},persist(){saved.setItem(context.KEY,JSON.stringify(context.state))}};
+ const context={KEY:base,state:JSON.parse(JSON.stringify(guest)),window:{MarinaSaveProtection:require('../save-state-guard.js')},localStorage:saved,$:ui.get,document:ui.document,ports:[{id:'rimini'},{id:'cervia'}],boats:[{id:'voyager'}],boat:id=>({id,tank:400,name:'RPG Academy 8'}),console,fresh:()=>({name:'',owned:['voyager'],completed:[],coins:10000,fuel:400,condition:100,voyages:0}),render(){},showTab(){},persist(){saved.setItem(context.KEY,JSON.stringify(context.state))}};
  vm.createContext(context);vm.runInContext(functionSection('const ME_BASE_SAVE_KEY=KEY;','// For testers only:'),context);
  if(html.includes('const meSaveProtection='))vm.runInContext(functionSection('const meSaveProtection=','function persist()'),context);
  return {context,ui,saved,guest,base};
