@@ -34,6 +34,16 @@ const ROLE_SETS={
  yacht30:[["Comandante","Rotta e sicurezza"],["Primo Ufficiale","Operazioni e sicurezza"],["Engineer","Tecnica e manutenzione"],["Chef","Cambusa e qualità ospiti"],["Hostess","Ospiti e servizio"],["Deckhand","Coperta e tender"]],
  luna:[["Comandante","Rotta e sicurezza"],["Primo Ufficiale","Operazioni e sicurezza"],["Engineer","Tecnica e manutenzione"],["Chef","Cambusa e qualità ospiti"],["Chief Steward/ess","Ospiti VIP"],["Deckhand","Coperta e tender"],["Deckhand","Supporto operativo"]]
 };
+const CANDIDATES=[
+ {id:"marco-riva",name:"Marco Riva",role:"Comandante",skill:72,salary:210},
+ {id:"elena-conti",name:"Elena Conti",role:"Primo Ufficiale",skill:68,salary:185},
+ {id:"luca-ferri",name:"Luca Ferri",role:"Engineer",skill:74,salary:195},
+ {id:"sofia-moretti",name:"Sofia Moretti",role:"Hostess",skill:70,salary:165},
+ {id:"ana-silva",name:"Ana Silva",role:"Chief Steward/ess",skill:78,salary:215},
+ {id:"matteo-gallo",name:"Matteo Gallo",role:"Deckhand",skill:66,salary:145},
+ {id:"giulia-romano",name:"Giulia Romano",role:"Chef",skill:73,salary:190},
+ {id:"davide-serra",name:"Davide Serra",role:"Marinaio",skill:64,salary:135}
+];
 const FOCUS={
  balanced:{label:"Bilanciato",icon:"⚓",bonus:.00,text:"Nessuna penalità; rendimento generale stabile."},
  navigation:{label:"Navigazione",icon:"🧭",bonus:.025,text:"Più rendimento sulle missioni di trasferimento e charter."},
@@ -41,6 +51,41 @@ const FOCUS={
  hospitality:{label:"Ospiti",icon:"✨",bonus:.03,text:"Ricompense charter e VIP migliori, ma equipaggio più esigente."}
 };
 function roster(id){return ROLE_SETS[String(id||"voyager")]||ROLE_SETS.voyager}
+function defaultRoster(id){
+ const roles=roster(id),base=Math.max(0,num(crewInfo(id).daily)),share=roles.length?Math.round(base/roles.length):0;
+ return roles.map((r,i)=>({id:"default-"+String(id)+"-"+i,name:r[0],role:r[0],duty:r[1],skill:50,salary:share,default:true}));
+}
+function ensureRoster(id){
+ const s=gameState();if(!s)return defaultRoster(id);
+ id=String(id||s.boat||"voyager");
+ if(!s.crewRoster||typeof s.crewRoster!=="object")s.crewRoster={};
+ if(!Array.isArray(s.crewRoster[id])||!s.crewRoster[id].length)s.crewRoster[id]=defaultRoster(id);
+ return s.crewRoster[id];
+}
+function candidates(id){
+ const roles=new Set(roster(id).map(r=>r[0]));
+ const day=Math.floor(Date.now()/86400000);
+ return CANDIDATES.filter(x=>roles.has(x.role)).sort((a,b)=>((a.id.length+day)%7)-((b.id.length+day)%7)).slice(0,3);
+}
+function payroll(id){return ensureRoster(id).reduce((n,m)=>n+Math.max(0,num(m.salary)),0)}
+function recruit(candidateId){
+ const s=gameState();if(!s||s.trip)return;
+ const id=String(s.boat||"voyager"),cand=CANDIDATES.find(x=>x.id===candidateId);if(!cand)return;
+ const list=ensureRoster(id),slot=list.findIndex(m=>m.role===cand.role);
+ if(slot<0)return;
+ const fee=900+cand.skill*12;
+ if((Number(s.coins)||0)<fee){if(typeof notice==="function")notice("Crediti insufficienti per il reclutamento.");return}
+ const ok=typeof meAtomicPersist==="function"?meAtomicPersist(()=>{
+  s.coins-=fee;
+  const duty=roster(id).find(r=>r[0]===cand.role)?.[1]||"Operazioni di bordo";
+  list[slot]={...cand,duty,default:false,recruitedAt:Date.now()};
+  s.crewRoster[id]=list;
+ }):false;
+ if(!ok)return;
+ if(typeof render==="function")render();
+ if(typeof notice==="function")notice(cand.name+" ingaggiato come "+cand.role+" · costo "+fee.toLocaleString("it-IT")+" cr");
+ draw();
+}
 function ensureState(){
  const s=gameState();if(!s)return null;
  if(!s.crewProgress||typeof s.crewProgress!=="object")s.crewProgress={};
@@ -56,11 +101,13 @@ function snapshot(id){
  const raw=(s.crewProgress&&s.crewProgress[id])||{xp:0,morale:85,training:0,focus:"balanced"};
  const xp=num(raw.xp),morale=Math.max(35,Math.min(100,num(raw.morale)||85)),training=Math.max(0,Math.min(5,num(raw.training))),focus=FOCUS[raw.focus]?raw.focus:"balanced";
  const level=xp>=30?5:xp>=18?4:xp>=10?3:xp>=4?2:1;
+ const members=ensureRoster(id),avgSkill=members.length?members.reduce((n,m)=>n+Math.max(0,num(m.skill)),0)/members.length:50;
+ const skillBonus=Math.max(0,Math.min(.05,(avgSkill-50)*.0018));
  const xpBonus=Math.min(.06,xp*.002);
  const trainingBonus=training*.012;
  const moraleBonus=morale>=90?.03:morale>=75?.015:morale<55?-.03:0;
  const focusBonus=FOCUS[focus]?.bonus||0;
- return {unlocked:num(s.voyages)>=4||((s.owned||[]).length>=2),xp,morale,training,focus,level,bonus:Math.max(.95,1+xpBonus+trainingBonus+moraleBonus+focusBonus),info:crewInfo(id),roster:roster(id)};
+ return {unlocked:num(s.voyages)>=4||((s.owned||[]).length>=2),xp,morale,training,focus,level,avgSkill:Math.round(avgSkill),payroll:payroll(id),bonus:Math.max(.95,1+xpBonus+trainingBonus+moraleBonus+focusBonus+skillBonus),info:crewInfo(id),roster:members,candidates:candidates(id)};
 }
 function missionMultiplier(id){return snapshot(id).bonus}
 function onMissionComplete(id){
@@ -124,15 +171,16 @@ function draw(){
  box.innerHTML='<div class="me-crew-head"><div><small>EQUIPAGGIO · '+String(snap.info.count||1)+' PERSONE</small><strong>👥 Equipaggio '+(typeof boat==="function"?(boat(s.boat)?.name||"Yacht"):"Yacht")+'</strong></div><small>LV '+snap.level+'</small></div>'+
  '<div class="me-crew-role">'+snap.info.roles+' · costo operativo '+num(snap.info.daily).toLocaleString("it-IT")+' cr/missione</div>'+
  '<div class="me-crew-grid"><div class="me-crew-stat"><b>'+snap.xp+'</b><span>ESPERIENZA</span></div><div class="me-crew-stat"><b>'+snap.morale+'%</b><span>MORALE</span></div><div class="me-crew-stat"><b>'+snap.training+'/5</b><span>ADDESTRAMENTO</span></div></div>'+
- '<div class="me-crew-roster">'+snap.roster.map((r,i)=>'<div class="me-crew-member"><b>'+(i+1)+'. '+r[0]+'</b>'+r[1]+'</div>').join('')+'</div>'+
- '<div class="me-crew-bonus">Assetto: <b>'+FOCUS[snap.focus].icon+' '+FOCUS[snap.focus].label+'</b> · '+FOCUS[snap.focus].text+'<br>Bonus efficienza missioni: <b>'+(pct>=0?"+":"")+pct+'%</b>.</div>'+
- '<div class="me-crew-focus">'+Object.entries(FOCUS).map(([k,v])=>'<button type="button" data-crew-focus="'+k+'" class="'+(snap.focus===k?'on':'')+'">'+v.icon+' '+v.label+'</button>').join('')+'</div>'+
+ '<div class="me-crew-roster">'+snap.roster.map((r,i)=>'<div class="me-crew-member"><b>'+(i+1)+'. '+r.name+'</b>'+r.role+' · '+r.duty+'<br>Competenza '+r.skill+' · stipendio '+num(r.salary).toLocaleString("it-IT")+' cr/missione</div>').join('')+'</div>'+
+ '<div class="me-crew-bonus">Assetto: <b>'+FOCUS[snap.focus].icon+' '+FOCUS[snap.focus].label+'</b> · '+FOCUS[snap.focus].text+'<br>Competenza media: <b>'+snap.avgSkill+'</b> · stipendi <b>'+snap.payroll.toLocaleString("it-IT")+' cr/missione</b> · bonus efficienza: <b>'+(pct>=0?"+":"")+pct+'%</b>.</div>'+
+ '<div class="me-crew-focus">'+Object.entries(FOCUS).map(([k,v])=>'<button type="button" data-crew-focus="'+k+'" class="'+(snap.focus===k?'on':'')+'">'+v.icon+' '+v.label+'</button>').join('')+'</div>'+ '<div class="me-crew-role"><b>RECLUTAMENTO</b> · candidati disponibili oggi</div><div class="me-crew-roster">'+snap.candidates.map(x=>{const fee=900+x.skill*12;return '<div class="me-crew-member"><b>'+x.name+'</b>'+x.role+' · competenza '+x.skill+' · stipendio '+x.salary+' cr<br><button type="button" data-crew-recruit="'+x.id+'">INGAGGIA · '+fee.toLocaleString("it-IT")+' CR</button></div>'}).join('')+'</div>'+
  '<div class="me-crew-actions"><button type="button" data-crew-rest>⚓ RIPOSO · 250 CR</button><button type="button" data-crew-train>🎓 ADDESTRA · 800 CR</button></div>';
  box.querySelector("[data-crew-rest]")?.addEventListener("click",rest);
  box.querySelector("[data-crew-train]")?.addEventListener("click",train);
  box.querySelectorAll("[data-crew-focus]").forEach(b=>b.addEventListener("click",()=>setFocus(b.dataset.crewFocus)));
+ box.querySelectorAll("[data-crew-recruit]").forEach(b=>b.addEventListener("click",()=>recruit(b.dataset.crewRecruit)));
 }
-window.MarinaEmpireCrew={snapshot,missionMultiplier,onMissionComplete,render:draw};
+window.MarinaEmpireCrew={snapshot,missionMultiplier,onMissionComplete,payrollForBoat:payroll,recruit,render:draw};
 function boot(){
  if(!ensure()){setTimeout(boot,700);return}
  draw();
