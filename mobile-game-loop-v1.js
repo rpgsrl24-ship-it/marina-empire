@@ -88,7 +88,7 @@ style.textContent=`
   }
   #meMobileLoopStages{
     grid-column:1/-1!important;
-    display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important;
     gap:4px!important;margin-top:2px!important
   }
   #meMobileLoopStages i{
@@ -207,7 +207,7 @@ function nextAction(){
     const what=service.fuel&&service.condition?"carburante e manutenzione":service.fuel?"carburante":"manutenzione";
     return {stage:0,label:"PREPARA LO YACHT",title:"Controlla "+what,desc:"Prima della prossima missione prepara lo yacht dalla Home.",action:"SERVIZI",target:"services"};
   }
-  try{const g=window.MarinaEmpireMobileProgression?.milestone?.();if(g&&g.panel){return {stage:Math.max(1,Math.min(4,(Number(g.step)||1)-1)),label:"CRESCITA COMANDANTE",title:g.title,desc:g.desc,action:g.action,target:g.panel};}}catch(_){}\n  return {stage:1,label:"FASE 2 · MISSIONE",title:"Scegli la prossima missione",desc:"Accetta un incarico, salpa e aumenta crediti e prestigio.",action:"MISSIONI",target:"missions"};
+  try{const g=window.MarinaEmpireMobileProgression?.milestone?.();if(g&&g.panel){return {stage:Math.max(1,Math.min(7,(Number(g.step)||1)-1)),label:"CRESCITA COMANDANTE",title:g.title,desc:g.desc,action:g.action,target:g.panel};}}catch(_){}\n  return {stage:1,label:"FASE 2 · MISSIONE",title:"Scegli la prossima missione",desc:"Accetta un incarico, salpa e aumenta crediti e prestigio.",action:"MISSIONI",target:"missions"};
 }
 function titleFor(id){
   return {
@@ -310,7 +310,7 @@ function ensureHome(){
   if(!document.getElementById("meMobileGameLoop")){
     const card=document.createElement("section");
     card.id="meMobileGameLoop";
-    card.innerHTML='<div><small id="meMobileLoopLabel">PROSSIMO PASSO</small><strong id="meMobileLoopTitle">Preparazione</strong><span id="meMobileLoopDesc">Controllo partita…</span></div><button id="meMobileGameLoopAction" type="button">CONTINUA</button><div id="meMobileLoopStages"><i></i><i></i><i></i><i></i><i></i></div>';
+    card.innerHTML='<div><small id="meMobileLoopLabel">PROSSIMO PASSO</small><strong id="meMobileLoopTitle">Preparazione</strong><span id="meMobileLoopDesc">Controllo partita…</span></div><button id="meMobileGameLoopAction" type="button">CONTINUA</button><div id="meMobileLoopStages">'+Array.from({length:8},()=>"<i></i>").join("")+'</div>';
     card.querySelector("#meMobileGameLoopAction").addEventListener("click",runPrimary);
     const credits=document.getElementById("meMobileCreditsHero");
     if(credits)credits.insertAdjacentElement("beforebegin",card);else home.prepend(card);
