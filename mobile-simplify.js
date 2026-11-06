@@ -6,7 +6,7 @@ window.__ME_MOBILE_SIMPLIFY__=true;
 const style=document.createElement("style");
 style.id="me-mobile-simplify-style";
 style.textContent=`
-@media(max-width:740px){
+@media(max-width:899px){
   /* HOME: guida + 4 scelte chiare */
   #home .me-mobile-home-dashboard{padding-top:0!important}
   #home .me-mobile-home-grid{margin-top:0!important}
@@ -120,7 +120,7 @@ style.textContent=`
 document.head.appendChild(style);
 
 function compactNpcCards(){
- if(typeof innerWidth!=="undefined"&&innerWidth>740)return;
+ if(typeof innerWidth!=="undefined"&&innerWidth>899)return;
  const cards=[...document.querySelectorAll(".me-npc-box")];
  const seen=new Set();
  let kept=0;
