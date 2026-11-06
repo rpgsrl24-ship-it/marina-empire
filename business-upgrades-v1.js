@@ -8,7 +8,7 @@ style.textContent=`
 .me-business-upgrades{margin:12px 0;padding:12px;border:1px solid rgba(214,181,117,.35);border-radius:12px;background:#082735}
 .me-business-upgrades h3{margin:0 0 6px;color:#f2d293}.me-business-upgrade{padding:9px;margin:7px 0;border:1px solid rgba(255,255,255,.08);border-radius:9px;background:#0a3040}
 .me-business-upgrade strong{color:#f0d29d}.me-business-upgrade small{display:block;color:#9db4bd;margin-top:4px}.me-business-upgrade button{margin-top:7px;min-height:40px}
-@media(max-width:740px){.me-business-upgrades{padding:9px}.me-business-upgrade button{width:100%;min-height:44px}}
+@media(max-width:899px){.me-business-upgrades{padding:9px}.me-business-upgrade button{width:100%;min-height:44px}}
 `;
 document.head.appendChild(style);
 
