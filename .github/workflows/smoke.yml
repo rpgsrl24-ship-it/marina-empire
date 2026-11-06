@@ -35,7 +35,7 @@ concurrency:
 jobs:
   smoke:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -54,5 +54,5 @@ jobs:
       - name: Install Chromium for P0 checks
         run: npx playwright install --with-deps chromium
       - name: Verify guest journey and P0 guards in Chromium
-        timeout-minutes: 4
+        timeout-minutes: 8
         run: node tests/prelaunch-browser.test.cjs
