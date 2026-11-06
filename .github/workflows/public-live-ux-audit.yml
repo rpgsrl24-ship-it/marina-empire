@@ -9,10 +9,13 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: marina-empire-public-live-ux-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   live-ux:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,7 +28,7 @@ jobs:
       - name: Wait for GitHub Pages to expose this commit
         shell: bash
         run: |
-          for i in $(seq 1 30); do
+          for i in $(seq 1 60); do
             if curl -fsSL "https://rpgsrl24-ship-it.github.io/marina-empire/release.json?ts=$(date +%s)" | grep -Fq "$GITHUB_SHA"; then
               echo "Public deployment matches $GITHUB_SHA"
               exit 0
