@@ -1419,7 +1419,7 @@ padding:5px!important;gap:4px!important;
   .screen.me-mobile-home-sheet .me-lux-page-head h1{font-size:23px!important;margin:3px 0!important}
   .screen.me-mobile-home-sheet .me-lux-page-head p{font-size:10px!important;margin:2px 0!important}
 }
-</style></style><style id="me-mobile-exit-v1">
+</style><style id="me-mobile-exit-v1">
 @media(max-width:740px){
  #meMobileExitGame{
   margin-top:5px!important;
@@ -1442,6 +1442,41 @@ padding:5px!important;gap:4px!important;
  #setupDashboard select{min-height:42px!important;padding:9px!important;font-size:11px!important}
  #setupDashboard #meQuickStart,#setupDashboard #confirmSetup{width:100%!important;min-height:46px!important;margin-top:10px!important;font-size:11px!important;font-weight:900!important} #setupDashboard #meQuickStart{background:linear-gradient(135deg,#f0cf84,#b98232)!important;color:#102532!important;border-color:#f4d693!important}
  #missions #firstVoyageGuide h2{font-size:17px!important;margin:0 0 5px!important}
+}
+</style><style id="me-mobile-nav-wide-v13">
+@media(max-width:899px){
+ html body .shell>#navigation.nav{display:none!important}
+ html body .mobile-game-nav{
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;
+  z-index:100000!important;gap:3px!important;
+  padding:6px 5px calc(6px + env(safe-area-inset-bottom,0px))!important;
+  background:#061d2bf8!important;border-top:1px solid #c29a60!important;
+  box-shadow:0 -7px 24px #0009!important;overflow:visible!important
+ }
+ html body .mobile-game-nav button{
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  min-width:0!important;min-height:54px!important;padding:5px 2px!important;
+  font-size:9px!important;line-height:1.05!important;white-space:nowrap!important
+ }
+ html body .mobile-game-nav button span{font-size:21px!important;line-height:23px!important}
+ html body .mobile-game-nav button.on{background:#244455!important;color:#f9d795!important;box-shadow:inset 0 0 0 1px #a98b54!important}
+ html body .me-mobile-more{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  position:fixed!important;left:10px!important;right:10px!important;
+  bottom:calc(76px + env(safe-area-inset-bottom,0px))!important;
+  z-index:100010!important;max-height:calc(100dvh - 110px)!important;overflow:auto!important;
+  padding:12px!important;background:#082536fb!important;border:1px solid #c29a60!important;
+  border-radius:14px!important;box-shadow:0 15px 40px #000b!important
+ }
+ html body .me-mobile-more.hide{display:none!important}
+ html body .me-mobile-more:not(.hide){display:grid!important}
+ html body .me-mobile-more button{min-height:50px!important;padding:10px 7px!important;font-size:11px!important}
+ html body{padding-bottom:calc(82px + env(safe-area-inset-bottom,0px))!important}
+}
+@media(min-width:900px){
+ html body .mobile-game-nav{display:none!important}
+ html body .me-mobile-more{display:none!important}
 }
 </style></head><body>
 <div id="welcome" class="overlay"><div class="welcome"><div class="crest">&#9875;</div><h1>MARINA<br>EMPIRE</h1><h2>Il tuo impero nautico inizia qui</h2><p class="muted">Naviga fra le marine italiane, completa missioni e costruisci la tua flotta.</p><input id="playerName" placeholder="Nome del comandante" maxlength="32" autocomplete="nickname"><button class="gold" id="play">PROVA GRATIS · TOUR GUIDATO</button><p class="muted" style="font-size:13px;margin:6px 0 14px">Nessuna email richiesta: prova 2 missioni e 1 incarico Marina Live. Poi registrati gratis per salvare e continuare. Acquisti sempre facoltativi.</p><a href="./admin.html" style="display:block;margin:12px auto;padding:13px;border:1px solid #c6a365;border-radius:8px;color:#e8cc90;text-decoration:none;font-weight:800">🏝️ ISOLA DELLE ROSE · ACCESSO DIREZIONE</a><a href="./pubblicita.html" style="display:block;margin:10px auto;padding:12px;border:1px solid #c6a365;border-radius:12px;color:#e8cc90;text-decoration:none;font-weight:700">📣 PUBBLICITÀ E SPONSOR · PER LE AZIENDE</a><button id="help">COME SI GIOCA</button><a href="mailto:info@floatmarine.it?subject=Marina%20Empire%20-%20Feedback%20beta" style="display:block;margin:10px auto;padding:12px;border:1px solid #deb970;border-radius:12px;color:#f6d394;text-decoration:none;font-weight:700">✉️ SEGNALA UN PROBLEMA</a><div class="foot">BY RPG YACHT · BETA</div></div></div>
@@ -3243,7 +3278,7 @@ const obs=new MutationObserver(()=>{if(!document.getElementById("marinas").class
  });
  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMore()});
  document.querySelectorAll('.screen').forEach(screen=>new MutationObserver(activeTab).observe(screen,{attributes:true,attributeFilter:['class']}));
- window.addEventListener('resize',()=>{if(window.innerWidth>740)closeMore();activeTab()});
+ window.addEventListener('resize',()=>{if(window.innerWidth>899)closeMore();activeTab()});
  activeTab();
 })();
 </script><script id="marina-empire-deep-links-v1">(function(){const valid=new Set(["home","map","fleet","marinas","missions","office","profile","headquarters"]);const requested=new URLSearchParams(location.search).get("page");if(!valid.has(requested))return;function openRequested(){const btn=document.querySelector('[data-tab="'+requested+'"]');if(btn){btn.click();return}if(typeof showTab==="function")showTab(requested)}if(document.readyState==="complete")setTimeout(openRequested,180);else window.addEventListener("load",()=>setTimeout(openRequested,180),{once:true})})();</script><style id="fleet-operations-v27">.fleet-command-strip{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;padding:20px;margin:18px 0;border:1px solid #b9985b;border-radius:16px;background:linear-gradient(115deg,#143c50,#061c2d)}.fleet-command-strip h3{margin:5px 0;color:#f1d494;font:700 24px Georgia,serif}.fleet-command-strip p{margin:5px 0;max-width:570px}.fleet-command-actions{display:flex;gap:9px;flex-wrap:wrap}.fleet-help-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}.fleet-help-grid .item{margin:0}.fleet-help-grid h3{color:#f2d397}.fleet-help-grid button{width:100%;margin-top:8px}@media(max-width:850px){.fleet-help-grid{grid-template-columns:1fr}.fleet-command-actions{width:100%}.fleet-command-actions button{flex:1}}</style><style id="marina-command-v28">.marina-command-center{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:22px;margin:15px 0;border:1px solid #c19a58;border-radius:17px;background:linear-gradient(120deg,#153f52,#061c2e)}.marina-command-center h3{font:700 clamp(21px,3vw,29px) Georgia,serif;color:#f3d89d;margin:5px 0}.marina-command-center p{color:#c3d9de;max-width:570px;margin:7px 0}.marina-command-buttons{display:flex;flex-wrap:wrap;gap:8px}.marina-guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 26px}.marina-guide-grid article{padding:17px;border:1px solid #66808c;border-radius:13px;background:#0c2c3c}.marina-guide-grid b{color:#f2d28e}.marina-guide-grid p{font-size:13px;color:#bfd0d5;line-height:1.55;margin-bottom:0}.marina-list-heading,.marina-business-heading h2{color:#f2d79b;font-family:Georgia,serif}.marina-business-heading{margin-top:30px;padding-top:20px;border-top:1px solid #7c715d}@media(max-width:850px){.marina-guide-grid{grid-template-columns:1fr}.marina-command-buttons{width:100%}.marina-command-buttons button{flex:1 1 180px}}</style><style id="me-navigation-map-hotfix-v35">
