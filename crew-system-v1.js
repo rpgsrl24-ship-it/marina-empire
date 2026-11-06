@@ -16,7 +16,7 @@ style.textContent=`
 .me-crew-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
 .me-crew-actions button{flex:1 1 120px;min-height:40px;padding:7px 9px;font-size:9px}
 .me-crew-bonus{margin-top:8px;padding:7px 8px;border-radius:8px;background:rgba(214,181,117,.08);color:#edd29b;font-size:9px}.me-crew-roster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px}.me-crew-member{padding:7px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:#0a2633;font-size:8px;color:#b9cdd4}.me-crew-member b{display:block;color:#f2d293;font-size:9px}.me-crew-focus{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.me-crew-focus button{flex:1 1 90px;min-height:36px;padding:6px;font-size:8px}.me-crew-focus button.on{border-color:#d6b575;color:#f2d293;background:#173d4c}
-@media(max-width:740px){.me-crew-card{margin:9px 0;padding:10px}.me-crew-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.me-crew-actions button{min-height:44px}}
+@media(max-width:899px){.me-crew-card{margin:9px 0;padding:10px}.me-crew-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.me-crew-actions button{min-height:44px}}
 `;
 document.head.appendChild(style);
 
