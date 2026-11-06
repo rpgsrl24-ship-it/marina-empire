@@ -106,7 +106,7 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.equal(await page.locator('[data-business-marina="rose"]').count(),0,'Headquarters must not sell businesses');
     assert.equal(await page.locator('#meVoucherRedeem').isDisabled(),true,'Paid-credit redemption stays disabled');
     assert.equal(await page.locator('#meVoucherCode').isDisabled(),true,'Paid-credit entry stays disabled');
-    if (mobile && viewport.width<=740) {
+    if (mobile && viewport.width<=899) {
       await goTab(page,'home',true);
       const mobileDashboardChecks=[
         ['fleet','#fleet'],
@@ -251,8 +251,8 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.ok(arrived.coins>=launched.coins+launched.trip.mission.reward,'At least the advertised mission reward is credited');
     assert.ok(arrived.fuel>=0 && arrived.condition>=0,'Arrival cannot underflow fuel or condition');
     assert.equal(await page.locator('#voyageArrivalNotice').isVisible(),true,'Arrival summary is visible');
-    if (mobile && viewport.width<=740) {
-      assert.equal(await page.locator('#voyageCinema').isVisible(),false,name+': mobile layout removes the travel console after arrival');
+    if (mobile && viewport.width<=899) {
+      assert.equal(await page.locator('#voyageCinema').isVisible(),true,name+': mobile layout keeps the docked arrival console available after arrival');
       assert.equal(await page.locator('.mobile-game-nav').isVisible(),true,name+': mobile bottom navigation stays available after arrival');
       assert.equal(await page.locator('[data-mobile-tab="home"]').isVisible(),true,name+': Home remains reachable after arrival');
       assert.equal(await page.locator('[data-mobile-tab="missions"]').isVisible(),true,name+': Missions remains reachable after arrival');
