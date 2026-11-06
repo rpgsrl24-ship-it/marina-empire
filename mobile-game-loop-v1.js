@@ -7,7 +7,7 @@ window.__ME_MOBILE_GAME_LOOP_V1__=true;
 const style=document.createElement("style");
 style.id="me-mobile-game-loop-v1-style";
 style.textContent=`
-@media(max-width:740px){
+@media(max-width:899px){
   body.me-mobile-home-sheet-open{overflow:hidden!important}
   body.me-mobile-home-sheet-open #home{
     display:block!important;
@@ -138,7 +138,7 @@ style.textContent=`
     cursor:pointer!important
   }
 }
-@media(min-width:741px){
+@media(min-width:900px){
   #meMobileGameLoop,#meMobileHomeServices,#meMobileHomeCommandCenter,#meMobileSheetBar{display:none!important}
 }
 `;
@@ -219,7 +219,7 @@ function clearSheetClasses(){
   document.querySelectorAll(".screen.me-mobile-home-sheet").forEach(el=>el.classList.remove("me-mobile-home-sheet"));
 }
 function closePanel(){
-  if(meViewportWidth()>740)return;
+  if(meViewportWidth()>899)return;
   clearSheetClasses();
   currentPanel=null;
   document.body.classList.remove("me-mobile-home-sheet-open");
@@ -233,7 +233,7 @@ function normalizedPanel(id){
   return id;
 }
 function openPanel(id,opts){
-  if(meViewportWidth()>740){if(typeof showTab==="function")showTab(id);return}
+  if(meViewportWidth()>899){if(typeof showTab==="function")showTab(id);return}
   id=normalizedPanel(id);
   if(id==="home"){closePanel();return}
   const target=document.getElementById(id);
@@ -284,7 +284,7 @@ function runPrimary(){
   openPanel(action.target);
 }
 function ensureHome(){
-  if(meViewportWidth()>740)return;
+  if(meViewportWidth()>899)return;
   const home=document.querySelector("#home .me-mobile-home-dashboard");
   if(!home)return;
 
@@ -354,7 +354,7 @@ function ensureHome(){
   }
 }
 function sync(){
-  if(meViewportWidth()>740)return;
+  if(meViewportWidth()>899)return;
   ensureHome();
   const s=gameState();
   const action=nextAction();
@@ -380,7 +380,7 @@ function sync(){
   serviceButtons.forEach(b=>b.disabled=!!s?.trip);
 }
 function reassertSheet(){
-  if(meViewportWidth()>740||!currentPanel)return;
+  if(meViewportWidth()>899||!currentPanel)return;
   const target=document.getElementById(currentPanel),home=document.getElementById("home");
   if(!target||!home)return;
   home.classList.remove("hide");
@@ -389,7 +389,7 @@ function reassertSheet(){
   document.body.classList.add("me-mobile-home-sheet-open");
 }
 document.addEventListener("click",e=>{
-  if(meViewportWidth()>740)return;
+  if(meViewportWidth()>899)return;
 
   const mobileTab=e.target.closest("[data-mobile-tab]");
   if(mobileTab){
@@ -443,7 +443,7 @@ window.addEventListener("marina-empire-updated",()=>{
   setTimeout(()=>{sync();reassertSheet()},30);
 });
 window.addEventListener("resize",()=>{
-  if(meViewportWidth()>740&&currentPanel){
+  if(meViewportWidth()>899&&currentPanel){
     clearSheetClasses();currentPanel=null;document.body.classList.remove("me-mobile-home-sheet-open");
   }else sync();
 });
