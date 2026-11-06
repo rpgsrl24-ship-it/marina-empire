@@ -136,11 +136,17 @@ function complete(chain,p,c){
     state.vesselRelations=state.vesselRelations&&typeof state.vesselRelations==="object"?state.vesselRelations:{};
     state.vesselRelations[marina]=state.vesselRelations[marina]&&typeof state.vesselRelations[marina]==="object"?state.vesselRelations[marina]:{};
     const vr=state.vesselRelations[marina][chain.vessel.id]||{};
+    const departureAt=Date.now();
+    const returnDelay=(18+(hash(chain.vessel.id+"|"+marina+"|"+departureAt)%55))*3600000;
     state.vesselRelations[marina][chain.vessel.id]={
      visits:Math.max(0,Math.floor(Number(vr.visits)||0))+1,
      services:Math.max(0,Math.floor(Number(vr.services)||0))+chain.steps.length,
      lastChain:chain.id,
-     lastAt:Date.now()
+     lastContract:chain.steps[chain.steps.length-1]?.type||"",
+     lastAt:departureAt,
+     lastDepartureAt:departureAt,
+     nextVisitAfter:departureAt+returnDelay,
+     name:chain.vessel.name
     };
    }
   }
