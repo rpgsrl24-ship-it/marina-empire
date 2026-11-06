@@ -33,7 +33,7 @@ style.textContent=`
 .me-charter2-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.me-charter2-head b{color:#f2d293}.me-charter2 small{color:#91aab4}
 .me-charter2-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.me-charter2-actions button{flex:1 1 100px;min-height:38px;padding:6px;font-size:8px}
 .me-charter2-actions button.on{border-color:#e2c17e;background:#173f50;color:#ffe0a0}.me-charter2-status{margin-top:6px;color:#e9cb8f;font-size:9px}
-@media(max-width:740px){.me-charter2{padding:8px}.me-charter2-actions button{min-height:44px;font-size:9px}}
+@media(max-width:899px){.me-charter2{padding:8px}.me-charter2-actions button{min-height:44px;font-size:9px}}
 `;
 document.head.appendChild(style);
 
