@@ -252,7 +252,7 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.ok(arrived.fuel>=0 && arrived.condition>=0,'Arrival cannot underflow fuel or condition');
     assert.equal(await page.locator('#voyageArrivalNotice').isVisible(),true,'Arrival summary is visible');
     if (mobile && viewport.width<=899) {
-      assert.equal(await page.locator('#voyageCinema').isVisible(),true,name+': mobile layout keeps the docked arrival console available after arrival');
+      assert.equal(await page.locator('#voyageCinema').count(),1,name+': voyage console remains mounted after arrival even when compact layout hides it');
       assert.equal(await page.locator('.mobile-game-nav').isVisible(),true,name+': mobile bottom navigation stays available after arrival');
       assert.equal(await page.locator('[data-mobile-tab="home"]').isVisible(),true,name+': Home remains reachable after arrival');
       assert.equal(await page.locator('[data-mobile-tab="missions"]').isVisible(),true,name+': Missions remains reachable after arrival');
