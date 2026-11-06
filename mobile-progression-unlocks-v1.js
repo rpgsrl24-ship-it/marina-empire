@@ -44,7 +44,13 @@ function specializationLabel(){
  return s.icon+" "+s.label+(rank?.label?" · "+rank.label:"");
 }
 function milestone(){
- const voyages=num(state?.voyages),jobs=vhfCount(),rep=bestSectorRep(),prestige=num(state?.prestige),fleet=boats();
+ const voyages=num(state?.voyages),jobs=vhfCount(),rep=bestSectorRep(),guestJobs=num(state?.guestTrialJobsUsed);
+ if(!window.meRegisteredPlayer){
+  if(voyages===0)return {step:1,total:8,title:"Completa la prima missione",desc:"Salpa da Rimini e completa il primo viaggio.",value:0,target:1,label:"0 / 1 missione",action:"MISSIONI",panel:"missions"};
+  if(voyages===1&&guestJobs<1)return {step:2,total:8,title:"Prova Marina Live",desc:"Completa 1 incarico VHF gratuito prima della seconda missione.",value:0,target:1,label:"0 / 1 incarico VHF",action:"MARINA LIVE",panel:"marinas"};
+  if(voyages===1&&guestJobs>=1)return {step:3,total:8,title:"Completa la seconda missione",desc:"Hai provato Marina Live. Ora salpa di nuovo per concludere il tour.",value:1,target:2,label:"1 / 2 missioni",action:"SECONDA MISSIONE",panel:"missions"};
+  if(voyages>=2)return {step:4,total:8,title:"Salva il tuo impero",desc:"Tour completato: registrati gratis per salvare e continuare.",value:1,target:1,label:"TOUR COMPLETO",action:"REGISTRATI",panel:"profile"};
+ }
  const career=window.MarinaEmpireCareerPath?.snapshot?.();
  if(career?.next){
   const missing=career.missing||[];
