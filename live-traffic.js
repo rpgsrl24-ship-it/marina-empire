@@ -71,8 +71,8 @@ function vesselRelation(vessel,key=portKey()){
   const services=Math.max(0,Math.floor(Number(raw.services)||0));
   const level=visits>=7?5:visits>=4?4:visits>=2?3:visits>=1?2:1;
   const label=level===5?"CLIENTE VIP":level===4?"CLIENTE PREFERITO":level===3?"CLIENTE ABITUALE":level===2?"DI RITORNO":"NUOVO CLIENTE";
-  return {visits,services,level,label,lastAt:Number(raw.lastAt)||0,lastChain:String(raw.lastChain||""),lastContract:String(raw.lastContract||""),lastDepartureAt:Number(raw.lastDepartureAt)||0,nextVisitAfter:Number(raw.nextVisitAfter)||0};
- }catch(_){return {visits:0,services:0,level:1,label:"NUOVO CLIENTE",lastAt:0,lastChain:"",lastContract:"",lastDepartureAt:0,nextVisitAfter:0}}
+  const loyalty=Math.max(0,Math.floor(Number(raw.loyalty)||0));\n  return {visits,services,loyalty,level,label,lastAt:Number(raw.lastAt)||0,lastChain:String(raw.lastChain||""),lastContract:String(raw.lastContract||""),lastDepartureAt:Number(raw.lastDepartureAt)||0,nextVisitAfter:Number(raw.nextVisitAfter)||0};
+ }catch(_){return {visits:0,services:0,loyalty:0,level:1,label:"NUOVO CLIENTE",lastAt:0,lastChain:"",lastContract:"",lastDepartureAt:0,nextVisitAfter:0}}
 }
 function featuredVessel(){
  const key=portKey(),eligible=VESSELS.filter(v=>["superyacht","charter","regatta"].includes(v.profile));
@@ -179,7 +179,7 @@ function contractSnapshot(){
   const trustBonus=1+(Math.max(1,Number(t.level)||1)-1)*.035;
   const stageBonus=1+(stage-1)*.08;
   const operationBonus=1+(Math.max(1,Number(op.level)||1)-1)*.03;
-  const relationBonus=i===0&&relation?1+(Math.max(1,Number(relation.level)||1)-1)*.06:1;
+  const loyaltyBonus=i===0&&relation?Math.min(.18,(Math.max(0,Number(relation.loyalty)||0)*.015)):0;\n  const relationBonus=i===0&&relation?1+(Math.max(1,Number(relation.level)||1)-1)*.06+loyaltyBonus:1;
   const reward=Math.round(c.reward*demand*trustBonus*stageBonus*operationBonus*relationBonus);
   const prestige=Math.round(c.prestige*(1+(stage-1)*.06)*relationBonus);
   const reputation=Math.round(c.reputation*(1+(stage-1)*.05)*relationBonus);
@@ -187,7 +187,7 @@ function contractSnapshot(){
     dynamicId:"dyn-"+key+"-"+slot()+"-"+i+"-"+c.id,
     marina:key,worldEvent:w.event?.title||"Attività ordinaria",localEvent:local.event?.title||"Attività locale ordinaria",operationLevel:op.level,operationLabel:op.label,
     clientVessel:i===0&&feature?.id?{id:feature.id,name:feature.name,length:feature.length,profile:feature.profile}:null,
-    relationLevel:i===0&&relation?relation.level:1,relationLabel:i===0&&relation?relation.label:"NUOVO CLIENTE"};
+    relationLevel:i===0&&relation?relation.level:1,relationLabel:i===0&&relation?relation.label:"NUOVO CLIENTE",loyalty:i===0&&relation?relation.loyalty:0};
  });
 }
 function ensure(){
@@ -227,7 +227,7 @@ function render(){
   const running=active?.id===c.dynamicId;
   const check=window.MarinaEmpireNpcEconomy?.canStart?.(c)||{ok:false,message:"Sistema incarichi non disponibile"};
   const disabled=!!active||!check.ok;
-  return '<article class="me-contract"><strong>'+c.icon+' '+c.title+(c.clientVessel?' · '+c.clientVessel.name:'')+'</strong><p>'+c.worldEvent+' · '+formatCredits(c.reward)+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+(c.clientVessel?' · '+c.relationLabel:'')+'</p><button type="button" data-dyn-contract="'+c.dynamicId+'" '+(disabled?'disabled':'')+'>'+(running?'IN CORSO':check.ok?'ACCETTA CONTRATTO':check.message)+'</button><div class="me-contract-progress"><span data-progress="'+c.dynamicId+'"></span></div><div class="me-contract-status">'+(running?'Operazione in corso':('Disponibile ora · '+c.duration+'s'))+'</div></article>';
+  return '<article class="me-contract"><strong>'+c.icon+' '+c.title+(c.clientVessel?' · '+c.clientVessel.name:'')+'</strong><p>'+c.worldEvent+' · '+formatCredits(c.reward)+' cr · prestigio +'+c.prestige+' · rep. +'+c.reputation+(c.clientVessel?' · '+c.relationLabel+(c.loyalty>0?' · fedeltà '+c.loyalty:''):'')+'</p><button type="button" data-dyn-contract="'+c.dynamicId+'" '+(disabled?'disabled':'')+'>'+(running?'IN CORSO':check.ok?'ACCETTA CONTRATTO':check.message)+'</button><div class="me-contract-progress"><span data-progress="'+c.dynamicId+'"></span></div><div class="me-contract-status">'+(running?'Operazione in corso':('Disponibile ora · '+c.duration+'s'))+'</div></article>';
  }).join("");
  const mem=window.MarinaEmpireMarinaMemory?.current?.()||null;
  const memText=mem?' · memoria traffico '+(mem.pressure>=1.2?'alta':mem.pressure>=1.02?'attiva':mem.pressure<.88?'bassa':'normale'):'';
