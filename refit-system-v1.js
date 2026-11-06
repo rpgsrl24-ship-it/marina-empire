@@ -18,7 +18,7 @@ style.textContent=`
 .me-refit-track b{display:block;color:#f1d196;font-size:11px}.me-refit-track p{font-size:9px!important;margin:5px 0!important;color:#a9bdc5!important}
 .me-refit-track button{width:100%;min-height:40px;padding:7px;font-size:8px}
 .me-refit-level{font-size:9px;color:#e5c680;margin-bottom:6px}
-@media(max-width:740px){.me-refit-grid{grid-template-columns:1fr}.me-refit-track button{min-height:44px;font-size:9px}}
+@media(max-width:899px){.me-refit-grid{grid-template-columns:1fr}.me-refit-track button{min-height:44px;font-size:9px}}
 `;
 document.head.appendChild(style);
 
