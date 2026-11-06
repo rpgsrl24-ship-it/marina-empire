@@ -50,7 +50,7 @@ style.textContent=`
 .me-contract button:disabled{opacity:.5}
 .me-contract-status{margin-top:5px;font-size:8px;color:#8da9b3}
 .me-contract-progress{height:4px;margin-top:5px;background:#153947;border-radius:99px;overflow:hidden}.me-contract-progress span{display:block;height:100%;background:#d1ae70;width:0}
-@media(max-width:740px){.me-traffic-board{margin:7px 8px 8px;padding:8px}.me-traffic-grid{grid-template-columns:1fr}.me-traffic-list{grid-template-columns:1fr 1fr}.me-traffic-row{grid-template-columns:36px minmax(0,1fr);}.me-traffic-row em{grid-column:2}.me-contract-list{grid-template-columns:1fr 1fr}}
+@media(max-width:899px){.me-traffic-board{margin:7px 8px 8px;padding:8px}.me-traffic-grid{grid-template-columns:1fr}.me-traffic-list{grid-template-columns:1fr 1fr}.me-traffic-row{grid-template-columns:36px minmax(0,1fr);}.me-traffic-row em{grid-column:2}.me-contract-list{grid-template-columns:1fr 1fr}}
 @media(max-width:430px){.me-traffic-list,.me-contract-list{grid-template-columns:1fr}}
 `;
 document.head.appendChild(style);
@@ -62,7 +62,7 @@ function portKey(){
  try{if(typeof state!=="undefined"&&state?.port)return String(state.port).toLowerCase()}catch(_){}
  return document.querySelector(".me-current-marina-card")?.dataset?.marinaCard||"rimini";
 }
-function slot(ms=300000){return Math.floor(Date.now()/ms)}
+function slot(ms=180000){return Math.floor(Date.now()/ms)}
 function chainSlot(){return Math.floor(Date.now()/21600000)}
 function vesselRelation(vessel,key=portKey()){
  try{
@@ -215,7 +215,7 @@ function render(){
  }).join("");
  const mem=window.MarinaEmpireMarinaMemory?.current?.()||null;
  const memText=mem?' · memoria traffico '+(mem.pressure>=1.2?'alta':mem.pressure>=1.02?'attiva':mem.pressure<.88?'bassa':'normale'):'';
- box.innerHTML='<div class="me-traffic-head"><strong>⚓ TRAFFICO 24/7 · '+t.volume+' UNITÀ ATTIVE</strong><span>'+((w.weather?.icon||"🌤️")+" "+(w.weather?.label||""))+'</span></div><div style="font-size:8px;color:#d6b575;margin:-2px 0 3px">Profilo marina · '+t.profile.label+memText+'</div><div style="font-size:8.5px;color:#f0cf8a;margin:0 0 3px">'+(t.local.event?.icon||"⚓")+' EVENTO LOCALE SIMULATO · '+(t.local.event?.title||"Attività ordinaria")+'</div><div style="font-size:8px;color:#8fb0bb;margin:0 0 7px">'+(t.local.event?.text||t.profile.description)+' · Operatività Lv.'+t.operation.level+' · '+t.operation.label+(t.operation.next>0?' · '+t.operation.next+' catene al prossimo livello':' · livello massimo')+'</div><div class="me-traffic-grid"><div class="me-traffic-list">'+traffic+'</div><div class="me-contract-list">'+contractHtml+'</div></div>';
+ box.innerHTML='<div class="me-traffic-head"><strong>⚓ TRAFFICO 24/7 · '+t.volume+' UNITÀ ATTIVE</strong><span>'+((w.weather?.icon||"🌤️")+" "+(w.weather?.label||""))+'</span></div><div class="me-traffic-pulse" style="font-size:8px;color:#9fd7c7;margin:-2px 0 5px">● aggiornamento live ogni 15–30 secondi · '+(compact?'vista mobile ottimizzata':'vista completa')+'</div><div style="font-size:8px;color:#d6b575;margin:-2px 0 3px">Profilo marina · '+t.profile.label+memText+'</div><div style="font-size:8.5px;color:#f0cf8a;margin:0 0 3px">'+(t.local.event?.icon||"⚓")+' EVENTO LOCALE SIMULATO · '+(t.local.event?.title||"Attività ordinaria")+'</div><div style="font-size:8px;color:#8fb0bb;margin:0 0 7px">'+(t.local.event?.text||t.profile.description)+' · Operatività Lv.'+t.operation.level+' · '+t.operation.label+(t.operation.next>0?' · '+t.operation.next+' catene al prossimo livello':' · livello massimo')+'</div><div class="me-traffic-grid"><div class="me-traffic-list">'+traffic+'</div><div class="me-contract-list">'+contractHtml+'</div></div>';
  box.querySelectorAll("[data-dyn-contract]").forEach(btn=>btn.addEventListener("click",()=>start(btn.dataset.dynContract)));
 }
 function start(id){
