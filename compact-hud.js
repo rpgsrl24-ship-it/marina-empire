@@ -6,7 +6,7 @@ const st=document.createElement("style");
 st.id="me-compact-hud-style";
 st.textContent=`
 .me-compact-hud{display:none}
-@media(max-width:740px){
+@media(max-width:899px){
   .top{
     min-height:42px!important;height:auto!important;margin:0 0 4px!important;padding:5px 2px!important;
     display:flex!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid rgba(185,149,87,.32)!important
