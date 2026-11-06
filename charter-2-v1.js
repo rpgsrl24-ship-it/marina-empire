@@ -177,15 +177,16 @@ function arrivalResult(m,trip,crewReward){
  const returning=returningClient(m),progress=progressionBonus(m);
  const crew=window.MarinaEmpireCrew?.snapshot?.(m.boat)||{level:1,morale:75,training:0,focus:"balanced"};
  const spec=window.MarinaEmpireSpecialization?.get?.();
+ const refit=window.MarinaEmpireRefit?.snapshot?.(m.boat)||{charterMultiplier:1,charterRating:0};
  const incident=incidentEffect(m,trip,crew),special=specialOutcome(m,crew,p?.tier||"standard");
- let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05)+incident.rating+(returning?.rating||0)+special.rating;
+ let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05)+incident.rating+(returning?.rating||0)+special.rating+(Number(refit.charterRating)||0);
  if(Number(crew.morale)>=90)rating+=.18;else if(Number(crew.morale)<55)rating-=.45;
  if(crew.focus==="hospitality")rating+=.28;
  if(spec?.key==="charter")rating+=.18;
  if(String(trip?.weather||"").toLowerCase().includes("storm"))rating-=.35;
  rating=Math.max(1,Math.min(5,Math.round(rating*10)/10));
  const ratingBoost=rating>=4.7?.12:rating>=4.3?.08:rating>=3.9?.04:0;
- const pct=Math.max(0,tier.reward+ratingBoost+incident.bonus+special.bonus+(returning?.bonus||0)+(progress.reward-1));
+ const pct=Math.max(0,(tier.reward+ratingBoost+incident.bonus+special.bonus+(returning?.bonus||0)+(progress.reward-1))*(Number(refit.charterMultiplier)||1));
  const bonus=Math.round(Math.max(0,Number(crewReward)||0)*pct);
  const reputation=Math.max(3,Math.round((rating*2.2+(tier===TIERS.luxury?2:0))*progress.prestige));
  return {missionId:m.id,client:returning?{...c,label:returning.label,key:returning.key,loyaltyLevel:returning.loyaltyLevel}:c,returningClient:!!returning,clientLoyalty:returning?.loyaltyLevel||"",careerTier:progress.label,careerTierLevel:progress.tier,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct,incident:incident.incident,incidentMatched:!!(incident.incident&&incident.bonus>0),specialRequest:special.request,specialAccepted:special.accepted,specialMatched:special.matched};
