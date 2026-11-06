@@ -106,6 +106,8 @@ function pick(){
 function ensure(){
  const live=document.querySelector(".me-live-marina");
  if(!live)return false;
+ const global=[...document.querySelectorAll(".me-npc-box")];
+ global.forEach(el=>{if(!live.contains(el))el.remove()});
  const existing=[...live.querySelectorAll(".me-npc-box")];
  if(box&&box.parentNode===live){
   existing.forEach((el,i)=>{if(el!==box&&i>=0)el.remove()});
@@ -180,5 +182,16 @@ function boot(){
  window.addEventListener("marina-world-event",()=>{if(!job){current=pick();setTimeout(renderCurrent,80);}});
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)renderCurrent();});
 }
+function cleanupDuplicates(){
+ const live=document.querySelector(".me-live-marina");
+ if(!live)return;
+ const all=[...document.querySelectorAll(".me-npc-box")];
+ const keep=all.find(el=>live.contains(el));
+ all.forEach(el=>{if(el!==keep)el.remove()});
+ if(keep&&box!==keep)box=keep;
+}
+const npcObserver=new MutationObserver(()=>cleanupDuplicates());
+if(document.body)npcObserver.observe(document.body,{childList:true,subtree:true});
+setInterval(cleanupDuplicates,15000);
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true}); else boot();
 })();
