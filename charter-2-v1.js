@@ -1,0 +1,112 @@
+(()=>{
+"use strict";
+if(window.__ME_CHARTER_2_V1__)return;
+window.__ME_CHARTER_2_V1__=true;
+
+const TIERS={
+ standard:{label:"Standard",icon:"⚓",cost:0,rating:0,reward:.00,text:"Servizio essenziale, nessun costo extra."},
+ premium:{label:"Premium",icon:"✨",cost:350,rating:.35,reward:.05,text:"Provisioning migliore e attenzione ospiti."},
+ luxury:{label:"Luxury",icon:"👑",cost:800,rating:.70,reward:.10,text:"Servizio VIP, provisioning e concierge completi."}
+};
+const CLIENTS=[
+ {id:"family",label:"Famiglia",icon:"👨‍👩‍👧",pref:"comfort",need:"Comfort, puntualità e servizio semplice"},
+ {id:"corporate",label:"Corporate",icon:"💼",pref:"precision",need:"Puntualità, privacy e organizzazione"},
+ {id:"vip",label:"VIP",icon:"🥂",pref:"luxury",need:"Privacy, servizio premium e cura dei dettagli"},
+ {id:"honeymoon",label:"Honeymoon",icon:"💍",pref:"hospitality",need:"Atmosfera, comfort e servizio personale"},
+ {id:"event",label:"Evento",icon:"🎉",pref:"service",need:"Coordinamento, ospitalità e puntualità"},
+ {id:"influencer",label:"Creator / Influencer",icon:"📸",pref:"experience",need:"Esperienza memorabile e servizio impeccabile"}
+];
+
+const style=document.createElement("style");
+style.id="me-charter2-style";
+style.textContent=`
+.me-charter2{margin:8px 0;padding:9px;border:1px solid rgba(214,181,117,.32);border-radius:10px;background:rgba(5,31,44,.55)}
+.me-charter2-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.me-charter2-head b{color:#f2d293}.me-charter2 small{color:#91aab4}
+.me-charter2-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.me-charter2-actions button{flex:1 1 100px;min-height:38px;padding:6px;font-size:8px}
+.me-charter2-actions button.on{border-color:#e2c17e;background:#173f50;color:#ffe0a0}.me-charter2-status{margin-top:6px;color:#e9cb8f;font-size:9px}
+@media(max-width:740px){.me-charter2{padding:8px}.me-charter2-actions button{min-height:44px;font-size:9px}}
+`;
+document.head.appendChild(style);
+
+function stateRef(){try{return typeof state!=="undefined"?state:null}catch(_){return null}}
+function hash(s){let h=2166136261;for(const ch of String(s)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function isCharter(m){
+ if(!m||String(m.id||"").startsWith("INTRO_"))return false;
+ const service=String(m.service||m.name||"").toLowerCase();
+ return String(m.boat||"voyager")!=="voyager" && /(charter|escursione|tour|crociere|evento|ospiti|vip)/i.test(service);
+}
+function profile(m){
+ const seed=hash((m?.id||"")+"|"+(m?.dest||"")+"|"+(m?.client||""));
+ const c=CLIENTS[seed%CLIENTS.length];
+ return {...c,party:2+(seed%7),priority:(seed%3===0?"Alta":"Normale")};
+}
+function prepFor(m){
+ const s=stateRef();if(!s||!m)return null;
+ const all=s.charterPrep&&typeof s.charterPrep==="object"?s.charterPrep:{};
+ return all[m.id]||null;
+}
+function prepare(m,tierKey){
+ const s=stateRef();if(!s||!m||!isCharter(m)||!TIERS[tierKey]||s.trip)return false;
+ const tier=TIERS[tierKey],old=prepFor(m),already=Math.max(0,Number(old?.costPaid)||0),extra=Math.max(0,tier.cost-already);
+ if((Number(s.coins)||0)<extra){if(typeof notice==="function")notice("Crediti insufficienti per la preparazione charter.");return false}
+ const ok=typeof meAtomicPersist==="function"?meAtomicPersist(()=>{
+  s.coins-=extra;
+  s.charterPrep=s.charterPrep&&typeof s.charterPrep==="object"?s.charterPrep:{};
+  s.charterPrep[m.id]={tier:tierKey,costPaid:already+extra,at:Date.now(),client:profile(m).id};
+ }):false;
+ if(!ok)return false;
+ if(typeof render==="function")render();
+ if(typeof notice==="function")notice("Charter preparato: "+tier.label+(extra?" · "+extra.toLocaleString("it-IT")+" crediti":""));
+ window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"charter-prep"}}));
+ return true;
+}
+function beforeLaunch(m){
+ if(!isCharter(m))return {ok:true};
+ const p=prepFor(m);
+ if(!p||!TIERS[p.tier])return {ok:false,message:"Prima prepara il charter scegliendo Standard, Premium o Luxury."};
+ return {ok:true,prep:p,tier:TIERS[p.tier],client:profile(m)};
+}
+function cardAddon(m){
+ if(!isCharter(m))return "";
+ const c=profile(m),p=prepFor(m),selected=p?.tier||"";
+ return '<div class="me-charter2"><div class="me-charter2-head"><div><small>CHARTER 2.0 · PROFILO CLIENTE</small><b>'+c.icon+' '+c.label+' · '+c.party+' ospiti</b></div><small>Priorità '+c.priority+'</small></div><small>'+c.need+'</small><div class="me-charter2-actions">'+Object.entries(TIERS).map(([k,t])=>'<button type="button" data-charter-prep="'+k+'" data-charter-mission="'+String(m.id).replace(/"/g,"&quot;")+'" class="'+(selected===k?'on':'')+'">'+t.icon+' '+t.label+(t.cost?' · '+t.cost+' CR':' · 0 CR')+'</button>').join("")+'</div><div class="me-charter2-status">'+(selected?('Preparazione attiva: '+TIERS[selected].label+' · costo già sostenuto '+Math.max(0,Number(p.costPaid)||0).toLocaleString("it-IT")+' CR'):'Scegli il livello di servizio prima della partenza.')+'</div></div>';
+}
+function arrivalResult(m,trip,crewReward){
+ if(!isCharter(m))return null;
+ const p=prepFor(m),tier=TIERS[p?.tier]||TIERS.standard,c=profile(m);
+ const crew=window.MarinaEmpireCrew?.snapshot?.(m.boat)||{level:1,morale:75,training:0,focus:"balanced"};
+ const spec=window.MarinaEmpireSpecialization?.get?.();
+ let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05);
+ if(Number(crew.morale)>=90)rating+=.18;else if(Number(crew.morale)<55)rating-=.45;
+ if(crew.focus==="hospitality")rating+=.28;
+ if(spec?.key==="charter")rating+=.18;
+ if(String(trip?.weather||"").toLowerCase().includes("storm"))rating-=.35;
+ rating=Math.max(1,Math.min(5,Math.round(rating*10)/10));
+ const ratingBoost=rating>=4.7?.12:rating>=4.3?.08:rating>=3.9?.04:0;
+ const pct=Math.max(0,tier.reward+ratingBoost);
+ const bonus=Math.round(Math.max(0,Number(crewReward)||0)*pct);
+ const reputation=Math.max(3,Math.round(rating*2.2+(tier===TIERS.luxury?2:0)));
+ return {missionId:m.id,client:c,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct};
+}
+function applyArrival(r){
+ const s=stateRef();if(!s||!r)return;
+ s.charterStats=s.charterStats&&typeof s.charterStats==="object"?s.charterStats:{completed:0,ratingTotal:0,bestRating:0,repeatClients:0};
+ s.charterStats.completed=Math.max(0,Number(s.charterStats.completed)||0)+1;
+ s.charterStats.ratingTotal=Math.max(0,Number(s.charterStats.ratingTotal)||0)+r.rating;
+ s.charterStats.bestRating=Math.max(Number(s.charterStats.bestRating)||0,r.rating);
+ if(r.rating>=4.5)s.charterStats.repeatClients=Math.max(0,Number(s.charterStats.repeatClients)||0)+1;
+ s.sectorReputation=s.sectorReputation&&typeof s.sectorReputation==="object"?s.sectorReputation:{};
+ s.sectorReputation.charter=Math.max(0,Math.floor(Number(s.sectorReputation.charter)||0))+r.reputation;
+ if(s.charterPrep&&typeof s.charterPrep==="object")delete s.charterPrep[r.missionId];
+ s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,at:Date.now()};
+}
+document.addEventListener("click",e=>{
+ const b=e.target.closest("[data-charter-prep]");if(!b)return;
+ e.preventDefault();e.stopPropagation();
+ try{
+  const m=typeof findAvailableMission==="function"?findAvailableMission(b.dataset.charterMission):null;
+  if(m)prepare(m,b.dataset.charterPrep);
+ }catch(_){}
+});
+window.MarinaEmpireCharter2={isCharter,profile,prepFor,prepare,beforeLaunch,cardAddon,arrivalResult,applyArrival,tiers:TIERS};
+})();
