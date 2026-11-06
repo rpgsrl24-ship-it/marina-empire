@@ -246,8 +246,9 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.equal(arrived.port,launched.trip.dest,'Arrival updates yacht location');
     assert.equal(arrived.lastArrival.weather,launched.trip.weather,name+': arrival preserves the simulated weather profile');
     assert.equal(arrived.voyages,1,'The first trip is counted once');
-    assert.equal(arrived.lastArrival.reward,launched.trip.mission.reward,'The advertised mission reward is recorded');
-    assert.ok(arrived.coins>=launched.coins+launched.trip.mission.reward,'Reward is credited');
+    assert.equal(arrived.lastArrival.baseReward,launched.trip.mission.reward,'The advertised base mission reward is recorded');
+    assert.ok(arrived.lastArrival.reward>=arrived.lastArrival.baseReward,'Final reward may include valid crew/charter bonuses');
+    assert.ok(arrived.coins>=launched.coins+launched.trip.mission.reward,'At least the advertised mission reward is credited');
     assert.ok(arrived.fuel>=0 && arrived.condition>=0,'Arrival cannot underflow fuel or condition');
     assert.equal(await page.locator('#voyageArrivalNotice').isVisible(),true,'Arrival summary is visible');
     if (mobile && viewport.width<=740) {
