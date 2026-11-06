@@ -71,8 +71,8 @@ function vesselRelation(vessel,key=portKey()){
   const services=Math.max(0,Math.floor(Number(raw.services)||0));
   const level=visits>=7?5:visits>=4?4:visits>=2?3:visits>=1?2:1;
   const label=level===5?"CLIENTE VIP":level===4?"CLIENTE PREFERITO":level===3?"CLIENTE ABITUALE":level===2?"DI RITORNO":"NUOVO CLIENTE";
-  return {visits,services,level,label,lastAt:Number(raw.lastAt)||0,lastChain:String(raw.lastChain||"")};
- }catch(_){return {visits:0,services:0,level:1,label:"NUOVO CLIENTE",lastAt:0,lastChain:""}}
+  return {visits,services,level,label,lastAt:Number(raw.lastAt)||0,lastChain:String(raw.lastChain||""),lastContract:String(raw.lastContract||"")};
+ }catch(_){return {visits:0,services:0,level:1,label:"NUOVO CLIENTE",lastAt:0,lastChain:"",lastContract:""}}
 }
 function featuredVessel(){
  const key=portKey(),eligible=VESSELS.filter(v=>["superyacht","charter","regatta"].includes(v.profile));
@@ -203,12 +203,19 @@ function ensure(){
  return true;
 }
 function formatCredits(n){return Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT")}
+function relationStory(vessel){
+ const r=vessel?.relation;
+ if(!r||r.visits<=0)return "prima visita";
+ const contract=CONTRACTS.find(c=>c.id===r.lastContract);
+ const service=contract?.type||"servizio marina";
+ return r.visits===1?("ritorna dopo "+service):("cliente storico · "+r.visits+" visite · ultimo: "+service);
+}
 function render(){
  if(!ensure())return;
  const t=trafficSnapshot(),contracts=contractSnapshot(),w=t.world;
  const compact=typeof innerWidth!=="undefined"&&innerWidth<=899;
  const trafficLimit=compact?3:5,contractLimit=compact?2:contracts.length;
- const traffic=t.items.slice(0,trafficLimit).map(x=>'<div class="me-traffic-row"><span>'+x.action+'</span><b>'+(x.featured?'★ ':'')+x.name+(x.featured&&x.relation?.level>1?' · '+x.relation.label:'')+'</b><em>'+x.kind+' · '+x.berth+(x.eta>0?' · '+x.eta+' min':'')+'</em></div>').join("");
+ const traffic=t.items.slice(0,trafficLimit).map(x=>'<div class="me-traffic-row"><span>'+x.action+'</span><b>'+(x.featured?'★ ':'')+x.name+(x.featured&&x.relation?.level>1?' · '+x.relation.label:'')+'</b><em>'+x.kind+' · '+x.berth+(x.eta>0?' · '+x.eta+' min':'')+(x.featured?' · '+relationStory(x):'')+'</em></div>').join("");
  const contractHtml=contracts.slice(0,contractLimit).map(c=>{
   const running=active?.id===c.dynamicId;
   const check=window.MarinaEmpireNpcEconomy?.canStart?.(c)||{ok:false,message:"Sistema incarichi non disponibile"};
