@@ -206,8 +206,10 @@ function formatCredits(n){return Math.max(0,Math.round(Number(n)||0)).toLocaleSt
 function render(){
  if(!ensure())return;
  const t=trafficSnapshot(),contracts=contractSnapshot(),w=t.world;
- const traffic=t.items.slice(0,5).map(x=>'<div class="me-traffic-row"><span>'+x.action+'</span><b>'+(x.featured?'★ ':'')+x.name+(x.featured&&x.relation?.level>1?' · '+x.relation.label:'')+'</b><em>'+x.kind+' · '+x.berth+(x.eta>0?' · '+x.eta+' min':'')+'</em></div>').join("");
- const contractHtml=contracts.map(c=>{
+ const compact=typeof innerWidth!=="undefined"&&innerWidth<=899;
+ const trafficLimit=compact?3:5,contractLimit=compact?2:contracts.length;
+ const traffic=t.items.slice(0,trafficLimit).map(x=>'<div class="me-traffic-row"><span>'+x.action+'</span><b>'+(x.featured?'★ ':'')+x.name+(x.featured&&x.relation?.level>1?' · '+x.relation.label:'')+'</b><em>'+x.kind+' · '+x.berth+(x.eta>0?' · '+x.eta+' min':'')+'</em></div>').join("");
+ const contractHtml=contracts.slice(0,contractLimit).map(c=>{
   const running=active?.id===c.dynamicId;
   const check=window.MarinaEmpireNpcEconomy?.canStart?.(c)||{ok:false,message:"Sistema incarichi non disponibile"};
   const disabled=!!active||!check.ok;
