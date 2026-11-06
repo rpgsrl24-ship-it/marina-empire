@@ -7,7 +7,7 @@ window.__ME_MOBILE_FIRST_V5__=true;
 const style=document.createElement("style");
 style.id="me-mobile-first-v5-style";
 style.textContent=`
-@media(max-width:740px){
+@media(max-width:899px){
   /* Mobile-first cleanup: one HUD, one credit CTA, no desktop service panels */
   html body .stats{display:none!important}
   html body #meFuelPanel,
@@ -89,7 +89,7 @@ style.textContent=`
     font-size:9px!important;font-weight:900!important;letter-spacing:.11em!important
   }
 }
-@media(min-width:741px){
+@media(min-width:900px){
   #meMobileCreditsHero,#meMobileEmpireActions,#meMobileHomeSectionTitle{display:none!important}
 }
 `;
@@ -100,7 +100,7 @@ function go(id){
 }
 
 function ensure(){
-  if(meViewportWidth()>740)return;
+  if(meViewportWidth()>899)return;
   const home=document.querySelector("#home .me-mobile-home-dashboard");
   if(!home)return;
 
