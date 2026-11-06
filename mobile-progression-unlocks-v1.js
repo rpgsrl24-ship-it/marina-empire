@@ -139,7 +139,7 @@ function render(){
   }
  }
  const m=milestone(),pct=Math.max(0,Math.min(100,Math.round((m.value/Math.max(1,m.target))*100)));
- box.innerHTML='<div id="meMobileGrowthHead"><div><small>PROGRESSIONE COMANDANTE</small><strong>'+m.title+'</strong></div><span id="meMobileGrowthStep">FASE '+m.step+'/'+(m.total||8)</span></div>'+
+ box.innerHTML='<div id="meMobileGrowthHead"><div><small>PROGRESSIONE COMANDANTE</small><strong>'+m.title+'</strong></div><span id="meMobileGrowthStep">FASE '+m.step+'/'+(m.total||8)+'</span></div>'+
   '<p>'+m.desc+'</p><div id="meMobileGrowthBar"><i style="width:'+pct+'%"></i></div>'+
   '<div id="meMobileGrowthMeta"><span>'+m.label+'</span><span>'+pct+'%</span></div>'+
   '<button type="button" id="meMobileGrowthAction">'+m.action+'</button>'+
