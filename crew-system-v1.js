@@ -53,7 +53,7 @@ const FOCUS={
 function roster(id){return ROLE_SETS[String(id||"voyager")]||ROLE_SETS.voyager}
 function defaultRoster(id){
  const roles=roster(id),base=Math.max(0,num(crewInfo(id).daily)),share=roles.length?Math.round(base/roles.length):0;
- return roles.map((r,i)=>({id:"default-"+String(id)+"-"+i,name:r[0],role:r[0],duty:r[1],skill:50,salary:share,default:true}));
+ return roles.map((r,i)=>({id:"default-"+String(id)+"-"+i,name:r[0],role:r[0],duty:r[1],skill:50,salary:share,xp:0,morale:85,specialty:"base",default:true}));
 }
 function ensureRoster(id){
  const s=gameState();if(!s)return defaultRoster(id);
@@ -67,6 +67,21 @@ function candidates(id){
  const day=Math.floor(Date.now()/86400000);
  return CANDIDATES.filter(x=>roles.has(x.role)).sort((a,b)=>((a.id.length+day)%7)-((b.id.length+day)%7)).slice(0,3);
 }
+function normalizeMember(m){
+ m.xp=num(m.xp);
+ m.morale=Math.max(35,Math.min(100,num(m.morale)||85));
+ m.skill=Math.max(40,Math.min(95,num(m.skill)||50));
+ m.specialty=String(m.specialty||"base");
+ return m;
+}
+function memberSpecialty(m){
+ const xp=num(m.xp),role=String(m.role||"");
+ if(xp<5)return {id:"base",label:"In formazione",bonus:0};
+ if(role==="Comandante"||role==="Primo Ufficiale")return {id:"navigation",label:"Navigazione",bonus:.012};
+ if(role==="Engineer")return {id:"technical",label:"Tecnica",bonus:.014};
+ if(role==="Chef"||role==="Hostess"||role==="Chief Steward/ess")return {id:"hospitality",label:"Hospitality",bonus:.014};
+ return {id:"deck",label:"Operazioni di coperta",bonus:.01};
+}
 function payroll(id){return ensureRoster(id).reduce((n,m)=>n+Math.max(0,num(m.salary)),0)}
 function recruit(candidateId){
  const s=gameState();if(!s||s.trip)return;
@@ -78,7 +93,7 @@ function recruit(candidateId){
  const ok=typeof meAtomicPersist==="function"?meAtomicPersist(()=>{
   s.coins-=fee;
   const duty=roster(id).find(r=>r[0]===cand.role)?.[1]||"Operazioni di bordo";
-  list[slot]={...cand,duty,default:false,recruitedAt:Date.now()};
+  list[slot]={...cand,duty,xp:0,morale:88,specialty:"base",default:false,recruitedAt:Date.now()};
   s.crewRoster[id]=list;
  }):false;
  if(!ok)return;
@@ -101,13 +116,15 @@ function snapshot(id){
  const raw=(s.crewProgress&&s.crewProgress[id])||{xp:0,morale:85,training:0,focus:"balanced"};
  const xp=num(raw.xp),morale=Math.max(35,Math.min(100,num(raw.morale)||85)),training=Math.max(0,Math.min(5,num(raw.training))),focus=FOCUS[raw.focus]?raw.focus:"balanced";
  const level=xp>=30?5:xp>=18?4:xp>=10?3:xp>=4?2:1;
- const members=ensureRoster(id),avgSkill=members.length?members.reduce((n,m)=>n+Math.max(0,num(m.skill)),0)/members.length:50;
+ const members=ensureRoster(id).map(normalizeMember),avgSkill=members.length?members.reduce((n,m)=>n+Math.max(0,num(m.skill)),0)/members.length:50;
+ const avgMemberMorale=members.length?members.reduce((n,m)=>n+Math.max(35,num(m.morale)),0)/members.length:85;
+ const specialtyBonus=Math.min(.05,members.reduce((n,m)=>n+memberSpecialty(m).bonus,0));
  const skillBonus=Math.max(0,Math.min(.05,(avgSkill-50)*.0018));
  const xpBonus=Math.min(.06,xp*.002);
  const trainingBonus=training*.012;
  const moraleBonus=morale>=90?.03:morale>=75?.015:morale<55?-.03:0;
  const focusBonus=FOCUS[focus]?.bonus||0;
- return {unlocked:num(s.voyages)>=4||((s.owned||[]).length>=2),xp,morale,training,focus,level,avgSkill:Math.round(avgSkill),payroll:payroll(id),bonus:Math.max(.95,1+xpBonus+trainingBonus+moraleBonus+focusBonus+skillBonus),info:crewInfo(id),roster:members,candidates:candidates(id)};
+ return {unlocked:num(s.voyages)>=4||((s.owned||[]).length>=2),xp,morale,training,focus,level,avgSkill:Math.round(avgSkill),avgMemberMorale:Math.round(avgMemberMorale),payroll:payroll(id),bonus:Math.max(.95,1+xpBonus+trainingBonus+moraleBonus+focusBonus+skillBonus+specialtyBonus),info:crewInfo(id),roster:members,candidates:candidates(id)};
 }
 function missionMultiplier(id){return snapshot(id).bonus}
 function onMissionComplete(id){
@@ -121,6 +138,17 @@ function onMissionComplete(id){
  c.morale=Math.max(35,Math.min(100,(num(c.morale)||85)-drain));
  c.training=Math.max(0,Math.min(5,num(c.training)));
  s.crewProgress[id]=c;
+ const members=ensureRoster(id);
+ for(const member of members){
+  normalizeMember(member);
+  member.xp+=1;
+  const spec=memberSpecialty(member);
+  member.specialty=spec.id;
+  if(member.xp%5===0)member.skill=Math.min(95,member.skill+1);
+  const fatigue=member.role==="Comandante"||member.role==="Engineer"?4:3;
+  member.morale=Math.max(35,member.morale-fatigue);
+ }
+ if(s.crewRoster&&Array.isArray(s.crewRoster[id]))s.crewRoster[id]=members;
 }
 function spend(cost,fn,msg){
  const s=gameState();if(!s||s.trip)return;
@@ -134,7 +162,11 @@ function spend(cost,fn,msg){
 }
 function rest(){
  const c=ensureState();if(!c)return;
- spend(250,()=>{c.morale=Math.min(100,c.morale+18)},"Equipaggio riposato · morale aumentato");
+ spend(250,()=>{
+  c.morale=Math.min(100,c.morale+18);
+  const s=gameState(),id=String(s?.boat||"voyager");
+  ensureRoster(id).forEach(m=>{normalizeMember(m);m.morale=Math.min(100,m.morale+15)});
+ },"Equipaggio riposato · morale aumentato");
 }
 function train(){
  const c=ensureState();if(!c)return;
@@ -171,8 +203,8 @@ function draw(){
  box.innerHTML='<div class="me-crew-head"><div><small>EQUIPAGGIO · '+String(snap.info.count||1)+' PERSONE</small><strong>👥 Equipaggio '+(typeof boat==="function"?(boat(s.boat)?.name||"Yacht"):"Yacht")+'</strong></div><small>LV '+snap.level+'</small></div>'+
  '<div class="me-crew-role">'+snap.info.roles+' · costo operativo '+num(snap.info.daily).toLocaleString("it-IT")+' cr/missione</div>'+
  '<div class="me-crew-grid"><div class="me-crew-stat"><b>'+snap.xp+'</b><span>ESPERIENZA</span></div><div class="me-crew-stat"><b>'+snap.morale+'%</b><span>MORALE</span></div><div class="me-crew-stat"><b>'+snap.training+'/5</b><span>ADDESTRAMENTO</span></div></div>'+
- '<div class="me-crew-roster">'+snap.roster.map((r,i)=>'<div class="me-crew-member"><b>'+(i+1)+'. '+r.name+'</b>'+r.role+' · '+r.duty+'<br>Competenza '+r.skill+' · stipendio '+num(r.salary).toLocaleString("it-IT")+' cr/missione</div>').join('')+'</div>'+
- '<div class="me-crew-bonus">Assetto: <b>'+FOCUS[snap.focus].icon+' '+FOCUS[snap.focus].label+'</b> · '+FOCUS[snap.focus].text+'<br>Competenza media: <b>'+snap.avgSkill+'</b> · stipendi <b>'+snap.payroll.toLocaleString("it-IT")+' cr/missione</b> · bonus efficienza: <b>'+(pct>=0?"+":"")+pct+'%</b>.</div>'+
+ '<div class="me-crew-roster">'+snap.roster.map((r,i)=>{const sp=memberSpecialty(r);return '<div class="me-crew-member"><b>'+(i+1)+'. '+r.name+'</b>'+r.role+' · '+r.duty+'<br>Competenza '+r.skill+' · XP '+num(r.xp)+' · morale '+num(r.morale)+'%<br>'+sp.label+' · stipendio '+num(r.salary).toLocaleString("it-IT")+' cr/missione</div>'}).join('')+'</div>'+
+ '<div class="me-crew-bonus">Assetto: <b>'+FOCUS[snap.focus].icon+' '+FOCUS[snap.focus].label+'</b> · '+FOCUS[snap.focus].text+'<br>Competenza media: <b>'+snap.avgSkill+'</b> · morale medio <b>'+snap.avgMemberMorale+'%</b> · stipendi <b>'+snap.payroll.toLocaleString("it-IT")+' cr/missione</b> · bonus efficienza: <b>'+(pct>=0?"+":"")+pct+'%</b>.</div>'+
  '<div class="me-crew-focus">'+Object.entries(FOCUS).map(([k,v])=>'<button type="button" data-crew-focus="'+k+'" class="'+(snap.focus===k?'on':'')+'">'+v.icon+' '+v.label+'</button>').join('')+'</div>'+ '<div class="me-crew-role"><b>RECLUTAMENTO</b> · candidati disponibili oggi</div><div class="me-crew-roster">'+snap.candidates.map(x=>{const fee=900+x.skill*12;return '<div class="me-crew-member"><b>'+x.name+'</b>'+x.role+' · competenza '+x.skill+' · stipendio '+x.salary+' cr<br><button type="button" data-crew-recruit="'+x.id+'">INGAGGIA · '+fee.toLocaleString("it-IT")+' CR</button></div>'}).join('')+'</div>'+
  '<div class="me-crew-actions"><button type="button" data-crew-rest>⚓ RIPOSO · 250 CR</button><button type="button" data-crew-train>🎓 ADDESTRA · 800 CR</button></div>';
  box.querySelector("[data-crew-rest]")?.addEventListener("click",rest);
