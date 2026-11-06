@@ -83,7 +83,7 @@ function featuredVessel(){
  const ranked=[...pool].sort((a,b)=>{
   const pa=window.MarinaEmpireMarinaProfiles?.vesselWeight?.(a,key)||1,pb=window.MarinaEmpireMarinaProfiles?.vesselWeight?.(b,key)||1;
   const la=window.MarinaEmpireLocalEvents?.vesselWeight?.(a,key)||1,lb=window.MarinaEmpireLocalEvents?.vesselWeight?.(b,key)||1;
-  const ab=affinity.has(b.id)?1.35:1,aa=affinity.has(a.id)?1.35:1;\n  return (hash(b.id+"|"+seed)%1000)*pb*lb*ab-(hash(a.id+"|"+seed)%1000)*pa*la*aa;
+  return (hash(b.id+"|"+seed)%1000)*pb*lb-(hash(a.id+"|"+seed)%1000)*pa*la;
  });
  const v=ranked[0]||pool[0];
  let raw={};
@@ -213,7 +213,8 @@ function relationStory(vessel){
  if(!r||r.visits<=0)return "prima visita";
  const contract=CONTRACTS.find(c=>c.id===r.lastContract);
  const service=contract?.type||"servizio marina";
- const returnText=r.nextVisitAfter&&r.nextVisitAfter>Date.now()?" · ritorno programmato":"";\n return (r.visits===1?("ritorna dopo "+service):("cliente storico · "+r.visits+" visite · ultimo: "+service))+returnText;
+ const returnText=r.nextVisitAfter&&r.nextVisitAfter>Date.now()?" · ritorno programmato":"";
+ return (r.visits===1?("ritorna dopo "+service):("cliente storico · "+r.visits+" visite · ultimo: "+service))+returnText;
 }
 function render(){
  if(!ensure())return;
