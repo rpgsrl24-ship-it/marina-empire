@@ -71,22 +71,43 @@ function cardAddon(m){
  const c=profile(m),p=prepFor(m),selected=p?.tier||"";
  return '<div class="me-charter2"><div class="me-charter2-head"><div><small>CHARTER 2.0 · PROFILO CLIENTE</small><b>'+c.icon+' '+c.label+' · '+c.party+' ospiti</b></div><small>Priorità '+c.priority+'</small></div><small>'+c.need+'</small><div class="me-charter2-actions">'+Object.entries(TIERS).map(([k,t])=>'<button type="button" data-charter-prep="'+k+'" data-charter-mission="'+String(m.id).replace(/"/g,"&quot;")+'" class="'+(selected===k?'on':'')+'">'+t.icon+' '+t.label+(t.cost?' · '+t.cost+' CR':' · 0 CR')+'</button>').join("")+'</div><div class="me-charter2-status">'+(selected?('Preparazione attiva: '+TIERS[selected].label+' · costo già sostenuto '+Math.max(0,Number(p.costPaid)||0).toLocaleString("it-IT")+' CR'):'Scegli il livello di servizio prima della partenza.')+'</div></div>';
 }
+const INCIDENTS=[
+ {id:"diet",icon:"🍽️",title:"Richiesta speciale cambusa",text:"Gli ospiti chiedono un menu diverso all'ultimo minuto.",best:"hospitality"},
+ {id:"late",icon:"⏱️",title:"Cambio programma",text:"Il cliente modifica l'orario e chiede maggiore puntualità.",best:"navigation"},
+ {id:"comfort",icon:"🛋️",title:"Comfort ospiti",text:"Un ospite segnala comfort insufficiente durante il viaggio.",best:"hospitality"},
+ {id:"technical",icon:"🔧",title:"Piccola anomalia tecnica",text:"Serve attenzione dell'equipaggio per evitare disservizi.",best:"technical"},
+ {id:"privacy",icon:"🔒",title:"Richiesta privacy VIP",text:"Il cliente chiede maggiore discrezione e gestione ospiti.",best:"hospitality"},
+ {id:"weather",icon:"🌦️",title:"Meteo variabile",text:"Il piano va adattato senza compromettere l'esperienza.",best:"navigation"}
+];
+function incidentFor(m,trip){
+ if(!isCharter(m))return null;
+ const seed=hash((m.id||"")+"|"+(trip?.voyageId||0)+"|"+(trip?.weather||""));
+ if(seed%100>=58)return null;
+ return INCIDENTS[seed%INCIDENTS.length];
+}
+function incidentEffect(m,trip,crew){
+ const incident=incidentFor(m,trip);if(!incident)return {incident:null,rating:0,bonus:0};
+ const focus=String(crew?.focus||"balanced");
+ const matched=focus===incident.best;
+ return {incident,rating:matched?.18:-.12,bonus:matched?.025:0};
+}
 function arrivalResult(m,trip,crewReward){
  if(!isCharter(m))return null;
  const p=prepFor(m),tier=TIERS[p?.tier]||TIERS.standard,c=profile(m);
  const crew=window.MarinaEmpireCrew?.snapshot?.(m.boat)||{level:1,morale:75,training:0,focus:"balanced"};
  const spec=window.MarinaEmpireSpecialization?.get?.();
- let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05);
+ const incident=incidentEffect(m,trip,crew);
+ let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05)+incident.rating;
  if(Number(crew.morale)>=90)rating+=.18;else if(Number(crew.morale)<55)rating-=.45;
  if(crew.focus==="hospitality")rating+=.28;
  if(spec?.key==="charter")rating+=.18;
  if(String(trip?.weather||"").toLowerCase().includes("storm"))rating-=.35;
  rating=Math.max(1,Math.min(5,Math.round(rating*10)/10));
  const ratingBoost=rating>=4.7?.12:rating>=4.3?.08:rating>=3.9?.04:0;
- const pct=Math.max(0,tier.reward+ratingBoost);
+ const pct=Math.max(0,tier.reward+ratingBoost+incident.bonus);
  const bonus=Math.round(Math.max(0,Number(crewReward)||0)*pct);
  const reputation=Math.max(3,Math.round(rating*2.2+(tier===TIERS.luxury?2:0)));
- return {missionId:m.id,client:c,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct};
+ return {missionId:m.id,client:c,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct,incident:incident.incident,incidentMatched:!!(incident.incident&&incident.bonus>0)};
 }
 function applyArrival(r){
  const s=stateRef();if(!s||!r)return;
@@ -98,7 +119,7 @@ function applyArrival(r){
  s.sectorReputation=s.sectorReputation&&typeof s.sectorReputation==="object"?s.sectorReputation:{};
  s.sectorReputation.charter=Math.max(0,Math.floor(Number(s.sectorReputation.charter)||0))+r.reputation;
  if(s.charterPrep&&typeof s.charterPrep==="object")delete s.charterPrep[r.missionId];
- s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,at:Date.now()};
+ s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,incident:r.incident?.title||"",incidentMatched:!!r.incidentMatched,at:Date.now()};
 }
 document.addEventListener("click",e=>{
  const b=e.target.closest("[data-charter-prep]");if(!b)return;
@@ -108,5 +129,5 @@ document.addEventListener("click",e=>{
   if(m)prepare(m,b.dataset.charterPrep);
  }catch(_){}
 });
-window.MarinaEmpireCharter2={isCharter,profile,prepFor,prepare,beforeLaunch,cardAddon,arrivalResult,applyArrival,tiers:TIERS};
+window.MarinaEmpireCharter2={isCharter,profile,prepFor,prepare,beforeLaunch,cardAddon,arrivalResult,applyArrival,incidentFor,tiers:TIERS};
 })();
