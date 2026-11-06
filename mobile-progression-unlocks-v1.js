@@ -6,7 +6,7 @@ window.__ME_MOBILE_PROGRESSION_UNLOCKS_V1__=true;
 const style=document.createElement("style");
 style.id="me-mobile-progression-unlocks-v1-style";
 style.textContent=`
-@media(max-width:740px){
+@media(max-width:899px){
  #meMobileGrowth{
    order:-13!important;margin:0!important;padding:10px 11px!important;
    border:1px solid rgba(205,166,96,.48)!important;border-radius:13px!important;
@@ -26,7 +26,7 @@ style.textContent=`
  #meMobileGrowthMilestones i{display:block!important;flex:1!important;height:3px!important;border-radius:99px!important;background:#173845!important}
  #meMobileGrowthMilestones i.on{background:#d6b575!important}
 }
-@media(min-width:741px){#meMobileGrowth{display:none!important}}
+@media(min-width:900px){#meMobileGrowth{display:none!important}}
 `;
 document.head.appendChild(style);
 
@@ -59,7 +59,7 @@ function openPanel(id){
  if(typeof showTab==="function")showTab(id);
 }
 function ensure(){
- if(typeof innerWidth!=="undefined"&&innerWidth>740)return null;
+ if(typeof innerWidth!=="undefined"&&innerWidth>899)return null;
  const home=document.querySelector("#home .me-mobile-home-dashboard");if(!home)return null;
  let box=document.getElementById("meMobileGrowth");if(box)return box;
  box=document.createElement("section");box.id="meMobileGrowth";
