@@ -7,7 +7,7 @@ window.__ME_MOBILE_HOME_CLEAN_V4__=true;
 const st=document.createElement("style");
 st.id="me-mobile-home-clean-v4-style";
 st.textContent=`
-@media(max-width:740px){
+@media(max-width:899px){
   /* One navigation system only: bottom bar */
   html body .me-command-rail,
   html body .me-command-bottom,
@@ -79,7 +79,7 @@ st.textContent=`
   #home{padding-bottom:96px!important}
   #home .me-mobile-home-dashboard{padding-top:0!important}
 }
-@media(min-width:741px){
+@media(min-width:900px){
   #meMobileMarinaLiveCard{display:none!important}
 }
 `;
@@ -101,7 +101,7 @@ function liveSummary(){
   }catch(_){return portName()+" · MONDO VIVO"}
 }
 function ensure(){
-  if(meViewportWidth()>740)return;
+  if(meViewportWidth()>899)return;
   const hud=document.getElementById("meCompactHud");
   const home=document.getElementById("home");
   if(!home)return;
