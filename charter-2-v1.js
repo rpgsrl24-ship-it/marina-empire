@@ -171,6 +171,21 @@ function progressionBonus(m){
  const prestige=1+(s.tier-1)*.05;
  return {reward,prestige,label:s.label,tier:s.tier};
 }
+function crewImpact(crew,incident,special){
+ const members=Array.isArray(crew?.roster)?crew.roster:[];
+ const avgMorale=Math.max(35,Math.min(100,Number(crew?.avgMemberMorale)||Number(crew?.morale)||75));
+ const specs=members.map(x=>String(x?.specialty||"base"));
+ let rating=0,bonus=0;
+ if(avgMorale>=90){rating+=.14;bonus+=.015}
+ else if(avgMorale<55){rating-=.35}
+ if(special?.request?.bestFocus==="hospitality"&&specs.includes("hospitality")){rating+=.12;bonus+=.012}
+ if(special?.request?.bestFocus==="navigation"&&specs.includes("navigation")){rating+=.10;bonus+=.01}
+ if(special?.request?.bestFocus==="technical"&&specs.includes("technical")){rating+=.10;bonus+=.01}
+ if(incident?.incident?.best==="hospitality"&&specs.includes("hospitality"))rating+=.10;
+ if(incident?.incident?.best==="navigation"&&specs.includes("navigation"))rating+=.08;
+ if(incident?.incident?.best==="technical"&&specs.includes("technical"))rating+=.08;
+ return {rating,bonus,avgMorale};
+}
 function arrivalResult(m,trip,crewReward){
  if(!isCharter(m))return null;
  const p=prepFor(m),tier=TIERS[p?.tier]||TIERS.standard,c=profile(m);
@@ -178,18 +193,18 @@ function arrivalResult(m,trip,crewReward){
  const crew=window.MarinaEmpireCrew?.snapshot?.(m.boat)||{level:1,morale:75,training:0,focus:"balanced"};
  const spec=window.MarinaEmpireSpecialization?.get?.();
  const refit=window.MarinaEmpireRefit?.snapshot?.(m.boat)||{charterMultiplier:1,charterRating:0};
- const incident=incidentEffect(m,trip,crew),special=specialOutcome(m,crew,p?.tier||"standard");
- let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05)+incident.rating+(returning?.rating||0)+special.rating+(Number(refit.charterRating)||0);
+ const incident=incidentEffect(m,trip,crew),special=specialOutcome(m,crew,p?.tier||"standard"),crewFx=crewImpact(crew,incident,special);
+ let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05)+incident.rating+crewFx.rating+(returning?.rating||0)+special.rating+(Number(refit.charterRating)||0);
  if(Number(crew.morale)>=90)rating+=.18;else if(Number(crew.morale)<55)rating-=.45;
  if(crew.focus==="hospitality")rating+=.28;
  if(spec?.key==="charter")rating+=.18;
  if(String(trip?.weather||"").toLowerCase().includes("storm"))rating-=.35;
  rating=Math.max(1,Math.min(5,Math.round(rating*10)/10));
  const ratingBoost=rating>=4.7?.12:rating>=4.3?.08:rating>=3.9?.04:0;
- const pct=Math.max(0,(tier.reward+ratingBoost+incident.bonus+special.bonus+(returning?.bonus||0)+(progress.reward-1))*(Number(refit.charterMultiplier)||1));
+ const pct=Math.max(0,(tier.reward+ratingBoost+incident.bonus+special.bonus+crewFx.bonus+(returning?.bonus||0)+(progress.reward-1))*(Number(refit.charterMultiplier)||1));
  const bonus=Math.round(Math.max(0,Number(crewReward)||0)*pct);
  const reputation=Math.max(3,Math.round((rating*2.2+(tier===TIERS.luxury?2:0))*progress.prestige));
- return {missionId:m.id,client:returning?{...c,label:returning.label,key:returning.key,loyaltyLevel:returning.loyaltyLevel}:c,returningClient:!!returning,clientLoyalty:returning?.loyaltyLevel||"",careerTier:progress.label,careerTierLevel:progress.tier,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct,incident:incident.incident,incidentMatched:!!(incident.incident&&incident.bonus>0),specialRequest:special.request,specialAccepted:special.accepted,specialMatched:special.matched};
+ return {missionId:m.id,client:returning?{...c,label:returning.label,key:returning.key,loyaltyLevel:returning.loyaltyLevel}:c,returningClient:!!returning,clientLoyalty:returning?.loyaltyLevel||"",careerTier:progress.label,careerTierLevel:progress.tier,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct,crewMorale:crewFx.avgMorale,incident:incident.incident,incidentMatched:!!(incident.incident&&incident.bonus>0),specialRequest:special.request,specialAccepted:special.accepted,specialMatched:special.matched};
 }
 function applyArrival(r){
  const s=stateRef();if(!s||!r)return;
@@ -214,7 +229,7 @@ function applyArrival(r){
  s.charterHistory=Array.isArray(s.charterHistory)?s.charterHistory:[];
  s.charterHistory=[...s.charterHistory,{client:oldClient.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,returning:!!r.returningClient,special:r.specialRequest?.title||"",at:Date.now()}].slice(-20);
  if(s.charterPrep&&typeof s.charterPrep==="object")delete s.charterPrep[r.missionId];
- s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,returningClient:!!r.returningClient,clientLoyalty:r.clientLoyalty||"",careerTier:r.careerTier||"",incident:r.incident?.title||"",incidentMatched:!!r.incidentMatched,specialRequest:r.specialRequest?.title||"",specialAccepted:!!r.specialAccepted,specialMatched:!!r.specialMatched,at:Date.now()};
+ s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,crewMorale:Math.round(Number(r.crewMorale)||0),returningClient:!!r.returningClient,clientLoyalty:r.clientLoyalty||"",careerTier:r.careerTier||"",incident:r.incident?.title||"",incidentMatched:!!r.incidentMatched,specialRequest:r.specialRequest?.title||"",specialAccepted:!!r.specialAccepted,specialMatched:!!r.specialMatched,at:Date.now()};
 }
 document.addEventListener("click",e=>{
  const special=e.target.closest("[data-charter-special]");
