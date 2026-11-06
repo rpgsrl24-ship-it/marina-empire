@@ -104,7 +104,7 @@ function metrics(){
   boats:Array.isArray(state.owned)?new Set(state.owned).size:0,
   prestige:Math.max(0,Math.floor(Number(state.prestige)||0)),
   businesses:countTruthy(state.businesses),
-  npcJobs:Math.max(0,Math.floor(Number(state.npcJobsCompleted)||0)),
+  npcJobs:Math.max(Math.max(0,Math.floor(Number(state.npcJobsCompleted)||0)),Array.isArray(state.vhfJobs)?state.vhfJobs.length:0),
   sectorRep:reps.reduce((m,v)=>Math.max(m,Math.max(0,Math.floor(Number(v)||0))),0),
   marinas:Object.entries(state.marinas||{}).filter(([id,v])=>id!=="rose"&&v&&Number.isFinite(Number(v.lastReward))).length,
   serviceChains:Math.max(0,Math.floor(Number(state.serviceChainsCompleted)||0)),
