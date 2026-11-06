@@ -9,7 +9,7 @@ const boatsLine=html.split('\n').find(l=>l.startsWith('const boats=['));
 const burnLine=html.split('\n').find(l=>l.startsWith('function fuelBurnPerNm('));
 assert(boatsLine,'Missing boats declaration');
 assert(burnLine,'Missing fuelBurnPerNm');
-const context=vm.createContext({Number,Math,Object,Array,Set,String});
+const context=vm.createContext({Number,Math,Object,Array,Set,String,window:{MarinaEmpireRefit:{snapshot:()=>null}}});
 vm.runInContext(boatsLine,context);
 vm.runInContext(burnLine,context);
 
@@ -49,7 +49,8 @@ test('fuel reserve and service guards remain active',()=>{
  assert(html.includes('Math.max(0,Math.min(100,boat(state.boat).tank-state.fuel))'));
  assert(html.includes('state.condition=Math.min(100,state.condition+15)'));
  assert(html.includes('const worldWear=Number(trip.weatherWear)||weather.wear'));
- assert(html.includes('state.condition=Math.max(0,state.condition-worldWear)'));
+ assert(html.includes('const appliedWear=Math.max(0,worldWear*refitWear)'));
+ assert(html.includes('state.condition=Math.max(0,state.condition-appliedWear)'));
  assert(html.includes('wear:3')&&html.includes('wear:4')&&html.includes('wear:5'),'Simulated weather wear must remain bounded to 3-5%');
 });
 
