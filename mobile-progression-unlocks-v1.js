@@ -45,16 +45,29 @@ function specializationLabel(){
 }
 function milestone(){
  const voyages=num(state?.voyages),jobs=vhfCount(),rep=bestSectorRep(),prestige=num(state?.prestige),fleet=boats();
- if(voyages<2)return {step:1,title:"Completa il tour iniziale",desc:"Concludi 2 missioni e prova Marina Live.",value:voyages,target:2,label:voyages+" / 2 missioni",action:"MISSIONI",panel:"missions"};
- if(jobs<5)return {step:2,title:"Diventa operatore di marina",desc:"Completa incarichi VHF per sbloccare Port Assistant e vantaggi locali.",value:jobs,target:5,label:jobs+" / 5 incarichi VHF",action:"MARINA LIVE",panel:"marinas"};
- if(rep<40)return {step:3,title:"Sblocca una specializzazione",desc:"Porta almeno un settore a 40 reputazione per scegliere la tua carriera.",value:rep,target:40,label:rep+" / 40 reputazione",action:"CRESCI REPUTAZIONE",panel:"marinas"};
- if(!String(state?.specialization||""))return {step:3,title:"Scegli la tua carriera",desc:"Hai raggiunto la reputazione richiesta. Ora scegli una specializzazione e sblocca i contratti esclusivi.",value:1,target:1,label:"Specializzazione disponibile",action:"SCEGLI SPECIALIZZAZIONE",panel:"office"};
- const armatureScore=Math.min(3,(voyages>=6?1:0)+(fleet>=2?1:0)+(prestige>=1000?1:0));
- if(armatureScore<3)return {step:4,title:"Diventa Armatore",desc:"Obiettivo carriera: 6 viaggi, 2 yacht e 1.000 prestigio.",value:armatureScore,target:3,label:(voyages>=6?"✓":"○")+" 6 viaggi · "+(fleet>=2?"✓":"○")+" 2 yacht · "+(prestige>=1000?"✓":"○")+" 1.000 prestigio",action:fleet<2?"FLOTTA":"MISSIONI",panel:fleet<2?"fleet":"missions"};
+ const career=window.MarinaEmpireCareerPath?.snapshot?.();
+ if(career?.next){
+  const missing=career.missing||[];
+  const first=missing[0];
+  const done=Math.max(0,(career.next.requirements||[]).filter(x=>x.done).length);
+  const total=Math.max(1,(career.next.requirements||[]).length);
+  return {
+   step:Math.max(1,Math.min(8,Number(career.current?.level)||1)),
+   total:8,
+   title:"Verso "+career.next.title,
+   desc:career.next.focus,
+   value:done,target:total,
+   label:first?(first.label+" · "+Math.floor(first.value||0)+" / "+Math.floor(first.target||1)):"Obiettivi fase completati",
+   action:first?("VAI A "+String(first.tab||"missions").toUpperCase()):"CONTINUA",
+   panel:first?.tab||"missions"
+  };
+ }
+ if(voyages<2)return {step:1,total:8,title:"Completa il tour iniziale",desc:"Concludi 2 missioni e prova Marina Live.",value:voyages,target:2,label:voyages+" / 2 missioni",action:"MISSIONI",panel:"missions"};
+ if(jobs<5)return {step:2,total:8,title:"Diventa operatore di marina",desc:"Completa incarichi VHF per sbloccare Port Assistant e vantaggi locali.",value:jobs,target:5,label:jobs+" / 5 incarichi VHF",action:"MARINA LIVE",panel:"marinas"};
+ if(rep<40)return {step:3,total:8,title:"Sblocca una specializzazione",desc:"Porta almeno un settore a 40 reputazione per scegliere la tua carriera.",value:rep,target:40,label:rep+" / 40 reputazione",action:"CRESCI REPUTAZIONE",panel:"marinas"};
  const spec=specializationLabel();
- return {step:5,title:"Espandi il tuo impero",desc:(spec?spec+" attivo. ":"")+"Alterna missioni, Marina Live, mercato e attività per avanzare verso Operatore Nautico.",value:1,target:1,label:spec||"Carriera avanzata attiva",action:"DIREZIONE",panel:"office"};
-}
-function openPanel(id){
+ return {step:8,total:8,title:"Marina Empire",desc:(spec?spec+" attivo. ":"")+"Continua a competere, gestire marine, yacht, equipaggi e attività nel mondo vivo.",value:1,target:1,label:"Carriera avanzata continua",action:"DIREZIONE",panel:"office"};
+}function openPanel(id){
  if(window.MarinaEmpireMobileHome?.open){window.MarinaEmpireMobileHome.open(id);return}
  if(typeof showTab==="function")showTab(id);
 }
@@ -79,11 +92,11 @@ function render(){
  if(typeof state==="undefined"||!state?.name)return;
  const box=ensure();if(!box)return;
  const m=milestone(),pct=Math.max(0,Math.min(100,Math.round((m.value/Math.max(1,m.target))*100)));
- box.innerHTML='<div id="meMobileGrowthHead"><div><small>PROGRESSIONE COMANDANTE</small><strong>'+m.title+'</strong></div><span id="meMobileGrowthStep">FASE '+m.step+'/5</span></div>'+
+ box.innerHTML='<div id="meMobileGrowthHead"><div><small>PROGRESSIONE COMANDANTE</small><strong>'+m.title+'</strong></div><span id="meMobileGrowthStep">FASE '+m.step+'/'+(m.total||8)</span></div>'+
   '<p>'+m.desc+'</p><div id="meMobileGrowthBar"><i style="width:'+pct+'%"></i></div>'+
   '<div id="meMobileGrowthMeta"><span>'+m.label+'</span><span>'+pct+'%</span></div>'+
   '<button type="button" id="meMobileGrowthAction">'+m.action+'</button>'+
-  '<div id="meMobileGrowthMilestones">'+[1,2,3,4,5].map(i=>'<i class="'+(i<=m.step?'on':'')+'"></i>').join("")+'</div>';
+  '<div id="meMobileGrowthMilestones">'+Array.from({length:m.total||8},(_,x)=>x+1).map(i=>'<i class="'+(i<=m.step?'on':'')+'"></i>').join("")+'</div>';
 }
 window.MarinaEmpireMobileProgression={render,milestone};
 function boot(){
