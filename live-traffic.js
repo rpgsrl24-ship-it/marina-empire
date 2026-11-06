@@ -71,13 +71,13 @@ function vesselRelation(vessel,key=portKey()){
   const services=Math.max(0,Math.floor(Number(raw.services)||0));
   const level=visits>=7?5:visits>=4?4:visits>=2?3:visits>=1?2:1;
   const label=level===5?"CLIENTE VIP":level===4?"CLIENTE PREFERITO":level===3?"CLIENTE ABITUALE":level===2?"DI RITORNO":"NUOVO CLIENTE";
-  return {visits,services,level,label,lastAt:Number(raw.lastAt)||0,lastChain:String(raw.lastChain||""),lastContract:String(raw.lastContract||"")};
- }catch(_){return {visits:0,services:0,level:1,label:"NUOVO CLIENTE",lastAt:0,lastChain:"",lastContract:""}}
+  return {visits,services,level,label,lastAt:Number(raw.lastAt)||0,lastChain:String(raw.lastChain||""),lastContract:String(raw.lastContract||""),lastDepartureAt:Number(raw.lastDepartureAt)||0,nextVisitAfter:Number(raw.nextVisitAfter)||0};
+ }catch(_){return {visits:0,services:0,level:1,label:"NUOVO CLIENTE",lastAt:0,lastChain:"",lastContract:"",lastDepartureAt:0,nextVisitAfter:0}}
 }
 function featuredVessel(){
  const key=portKey(),eligible=VESSELS.filter(v=>["superyacht","charter","regatta"].includes(v.profile));
  const seed=hash(key+"|featured|"+chainSlot());
- const known=eligible.filter(v=>vesselRelation(v,key).visits>0);
+ const known=eligible.filter(v=>{const r=vesselRelation(v,key);return r.visits>0&&(!r.nextVisitAfter||r.nextVisitAfter<=Date.now())});
  const useKnown=known.length>0&&(seed%100)<60;
  const pool=useKnown?known:eligible;
  const ranked=[...pool].sort((a,b)=>{
@@ -208,7 +208,7 @@ function relationStory(vessel){
  if(!r||r.visits<=0)return "prima visita";
  const contract=CONTRACTS.find(c=>c.id===r.lastContract);
  const service=contract?.type||"servizio marina";
- return r.visits===1?("ritorna dopo "+service):("cliente storico · "+r.visits+" visite · ultimo: "+service);
+ const returnText=r.nextVisitAfter&&r.nextVisitAfter>Date.now()?" · ritorno programmato":"";\n return (r.visits===1?("ritorna dopo "+service):("cliente storico · "+r.visits+" visite · ultimo: "+service))+returnText;
 }
 function render(){
  if(!ensure())return;
