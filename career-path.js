@@ -94,11 +94,15 @@ function metrics(){
  if(typeof state==="undefined"||!state)return {voyages:0,boats:0,prestige:0,businesses:0,npcJobs:0,sectorRep:0,marinas:0,serviceChains:0,empireScore:0,crewLevel:0,refitLevels:0,charters:0,charterRep:0,businessLevels:0};
  const reps=state.sectorReputation&&typeof state.sectorReputation==="object"?Object.values(state.sectorReputation):[];
  let crewLevel=0;
- try{crewLevel=Math.max(0,Number(window.MarinaEmpireCrew?.snapshot?.()?.level)||0)}catch(_){}
+ try{
+  const ids=Array.isArray(state.owned)&&state.owned.length?state.owned:[state.boat];
+  crewLevel=ids.reduce((m,id)=>Math.max(m,Math.max(0,Number(window.MarinaEmpireCrew?.snapshot?.(id)?.level)||0)),0);
+ }catch(_){}
  const refitValues=state.refits&&typeof state.refits==="object"?Object.values(state.refits):[];
  const refitLevels=refitValues.reduce((sum,r)=>sum+Math.max(0,Number(r?.engine)||0)+Math.max(0,Number(r?.hospitality)||0)+Math.max(0,Number(r?.reliability)||0),0);
  const charterRaw=state.charterStats&&typeof state.charterStats==="object"?state.charterStats:{};
- const businessLevels=Object.values(state.businessLevels||{}).reduce((sum,v)=>sum+Math.max(1,Number(v)||1),0);
+ const ownedBusinessKeys=Object.entries(state.businesses||{}).filter(([,v])=>!!v).map(([k])=>k);
+ const businessLevels=ownedBusinessKeys.reduce((sum,key)=>sum+Math.max(1,Math.floor(Number(state.businessLevels?.[key])||1)),0);
  return {
   voyages:Math.max(0,Math.floor(Number(state.voyages)||0)),
   boats:Array.isArray(state.owned)?new Set(state.owned).size:0,
