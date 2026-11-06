@@ -173,25 +173,34 @@ function loop(){
  if(!document.hidden&&!job){current=pick();renderCurrent();}
  timer=setTimeout(loop,26000+Math.floor(Math.random()*16000));
 }
-function boot(){
- if(!ensure()){setTimeout(boot,700);return;}
- current=pick();renderCurrent();loop();
- const list=document.getElementById("marinaList");
- if(list)new MutationObserver(()=>setTimeout(()=>{box=null;ensure();renderCurrent();},100)).observe(list,{childList:true,subtree:true});
- window.addEventListener("marina-empire-updated",()=>setTimeout(()=>{box=null;ensure();renderCurrent();},100));
- window.addEventListener("marina-world-event",()=>{if(!job){current=pick();setTimeout(renderCurrent,80);}});
- document.addEventListener("visibilitychange",()=>{if(!document.hidden)renderCurrent();});
-}
 function cleanupDuplicates(){
  const live=document.querySelector(".me-live-marina");
- if(!live)return;
  const all=[...document.querySelectorAll(".me-npc-box")];
- const keep=all.find(el=>live.contains(el));
+ if(!live||!all.length)return;
+ let keep=all.find(el=>live.contains(el))||all[0];
  all.forEach(el=>{if(el!==keep)el.remove()});
- if(keep&&box!==keep)box=keep;
+ if(keep!==box)box=keep;
 }
-const npcObserver=new MutationObserver(()=>cleanupDuplicates());
-if(document.body)npcObserver.observe(document.body,{childList:true,subtree:true});
-setInterval(cleanupDuplicates,15000);
+let refreshTimer=null;
+function scheduleRefresh(delay=120){
+ clearTimeout(refreshTimer);
+ refreshTimer=setTimeout(()=>{
+  cleanupDuplicates();
+  if(!ensure())return;
+  if(!current)current=pick();
+  renderCurrent();
+ },delay);
+}
+function boot(){
+ if(!ensure()){setTimeout(boot,700);return;}
+ cleanupDuplicates();
+ current=pick();renderCurrent();loop();
+ const list=document.getElementById("marinaList");
+ if(list)new MutationObserver(()=>scheduleRefresh(180)).observe(list,{childList:true});
+ window.addEventListener("marina-empire-updated",()=>scheduleRefresh(160));
+ window.addEventListener("marina-world-event",()=>{if(!job){current=pick();scheduleRefresh(100)}});
+ document.addEventListener("visibilitychange",()=>{if(!document.hidden)scheduleRefresh(80)});
+ setInterval(cleanupDuplicates,20000);
+}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true}); else boot();
 })();
