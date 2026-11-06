@@ -1338,7 +1338,7 @@ padding:5px!important;gap:4px!important;
   .mobile-game-nav{z-index:100000!important}
   .me-mobile-more{z-index:100010!important}
 }
-<style id="me-mobile-final-polish-v11">
+</style><style id="me-mobile-final-polish-v11">
 @media(max-width:740px){
   /* One actionable opportunity at a time */
   #marinas:not(.me-mobile-expanded) .me-traffic-board{display:none!important}
@@ -4040,10 +4040,12 @@ button.addEventListener("click",async()=>{
     nodes.slice(1).forEach(n=>n.remove());
   }
   function clean(){
-    if(window.innerWidth>740)return;
+    /* Duplicate live blocks are never intentional. Remove them on every viewport
+       before applying mobile-only compact state. */
     dedupe("#marinas .me-world-event");
     dedupe("#marinas .me-npc-box");
     dedupe("#marinas .me-traffic-board");
+    if(window.innerWidth>740)return;
 
     const npc=document.querySelector("#marinas .me-npc-box");
     if(npc){
