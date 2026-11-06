@@ -91,23 +91,49 @@ function incidentEffect(m,trip,crew){
  const matched=focus===incident.best;
  return {incident,rating:matched?.18:-.12,bonus:matched?.025:0};
 }
+function charterStats(){
+ const s=stateRef();
+ const raw=s?.charterStats&&typeof s.charterStats==="object"?s.charterStats:{completed:0,ratingTotal:0,bestRating:0,repeatClients:0};
+ const completed=Math.max(0,Number(raw.completed)||0);
+ const avg=completed>0?Math.max(0,Number(raw.ratingTotal)||0)/completed:0;
+ const rep=Math.max(0,Math.floor(Number(s?.sectorReputation?.charter)||0));
+ const tier=rep>=120&&avg>=4.5?4:rep>=60&&avg>=4.2?3:rep>=25&&avg>=3.9?2:1;
+ const label=tier===4?"Charter Elite":tier===3?"Luxury Charter":tier===2?"Charter Premium":"Charter Base";
+ return {completed,avg:Math.round(avg*10)/10,bestRating:Number(raw.bestRating)||0,repeatClients:Math.max(0,Number(raw.repeatClients)||0),reputation:rep,tier,label};
+}
+function returningClient(m){
+ const s=stateRef(),stats=charterStats();
+ if(!isCharter(m)||stats.completed<2)return null;
+ const seed=hash((m.id||"")+"|return|"+stats.completed+"|"+stats.reputation);
+ if(seed%100>Math.min(72,18+stats.repeatClients*6+stats.tier*5))return null;
+ const previous=s?.lastCharterReview;
+ return previous?.client?{label:previous.client,bonus:.04,rating:.12}:null;
+}
+function progressionBonus(m){
+ if(!isCharter(m))return {reward:1,prestige:1,label:""};
+ const s=charterStats();
+ const reward=1+(s.tier-1)*.04;
+ const prestige=1+(s.tier-1)*.05;
+ return {reward,prestige,label:s.label,tier:s.tier};
+}
 function arrivalResult(m,trip,crewReward){
  if(!isCharter(m))return null;
  const p=prepFor(m),tier=TIERS[p?.tier]||TIERS.standard,c=profile(m);
+ const returning=returningClient(m),progress=progressionBonus(m);
  const crew=window.MarinaEmpireCrew?.snapshot?.(m.boat)||{level:1,morale:75,training:0,focus:"balanced"};
  const spec=window.MarinaEmpireSpecialization?.get?.();
  const incident=incidentEffect(m,trip,crew);
- let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05)+incident.rating;
+ let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05)+incident.rating+(returning?.rating||0);
  if(Number(crew.morale)>=90)rating+=.18;else if(Number(crew.morale)<55)rating-=.45;
  if(crew.focus==="hospitality")rating+=.28;
  if(spec?.key==="charter")rating+=.18;
  if(String(trip?.weather||"").toLowerCase().includes("storm"))rating-=.35;
  rating=Math.max(1,Math.min(5,Math.round(rating*10)/10));
  const ratingBoost=rating>=4.7?.12:rating>=4.3?.08:rating>=3.9?.04:0;
- const pct=Math.max(0,tier.reward+ratingBoost+incident.bonus);
+ const pct=Math.max(0,tier.reward+ratingBoost+incident.bonus+(returning?.bonus||0)+(progress.reward-1));
  const bonus=Math.round(Math.max(0,Number(crewReward)||0)*pct);
- const reputation=Math.max(3,Math.round(rating*2.2+(tier===TIERS.luxury?2:0)));
- return {missionId:m.id,client:c,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct,incident:incident.incident,incidentMatched:!!(incident.incident&&incident.bonus>0)};
+ const reputation=Math.max(3,Math.round((rating*2.2+(tier===TIERS.luxury?2:0))*progress.prestige));
+ return {missionId:m.id,client:returning?{...c,label:returning.label}:c,returningClient:!!returning,careerTier:progress.label,careerTierLevel:progress.tier,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct,incident:incident.incident,incidentMatched:!!(incident.incident&&incident.bonus>0)};
 }
 function applyArrival(r){
  const s=stateRef();if(!s||!r)return;
@@ -116,10 +142,11 @@ function applyArrival(r){
  s.charterStats.ratingTotal=Math.max(0,Number(s.charterStats.ratingTotal)||0)+r.rating;
  s.charterStats.bestRating=Math.max(Number(s.charterStats.bestRating)||0,r.rating);
  if(r.rating>=4.5)s.charterStats.repeatClients=Math.max(0,Number(s.charterStats.repeatClients)||0)+1;
+ if(r.returningClient)s.charterStats.returningCompleted=Math.max(0,Number(s.charterStats.returningCompleted)||0)+1;
  s.sectorReputation=s.sectorReputation&&typeof s.sectorReputation==="object"?s.sectorReputation:{};
  s.sectorReputation.charter=Math.max(0,Math.floor(Number(s.sectorReputation.charter)||0))+r.reputation;
  if(s.charterPrep&&typeof s.charterPrep==="object")delete s.charterPrep[r.missionId];
- s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,incident:r.incident?.title||"",incidentMatched:!!r.incidentMatched,at:Date.now()};
+ s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,returningClient:!!r.returningClient,careerTier:r.careerTier||"",incident:r.incident?.title||"",incidentMatched:!!r.incidentMatched,at:Date.now()};
 }
 document.addEventListener("click",e=>{
  const b=e.target.closest("[data-charter-prep]");if(!b)return;
@@ -129,5 +156,5 @@ document.addEventListener("click",e=>{
   if(m)prepare(m,b.dataset.charterPrep);
  }catch(_){}
 });
-window.MarinaEmpireCharter2={isCharter,profile,prepFor,prepare,beforeLaunch,cardAddon,arrivalResult,applyArrival,incidentFor,tiers:TIERS};
+window.MarinaEmpireCharter2={isCharter,profile,prepFor,prepare,beforeLaunch,cardAddon,arrivalResult,applyArrival,incidentFor,charterStats,progressionBonus,returningClient,tiers:TIERS};
 })();
