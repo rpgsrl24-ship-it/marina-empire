@@ -8,7 +8,7 @@ const STAGES=[
  {id:"owner",level:2,title:"ARMATORE",icon:"🛥️",focus:"Espandi la flotta e inizia a gestire davvero lo yacht.",requirements:[
   {key:"voyages",label:"6 viaggi completati",target:6,tab:"missions"},
   {key:"boats",label:"2 yacht in flotta",target:2,tab:"fleet"},
-  {key:"prestige",label:"1.000 prestigio",target:1000,tab:"missions"}
+  {key:"prestige",label:"350 prestigio",target:350,tab:"missions"}
  ]},
  {id:"operator",level:3,title:"OPERATORE NAUTICO",icon:"💼",focus:"Trasforma la navigazione in un'attività economica.",requirements:[
   {key:"voyages",label:"15 viaggi completati",target:15,tab:"missions"},
