@@ -25,6 +25,17 @@ style.textContent=`
  #meMobileGrowthMilestones{display:flex!important;gap:4px!important;margin-top:8px!important}
  #meMobileGrowthMilestones i{display:block!important;flex:1!important;height:3px!important;border-radius:99px!important;background:#173845!important}
  #meMobileGrowthMilestones i.on{background:#d6b575!important}
+ #meMobileArrivalReward{
+   display:none!important;order:-14!important;margin:0!important;padding:10px 11px!important;
+   border:1px solid rgba(101,205,173,.48)!important;border-radius:13px!important;
+   background:linear-gradient(145deg,#0a3941,#072936)!important;
+   box-shadow:0 7px 18px rgba(0,0,0,.22)!important
+ }
+ #meMobileArrivalReward.show{display:block!important}
+ #meMobileArrivalReward small{display:block!important;color:#8fd8bf!important;font-size:7px!important;font-weight:950!important;letter-spacing:.12em!important}
+ #meMobileArrivalReward strong{display:block!important;margin-top:2px!important;color:#f3d598!important;font-size:14px!important}
+ #meMobileArrivalReward p{margin:6px 0!important;color:#cfe1e4!important;font-size:9px!important;line-height:1.3!important}
+ #meMobileArrivalReward button{width:100%!important;min-height:42px!important;margin-top:7px!important;padding:7px 9px!important;border:1px solid #d6b575!important;border-radius:9px!important;background:#123c4d!important;color:#f3d79c!important;font-size:9px!important;font-weight:950!important}
 }
 @media(min-width:900px){#meMobileGrowth{display:none!important}}
 `;
@@ -80,6 +91,19 @@ function milestone(){
 function ensure(){
  if(typeof innerWidth!=="undefined"&&innerWidth>899)return null;
  const home=document.querySelector("#home .me-mobile-home-dashboard");if(!home)return null;
+ if(!document.getElementById("meMobileArrivalReward")){
+  const arrival=document.createElement("section");
+  arrival.id="meMobileArrivalReward";
+  arrival.innerHTML='<small>MISSIONE COMPLETATA</small><strong id="meMobileArrivalRewardTitle">Arrivo registrato</strong><p id="meMobileArrivalRewardText"></p><button type="button" id="meMobileArrivalRewardAction">CONTINUA</button>';
+  arrival.querySelector("#meMobileArrivalRewardAction").addEventListener("click",()=>{
+   const voyages=num(state?.voyages),guestJobs=num(state?.guestTrialJobsUsed);
+   if(!window.meRegisteredPlayer&&voyages===1&&guestJobs<1){openPanel("marinas");return}
+   if(!window.meRegisteredPlayer&&voyages===1&&guestJobs>=1){openPanel("missions");return}
+   if(!window.meRegisteredPlayer&&voyages>=2){openPanel("profile");return}
+   openPanel("marinas");
+  });
+  home.prepend(arrival);
+ }
  let box=document.getElementById("meMobileGrowth");if(box)return box;
  box=document.createElement("section");box.id="meMobileGrowth";
  const services=document.getElementById("meMobileHomeServices");
@@ -97,6 +121,23 @@ function ensure(){
 function render(){
  if(typeof state==="undefined"||!state?.name)return;
  const box=ensure();if(!box)return;
+ const arrival=document.getElementById("meMobileArrivalReward");
+ if(arrival){
+  const a=state?.lastArrival,active=!!(a&&!state?.trip&&Number.isFinite(Number(a.at))&&Date.now()-Number(a.at)<15*60*1000);
+  arrival.classList.toggle("show",active);
+  if(active){
+   const voyages=num(state?.voyages),guestJobs=num(state?.guestTrialJobsUsed);
+   const title=document.getElementById("meMobileArrivalRewardTitle"),textEl=document.getElementById("meMobileArrivalRewardText"),btn=document.getElementById("meMobileArrivalRewardAction");
+   if(title)title.textContent="⚓ "+String(typeof port==="function"?port(a.destination||state.port)?.name||"Marina":"Marina")+" · +"+num(a.reward).toLocaleString("it-IT")+" cr";
+   if(textEl)textEl.textContent="Prestigio +"+num(a.prestige)+" · carburante "+num(state.fuel)+" L · stato yacht "+num(state.condition)+"%.";
+   if(btn){
+    if(!window.meRegisteredPlayer&&voyages===1&&guestJobs<1)btn.textContent="PROVA MARINA LIVE";
+    else if(!window.meRegisteredPlayer&&voyages===1)btn.textContent="SECONDA MISSIONE";
+    else if(!window.meRegisteredPlayer&&voyages>=2)btn.textContent="REGISTRATI E CONTINUA";
+    else btn.textContent="APRI MARINA LIVE";
+   }
+  }
+ }
  const m=milestone(),pct=Math.max(0,Math.min(100,Math.round((m.value/Math.max(1,m.target))*100)));
  box.innerHTML='<div id="meMobileGrowthHead"><div><small>PROGRESSIONE COMANDANTE</small><strong>'+m.title+'</strong></div><span id="meMobileGrowthStep">FASE '+m.step+'/'+(m.total||8)</span></div>'+
   '<p>'+m.desc+'</p><div id="meMobileGrowthBar"><i style="width:'+pct+'%"></i></div>'+
