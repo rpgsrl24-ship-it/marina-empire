@@ -52,7 +52,7 @@ Le percentuali sono stime di maturità progettuale, non metriche automatiche.
 | Multiplayer persistente | 45% | Account/cloud/leaderboard presenti, economia condivisa ancora parziale |
 | Prenotazione posti barca reale | 35% | Schema e protezioni presenti, mapping visuale/database non validato |
 | Monetizzazione crediti | 70% | Infrastruttura e release gate presenti; ogni modifica richiede verifica specifica |
-| Equipaggi | 30% | V1 attiva: esperienza, morale, addestramento, livelli e bonus missione; manca ancora reclutamento per ruolo e stipendi completi |
+| Equipaggi | 50% | Ruoli, esperienza, morale, addestramento, assetti operativi e bonus missione attivi; manca reclutamento individuale/stipendi evoluti |
 | Charter completo | 25% | Charter economico presente, manca il ciclo cliente-equipaggio-ospiti-itinerario-rating |
 | Cantieri / refit | 5% | Mancante come sistema gestionale |
 | Economia a terra | 30% | Alcune attività nautiche presenti, manca ecosistema completo |
@@ -63,12 +63,23 @@ Le percentuali sono stime di maturità progettuale, non metriche automatiche.
 ### Valutazione complessiva
 
 - **Beta pubblica attuale:** circa 82–85%
-- **Gestionale nautico italiano completo:** circa 62–65%
-- **Visione internazionale Marina Empire:** circa 45–50%
+- **Gestionale nautico italiano completo:** circa 68–70%
+- **Visione internazionale Marina Empire:** circa 50–52%
 
 Il problema principale non è più la quantità di funzioni: è integrare i sistemi in cicli di gioco profondi e durevoli.
 
 ## Aggiornamento operativo — 6 novembre 2026
+
+### Aggiornamento mattina — stabilità mobile ed economia
+
+- disabilitato il renderer NPC standalone instabile; Marina Live/VHF/traffico restano attivi;
+- regressione mobile completata con Home, Missioni, Mappa, Flotta, Attività, Marketplace e Marina Live funzionanti;
+- attività nautiche ora sviluppabili fino a livello 3;
+- introdotte operazioni giornaliere per promozione, formazione staff, manutenzione preventiva e pacchetti VIP;
+- rendite attività collegate a upgrade e bonus operativi temporanei;
+- Marketplace verificato: prezzi dinamici locali, nuovo/usato/occasioni, domanda NPC e reputazione Broker già operativi.
+
+
 
 Dopo la baseline del 4 novembre sono stati aggiunti:
 - quick start mobile ospite con base demo e primo accesso semplificato;
