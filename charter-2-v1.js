@@ -141,13 +141,28 @@ function charterStats(){
  const label=tier===4?"Charter Elite":tier===3?"Luxury Charter":tier===2?"Charter Premium":"Charter Base";
  return {completed,avg:Math.round(avg*10)/10,bestRating:Number(raw.bestRating)||0,repeatClients:Math.max(0,Number(raw.repeatClients)||0),reputation:rep,tier,label};
 }
+function clientBook(){
+ const s=stateRef();
+ const book=s?.charterClients&&typeof s.charterClients==="object"?s.charterClients:{};
+ return Object.entries(book).map(([key,v])=>({
+  key,label:String(v?.label||key),trips:Math.max(0,Number(v?.trips)||0),
+  ratingTotal:Math.max(0,Number(v?.ratingTotal)||0),best:Math.max(0,Number(v?.best)||0),
+  loyalty:Math.max(0,Number(v?.loyalty)||0),lastAt:Math.max(0,Number(v?.lastAt)||0)
+ })).map(x=>({...x,avg:x.trips?Math.round(x.ratingTotal/x.trips*10)/10:0,
+ loyaltyLevel:x.loyalty>=40?"VIP":x.loyalty>=20?"Gold":x.loyalty>=8?"Silver":"Bronze"}))
+ .sort((a,b)=>b.loyalty-a.loyalty||b.lastAt-a.lastAt);
+}
 function returningClient(m){
- const s=stateRef(),stats=charterStats();
- if(!isCharter(m)||stats.completed<2)return null;
+ const stats=charterStats(),clients=clientBook();
+ if(!isCharter(m)||stats.completed<2||!clients.length)return null;
  const seed=hash((m.id||"")+"|return|"+stats.completed+"|"+stats.reputation);
- if(seed%100>Math.min(72,18+stats.repeatClients*6+stats.tier*5))return null;
- const previous=s?.lastCharterReview;
- return previous?.client?{label:previous.client,bonus:.04,rating:.12}:null;
+ const chance=Math.min(78,20+stats.repeatClients*5+stats.tier*6+Math.min(18,clients[0]?.loyalty||0));
+ if(seed%100>chance)return null;
+ const pool=clients.slice(0,Math.min(4,clients.length));
+ const chosen=pool[seed%pool.length];
+ const loyaltyBonus=chosen.loyaltyLevel==="VIP"?.08:chosen.loyaltyLevel==="Gold"?.06:chosen.loyaltyLevel==="Silver"?.05:.035;
+ const ratingBonus=chosen.avg>=4.7?.18:chosen.avg>=4.4?.14:.10;
+ return {label:chosen.label,key:chosen.key,bonus:loyaltyBonus,rating:ratingBonus,loyaltyLevel:chosen.loyaltyLevel};
 }
 function progressionBonus(m){
  if(!isCharter(m))return {reward:1,prestige:1,label:""};
@@ -173,7 +188,7 @@ function arrivalResult(m,trip,crewReward){
  const pct=Math.max(0,tier.reward+ratingBoost+incident.bonus+special.bonus+(returning?.bonus||0)+(progress.reward-1));
  const bonus=Math.round(Math.max(0,Number(crewReward)||0)*pct);
  const reputation=Math.max(3,Math.round((rating*2.2+(tier===TIERS.luxury?2:0))*progress.prestige));
- return {missionId:m.id,client:returning?{...c,label:returning.label}:c,returningClient:!!returning,careerTier:progress.label,careerTierLevel:progress.tier,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct,incident:incident.incident,incidentMatched:!!(incident.incident&&incident.bonus>0),specialRequest:special.request,specialAccepted:special.accepted,specialMatched:special.matched};
+ return {missionId:m.id,client:returning?{...c,label:returning.label,key:returning.key,loyaltyLevel:returning.loyaltyLevel}:c,returningClient:!!returning,clientLoyalty:returning?.loyaltyLevel||"",careerTier:progress.label,careerTierLevel:progress.tier,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct,incident:incident.incident,incidentMatched:!!(incident.incident&&incident.bonus>0),specialRequest:special.request,specialAccepted:special.accepted,specialMatched:special.matched};
 }
 function applyArrival(r){
  const s=stateRef();if(!s||!r)return;
@@ -185,8 +200,20 @@ function applyArrival(r){
  if(r.returningClient)s.charterStats.returningCompleted=Math.max(0,Number(s.charterStats.returningCompleted)||0)+1;
  s.sectorReputation=s.sectorReputation&&typeof s.sectorReputation==="object"?s.sectorReputation:{};
  s.sectorReputation.charter=Math.max(0,Math.floor(Number(s.sectorReputation.charter)||0))+r.reputation;
+ s.charterClients=s.charterClients&&typeof s.charterClients==="object"?s.charterClients:{};
+ const clientKey=String(r.client?.key||r.client?.id||r.client?.label||"cliente").toLocaleLowerCase("it-IT").replace(/[^a-z0-9à-ÿ]+/g,"-").slice(0,60);
+ const oldClient=s.charterClients[clientKey]&&typeof s.charterClients[clientKey]==="object"?s.charterClients[clientKey]:{label:r.client?.label||"Cliente",trips:0,ratingTotal:0,best:0,loyalty:0};
+ oldClient.label=r.client?.label||oldClient.label;
+ oldClient.trips=Math.max(0,Number(oldClient.trips)||0)+1;
+ oldClient.ratingTotal=Math.max(0,Number(oldClient.ratingTotal)||0)+r.rating;
+ oldClient.best=Math.max(Number(oldClient.best)||0,r.rating);
+ oldClient.loyalty=Math.max(0,Number(oldClient.loyalty)||0)+(r.rating>=4.7?5:r.rating>=4.3?3:r.rating>=3.8?2:1)+(r.specialMatched?2:0);
+ oldClient.lastAt=Date.now();
+ s.charterClients[clientKey]=oldClient;
+ s.charterHistory=Array.isArray(s.charterHistory)?s.charterHistory:[];
+ s.charterHistory=[...s.charterHistory,{client:oldClient.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,returning:!!r.returningClient,special:r.specialRequest?.title||"",at:Date.now()}].slice(-20);
  if(s.charterPrep&&typeof s.charterPrep==="object")delete s.charterPrep[r.missionId];
- s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,returningClient:!!r.returningClient,careerTier:r.careerTier||"",incident:r.incident?.title||"",incidentMatched:!!r.incidentMatched,specialRequest:r.specialRequest?.title||"",specialAccepted:!!r.specialAccepted,specialMatched:!!r.specialMatched,at:Date.now()};
+ s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,returningClient:!!r.returningClient,clientLoyalty:r.clientLoyalty||"",careerTier:r.careerTier||"",incident:r.incident?.title||"",incidentMatched:!!r.incidentMatched,specialRequest:r.specialRequest?.title||"",specialAccepted:!!r.specialAccepted,specialMatched:!!r.specialMatched,at:Date.now()};
 }
 document.addEventListener("click",e=>{
  const special=e.target.closest("[data-charter-special]");
@@ -202,5 +229,5 @@ document.addEventListener("click",e=>{
   if(m)prepare(m,b.dataset.charterPrep);
  }catch(_){}
 });
-window.MarinaEmpireCharter2={isCharter,profile,specialRequest,prepFor,prepare,setSpecialRequest,beforeLaunch,cardAddon,arrivalResult,applyArrival,incidentFor,charterStats,progressionBonus,returningClient,tiers:TIERS};
+window.MarinaEmpireCharter2={isCharter,profile,specialRequest,prepFor,prepare,setSpecialRequest,beforeLaunch,cardAddon,arrivalResult,applyArrival,incidentFor,charterStats,clientBook,progressionBonus,returningClient,tiers:TIERS};
 })();
