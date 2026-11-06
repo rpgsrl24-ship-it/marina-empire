@@ -96,9 +96,7 @@ async function trial(browser,origin,name,viewport,mobile) {
     await page.locator('#playerName').fill('Collaudo P0');
     await page.locator('#play').click();
     assert.deepEqual(errors,[],`${name}: new player entry must not throw`);
-    await page.locator('#confirmSetup').waitFor({state:'visible'});
-    await page.locator('#setupMarina').selectOption('rimini');
-    await page.locator('#confirmSetup').click();
+    await page.waitForFunction(()=>typeof state!=="undefined"&&state?.name&&state?.setupComplete===true);
     await page.locator('#missionList [data-mission]:enabled').first().waitFor({state:'visible'});
     assert.deepEqual(errors,[],`${name}: setup and rendering must not throw`);
     assert.ok((await page.locator('#fleetList').innerText()).includes('RPG'),'Fleet must finish rendering');
