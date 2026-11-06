@@ -71,7 +71,8 @@ function vesselRelation(vessel,key=portKey()){
   const services=Math.max(0,Math.floor(Number(raw.services)||0));
   const level=visits>=7?5:visits>=4?4:visits>=2?3:visits>=1?2:1;
   const label=level===5?"CLIENTE VIP":level===4?"CLIENTE PREFERITO":level===3?"CLIENTE ABITUALE":level===2?"DI RITORNO":"NUOVO CLIENTE";
-  const loyalty=Math.max(0,Math.floor(Number(raw.loyalty)||0));\n  return {visits,services,loyalty,level,label,lastAt:Number(raw.lastAt)||0,lastChain:String(raw.lastChain||""),lastContract:String(raw.lastContract||""),lastDepartureAt:Number(raw.lastDepartureAt)||0,nextVisitAfter:Number(raw.nextVisitAfter)||0};
+  const loyalty=Math.max(0,Math.floor(Number(raw.loyalty)||0));
+  return {visits,services,loyalty,level,label,lastAt:Number(raw.lastAt)||0,lastChain:String(raw.lastChain||""),lastContract:String(raw.lastContract||""),lastDepartureAt:Number(raw.lastDepartureAt)||0,nextVisitAfter:Number(raw.nextVisitAfter)||0};
  }catch(_){return {visits:0,services:0,loyalty:0,level:1,label:"NUOVO CLIENTE",lastAt:0,lastChain:"",lastContract:"",lastDepartureAt:0,nextVisitAfter:0}}
 }
 function featuredVessel(){
@@ -179,7 +180,8 @@ function contractSnapshot(){
   const trustBonus=1+(Math.max(1,Number(t.level)||1)-1)*.035;
   const stageBonus=1+(stage-1)*.08;
   const operationBonus=1+(Math.max(1,Number(op.level)||1)-1)*.03;
-  const loyaltyBonus=i===0&&relation?Math.min(.18,(Math.max(0,Number(relation.loyalty)||0)*.015)):0;\n  const relationBonus=i===0&&relation?1+(Math.max(1,Number(relation.level)||1)-1)*.06+loyaltyBonus:1;
+  const loyaltyBonus=i===0&&relation?Math.min(.18,(Math.max(0,Number(relation.loyalty)||0)*.015)):0;
+  const relationBonus=i===0&&relation?1+(Math.max(1,Number(relation.level)||1)-1)*.06+loyaltyBonus:1;
   const reward=Math.round(c.reward*demand*trustBonus*stageBonus*operationBonus*relationBonus);
   const prestige=Math.round(c.prestige*(1+(stage-1)*.06)*relationBonus);
   const reputation=Math.round(c.reputation*(1+(stage-1)*.05)*relationBonus);
