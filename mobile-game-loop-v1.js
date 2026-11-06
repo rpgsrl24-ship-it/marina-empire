@@ -321,6 +321,8 @@ function ensureHome(){
       '<button type="button" data-home-panel="map"><span>🧭</span>NAVIGA</button>'+
       '<button type="button" data-home-panel="marinas" class="me-live-command"><span>⚓</span>MARINA LIVE</button>'+
       '<button type="button" data-home-panel="fleet"><span>🛥️</span>FLOTTA</button>'+
+      '<button type="button" data-home-section="crew"><span>👥</span>EQUIPAGGIO</button>'+
+      '<button type="button" data-home-section="refit"><span>🛠️</span>REFIT</button>'+
       '<button type="button" data-home-panel="office"><span>◈</span>DIREZIONE</button>'+
       '<button type="button" data-home-panel="marketplace"><span>🛒</span>MARKET</button>'+
       '<button type="button" data-home-community="1"><span>💬</span>COMMUNITY</button>'+
@@ -329,6 +331,13 @@ function ensureHome(){
     center.addEventListener("click",e=>{
       const b=e.target.closest("button");if(!b)return;
       if(b.dataset.homeCommunity)openPanel("office",{community:true});
+      else if(b.dataset.homeSection){
+        openPanel("office");
+        setTimeout(()=>{
+          const id=b.dataset.homeSection==="crew"?"meCrewSystem":"meRefitV1";
+          document.getElementById(id)?.scrollIntoView({behavior:"smooth",block:"start"});
+        },140);
+      }
       else if(b.dataset.homePanel)openPanel(b.dataset.homePanel);
     });
     const goal=home.querySelector(".me-mobile-home-goal");
