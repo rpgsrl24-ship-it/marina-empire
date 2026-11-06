@@ -207,7 +207,8 @@ function nextAction(){
     const what=service.fuel&&service.condition?"carburante e manutenzione":service.fuel?"carburante":"manutenzione";
     return {stage:0,label:"PREPARA LO YACHT",title:"Controlla "+what,desc:"Prima della prossima missione prepara lo yacht dalla Home.",action:"SERVIZI",target:"services"};
   }
-  try{const g=window.MarinaEmpireMobileProgression?.milestone?.();if(g&&g.panel){return {stage:Math.max(1,Math.min(7,(Number(g.step)||1)-1)),label:"CRESCITA COMANDANTE",title:g.title,desc:g.desc,action:g.action,target:g.panel};}}catch(_){}\n  return {stage:1,label:"FASE 2 · MISSIONE",title:"Scegli la prossima missione",desc:"Accetta un incarico, salpa e aumenta crediti e prestigio.",action:"MISSIONI",target:"missions"};
+  try{const g=window.MarinaEmpireMobileProgression?.milestone?.();if(g&&g.panel){return {stage:Math.max(1,Math.min(7,(Number(g.step)||1)-1)),label:"CRESCITA COMANDANTE",title:g.title,desc:g.desc,action:g.action,target:g.panel};}}catch(_){}
+  return {stage:1,label:"FASE 2 · MISSIONE",title:"Scegli la prossima missione",desc:"Accetta un incarico, salpa e aumenta crediti e prestigio.",action:"MISSIONI",target:"missions"};
 }
 function titleFor(id){
   return {
