@@ -16,6 +16,15 @@ const CLIENTS=[
  {id:"event",label:"Evento",icon:"🎉",pref:"service",need:"Coordinamento, ospitalità e puntualità"},
  {id:"influencer",label:"Creator / Influencer",icon:"📸",pref:"experience",need:"Esperienza memorabile e servizio impeccabile"}
 ];
+const SPECIAL_REQUESTS=[
+ {id:"menu",icon:"🍽️",title:"Menu personalizzato",text:"Gli ospiti chiedono una cambusa dedicata.",cost:120,bonus:.04,rating:.16,bestFocus:"hospitality",minTier:"premium"},
+ {id:"privacy",icon:"🔒",title:"Privacy totale",text:"Cliente VIP: accessi ridotti e massima discrezione.",cost:180,bonus:.05,rating:.18,bestFocus:"hospitality",minTier:"luxury"},
+ {id:"schedule",icon:"⏱️",title:"Orario prioritario",text:"Arrivo puntuale richiesto per un appuntamento a terra.",cost:90,bonus:.035,rating:.14,bestFocus:"navigation",minTier:"standard"},
+ {id:"toys",icon:"🏄",title:"Water toys pronti",text:"Gli ospiti vogliono SUP, Seabob ed e-foil disponibili.",cost:160,bonus:.05,rating:.17,bestFocus:"hospitality",minTier:"premium"},
+ {id:"technical",icon:"🔧",title:"Comfort tecnico premium",text:"Richiesta massima affidabilità di bordo e impianti.",cost:140,bonus:.045,rating:.16,bestFocus:"technical",minTier:"premium"},
+ {id:"content",icon:"📸",title:"Esperienza fotografica",text:"Il cliente vuole soste scenografiche e servizio dedicato.",cost:110,bonus:.04,rating:.15,bestFocus:"navigation",minTier:"premium"}
+];
+const TIER_ORDER={standard:1,premium:2,luxury:3};
 
 const style=document.createElement("style");
 style.id="me-charter2-style";
@@ -40,6 +49,11 @@ function profile(m){
  const c=CLIENTS[seed%CLIENTS.length];
  return {...c,party:2+(seed%7),priority:(seed%3===0?"Alta":"Normale")};
 }
+function specialRequest(m){
+ if(!isCharter(m))return null;
+ const seed=hash((m?.id||"")+"|special|"+(m?.dest||""));
+ return SPECIAL_REQUESTS[seed%SPECIAL_REQUESTS.length];
+}
 function prepFor(m){
  const s=stateRef();if(!s||!m)return null;
  const all=s.charterPrep&&typeof s.charterPrep==="object"?s.charterPrep:{};
@@ -52,7 +66,7 @@ function prepare(m,tierKey){
  const ok=typeof meAtomicPersist==="function"?meAtomicPersist(()=>{
   s.coins-=extra;
   s.charterPrep=s.charterPrep&&typeof s.charterPrep==="object"?s.charterPrep:{};
-  s.charterPrep[m.id]={tier:tierKey,costPaid:already+extra,at:Date.now(),client:profile(m).id};
+  s.charterPrep[m.id]={tier:tierKey,costPaid:already+extra,at:Date.now(),client:profile(m).id,specialAccepted:!!old?.specialAccepted,specialCostPaid:Math.max(0,Number(old?.specialCostPaid)||0)};
  }):false;
  if(!ok)return false;
  if(typeof render==="function")render();
@@ -66,10 +80,36 @@ function beforeLaunch(m){
  if(!p||!TIERS[p.tier])return {ok:false,message:"Prima prepara il charter scegliendo Standard, Premium o Luxury."};
  return {ok:true,prep:p,tier:TIERS[p.tier],client:profile(m)};
 }
+function setSpecialRequest(m,accept){
+ const s=stateRef();if(!s||!m||!isCharter(m)||s.trip)return false;
+ const req=specialRequest(m),p=prepFor(m);
+ if(!req){return false}
+ if(!p||!TIERS[p.tier]){if(typeof notice==="function")notice("Prima scegli il livello di servizio del charter.");return false}
+ const already=Math.max(0,Number(p.specialCostPaid)||0),extra=accept?Math.max(0,req.cost-already):0;
+ if(accept&&(Number(s.coins)||0)<extra){if(typeof notice==="function")notice("Crediti insufficienti per la richiesta speciale.");return false}
+ const ok=typeof meAtomicPersist==="function"?meAtomicPersist(()=>{
+  if(accept)s.coins-=extra;
+  p.specialAccepted=!!accept;
+  p.specialCostPaid=accept?already+extra:already;
+ }):false;
+ if(!ok)return false;
+ if(typeof render==="function")render();
+ if(typeof notice==="function")notice(accept?"Richiesta speciale accettata: "+req.title:"Richiesta speciale non inclusa");
+ window.dispatchEvent(new CustomEvent("marina-empire-updated",{detail:{reason:"charter-special"}}));
+ return true;
+}
+function specialOutcome(m,crew,tierKey){
+ const req=specialRequest(m),p=prepFor(m);
+ if(!req||!p?.specialAccepted)return {request:req,accepted:false,matched:false,rating:0,bonus:0};
+ const tierOk=(TIER_ORDER[tierKey]||1)>=(TIER_ORDER[req.minTier]||1);
+ const focusOk=String(crew?.focus||"balanced")===req.bestFocus;
+ const matched=tierOk&&focusOk;
+ return {request:req,accepted:true,matched,rating:matched?req.rating:-.18,bonus:matched?req.bonus:0};
+}
 function cardAddon(m){
  if(!isCharter(m))return "";
- const c=profile(m),p=prepFor(m),selected=p?.tier||"";
- return '<div class="me-charter2"><div class="me-charter2-head"><div><small>CHARTER 2.0 · PROFILO CLIENTE</small><b>'+c.icon+' '+c.label+' · '+c.party+' ospiti</b></div><small>Priorità '+c.priority+'</small></div><small>'+c.need+'</small><div class="me-charter2-actions">'+Object.entries(TIERS).map(([k,t])=>'<button type="button" data-charter-prep="'+k+'" data-charter-mission="'+String(m.id).replace(/"/g,"&quot;")+'" class="'+(selected===k?'on':'')+'">'+t.icon+' '+t.label+(t.cost?' · '+t.cost+' CR':' · 0 CR')+'</button>').join("")+'</div><div class="me-charter2-status">'+(selected?('Preparazione attiva: '+TIERS[selected].label+' · costo già sostenuto '+Math.max(0,Number(p.costPaid)||0).toLocaleString("it-IT")+' CR'):'Scegli il livello di servizio prima della partenza.')+'</div></div>';
+ const c=profile(m),p=prepFor(m),selected=p?.tier||"",req=specialRequest(m);
+ return '<div class="me-charter2"><div class="me-charter2-head"><div><small>CHARTER 2.0 · PROFILO CLIENTE</small><b>'+c.icon+' '+c.label+' · '+c.party+' ospiti</b></div><small>Priorità '+c.priority+'</small></div><small>'+c.need+'</small><div class="me-charter2-actions">'+Object.entries(TIERS).map(([k,t])=>'<button type="button" data-charter-prep="'+k+'" data-charter-mission="'+String(m.id).replace(/"/g,"&quot;")+'" class="'+(selected===k?'on':'')+'">'+t.icon+' '+t.label+(t.cost?' · '+t.cost+' CR':' · 0 CR')+'</button>').join("")+'</div><div class="me-charter2-status">'+(selected?('Preparazione attiva: '+TIERS[selected].label+' · costo già sostenuto '+Math.max(0,Number(p.costPaid)||0).toLocaleString("it-IT")+' CR'):'Scegli il livello di servizio prima della partenza.')+'</div>'+(req?'<div class="me-charter2-status"><b>'+req.icon+' RICHIESTA SPECIALE · '+req.title+'</b><br>'+req.text+' · costo '+req.cost+' CR · consigliato '+req.minTier+' + assetto '+req.bestFocus+'.</div><div class="me-charter2-actions"><button type="button" data-charter-special="yes" data-charter-mission="'+String(m.id).replace(/"/g,"&quot;")+'" class="'+(p?.specialAccepted?'on':'')+'">ACCETTA RICHIESTA</button><button type="button" data-charter-special="no" data-charter-mission="'+String(m.id).replace(/"/g,"&quot;")+'">NON INCLUDERE</button></div>':'')+'</div>';
 }
 const INCIDENTS=[
  {id:"diet",icon:"🍽️",title:"Richiesta speciale cambusa",text:"Gli ospiti chiedono un menu diverso all'ultimo minuto.",best:"hospitality"},
@@ -122,18 +162,18 @@ function arrivalResult(m,trip,crewReward){
  const returning=returningClient(m),progress=progressionBonus(m);
  const crew=window.MarinaEmpireCrew?.snapshot?.(m.boat)||{level:1,morale:75,training:0,focus:"balanced"};
  const spec=window.MarinaEmpireSpecialization?.get?.();
- const incident=incidentEffect(m,trip,crew);
- let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05)+incident.rating+(returning?.rating||0);
+ const incident=incidentEffect(m,trip,crew),special=specialOutcome(m,crew,p?.tier||"standard");
+ let rating=3.25+tier.rating+(Math.max(1,Number(crew.level)||1)-1)*.09+Math.min(.25,(Number(crew.training)||0)*.05)+incident.rating+(returning?.rating||0)+special.rating;
  if(Number(crew.morale)>=90)rating+=.18;else if(Number(crew.morale)<55)rating-=.45;
  if(crew.focus==="hospitality")rating+=.28;
  if(spec?.key==="charter")rating+=.18;
  if(String(trip?.weather||"").toLowerCase().includes("storm"))rating-=.35;
  rating=Math.max(1,Math.min(5,Math.round(rating*10)/10));
  const ratingBoost=rating>=4.7?.12:rating>=4.3?.08:rating>=3.9?.04:0;
- const pct=Math.max(0,tier.reward+ratingBoost+incident.bonus+(returning?.bonus||0)+(progress.reward-1));
+ const pct=Math.max(0,tier.reward+ratingBoost+incident.bonus+special.bonus+(returning?.bonus||0)+(progress.reward-1));
  const bonus=Math.round(Math.max(0,Number(crewReward)||0)*pct);
  const reputation=Math.max(3,Math.round((rating*2.2+(tier===TIERS.luxury?2:0))*progress.prestige));
- return {missionId:m.id,client:returning?{...c,label:returning.label}:c,returningClient:!!returning,careerTier:progress.label,careerTierLevel:progress.tier,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct,incident:incident.incident,incidentMatched:!!(incident.incident&&incident.bonus>0)};
+ return {missionId:m.id,client:returning?{...c,label:returning.label}:c,returningClient:!!returning,careerTier:progress.label,careerTierLevel:progress.tier,tierKey:p?.tier||"standard",tierLabel:tier.label,rating,bonus,reputation,pct,incident:incident.incident,incidentMatched:!!(incident.incident&&incident.bonus>0),specialRequest:special.request,specialAccepted:special.accepted,specialMatched:special.matched};
 }
 function applyArrival(r){
  const s=stateRef();if(!s||!r)return;
@@ -146,9 +186,15 @@ function applyArrival(r){
  s.sectorReputation=s.sectorReputation&&typeof s.sectorReputation==="object"?s.sectorReputation:{};
  s.sectorReputation.charter=Math.max(0,Math.floor(Number(s.sectorReputation.charter)||0))+r.reputation;
  if(s.charterPrep&&typeof s.charterPrep==="object")delete s.charterPrep[r.missionId];
- s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,returningClient:!!r.returningClient,careerTier:r.careerTier||"",incident:r.incident?.title||"",incidentMatched:!!r.incidentMatched,at:Date.now()};
+ s.lastCharterReview={missionId:r.missionId,client:r.client.label,rating:r.rating,tier:r.tierLabel,bonus:r.bonus,reputation:r.reputation,returningClient:!!r.returningClient,careerTier:r.careerTier||"",incident:r.incident?.title||"",incidentMatched:!!r.incidentMatched,specialRequest:r.specialRequest?.title||"",specialAccepted:!!r.specialAccepted,specialMatched:!!r.specialMatched,at:Date.now()};
 }
 document.addEventListener("click",e=>{
+ const special=e.target.closest("[data-charter-special]");
+ if(special){
+  e.preventDefault();e.stopPropagation();
+  try{const m=typeof findAvailableMission==="function"?findAvailableMission(special.dataset.charterMission):null;if(m)setSpecialRequest(m,special.dataset.charterSpecial==="yes")}catch(_){}
+  return;
+ }
  const b=e.target.closest("[data-charter-prep]");if(!b)return;
  e.preventDefault();e.stopPropagation();
  try{
@@ -156,5 +202,5 @@ document.addEventListener("click",e=>{
   if(m)prepare(m,b.dataset.charterPrep);
  }catch(_){}
 });
-window.MarinaEmpireCharter2={isCharter,profile,prepFor,prepare,beforeLaunch,cardAddon,arrivalResult,applyArrival,incidentFor,charterStats,progressionBonus,returningClient,tiers:TIERS};
+window.MarinaEmpireCharter2={isCharter,profile,specialRequest,prepFor,prepare,setSpecialRequest,beforeLaunch,cardAddon,arrivalResult,applyArrival,incidentFor,charterStats,progressionBonus,returningClient,tiers:TIERS};
 })();
