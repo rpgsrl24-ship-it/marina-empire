@@ -3439,7 +3439,7 @@ setTimeout(update,250);
 }
 </style><script id="me-mobile-voyage-visibility-v42">(function(){
 function sync(){
-if(window.innerWidth>740)return;
+if(window.innerWidth>899)return;
 const cinema=document.getElementById('voyageCinema'),screen=document.getElementById('map');
 if(!cinema||!screen||screen.classList.contains('hide')||cinema.classList.contains('hide'))return;
 if(typeof voyageLeafletMap!=='undefined'&&voyageLeafletMap){requestAnimationFrame(()=>voyageLeafletMap.invalidateSize());setTimeout(()=>voyageLeafletMap.invalidateSize(),180)}
@@ -4078,9 +4078,17 @@ button.addEventListener("click",async()=>{
     /* Duplicate live blocks are never intentional. Remove them on every viewport
        before applying mobile-only compact state. */
     dedupe("#marinas .me-world-event");
-    dedupe("#marinas .me-npc-box");
-    dedupe("#marinas .me-traffic-board");
-    if(window.innerWidth>740)return;
+    dedupe(".me-traffic-board");
+    dedupe(".me-npc-box");
+    const seenNpc=new Set();
+    document.querySelectorAll(".me-npc-role").forEach(role=>{
+      const card=role.closest(".me-npc-box")||role.closest(".item")||role.parentElement;
+      if(!card)return;
+      const sig=(role.textContent||"").trim()+"|"+((card.querySelector(".me-npc-meta")?.textContent||"").trim());
+      if(seenNpc.has(sig)){card.remove();return}
+      seenNpc.add(sig);
+    });
+    if(window.innerWidth>899)return;
 
     const npc=document.querySelector("#marinas .me-npc-box");
     if(npc){
