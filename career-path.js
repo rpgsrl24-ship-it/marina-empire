@@ -28,29 +28,29 @@ const STAGES=[
   {key:"businesses",label:"2 attività nautiche",target:2,tab:"office"},
   {key:"serviceChains",label:"2 catene operative completate",target:2,tab:"marinas"}
  ]},
- {id:"manager",level:6,title:"MARINA MANAGER",icon:"⚓",focus:"Gestisci una vera rete portuale e le sue attività.",requirements:[
+ {id:"manager",level:6,title:"MARINA MANAGER",icon:"⚓",focus:"Dimostra di saper gestire operazioni portuali prima di acquistare una marina.",requirements:[
   {key:"voyages",label:"40 viaggi completati",target:40,tab:"missions"},
-  {key:"marinas",label:"1 marina posseduta",target:1,tab:"marinas"},
+  {key:"marinaOpsLevel",label:"Operatività marina livello 3",target:3,tab:"marinas"},
   {key:"businesses",label:"3 attività nautiche",target:3,tab:"office"},
   {key:"businessLevels",label:"6 livelli attività complessivi",target:6,tab:"office"},
   {key:"serviceChains",label:"5 catene operative completate",target:5,tab:"marinas"},
-  {key:"empireScore",label:"8.000 Empire Score",target:8000,tab:"profile"}
+  {key:"empireScore",label:"6.500 Empire Score",target:6500,tab:"profile"}
  ]},
- {id:"network",level:7,title:"MARINA NETWORK",icon:"🌍",focus:"Costruisci una rete multi-marina con flotta, business e operazioni avanzate.",requirements:[
+ {id:"network",level:7,title:"MARINA NETWORK",icon:"🌍",focus:"Acquista la prima marina e costruisci una rete con flotta, business e operazioni avanzate.",requirements:[
   {key:"voyages",label:"75 viaggi completati",target:75,tab:"missions"},
-  {key:"marinas",label:"2 marine possedute",target:2,tab:"marinas"},
+  {key:"marinas",label:"1 marina posseduta",target:1,tab:"marinas"},
   {key:"boats",label:"5 yacht in flotta",target:5,tab:"fleet"},
   {key:"businesses",label:"5 attività nautiche",target:5,tab:"office"},
   {key:"serviceChains",label:"10 catene operative completate",target:10,tab:"marinas"},
-  {key:"empireScore",label:"20.000 Empire Score",target:20000,tab:"profile"}
+  {key:"empireScore",label:"12.000 Empire Score",target:12000,tab:"profile"}
  ]},
  {id:"empire",level:8,title:"MARINA EMPIRE",icon:"👑",focus:"Costruisci un impero nautico internazionale e continua a competere nel mondo vivo.",requirements:[
   {key:"voyages",label:"120 viaggi completati",target:120,tab:"missions"},
-  {key:"marinas",label:"3 marine possedute",target:3,tab:"marinas"},
+  {key:"marinas",label:"2 marine possedute",target:2,tab:"marinas"},
   {key:"businesses",label:"7 attività nautiche",target:7,tab:"office"},
-  {key:"boats",label:"7 yacht in flotta",target:7,tab:"fleet"},
+  {key:"boats",label:"6 yacht in flotta",target:6,tab:"fleet"},
   {key:"serviceChains",label:"18 catene operative completate",target:18,tab:"marinas"},
-  {key:"empireScore",label:"50.000 Empire Score",target:50000,tab:"profile"}
+  {key:"empireScore",label:"22.000 Empire Score",target:22000,tab:"profile"}
  ]}
 ]
 
@@ -91,7 +91,7 @@ function countTruthy(obj){
  return Object.values(obj).filter(Boolean).length;
 }
 function metrics(){
- if(typeof state==="undefined"||!state)return {voyages:0,boats:0,prestige:0,businesses:0,npcJobs:0,sectorRep:0,marinas:0,serviceChains:0,empireScore:0,crewLevel:0,refitLevels:0,charters:0,charterRep:0,businessLevels:0};
+ if(typeof state==="undefined"||!state)return {voyages:0,boats:0,prestige:0,businesses:0,npcJobs:0,sectorRep:0,marinas:0,serviceChains:0,empireScore:0,crewLevel:0,refitLevels:0,charters:0,charterRep:0,businessLevels:0,marinaOpsLevel:0};
  const reps=state.sectorReputation&&typeof state.sectorReputation==="object"?Object.values(state.sectorReputation):[];
  let crewLevel=0;
  try{
@@ -101,6 +101,11 @@ function metrics(){
  const refitValues=state.refits&&typeof state.refits==="object"?Object.values(state.refits):[];
  const refitLevels=refitValues.reduce((sum,r)=>sum+Math.max(0,Number(r?.engine)||0)+Math.max(0,Number(r?.hospitality)||0)+Math.max(0,Number(r?.reliability)||0),0);
  const charterRaw=state.charterStats&&typeof state.charterStats==="object"?state.charterStats:{};
+ const marinaOpsLevel=Object.values(state.marinaOperations||{}).reduce((m,v)=>{
+  const completed=Math.max(0,Math.floor(Number(v?.completed)||0));
+  const level=completed>=20?5:completed>=10?4:completed>=5?3:completed>=2?2:1;
+  return Math.max(m,level);
+ },0);
  const ownedBusinessKeys=Object.entries(state.businesses||{}).filter(([,v])=>!!v).map(([k])=>k);
  const businessLevels=ownedBusinessKeys.reduce((sum,key)=>sum+Math.max(1,Math.floor(Number(state.businessLevels?.[key])||1)),0);
  return {
@@ -117,7 +122,8 @@ function metrics(){
   refitLevels,
   charters:Math.max(0,Math.floor(Number(charterRaw.completed)||0)),
   charterRep:Math.max(0,Math.floor(Number(state.sectorReputation?.charter)||0)),
-  businessLevels
+  businessLevels,
+  marinaOpsLevel
  };
 }
 function requirementStatus(r,m){
