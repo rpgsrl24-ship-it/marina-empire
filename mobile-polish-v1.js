@@ -21,10 +21,12 @@ style.textContent=`
  html body .me-npc-box{display:none!important}
  html body .me-live-marina .me-npc-box:first-of-type{display:block!important}
  #meMobileMissionFixedHome{
-   position:fixed;z-index:250;left:10px;top:10px;min-height:40px;padding:7px 11px;
+   position:fixed;z-index:250;left:10px;top:10px;min-height:44px;padding:8px 12px;
    border:1px solid rgba(232,198,132,.65);border-radius:10px;background:rgba(4,28,41,.94);
    color:#ffe0a0;font-size:10px;font-weight:900;box-shadow:0 4px 18px rgba(0,0,0,.35)
  }
+ #navigation button,.me-mobile-left-rail button,.me-mobile-right-rail button{min-width:44px!important;min-height:44px!important}
+ #meMobileSetupHint{padding:10px 11px;margin:8px 0;border:1px solid rgba(214,181,117,.42);border-radius:10px;background:#0a3040;color:#f3d495;font-size:11px;line-height:1.35}
 }
 `;
 document.head.appendChild(style);
@@ -59,12 +61,38 @@ function polishLocked(){
 }
 function pruneNpc(){
  const boxes=[...document.querySelectorAll(".me-npc-box")];
- if(!boxes.length)return;
- const visibleLive=[...document.querySelectorAll(".me-live-marina")].find(el=>el.offsetParent!==null)||document.querySelector(".me-live-marina");
- const keep=visibleLive?boxes.find(x=>visibleLive.contains(x)):boxes[0];
- boxes.forEach(x=>{if(x!==keep)x.remove()});
+ if(boxes.length){
+  const visibleLive=[...document.querySelectorAll(".me-live-marina")].find(el=>el.offsetParent!==null)||document.querySelector(".me-live-marina");
+  const keep=visibleLive?boxes.find(x=>visibleLive.contains(x)):boxes[0];
+  boxes.forEach(x=>{if(x!==keep)x.remove()});
+ }
+ const roots=[...document.querySelectorAll(".me-live-marina,#meMarinaLivePanel,#home")];
+ for(const root of roots){
+  const seen=new Set();
+  const cards=[...root.querySelectorAll(".me-live-row,.me-contract,.me-npc-box,.me-live-feed-row")];
+  for(const card of cards){
+   const key=(card.className+"|"+(card.textContent||"").replace(/\s+/g," ").trim()).slice(0,600);
+   if(!key||key.length<18)continue;
+   if(seen.has(key))card.remove();else seen.add(key);
+  }
+ }
 }
-function sync(){ensureMissionClose();polishLocked();pruneNpc()}
+function polishLabels(){
+ if(window.innerWidth>740)return;
+ const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+ const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+ nodes.forEach(n=>{if(n.nodeValue&&n.nodeValue.includes("AZIONECONSIGLIATA"))n.nodeValue=n.nodeValue.replaceAll("AZIONECONSIGLIATA","AZIONE CONSIGLIATA")});
+}
+function missionGuidance(){
+ if(window.innerWidth>740)return;
+ let s=null;try{s=typeof state!=="undefined"?state:null}catch(_){}
+ const list=document.getElementById("missionList");if(!list)return;
+ let hint=document.getElementById("meMobileSetupHint");
+ const needs=!!(s?.name&&!s?.setupComplete&&(Number(s?.voyages)||0)===0);
+ if(!needs){hint?.remove();return}
+ if(!hint){hint=document.createElement("div");hint.id="meMobileSetupHint";hint.textContent="⚓ Completa prima la configurazione iniziale: yacht + marina. Subito dopo comparirà la prima missione.";list.insertAdjacentElement("beforebegin",hint)}
+}
+function sync(){ensureMissionClose();polishLocked();pruneNpc();polishLabels();missionGuidance()}
 window.addEventListener("resize",sync);
 window.addEventListener("marina-empire-updated",()=>setTimeout(sync,40));
 const mo=new MutationObserver(()=>sync());
