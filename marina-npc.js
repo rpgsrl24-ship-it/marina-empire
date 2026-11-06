@@ -40,7 +40,7 @@ style.textContent=`
 `;
 document.head.appendChild(style);
 
-let timer=null,box=null,current=null,job=null,jobTick=null;
+let timer=null,box=null,current=null,job=null,jobTick=null,recentTypes=[];
 
 function level(){
  const h=new Date().getHours();
@@ -94,12 +94,19 @@ function pick(){
  const weighted=[];
  for(const op of OPPORTUNITIES){
   const sector=worldSector(op),fav=e&&Array.isArray(e.sectors)&&e.sectors.includes(sector);
-  weighted.push(op);
-  if(fav){weighted.push(op);weighted.push(op);}
-  if(w?.id==="rough"&&(sector==="tecnica"||sector==="marina")){weighted.push(op);weighted.push(op);}
-  if(w?.id==="rain"&&sector==="servizi")weighted.push(op);
+  const recentlyUsed=recentTypes.includes(op.type);
+  if(!recentlyUsed)weighted.push(op);
+  if(fav&&!recentlyUsed){weighted.push(op);weighted.push(op);}
+  if(w?.id==="rough"&&(sector==="tecnica"||sector==="marina")&&!recentlyUsed){weighted.push(op);weighted.push(op);}
+  if(w?.id==="rain"&&sector==="servizi"&&!recentlyUsed)weighted.push(op);
  }
- const picked=adjusted(weighted[Math.floor(Math.random()*weighted.length)]);
+ const pool=weighted.length?weighted:OPPORTUNITIES;
+ const picked=adjusted(pool[Math.floor(Math.random()*pool.length)]);
+ recentTypes=[picked.type,...recentTypes.filter(x=>x!==picked.type)].slice(0,5);
+ const marina=(()=>{try{return typeof port==="function"?port(state?.port||"rimini")?.name:"Marina"}catch(_){return"Marina"}})();
+ const vessels=["M/Y Aurora","M/Y Blue Star","S/Y Maestrale","M/Y Stella","S/Y Bora","M/Y Riviera","M/Y Levante","S/Y Azzurra"];
+ const vessel=vessels[(Date.now()+picked.type.length*17)%vessels.length|0];
+ picked.displayContext=(picked.role==="Charter"||picked.role==="Armatore"||picked.role==="Broker")?vessel:marina;
  if(w&&w.id==="rough"&&worldSector(picked)==="charter")picked.reward=Math.round(picked.reward*.9);
  return picked;
 }
@@ -129,7 +136,7 @@ function ensure(){
 function renderCurrent(){
  if(!ensure())return;
  if(!current)current=pick();
- box.querySelector(".me-npc-row").innerHTML='<span>'+current.icon+'</span><span><span class="me-npc-role">'+current.role+'</span> · '+current.text+'</span>';
+ box.querySelector(".me-npc-row").innerHTML='<span>'+current.icon+'</span><span><span class="me-npc-role">'+current.role+'</span> · '+current.text+(current.displayContext?' · <b>'+current.displayContext+'</b>':'')+'</span>';
  const economy=window.MarinaEmpireNpcEconomy;
  const sector=economy?.sectorFor?economy.sectorFor(current):"servizi";
  const sectorLevel=economy?.sectorLevel?economy.sectorLevel(sector):1;
