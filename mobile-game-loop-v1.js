@@ -404,8 +404,14 @@ function sync(){
     if(pulseTitle)pulseTitle.textContent=(s?.trip?"Navigazione in corso":"Marina Live · "+marinaName(s?.port));
     if(pulseText){
       if(s?.trip)pulseText.textContent="Rotta attiva · segui GPS, carburante e arrivo.";
-      else if(contracts.length)pulseText.textContent=count+" unità attive · "+contracts.length+" richieste disponibili.";
-      else pulseText.textContent=count+" unità attive · nessuna richiesta urgente.";
+      else {
+        const world=window.MarinaEmpireWorldEvents?.current?.();
+        const weather=window.MarinaEmpireWorldEvents?.weatherFor?.(s?.port||"rimini");
+        const eventLabel=world?.title?world.title:"Attività ordinaria";
+        const weatherLabel=weather?.label?weather.label:"meteo regolare";
+        if(contracts.length)pulseText.textContent=count+" unità · "+contracts.length+" richieste · "+eventLabel+" · "+weatherLabel;
+        else pulseText.textContent=count+" unità · "+eventLabel+" · "+weatherLabel;
+      }
     }
   }catch(_){
     if(pulseTitle)pulseTitle.textContent="Marina operativa";
