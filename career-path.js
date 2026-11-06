@@ -54,7 +54,7 @@ style.textContent=`
 .me-career-requirement b{color:#dce7ea;font-size:9px}.me-career-requirement.ok b{color:#9fe1c4}
 .me-career-bar{grid-column:1/-1;height:5px;border-radius:99px;background:#173846;overflow:hidden}.me-career-bar span{display:block;height:100%;background:#caa96a}
 .me-career-action{width:100%;margin-top:9px;padding:9px 11px;border:1px solid rgba(214,181,117,.52);border-radius:9px;background:#17475a;color:#fff;font-size:10px;font-weight:800}
-@media(max-width:740px){
+@media(max-width:899px){
  .me-career-path{margin:10px 0;padding:11px}
  .me-career-road{display:flex;gap:5px;overflow:hidden}
  .me-career-stage{display:none;flex:1;padding:8px}.me-career-stage.current,.me-career-stage.current + .me-career-stage{display:block}
