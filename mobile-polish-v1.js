@@ -92,11 +92,39 @@ function missionGuidance(){
  if(!needs){hint?.remove();return}
  if(!hint){hint=document.createElement("div");hint.id="meMobileSetupHint";hint.textContent="⚓ Completa prima la configurazione iniziale: yacht + marina. Subito dopo comparirà la prima missione.";list.insertAdjacentElement("beforebegin",hint)}
 }
-function sync(){ensureMissionClose();polishLocked();pruneNpc();polishLabels();missionGuidance()}
+function ensureCrewRefitTools(){
+ if(window.innerWidth>740)return;
+ const home=document.querySelector("#home .me-mobile-home-dashboard")||document.getElementById("home");
+ if(!home)return;
+ let bar=document.getElementById("meMobileCrewRefitTools");
+ if(!bar){
+  bar=document.createElement("div");
+  bar.id="meMobileCrewRefitTools";
+  bar.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0";
+  bar.innerHTML='<button type="button" data-mobile-tool="crew" style="min-height:48px">👥 EQUIPAGGIO</button><button type="button" data-mobile-tool="refit" style="min-height:48px">🛠️ REFIT</button>';
+  bar.addEventListener("click",e=>{
+   const b=e.target.closest("[data-mobile-tool]");if(!b)return;
+   const tool=b.dataset.mobileTool;
+   if(typeof showTab==="function")showTab("office");
+   setTimeout(()=>{
+    const id=tool==="crew"?"meCrewSystem":"meRefitV1";
+    const target=document.getElementById(id);
+    if(target&&target.offsetParent!==null)target.scrollIntoView({behavior:"smooth",block:"start"});
+    else if(typeof notice==="function")notice(tool==="crew"?"Equipaggio si sblocca dopo 4 viaggi o con una seconda barca.":"Refit si sblocca dopo 3 viaggi o con una seconda barca.");
+   },160);
+  });
+  const goal=home.querySelector(".me-mobile-home-goal");
+  if(goal)goal.insertAdjacentElement("beforebegin",bar);else home.appendChild(bar);
+ }
+}
+function sync(){ensureMissionClose();polishLocked();polishLabels();missionGuidance();ensureCrewRefitTools()}
 window.addEventListener("resize",sync);
 window.addEventListener("marina-empire-updated",()=>setTimeout(sync,40));
-const mo=new MutationObserver(()=>sync());
-if(document.body)mo.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["disabled","class"]});
+let syncTimer=null;
+function scheduleSync(delay=80){clearTimeout(syncTimer);syncTimer=setTimeout(sync,delay)}
+window.addEventListener("marina-empire-updated",()=>scheduleSync(80));
+window.addEventListener("resize",()=>scheduleSync(120));
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)scheduleSync(80)});
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",sync,{once:true});else sync();
-setInterval(sync,20000);
+setInterval(sync,10000);
 })();
