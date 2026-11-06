@@ -83,7 +83,7 @@ function featuredVessel(){
  const ranked=[...pool].sort((a,b)=>{
   const pa=window.MarinaEmpireMarinaProfiles?.vesselWeight?.(a,key)||1,pb=window.MarinaEmpireMarinaProfiles?.vesselWeight?.(b,key)||1;
   const la=window.MarinaEmpireLocalEvents?.vesselWeight?.(a,key)||1,lb=window.MarinaEmpireLocalEvents?.vesselWeight?.(b,key)||1;
-  return (hash(b.id+"|"+seed)%1000)*pb*lb-(hash(a.id+"|"+seed)%1000)*pa*la;
+  const ab=affinity.has(b.id)?1.35:1,aa=affinity.has(a.id)?1.35:1;\n  return (hash(b.id+"|"+seed)%1000)*pb*lb*ab-(hash(a.id+"|"+seed)%1000)*pa*la*aa;
  });
  const v=ranked[0]||pool[0];
  let raw={};
@@ -149,6 +149,13 @@ function trafficSnapshot(){
 }
 function contractSnapshot(){
  const key=portKey(),w=world(),local=localEvent(),stage=careerLevel(),t=trust(),op=operation(),seed=hash(key+"|contracts|"+slot());
+ const feature=featuredVessel();
+ const relation=feature?.id?vesselRelation(feature,key):null;
+ const preferredIds=relation?.lastContract?[relation.lastContract]:[];
+ const profilePrefs=feature?.profile==="superyacht"?["vip","provisioning","toys","security","transfer","fuel"]:
+  feature?.profile==="charter"?["charter","provisioning","toys","tech","fuel"]:
+  feature?.profile==="regatta"?["arrival","fuel","security","charter"]:[];
+ const affinity=new Set([...preferredIds,...profilePrefs]);
  const order=[...CONTRACTS].sort((a,b)=>{
   const pa=window.MarinaEmpireMarinaProfiles?.contractWeight?.(a,key)||1,pb=window.MarinaEmpireMarinaProfiles?.contractWeight?.(b,key)||1;
   const la=window.MarinaEmpireLocalEvents?.contractWeight?.(a,key)||1,lb=window.MarinaEmpireLocalEvents?.contractWeight?.(b,key)||1;
@@ -166,8 +173,6 @@ function contractSnapshot(){
  const pressureExtra=pressure>=1.18?1:0;
  const shiftExtra=shift.phase?.id==="rush"?1:0;
  const contractCount=Math.min(4,2+(Math.max(1,Number(op.level)||1)>=3?1:0)+(Math.max(1,Number(op.level)||1)>=5?1:0)+pressureExtra+shiftExtra);
- const feature=featuredVessel();
- const relation=feature?.id?vesselRelation(feature,key):null;
  return order.slice(0,contractCount).map((c,i)=>{
   const demand=Math.max(.85,Math.min(1.8,(Number(w.demand)||1)*(Number(local.demand)||1)*serviceLoad*shiftDemand*shiftService*chainDemand*chainService));
   const trustBonus=1+(Math.max(1,Number(t.level)||1)-1)*.035;
