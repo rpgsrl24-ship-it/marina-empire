@@ -159,7 +159,8 @@ function contractSnapshot(){
  const order=[...CONTRACTS].sort((a,b)=>{
   const pa=window.MarinaEmpireMarinaProfiles?.contractWeight?.(a,key)||1,pb=window.MarinaEmpireMarinaProfiles?.contractWeight?.(b,key)||1;
   const la=window.MarinaEmpireLocalEvents?.contractWeight?.(a,key)||1,lb=window.MarinaEmpireLocalEvents?.contractWeight?.(b,key)||1;
-  return (hash(b.id+"|"+seed)%1000)*pb*lb-(hash(a.id+"|"+seed)%1000)*pa*la;
+  const ab=affinity.has(b.id)?1.35:1,aa=affinity.has(a.id)?1.35:1;
+  return (hash(b.id+"|"+seed)%1000)*pb*lb*ab-(hash(a.id+"|"+seed)%1000)*pa*la*aa;
  });
  const memory=window.MarinaEmpireMarinaMemory?.current?.()||{pressure:1,serviceLoad:1};
  const pressure=Math.max(.75,Math.min(1.35,Number(memory.pressure)||1));
