@@ -34,6 +34,7 @@ const elements = Object.fromEntries(['officeDashboard', 'businessList', 'marinaL
 const messages = [], handlers = {};
 let saves = 0, renders = 0;
 const context = vm.createContext({
+  window: {},
   state: {}, Date, Math, Number, Object, String, Array, Set,
   $: id => elements[id],
   money: n => Math.round(n).toLocaleString('it-IT'),
