@@ -126,7 +126,7 @@ function click(e){
  const id=b.dataset.go;
  if(id==="crew"){scrollOffice("meCrewSystem");return}
  if(id==="refit"){scrollOffice("meRefitV1");return}
- if(id==="community"){scrollOffice("marinaCommunity");return}
+ if(id==="community"){go("community");return}
  if(id==="charter"){go("missions");setTimeout(function(){document.getElementById("missionList")?.scrollIntoView({behavior:"smooth",block:"start"})},100);return}
  go(id)
 }
