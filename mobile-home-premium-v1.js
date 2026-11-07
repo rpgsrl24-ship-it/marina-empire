@@ -6,18 +6,22 @@ window.__ME_MOBILE_HOME_PREMIUM_V1__=true;
 const st=document.createElement("style");
 st.id="me-mobile-home-premium-v1-style";
 st.textContent='@media(max-width:899px){'+
+'body.me-premium-home-active .top,body.me-premium-home-active #meCompactHud,body.me-premium-home-active #meMobileMarinaLiveCard,body.me-premium-home-active .stats,body.me-premium-home-active .me-top-onboarding,body.me-premium-home-active #meMobileNextStep,body.me-premium-home-active #home>.me-beta-launch-notice{display:none!important}'+
+'body.me-premium-home-active .shell{padding-top:4px!important}'+
 '#home .me-mobile-home-dashboard{display:flex!important;flex-direction:column!important;gap:9px!important;padding:0 0 104px!important}'+
 '#home .me-mobile-home-dashboard>*:not(#mePremiumHome){display:none!important}'+
 '#mePremiumHome{display:flex!important;flex-direction:column!important;gap:9px!important;width:100%!important;margin:0!important;padding:0!important}'+
-'.meph-brand{text-align:center;color:#efd18e;padding:4px 0 1px}.meph-brand b{font:800 20px Georgia,serif;letter-spacing:.08em}.meph-brand small{display:block;margin-top:2px;color:#7f9aa7;font-size:7px;font-weight:900;letter-spacing:.14em}'+
+'.meph-brand{text-align:center;color:#efd18e;padding:3px 0 1px}.meph-brand b{font:800 22px Georgia,serif;letter-spacing:.08em}.meph-brand small{display:block;margin-top:2px;color:#96afba;font-size:7px;font-weight:900;letter-spacing:.14em}'+
+'.meph-hud{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.meph-hud>div{min-width:0;padding:8px 4px;border:1px solid rgba(232,188,103,.72);border-radius:11px;background:linear-gradient(145deg,#0d3c50,#082638);text-align:center;box-shadow:inset 0 1px #ffffff18,0 3px 12px #0004}.meph-hud span{display:block;color:#a5bbc4;font-size:7px;font-weight:900;white-space:nowrap}.meph-hud b{display:block;margin-top:4px;color:#ffd66f;font-size:13px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meph-hud .ok b{color:#69e48f}'+
 '.meph-live{overflow:hidden;border:1px solid #d8ad63;border-radius:16px;background:#062635;box-shadow:0 10px 28px #0007}'+
-'.meph-scene{position:relative;height:210px;overflow:hidden;background:linear-gradient(180deg,#00182508,#00182542),url("./anteprima/assets/render-2026/marine.jpg") center/cover no-repeat;isolation:isolate}'+
+'.meph-scene{position:relative;height:230px;overflow:hidden;background:#0c5975;isolation:isolate}.meph-scene:before{content:"";position:absolute;z-index:0;inset:0;background:url("./anteprima/assets/render-2026/marine.jpg") center 56%/cover no-repeat;filter:brightness(1.5) saturate(1.35) contrast(1.02);transform:scale(1.035)}'+
 '.meph-scene:after{content:"";position:absolute;z-index:1;inset:55% 0 0;background:repeating-radial-gradient(ellipse at 50% 0,transparent 0 17px,#e0f9ff18 19px,transparent 22px,transparent 44px);animation:mephWater 8s linear infinite;pointer-events:none}'+
 '@keyframes mephWater{from{transform:translateX(-2%)}to{transform:translateX(2%)}}'+
 '.meph-head{position:absolute;z-index:8;left:8px;right:8px;top:8px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}'+
 '.meph-livebadge,.meph-day{padding:6px 9px;border-radius:999px;background:#042a36e8;font-size:9px;font-weight:950}.meph-livebadge{border:1px solid #62dc9f;color:#ddfff0}.meph-day{border:1px solid #d6b57566;color:#ecd29c}'+
 '.meph-dot{display:inline-block;width:8px;height:8px;margin-right:5px;border-radius:50%;background:#65e3a1;box-shadow:0 0 9px #65e3a1}'+
-'.meph-vessel{position:absolute!important;z-index:5!important;left:-90px;width:94px!important;height:44px!important;min-height:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}'+
+'.meph-vessel{display:none!important}'+
+'.meph-traffic-ticker{position:absolute;z-index:9;left:8px;right:8px;top:47px;overflow:hidden;border:1px solid rgba(104,222,255,.68);border-radius:9px;background:rgba(3,30,43,.88);box-shadow:0 5px 14px #0006}.meph-traffic-track{display:flex;width:max-content;gap:26px;padding:7px 12px;animation:mephTicker 22s linear infinite;color:#ecf7f8;font-size:8px;font-weight:900;white-space:nowrap}.meph-traffic-track b{color:#7cff9f}.meph-traffic-track .out{color:#ffda67}.meph-traffic-track .move{color:#72d6ff}@keyframes mephTicker{to{transform:translateX(-50%)}}'+
 '.meph-vessel:nth-child(1){top:43%;animation:mephBoat1 18s linear -4s infinite}.meph-vessel:nth-child(2){top:60%;animation:mephBoat2 23s linear -11s infinite}.meph-vessel:nth-child(3){top:72%;animation:mephBoat3 28s linear -19s infinite}'+
 '@keyframes mephBoat1{0%{transform:translateX(-80px) translateY(8px) scale(.84)}45%{transform:translateX(52vw) translateY(-13px) scale(.96)}100%{transform:translateX(calc(100vw + 45px)) translateY(2px) scale(.86)}}'+
 '@keyframes mephBoat2{0%{transform:translateX(-110px) translateY(-5px) scale(.72)}50%{transform:translateX(48vw) translateY(12px) scale(.86)}100%{transform:translateX(calc(100vw + 55px)) translateY(-8px) scale(.74)}}'+
@@ -58,8 +62,8 @@ function ensure(){
  let root=document.getElementById("mePremiumHome");if(root)return root;
  root=document.createElement("section");root.id="mePremiumHome";
  root.innerHTML=
- '<div class="meph-brand"><b>⚓ MARINA EMPIRE</b><small>IL GESTIONALE NAUTICO ONLINE</small></div>'+
- '<section class="meph-live"><div class="meph-scene" id="mephScene" role="button" tabindex="0"><div class="meph-head"><div class="meph-livebadge"><i class="meph-dot"></i>MARINA LIVE</div><div class="meph-day" id="mephDay">☀️ GIORNO</div></div><div id="mephVessels"></div></div><div class="meph-livefoot"><div><small>TRAFFICO ATTIVO</small><strong id="mephLiveText">Marina · mondo vivo</strong></div><button type="button" id="mephOpenLive">APRI ›</button></div></section>'+
+ '<div class="meph-brand"><b>⚓ MARINA EMPIRE</b><small>IL GESTIONALE NAUTICO ONLINE</small></div>'+\n '<div class="meph-hud"><div><span>🪙 MONETE</span><b id="mephCoins">—</b></div><div><span>⭐ PRESTIGIO</span><b id="mephPrestige">—</b></div><div><span>⛽ CARBURANTE</span><b id="mephFuel">—</b></div><div class="ok"><span>🔧 STATO</span><b id="mephCondition">—</b></div></div>'+
+ '<section class="meph-live"><div class="meph-scene" id="mephScene" role="button" tabindex="0"><div class="meph-head"><div class="meph-livebadge"><i class="meph-dot"></i>MARINA LIVE</div><div class="meph-day" id="mephDay">☀️ GIORNO</div></div><div class="meph-traffic-ticker"><div class="meph-traffic-track" id="mephTrafficTrack"></div></div><div id="mephVessels"></div></div><div class="meph-livefoot"><div><small>TRAFFICO ATTIVO</small><strong id="mephLiveText">Marina · mondo vivo</strong></div><button type="button" id="mephOpenLive">APRI ›</button></div></section>'+
  '<section class="meph-alert"><div class="ico">🌍</div><div><small>EVENTO MONDO</small><strong id="mephWorldTitle">Attività ordinaria</strong><span id="mephWorldText">Marina operativa</span></div><button type="button" data-go="marinas">›</button></section>'+
  '<section class="meph-alert em"><div class="ico">🚨</div><div><small>EMERGENZA LIVE</small><strong id="mephEmergencyTitle">Intervento disponibile</strong><span id="mephEmergencyText">Controlla le richieste operative.</span></div><button type="button" data-go="marinas">›</button></section>'+
  '<div class="meph-actions"><button type="button" id="mephJob"><b>📋</b><span id="mephJobLabel">INCARICO VHF</span></button><button type="button" data-go="missions"><b>🎯</b>NUOVA<br>MISSIONE</button><button type="button" data-go="charter"><b>🤝</b>CONTRATTI<br>& CHARTER</button><button type="button" data-go="refit"><b>🛠️</b>CANTIERE<br>& REFIT</button></div>'+
@@ -104,15 +108,17 @@ function click(e){
 }
 
 function renderVessels(){
- const box=document.getElementById("mephVessels");if(!box)return;
- const t=live();const list=(t?.items||[]).slice(0,3);
- const arr=list.length?list:[{name:"Riva 56",kind:"motor",action:"in arrivo"},{name:"Blue Runner",kind:"tender",action:"in manovra"},{name:"Adriatica",kind:"sail",action:"in uscita"}];
- box.innerHTML=arr.map(function(v){
-  const sail=/sail|vela|s\//i.test(String(v.kind||"")+" "+String(v.name||""));
-  return '<button type="button" class="meph-vessel '+(sail?"sail":"motor")+'"><span class="meph-wake"></span><span class="meph-shape"><i class="meph-sail"></i></span><span class="meph-vlabel">'+esc(v.name)+" · "+esc(String(v.action||"in movimento").toLowerCase())+'</span></button>'
- }).join("")
+ const t=live();const list=(t?.items||[]).slice(0,5);
+ const arr=list.length?list:[{name:"Riva 56",action:"in arrivo"},{name:"Blue Runner",action:"in manovra"},{name:"Adriatica",action:"in uscita"}];
+ const track=document.getElementById("mephTrafficTrack");if(!track)return;
+ const one=arr.map(function(v){
+   const a=String(v.action||"in movimento").toLowerCase();
+   const cls=/uscita|partenza/.test(a)?"out":/manovra/.test(a)?"move":"";
+   const icon=/uscita|partenza/.test(a)?"↑":/arrivo/.test(a)?"↓":"↻";
+   return '<span>⚓ '+esc(v.name)+' · <b class="'+cls+'">'+icon+' '+esc(a)+'</b></span>'
+ }).join('<span>•</span>');
+ track.innerHTML=one+one;
 }
-
 function renderMore(){
  const box=document.getElementById("mePremiumMore");if(!box||!box.classList.contains("open"))return;
  const s=sref();const m=milestone();const diary=window.MarinaEmpireCaptainsLog?.rows?.()?.[0];
@@ -132,9 +138,19 @@ function renderMore(){
  })})
 }
 
+function syncActive(){
+ const home=document.getElementById("home");
+ document.body.classList.toggle("me-premium-home-active",w()<=899&&!!home&&!home.classList.contains("hide"));
+}
 function render(){
+ syncActive();
  if(!ensure())return;
  const s=sref(),t=live(),wld=world(),m=milestone(),em=emergency();
+ const cv=document.getElementById("mephCoins"),pv=document.getElementById("mephPrestige"),fv=document.getElementById("mephFuel"),sv=document.getElementById("mephCondition");
+ if(cv)cv.textContent=Math.max(0,Math.floor(Number(s?.coins)||0)).toLocaleString("it-IT");
+ if(pv)pv.textContent=Math.max(0,Math.floor(Number(s?.prestige)||0)).toLocaleString("it-IT");
+ if(fv)fv.textContent=Math.max(0,Math.floor(Number(s?.fuel)||0)).toLocaleString("it-IT")+" L";
+ if(sv)sv.textContent=Math.max(0,Math.round(Number(s?.condition)||0))+"%";
  renderVessels();
  const phase=wld?.phase||window.MarinaEmpireWorldEvents?.dayPhase?.();const d=document.getElementById("mephDay");if(d)d.textContent=(phase?.icon||"☀️")+" "+String(phase?.label||"GIORNO");
  const lt=document.getElementById("mephLiveText");if(lt)lt.textContent=marina(s?.port)+" · "+Math.max(0,Number(t?.volume)||0)+" unità · "+(t?.items?.[0]?.name||"traffico attivo");
@@ -146,8 +162,11 @@ function render(){
 }
 
 function boot(){
+ syncActive();
  if(!ensure()){setTimeout(boot,500);return}
  render();
+ const home=document.getElementById("home");
+ if(home)new MutationObserver(function(){syncActive();setTimeout(render,30)}).observe(home,{attributes:true,attributeFilter:["class"]});
  window.addEventListener("marina-empire-updated",function(){setTimeout(render,80)});
  window.addEventListener("marina-world-event",function(){setTimeout(render,80)});
  window.addEventListener("resize",function(){setTimeout(render,60)});
