@@ -34,7 +34,7 @@ function preferredHost(){
  const mobile=document.querySelector("#home .me-mobile-home-dashboard");
  if(mobile)return {host:mobile,anchor:mobile.querySelector(".me-mobile-home-hub")||mobile.firstElementChild};
  const home=document.getElementById("home");
- return home?{host,anchor:home.querySelector(".me-beta-launch-notice")}:null;
+ return home?{host:home,anchor:home.querySelector(".me-beta-launch-notice")}:null;
 }
 function ensure(){
  const loc=preferredHost();if(!loc)return null;
