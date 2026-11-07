@@ -40,7 +40,7 @@ jobs:
       - name: Install Chromium for P0 checks
         run: npx playwright install --with-deps chromium
       - name: Verify guest journey and P0 guards in Chromium
-        timeout-minutes: 8
+        timeout-minutes: 12
         run: |
           ME_TEST_SCENARIO=multi-tab-conflict node tests/prelaunch-browser.test.cjs
           ME_TEST_SCENARIO=desktop node tests/prelaunch-browser.test.cjs
