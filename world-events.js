@@ -20,7 +20,7 @@ const EVENTS=[
  {id:"vip_arrivals",icon:"✨",title:"Arrivi VIP",text:"Yacht premium in arrivo: cresce la domanda di servizi.",market:{boats:1.08,toys:1.09,tech:1.05},traffic:1.35,demand:1.25,sectors:["charter","servizi","broker"]}
 ];
 
-function slot(){return Math.floor(Date.now()/7200000)}
+function slot(){return Math.floor(Date.now()/7200000)}\nfunction displaySlot(){return Math.floor(Date.now()/900000)}
 function hash(str){
  let h=2166136261;
  for(const ch of String(str)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}
@@ -40,7 +40,7 @@ function currentPort(){
  try{if(typeof state!=="undefined"&&state&&state.port)return state.port}catch(_){}
  return document.querySelector(".me-current-marina-card")?.dataset?.marinaCard||"rimini";
 }
-function current(){return eventFor(currentPort())}
+function displayEventFor(port=currentPort()){\n const s=displaySlot(),h=hash("display|"+port+"|"+s);\n const e=EVENTS[h%EVENTS.length];\n return {...e,port,displaySlot:s,until:(s+1)*900000};\n}\nfunction current(){return displayEventFor(currentPort())}
 function modifiers(port=currentPort()){
  const e=eventFor(port),phase=dayPhase(),weather=weatherFor(port);
  return {boats:e.market.boats,toys:e.market.toys,tech:e.market.tech,traffic:e.traffic*phase.traffic*weather.traffic,demand:e.demand,event:e,phase,weather,missionDuration:weather.duration,missionWear:weather.wear};
@@ -52,7 +52,7 @@ function dayPhase(){
  if(h>=18&&h<21)return {id:"sunset",label:"TRAMONTO",icon:"🌇",traffic:1.05};
  return {id:"night",label:"NOTTE",icon:"🌙",traffic:.55};
 }
-window.MarinaEmpireWorldEvents={current,eventFor,weatherFor,modifiers,slot,dayPhase};
+window.MarinaEmpireWorldEvents={current,eventFor,displayEventFor,weatherFor,modifiers,slot,displaySlot,dayPhase};
 
 const style=document.createElement("style");
 style.textContent=".me-world-event{margin:10px 0;padding:10px 12px;border:1px solid rgba(214,181,117,.38);border-radius:12px;background:linear-gradient(135deg,#0b3042,#102739);display:flex;gap:10px;align-items:flex-start}.me-world-event-icon{font-size:22px}.me-world-event strong{display:block;color:#f0cf8a;font-size:12px}.me-world-event p{margin:3px 0;font-size:10px;color:#cbdbe1}.me-world-event small{color:#829fab;font-size:9px}";
