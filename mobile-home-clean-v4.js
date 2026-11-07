@@ -123,7 +123,7 @@ function sync(){
   ensure();
   const card=document.getElementById("meMobileMarinaLiveCard");
   const home=document.getElementById("home");
-  if(card)card.style.display=(meViewportWidth()<=740&&home&&!home.classList.contains("hide"))?"grid":"none";
+  if(card)card.style.display=(meViewportWidth()<=899&&home&&!home.classList.contains("hide"))?"grid":"none";
   const text=document.getElementById("meMobileMarinaLiveText");
   if(text)text.textContent=liveSummary();
 }
