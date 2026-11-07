@@ -16,6 +16,7 @@ style.textContent=`
  html body #missions{max-width:100vw!important;overflow-x:hidden!important}
  html body #missions>*{max-width:100%!important;min-width:0!important}
  html body #missions .panel,html body #missions .item{max-width:100%!important;min-width:0!important;overflow-x:hidden!important}
+ html body #missions .item p,html body #missions .item strong{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important;word-break:normal!important}
  html body #missions .me-mission-search{grid-template-columns:minmax(0,1fr)!important}
  html body #missions .me-mission-search input,html body #missions .me-mission-search select{width:100%!important;max-width:100%!important;min-width:0!important}
  html body .me-npc-box{display:none!important}
