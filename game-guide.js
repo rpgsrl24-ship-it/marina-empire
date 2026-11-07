@@ -32,7 +32,8 @@ const configs={
  marketplace:{icon:"🛒",title:"Compra o vendi nel mercato nautico",desc:"Consulta le offerte disponibili e scegli solo ciò che serve alla crescita.",label:"APRI MERCATO",target:"#meMarketplaceApp"},
  credits:{icon:"💳",title:"Crediti opzionali",desc:"Puoi comprare crediti oppure continuare a guadagnarli giocando.",label:"VEDI PACCHETTI",target:".me-credit-packs"},
  profile:{icon:"👤",title:"Gestisci account e carriera",desc:"Qui salvi i progressi online e controlli il livello del comandante.",label:"APRI ACCOUNT",target:"#meRegistrationArea"},
- headquarters:{icon:"🏝️",title:"Quartier generale RPG Yacht",desc:"Consulta la situazione e poi torna alle missioni per far crescere l’impero.",label:"MISSIONI",tab:"missions"},\n community:{icon:"💬",title:"Parla con gli altri comandanti",desc:"Scegli la chat generale oppure la stanza della marina attuale.",label:"APRI CHAT",target:"#marinaCommunity"},
+ headquarters:{icon:"🏝️",title:"Quartier generale RPG Yacht",desc:"Consulta la situazione e poi torna alle missioni per far crescere l’impero.",label:"MISSIONI",tab:"missions"},
+ community:{icon:"💬",title:"Parla con gli altri comandanti",desc:"Scegli la chat generale oppure la stanza della marina attuale.",label:"APRI CHAT",target:"#marinaCommunity"},
  home:{icon:"⚓",title:"Scegli cosa fare adesso",desc:"Il gioco ti porta sempre alla prossima azione utile.",label:"CONTINUA",tab:"missions"}
 };
 
