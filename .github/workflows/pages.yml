@@ -39,14 +39,21 @@ jobs:
         run: npm ci
       - name: Install Chromium for P0 checks
         run: npx playwright install --with-deps chromium
-      - name: Verify guest journey and P0 guards in Chromium
-        timeout-minutes: 12
-        run: |
-          ME_TEST_SCENARIO=multi-tab-conflict node tests/prelaunch-browser.test.cjs
-          ME_TEST_SCENARIO=desktop node tests/prelaunch-browser.test.cjs
-          ME_TEST_SCENARIO=mobile-portrait node tests/prelaunch-browser.test.cjs
-          ME_TEST_SCENARIO=mobile-landscape node tests/prelaunch-browser.test.cjs
-          ME_TEST_SCENARIO=recovery-mobile node tests/prelaunch-browser.test.cjs
+      - name: P0 multi-tab conflict
+        timeout-minutes: 2
+        run: ME_TEST_SCENARIO=multi-tab-conflict node tests/prelaunch-browser.test.cjs
+      - name: P0 desktop guest journey
+        timeout-minutes: 10
+        run: ME_TEST_SCENARIO=desktop node tests/prelaunch-browser.test.cjs
+      - name: P0 mobile portrait guest journey
+        timeout-minutes: 2
+        run: ME_TEST_SCENARIO=mobile-portrait node tests/prelaunch-browser.test.cjs
+      - name: P0 mobile landscape guest journey
+        timeout-minutes: 2
+        run: ME_TEST_SCENARIO=mobile-landscape node tests/prelaunch-browser.test.cjs
+      - name: P0 mobile recovery
+        timeout-minutes: 2
+        run: ME_TEST_SCENARIO=recovery-mobile node tests/prelaunch-browser.test.cjs
       - name: Record the exact published revision
         run: |
           node <<'NODE'
