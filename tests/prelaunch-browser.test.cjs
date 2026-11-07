@@ -298,11 +298,13 @@ async function trial(browser,origin,name,viewport,mobile) {
     await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key))?.trip,saveKey);
     let secondProgress=await save(page);
     for(let leg=0;leg<12 && secondProgress.trip;leg++){
-      await page.clock.setFixedTime(new Date(secondProgress.trip.until+1000));
-      await page.waitForFunction(key=>{
+      const previousUntil=Number(secondProgress.trip.until)||0;
+      await page.clock.setFixedTime(new Date(previousUntil+1000));
+      await page.evaluate(()=>{ if(typeof voyageHeartbeat==="function") voyageHeartbeat(); });
+      await page.waitForFunction(({key,previousUntil})=>{
         const s=JSON.parse(localStorage.getItem(key));
-        return !s?.trip || Number(s.trip.until)>Date.now();
-      },saveKey);
+        return !s?.trip || Number(s.trip.until)!==previousUntil;
+      },{key:saveKey,previousUntil});
       secondProgress=await save(page);
     }
     assert.equal(secondProgress.trip,null,name+': second guest mission must finish all planned legs');
