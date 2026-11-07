@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261107-home12";
+const CACHE="marina-empire-v20261107-home13";
 const CORE=[
  "./",
  "./index.html",
