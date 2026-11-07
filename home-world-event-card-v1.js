@@ -37,6 +37,8 @@ function preferredHost(){
  return home?{host:home,anchor:home.querySelector(".me-beta-launch-notice")}:null;
 }
 function ensure(){
+ const premiumEvent=document.getElementById("mephWorldTitle");
+ if(premiumEvent){document.getElementById("meHomeWorldEventCard")?.remove();return null}
  const loc=preferredHost();if(!loc)return null;
  let card=document.getElementById("meHomeWorldEventCard");
  if(!card){
