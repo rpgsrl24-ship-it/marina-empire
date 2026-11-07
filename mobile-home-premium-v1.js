@@ -12,7 +12,7 @@ st.textContent='@media(max-width:899px){'+
 '#home .me-mobile-home-dashboard>*:not(#mePremiumHome){display:none!important}'+
 '#mePremiumHome{display:flex!important;flex-direction:column!important;gap:9px!important;width:100%!important;margin:0!important;padding:0!important;background:linear-gradient(180deg,#041d2d 0%,#05283a 55%,#031825 100%)!important}'+
 '.meph-brand{text-align:center;color:#efd18e;padding:3px 0 1px}.meph-brand b{font:800 22px Georgia,serif;letter-spacing:.08em}.meph-brand small{display:block;margin-top:2px;color:#96afba;font-size:7px;font-weight:900;letter-spacing:.14em}'+
-'.meph-hud{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.meph-hud>div{min-width:0;padding:8px 4px;border:1px solid rgba(232,188,103,.72);border-radius:11px;background:linear-gradient(145deg,#1b6580,#0a3550);text-align:center;box-shadow:inset 0 1px #ffffff18,0 3px 12px #0004}.meph-hud span{display:block;color:#a5bbc4;font-size:7px;font-weight:900;white-space:nowrap}.meph-hud b{display:block;margin-top:4px;color:#ffd66f;font-size:13px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meph-hud .ok b{color:#69e48f}'+
+'.meph-hud{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.meph-hud>div,.meph-hud>button{min-width:0;padding:8px 4px;border:1px solid rgba(232,188,103,.72);border-radius:11px;background:linear-gradient(145deg,#1b6580,#0a3550);text-align:center;box-shadow:inset 0 1px #ffffff18,0 3px 12px #0004}.meph-hud button{border:1px solid rgba(232,188,103,.72);border-radius:11px;background:linear-gradient(145deg,#1b6580,#0a3550);color:inherit;box-shadow:inset 0 1px #ffffff18,0 3px 12px #0004}.meph-hud span{display:block;color:#a5bbc4;font-size:7px;font-weight:900;white-space:nowrap}.meph-hud b{display:block;margin-top:4px;color:#ffd66f;font-size:13px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meph-hud .ok b{color:#69e48f}'+
 '.meph-live{overflow:hidden;border:1px solid #d8ad63;border-radius:16px;background:#062635;box-shadow:0 10px 28px #0007}'+
 '.meph-scene{position:relative;height:230px;overflow:hidden;background:#0c5975;isolation:isolate}.meph-scene:before{content:"";position:absolute;z-index:0;inset:0;background:url("./anteprima/assets/render-2026/marine.jpg") center 56%/cover no-repeat;filter:brightness(1.72) saturate(1.5) contrast(1.03);transform:scale(1.035)}'+
 '.meph-scene:after{content:"";position:absolute;z-index:1;inset:55% 0 0;background:repeating-radial-gradient(ellipse at 50% 0,transparent 0 17px,#e0f9ff18 19px,transparent 22px,transparent 44px);animation:mephWater 8s linear infinite;pointer-events:none}'+
@@ -63,7 +63,7 @@ function ensure(){
  root=document.createElement("section");root.id="mePremiumHome";
  root.innerHTML=
  '<div class="meph-brand"><b>⚓ MARINA EMPIRE</b><small>IL GESTIONALE NAUTICO ONLINE</small></div>'+
- '<div class="meph-hud"><div><span>🪙 MONETE</span><b id="mephCoins">—</b></div><div><span>⭐ PRESTIGIO</span><b id="mephPrestige">—</b></div><div><span>⛽ CARBURANTE</span><b id="mephFuel">—</b></div><div class="ok"><span>🔧 STATO</span><b id="mephCondition">—</b></div></div>'+
+ '<div class="meph-hud"><div><span>🪙 MONETE</span><b id="mephCoins">—</b></div><div><span>⭐ PRESTIGIO</span><b id="mephPrestige">—</b></div><button type="button" class="meph-hud-action" data-hud-action="fuel"><span>⛽ CARBURANTE</span><b id="mephFuel">—</b></button><button type="button" class="meph-hud-action ok" data-hud-action="repair"><span>🔧 STATO</span><b id="mephCondition">—</b></button></div>'+
  '<div class="meph-traffic-ticker"><div class="meph-traffic-track" id="mephTrafficTrack"></div></div><section class="meph-live"><div class="meph-scene" id="mephScene" role="button" tabindex="0"><div class="meph-head"><div class="meph-livebadge"><i class="meph-dot"></i>MARINA LIVE</div><div class="meph-day" id="mephDay">☀️ GIORNO</div></div><div id="mephVessels"></div></div><div class="meph-livefoot"><div><small>TRAFFICO ATTIVO</small><strong id="mephLiveText">Marina · mondo vivo</strong></div><button type="button" id="mephOpenLive">APRI ›</button></div></section>'+
  '<section class="meph-alert"><div class="ico">🌍</div><div><small>EVENTO MONDO</small><strong id="mephWorldTitle">Attività ordinaria</strong><span id="mephWorldText">Marina operativa</span></div><button type="button" data-go="marinas">›</button></section>'+
  '<section class="meph-alert em"><div class="ico">🚨</div><div><small>EMERGENZA LIVE</small><strong id="mephEmergencyTitle">Intervento disponibile</strong><span id="mephEmergencyText">Controlla le richieste operative.</span></div><button type="button" data-go="marinas">›</button></section>'+
@@ -85,6 +85,29 @@ function ensure(){
  '<section class="meph-progress"><div><small>PROGRESSIONE & OBIETTIVI</small><strong id="mephProgressTitle">Continua il tuo impero</strong><span id="mephProgressText">Obiettivi, diario e servizi rapidi</span></div><button type="button" id="mephMore">DATI</button></section><div id="mePremiumMore"></div>';
  home.prepend(root);
  root.addEventListener("click",click);
+ root.querySelectorAll("[data-hud-action]").forEach(function(btn){
+   btn.addEventListener("click",function(ev){
+     ev.stopPropagation();
+     const action=btn.dataset.hudAction;
+     if(action==="fuel"){
+       const refuel=document.getElementById("refuel")||document.getElementById("officeRefuel");
+       if(refuel&&!refuel.disabled){refuel.click();return}
+       go("office");
+       setTimeout(function(){
+         const x=document.getElementById("refuel")||document.getElementById("officeRefuel")||document.getElementById("officeActions");
+         x?.scrollIntoView({behavior:"smooth",block:"center"});
+       },120);
+       return;
+     }
+     if(action==="repair"){
+       go("office");
+       setTimeout(function(){
+         const x=document.getElementById("maintenanceCard")||document.getElementById("repair")||document.getElementById("officeRepair")||document.getElementById("officeActions");
+         x?.scrollIntoView({behavior:"smooth",block:"center"});
+       },120);
+     }
+   });
+ });
  document.getElementById("mephScene")?.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();go("marinas")}});
  return root
 }
