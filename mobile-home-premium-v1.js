@@ -1,0 +1,158 @@
+(()=>{
+"use strict";
+if(window.__ME_MOBILE_HOME_PREMIUM_V1__)return;
+window.__ME_MOBILE_HOME_PREMIUM_V1__=true;
+
+const st=document.createElement("style");
+st.id="me-mobile-home-premium-v1-style";
+st.textContent='@media(max-width:899px){'+
+'#home .me-mobile-home-dashboard{display:flex!important;flex-direction:column!important;gap:9px!important;padding:0 0 104px!important}'+
+'#home .me-mobile-home-dashboard>*:not(#mePremiumHome){display:none!important}'+
+'#mePremiumHome{display:flex!important;flex-direction:column!important;gap:9px!important;width:100%!important;margin:0!important;padding:0!important}'+
+'.meph-brand{text-align:center;color:#efd18e;padding:4px 0 1px}.meph-brand b{font:800 20px Georgia,serif;letter-spacing:.08em}.meph-brand small{display:block;margin-top:2px;color:#7f9aa7;font-size:7px;font-weight:900;letter-spacing:.14em}'+
+'.meph-live{overflow:hidden;border:1px solid #d8ad63;border-radius:16px;background:#062635;box-shadow:0 10px 28px #0007}'+
+'.meph-scene{position:relative;height:210px;overflow:hidden;background:linear-gradient(180deg,#00182508,#00182542),url("./anteprima/assets/render-2026/marine.jpg") center/cover no-repeat;isolation:isolate}'+
+'.meph-scene:after{content:"";position:absolute;z-index:1;inset:55% 0 0;background:repeating-radial-gradient(ellipse at 50% 0,transparent 0 17px,#e0f9ff18 19px,transparent 22px,transparent 44px);animation:mephWater 8s linear infinite;pointer-events:none}'+
+'@keyframes mephWater{from{transform:translateX(-2%)}to{transform:translateX(2%)}}'+
+'.meph-head{position:absolute;z-index:8;left:8px;right:8px;top:8px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}'+
+'.meph-livebadge,.meph-day{padding:6px 9px;border-radius:999px;background:#042a36e8;font-size:9px;font-weight:950}.meph-livebadge{border:1px solid #62dc9f;color:#ddfff0}.meph-day{border:1px solid #d6b57566;color:#ecd29c}'+
+'.meph-dot{display:inline-block;width:8px;height:8px;margin-right:5px;border-radius:50%;background:#65e3a1;box-shadow:0 0 9px #65e3a1}'+
+'.meph-vessel{position:absolute!important;z-index:5!important;left:-90px;width:94px!important;height:44px!important;min-height:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}'+
+'.meph-vessel:nth-child(1){top:43%;animation:mephBoat1 18s linear -4s infinite}.meph-vessel:nth-child(2){top:60%;animation:mephBoat2 23s linear -11s infinite}.meph-vessel:nth-child(3){top:72%;animation:mephBoat3 28s linear -19s infinite}'+
+'@keyframes mephBoat1{0%{transform:translateX(-80px) translateY(8px) scale(.84)}45%{transform:translateX(52vw) translateY(-13px) scale(.96)}100%{transform:translateX(calc(100vw + 45px)) translateY(2px) scale(.86)}}'+
+'@keyframes mephBoat2{0%{transform:translateX(-110px) translateY(-5px) scale(.72)}50%{transform:translateX(48vw) translateY(12px) scale(.86)}100%{transform:translateX(calc(100vw + 55px)) translateY(-8px) scale(.74)}}'+
+'@keyframes mephBoat3{0%{transform:translateX(-140px) translateY(10px) scale(.64)}48%{transform:translateX(46vw) translateY(-7px) scale(.76)}100%{transform:translateX(calc(100vw + 60px)) translateY(8px) scale(.66)}}'+
+'.meph-shape{position:absolute;left:18px;top:7px;width:58px;height:26px;filter:drop-shadow(0 4px 5px #0008)}.meph-shape:before{content:"";position:absolute;left:0;right:0;bottom:2px;height:12px;background:linear-gradient(#f8fbfd,#bdd7e0);clip-path:polygon(0 18%,100% 0,82% 100%,17% 100%);border-radius:0 0 10px 10px}.meph-shape:after{content:"";position:absolute;left:20px;bottom:12px;width:27px;height:10px;border-radius:12px 14px 2px 2px;background:#f7fbfd;box-shadow:-8px 5px 0 -4px #0f5872}'+
+'.meph-vessel.sail .meph-shape:after{left:28px;bottom:12px;width:3px;height:27px;background:#eef7fa;box-shadow:none}.meph-sail{display:none}.meph-vessel.sail .meph-sail{display:block;position:absolute;left:31px;top:-7px;width:25px;height:25px;background:linear-gradient(135deg,#fff 0 48%,#4a97c2 49%);clip-path:polygon(0 100%,0 0,100% 100%)}'+
+'.meph-wake{position:absolute;left:-18px;top:27px;width:50px;height:7px;border-top:2px solid #e0fbff99;border-radius:50%}.meph-vlabel{position:absolute;left:3px;top:34px;max-width:90px;padding:2px 5px;border-radius:6px;background:#031c28cc;color:#eef7f8;font-size:7px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'+
+'.meph-livefoot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 9px;background:linear-gradient(#0a3546,#082937)}.meph-livefoot small{display:block;color:#86a3af;font-size:7px;font-weight:900;letter-spacing:.1em}.meph-livefoot strong{display:block;margin-top:2px;color:#f5dfab;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meph-livefoot button{min-height:39px!important;padding:7px 10px!important;background:linear-gradient(135deg,#e8c66f,#b98738)!important;color:#102734!important;font-size:9px!important;font-weight:950!important}'+
+'.meph-alert{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:9px;align-items:center;padding:10px 11px;border:1px solid #d3ab606f;border-radius:13px;background:linear-gradient(145deg,#092d3d,#082432)}.meph-alert.em{border-color:#ff5e5e77;background:linear-gradient(145deg,#3a1119,#102a36)}.meph-alert .ico{font-size:20px}.meph-alert small{display:block;color:#d6b66f;font-size:8px;font-weight:950}.meph-alert.em small{color:#ffd0b7}.meph-alert strong{display:block;margin-top:2px;color:#eef5f6;font-size:10px}.meph-alert span{display:block;margin-top:2px;color:#9bb1b9;font-size:8px}.meph-alert button{width:38px!important;min-width:38px!important;min-height:38px!important;padding:0!important}'+
+'.meph-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.meph-actions button{min-width:0!important;min-height:74px!important;padding:8px 4px!important;border:1px solid #d4ae657f!important;border-radius:12px!important;background:linear-gradient(145deg,#0c3445,#082634)!important;color:#f2d69d!important;font-size:8px!important;font-weight:950!important;line-height:1.15!important}.meph-actions button.ready{border-color:#e9bf68!important;box-shadow:0 0 0 1px #e8be682f,0 7px 18px #0004!important}.meph-actions b{display:block;margin-bottom:5px;font-size:19px}'+
+'.meph-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.meph-tile{position:relative;overflow:hidden;min-width:0!important;min-height:90px!important;padding:0!important;border:1px solid #c79f5b7a!important;border-radius:12px!important;background:#092837!important;text-align:left!important}.meph-tile:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#02141f0d 25%,#02141fe6 82%);z-index:1}.meph-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.82}.meph-tile .i{position:absolute;z-index:2;left:7px;top:7px;font-size:18px}.meph-tile .l{position:absolute;z-index:2;left:7px;right:5px;bottom:7px;color:#fff0c9;font-size:7.5px;font-weight:950;line-height:1.1;text-shadow:0 2px 5px #000}.meph-tile.plain{background:linear-gradient(145deg,#0d3546,#082635)!important}'+
+'.meph-progress{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 11px;border:1px solid #cda6605c;border-radius:13px;background:#082735}.meph-progress small{display:block;color:#8ea8b2;font-size:7px;font-weight:950}.meph-progress strong{display:block;margin-top:2px;color:#f1d293;font-size:10px}.meph-progress span{display:block;margin-top:3px;color:#9fb4bc;font-size:8px}.meph-progress button{min-height:38px!important;padding:6px 9px!important;font-size:8px!important;font-weight:950!important}'+
+'#mePremiumMore{display:none;gap:7px;padding:9px;border:1px solid #cda66047;border-radius:12px;background:#061f2d}#mePremiumMore.open{display:grid}.meph-more{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px;border:1px solid #ffffff10;border-radius:9px;background:#0a2a38}.meph-more b{color:#e9d09a;font-size:9px}.meph-more small{display:block;margin-top:2px;color:#91a8b1;font-size:8px}.meph-more button{min-height:36px!important;padding:6px 8px!important;font-size:8px!important}'+
+'@media(max-width:390px){.meph-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.meph-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.meph-tile{min-height:84px!important}}'+
+'@media(prefers-reduced-motion:reduce){.meph-vessel,.meph-scene:after{animation:none!important}.meph-vessel:nth-child(1){left:12%;top:48%}.meph-vessel:nth-child(2){left:43%;top:62%}.meph-vessel:nth-child(3){left:68%;top:72%}}'+
+'}@media(min-width:900px){#mePremiumHome{display:none!important}}';
+document.head.appendChild(st);
+
+function w(){return Number(globalThis.innerWidth)||1024}
+function sref(){try{return typeof state!=="undefined"?state:null}catch(e){return null}}
+function go(id){if(typeof showTab==="function")showTab(id)}
+function marina(id){try{return typeof port==="function"?port(id)?.name||"Marina":"Marina"}catch(e){return"Marina"}}
+function scrollOffice(id){go("office");setTimeout(function(){document.getElementById(id)?.scrollIntoView({behavior:"smooth",block:"start"})},140)}
+function live(){try{return window.MarinaEmpireLiveTraffic?.snapshot?.()||null}catch(e){return null}}
+function world(){try{return window.MarinaEmpireWorldEvents?.modifiers?.(sref()?.port)||null}catch(e){return null}}
+function esc(v){return String(v??"").replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function milestone(){try{return window.MarinaEmpireMobileProgression?.milestone?.()||null}catch(e){return null}}
+function vhfButton(){return document.querySelector(".me-live-vhf-action")}
+function emergency(){
+ const box=[...document.querySelectorAll(".me-emergency-box")].find(function(x){return x.querySelector("strong")});
+ if(!box)return null;
+ return {title:(box.querySelector("strong")?.textContent||"").replace(/^.*EMERGENZA LIVE\s*·\s*/i,"").trim(),text:(box.querySelector("p")?.textContent||"").trim()}
+}
+
+function ensure(){
+ if(w()>899)return null;
+ const home=document.querySelector("#home .me-mobile-home-dashboard");if(!home)return null;
+ let root=document.getElementById("mePremiumHome");if(root)return root;
+ root=document.createElement("section");root.id="mePremiumHome";
+ root.innerHTML=
+ '<div class="meph-brand"><b>⚓ MARINA EMPIRE</b><small>IL GESTIONALE NAUTICO ONLINE</small></div>'+
+ '<section class="meph-live"><div class="meph-scene" id="mephScene" role="button" tabindex="0"><div class="meph-head"><div class="meph-livebadge"><i class="meph-dot"></i>MARINA LIVE</div><div class="meph-day" id="mephDay">☀️ GIORNO</div></div><div id="mephVessels"></div></div><div class="meph-livefoot"><div><small>TRAFFICO ATTIVO</small><strong id="mephLiveText">Marina · mondo vivo</strong></div><button type="button" id="mephOpenLive">APRI ›</button></div></section>'+
+ '<section class="meph-alert"><div class="ico">🌍</div><div><small>EVENTO MONDO</small><strong id="mephWorldTitle">Attività ordinaria</strong><span id="mephWorldText">Marina operativa</span></div><button type="button" data-go="marinas">›</button></section>'+
+ '<section class="meph-alert em"><div class="ico">🚨</div><div><small>EMERGENZA LIVE</small><strong id="mephEmergencyTitle">Intervento disponibile</strong><span id="mephEmergencyText">Controlla le richieste operative.</span></div><button type="button" data-go="marinas">›</button></section>'+
+ '<div class="meph-actions"><button type="button" id="mephJob"><b>📋</b><span id="mephJobLabel">INCARICO VHF</span></button><button type="button" data-go="missions"><b>🎯</b>NUOVA<br>MISSIONE</button><button type="button" data-go="charter"><b>🤝</b>CONTRATTI<br>& CHARTER</button><button type="button" data-go="refit"><b>🛠️</b>CANTIERE<br>& REFIT</button></div>'+
+ '<div class="meph-grid">'+
+ '<button class="meph-tile" data-go="fleet"><img alt="" src="./anteprima/assets/render-2026/flotta.jpg"><span class="i">🛥️</span><span class="l">FLOTTA</span></button>'+
+ '<button class="meph-tile" data-go="marinas"><img alt="" src="./anteprima/assets/render-2026/marine.jpg"><span class="i">⚓</span><span class="l">LA TUA MARINA</span></button>'+
+ '<button class="meph-tile plain" data-go="map"><span class="i">🗺️</span><span class="l">MAPPA</span></button>'+
+ '<button class="meph-tile plain" data-go="crew"><span class="i">👥</span><span class="l">EQUIPAGGIO</span></button>'+
+ '<button class="meph-tile" data-go="charter"><img alt="" src="./anteprima/assets/render-2026/charter.jpg"><span class="i">🤝</span><span class="l">CONTRATTI / CHARTER</span></button>'+
+ '<button class="meph-tile plain" data-go="marketplace"><span class="i">🛒</span><span class="l">MARKETPLACE</span></button>'+
+ '<button class="meph-tile plain" data-go="community"><span class="i">💬</span><span class="l">COMMUNITY</span></button>'+
+ '<button class="meph-tile plain" data-go="profile"><span class="i">📊</span><span class="l">PROFILO / STAT.</span></button>'+
+ '<button class="meph-tile plain" data-go="credits"><span class="i">💳</span><span class="l">STORE / CREDITI</span></button>'+
+ '<button class="meph-tile" data-go="refit"><img alt="" src="./anteprima/assets/render-2026/cantieri.jpg"><span class="i">🔧</span><span class="l">CANTIERE / REFIT</span></button>'+
+ '<button class="meph-tile" data-go="office"><img alt="" src="./anteprima/assets/render-2026/economia.jpg"><span class="i">◈</span><span class="l">DIREZIONE</span></button>'+
+ '<button class="meph-tile plain" data-go="headquarters"><span class="i">🏝️</span><span class="l">BASE RPG</span></button>'+
+ '</div>'+
+ '<section class="meph-progress"><div><small>PROGRESSIONE & OBIETTIVI</small><strong id="mephProgressTitle">Continua il tuo impero</strong><span id="mephProgressText">Obiettivi, diario e servizi rapidi</span></div><button type="button" id="mephMore">DATI</button></section><div id="mePremiumMore"></div>';
+ home.prepend(root);
+ root.addEventListener("click",click);
+ document.getElementById("mephScene")?.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();go("marinas")}});
+ return root
+}
+
+function click(e){
+ if(e.target.closest(".meph-vessel")||e.target.closest("#mephScene")||e.target.closest("#mephOpenLive")){go("marinas");return}
+ if(e.target.closest("#mephJob")){
+   const b=vhfButton();
+   if(b&&!b.disabled){b.click();setTimeout(render,80);return}
+   go("marinas");setTimeout(function(){document.querySelector(".me-live-vhf")?.scrollIntoView({behavior:"smooth",block:"center"})},140);return
+ }
+ if(e.target.closest("#mephMore")){
+   const box=document.getElementById("mePremiumMore");const open=box.classList.toggle("open");e.target.textContent=open?"CHIUDI":"DATI";renderMore();return
+ }
+ const b=e.target.closest("[data-go]");if(!b)return;
+ const id=b.dataset.go;
+ if(id==="crew"){scrollOffice("meCrewSystem");return}
+ if(id==="refit"){scrollOffice("meRefitV1");return}
+ if(id==="community"){scrollOffice("marinaCommunity");return}
+ if(id==="charter"){go("missions");setTimeout(function(){document.getElementById("missionList")?.scrollIntoView({behavior:"smooth",block:"start"})},100);return}
+ go(id)
+}
+
+function renderVessels(){
+ const box=document.getElementById("mephVessels");if(!box)return;
+ const t=live();const list=(t?.items||[]).slice(0,3);
+ const arr=list.length?list:[{name:"Riva 56",kind:"motor",action:"in arrivo"},{name:"Blue Runner",kind:"tender",action:"in manovra"},{name:"Adriatica",kind:"sail",action:"in uscita"}];
+ box.innerHTML=arr.map(function(v){
+  const sail=/sail|vela|s\//i.test(String(v.kind||"")+" "+String(v.name||""));
+  return '<button type="button" class="meph-vessel '+(sail?"sail":"motor")+'"><span class="meph-wake"></span><span class="meph-shape"><i class="meph-sail"></i></span><span class="meph-vlabel">'+esc(v.name)+" · "+esc(String(v.action||"in movimento").toLowerCase())+'</span></button>'
+ }).join("")
+}
+
+function renderMore(){
+ const box=document.getElementById("mePremiumMore");if(!box||!box.classList.contains("open"))return;
+ const s=sref();const m=milestone();const diary=window.MarinaEmpireCaptainsLog?.rows?.()?.[0];
+ let daily="Obiettivi disponibili";
+ try{const k=window.MarinaEmpireMobileDailyOps?.dayKey?.()||new Date().toISOString().slice(0,10);const api=window.MarinaEmpireObjectives;api?.ensure?.("daily",k);const stat=api?.status?.("daily",k);const items=window.MarinaEmpireMobileDailyOps?.selected?.()||[];if(stat&&items.length)daily=(stat.claimed||[]).length+" / "+items.length+" premi giornalieri riscossi"}catch(e){}
+ let tank=0;try{tank=typeof boat==="function"?Number(boat(s?.boat)?.tank)||0:0}catch(e){}
+ box.innerHTML=
+ '<div class="meph-more"><div><b>🏁 OBIETTIVI DI OGGI</b><small>'+esc(daily)+'</small></div><button type="button" data-more="streak">PREMIO</button></div>'+
+ '<div class="meph-more"><div><b>🧭 DIARIO DEL COMANDANTE</b><small>'+esc(diary?.title||m?.title||"Costruisci il tuo impero")+'</small></div><button type="button" data-more="profile">APRI</button></div>'+
+ '<div class="meph-more"><div><b>⛽ CARBURANTE</b><small>'+Math.round(Number(s?.fuel)||0)+" / "+Math.round(tank||Number(s?.fuel)||0)+' L</small></div><button type="button" data-more="fuel">PIENO</button></div>'+
+ '<div class="meph-more"><div><b>🔧 MANUTENZIONE</b><small>Stato yacht '+Math.round(Number(s?.condition)||0)+'%</small></div><button type="button" data-more="repair">GESTISCI</button></div>';
+ box.querySelectorAll("[data-more]").forEach(function(b){b.addEventListener("click",function(ev){ev.stopPropagation();const a=b.dataset.more;
+  if(a==="streak"){try{const k=window.MarinaEmpireMobileDailyOps?.dayKey?.()||new Date().toISOString().slice(0,10);const r=window.MarinaEmpireObjectives?.checkIn?.(k);if(r?.message&&typeof notice==="function")notice(r.message,5000)}catch(e){}setTimeout(renderMore,80);return}
+  if(a==="profile"){go("profile");return}
+  if(a==="fuel"){const f=document.getElementById("refuel")||document.getElementById("officeRefuel");if(f&&!f.disabled){f.click();return}go("office");return}
+  if(a==="repair"){go("office");setTimeout(function(){document.getElementById("officeActions")?.scrollIntoView({behavior:"smooth",block:"center"})},120)}
+ })})
+}
+
+function render(){
+ if(!ensure())return;
+ const s=sref(),t=live(),wld=world(),m=milestone(),em=emergency();
+ renderVessels();
+ const phase=wld?.phase||window.MarinaEmpireWorldEvents?.dayPhase?.();const d=document.getElementById("mephDay");if(d)d.textContent=(phase?.icon||"☀️")+" "+String(phase?.label||"GIORNO");
+ const lt=document.getElementById("mephLiveText");if(lt)lt.textContent=marina(s?.port)+" · "+Math.max(0,Number(t?.volume)||0)+" unità · "+(t?.items?.[0]?.name||"traffico attivo");
+ const wt=document.getElementById("mephWorldTitle"),wx=document.getElementById("mephWorldText");if(wt)wt.textContent=wld?.event?.title||"Attività ordinaria";if(wx)wx.textContent=(wld?.weather?.icon||"☀️")+" "+(wld?.weather?.label||"CALMO")+" · "+(wld?.weather?.sea||"Mare regolare");
+ const et=document.getElementById("mephEmergencyTitle"),ex=document.getElementById("mephEmergencyText");if(et)et.textContent=em?.title||"Intervento disponibile";if(ex)ex.textContent=em?.text||"Apri Marina Live per vedere richieste e priorità.";
+ const vb=vhfButton();const txt=(vb?.textContent||"").trim();const jl=document.getElementById("mephJobLabel"),jb=document.getElementById("mephJob");if(jl)jl.textContent=txt||"INCARICO VHF";if(jb)jb.classList.toggle("ready",/RISCUOTI|PRENDI/.test(txt));
+ const pt=document.getElementById("mephProgressTitle"),px=document.getElementById("mephProgressText");if(pt)pt.textContent=m?.title||"Continua il tuo impero";if(px)px.textContent=m?.label||"Obiettivi, diario e servizi rapidi";
+ renderMore()
+}
+
+function boot(){
+ if(!ensure()){setTimeout(boot,500);return}
+ render();
+ window.addEventListener("marina-empire-updated",function(){setTimeout(render,80)});
+ window.addEventListener("marina-world-event",function(){setTimeout(render,80)});
+ window.addEventListener("resize",function(){setTimeout(render,60)});
+ document.addEventListener("visibilitychange",function(){if(!document.hidden)render()});
+ setInterval(render,15000)
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot()
+})();
