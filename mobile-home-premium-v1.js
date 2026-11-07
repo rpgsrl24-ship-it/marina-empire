@@ -113,6 +113,7 @@ function ensure(){
 }
 
 function click(e){
+ if(e.target.closest("#mephWorldAction")){const ev=world()?.event;const url=window.MarinaEmpireWorldEvents?.eventUrl?.(ev,sref()?.port);if(url){location.href=url;return}go("marinas");return}
  if(e.target.closest(".meph-vessel")||e.target.closest("#mephScene")||e.target.closest("#mephOpenLive")){go("marinas");return}
  if(e.target.closest("#mephJob")){
    const b=vhfButton();
@@ -185,7 +186,7 @@ function render(){
  renderVessels();
  const phase=wld?.phase||window.MarinaEmpireWorldEvents?.dayPhase?.();const d=document.getElementById("mephDay");if(d)d.textContent=(phase?.icon||"☀️")+" "+String(phase?.label||"GIORNO");
  const lt=document.getElementById("mephLiveText");if(lt)lt.textContent=marina(s?.port)+" · "+Math.max(0,Number(t?.volume)||0)+" unità · "+(t?.items?.[0]?.name||"traffico attivo");
- const wt=document.getElementById("mephWorldTitle"),wx=document.getElementById("mephWorldText"),wa=document.getElementById("mephWorldAction");if(wt)wt.textContent=wld?.event?.title||"Attività ordinaria";if(wx)wx.textContent=(wld?.weather?.icon||"☀️")+" "+(wld?.weather?.label||"CALMO")+" · "+(wld?.weather?.sea||"Mare regolare");if(wa){const toy=wld?.event?.id==="toy_weekend";wa.textContent=toy?"APRI ›":"›";wa.style.width=toy?"58px":"";}
+ const wt=document.getElementById("mephWorldTitle"),wx=document.getElementById("mephWorldText"),wa=document.getElementById("mephWorldAction");if(wt)wt.textContent=wld?.event?.title||"Attività ordinaria";if(wx){const e=wld?.event;const left=window.MarinaEmpireWorldEvents?.timeLeft?.(e?.until)||"";wx.textContent=(e?.bonus?e.bonus+" · ":"")+(left?"cambia tra "+left:"");}if(wa){wa.textContent="APRI ›";wa.style.width="58px";}
  const et=document.getElementById("mephEmergencyTitle"),ex=document.getElementById("mephEmergencyText");if(et)et.textContent=em?.title||"Intervento disponibile";if(ex)ex.textContent=em?.text||"Apri Marina Live per vedere richieste e priorità.";
  const vb=vhfButton();const txt=(vb?.textContent||"").trim();const jl=document.getElementById("mephJobLabel"),jb=document.getElementById("mephJob");if(jl)jl.textContent=txt||"INCARICO VHF";if(jb)jb.classList.toggle("ready",/RISCUOTI|PRENDI/.test(txt));
  const pt=document.getElementById("mephProgressTitle"),px=document.getElementById("mephProgressText");if(pt)pt.textContent=m?.title||"Continua il tuo impero";if(px)px.textContent=m?.label||"Obiettivi, diario e servizi rapidi";
