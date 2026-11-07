@@ -296,8 +296,16 @@ async function trial(browser,origin,name,viewport,mobile) {
     assert.ok(await page.locator('#missionList [data-mission]:enabled').count()>0,'Guest can start a second mission');
     await page.locator('#missionList [data-mission]:enabled').first().click();
     await page.waitForFunction(key=>!!JSON.parse(localStorage.getItem(key))?.trip,saveKey);
-    const secondLaunch=await save(page);
-    await page.clock.setFixedTime(new Date(secondLaunch.trip.until+1000));
+    let secondProgress=await save(page);
+    for(let leg=0;leg<12 && secondProgress.trip;leg++){
+      await page.clock.setFixedTime(new Date(secondProgress.trip.until+1000));
+      await page.waitForFunction(key=>{
+        const s=JSON.parse(localStorage.getItem(key));
+        return !s?.trip || Number(s.trip.until)>Date.now();
+      },saveKey);
+      secondProgress=await save(page);
+    }
+    assert.equal(secondProgress.trip,null,name+': second guest mission must finish all planned legs');
     await page.waitForFunction(key=>(JSON.parse(localStorage.getItem(key))?.voyages||0)===2,saveKey);
     const secondArrival=await save(page);
     assert.equal(secondArrival.voyages,2,'The extended guest tour counts the second mission once');
