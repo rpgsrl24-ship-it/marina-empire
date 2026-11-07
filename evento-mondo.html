@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061c2d"><title>Evento dal mondo | Marina Empire</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#031522;color:#edf5f6;--gold:#edcc86}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 75% 0,#17536c,#06283a 36%,#031522 74%)}a{color:inherit;text-decoration:none}
+.shell{width:min(980px,100%);margin:auto;padding:12px 12px 80px}.top{display:flex;align-items:center;justify-content:space-between;gap:10px}.brand{font:800 clamp(20px,5vw,32px) Georgia,serif;color:var(--gold);letter-spacing:.06em}.back{padding:10px 12px;border:1px solid #b78d4e;border-radius:10px;background:#082b3d}
+.hero{margin-top:12px;padding:22px;border:1px solid #c49b5c;border-radius:20px;background:linear-gradient(145deg,#10475f,#081f31);box-shadow:0 16px 40px #0007}.eyebrow{color:#81dcf2;font-size:10px;font-weight:900;letter-spacing:.12em}.icon{font-size:42px;margin:8px 0}h1{margin:5px 0;font:800 clamp(30px,9vw,54px)/1 Georgia,serif;color:#f4d798}.lead{font-size:15px;line-height:1.55;color:#d4e2e6}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.card{padding:14px;border:1px solid #8aa6af55;border-radius:14px;background:#082a3a}.card small{display:block;color:#88a9b5;font-size:9px;font-weight:900}.card strong{display:block;margin-top:5px;color:#f0d08f;font-size:15px}.card p{margin:5px 0 0;color:#b8ccd2;font-size:12px;line-height:1.45}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.actions a{flex:1 1 200px;padding:13px;border-radius:11px;text-align:center;font-weight:900}.primary{background:linear-gradient(130deg,#f4d891,#b78133);color:#102432}.secondary{border:1px solid #b68d51;background:#082a3b}
+.note{margin-top:12px;color:#7899a6;font-size:10px}.count{margin-top:8px;color:#9dcbd7;font-size:11px}
+@media(max-width:650px){.shell{padding:9px 9px 78px}.hero{padding:17px}.grid{grid-template-columns:1fr}}
+</style></head><body><main class="shell">
+<header class="top"><div class="brand">⚓ MARINA EMPIRE</div><a class="back" href="./">‹ TORNA AL GIOCO</a></header>
+<section class="hero"><div class="eyebrow">🌍 EVENTO DAL MONDO</div><div class="icon" id="icon">🌍</div><h1 id="title">Evento in corso</h1><p class="lead" id="detail">Le attività del mondo nautico stanno influenzando la tua marina.</p><div class="count" id="timer"></div></section>
+<section class="grid">
+<article class="card"><small>EFFETTO EVENTO</small><strong id="bonus">Bonus dinamico</strong><p>L'evento influenza opportunità, traffico o domanda nel mondo di gioco.</p></article>
+<article class="card"><small>MARINA</small><strong id="port">Marina attuale</strong><p>Gli eventi possono avere un impatto diverso in base alla località.</p></article>
+<article class="card"><small>CONSIGLIO</small><strong id="advice">Controlla le opportunità</strong><p>Usa l'evento per scegliere la prossima attività del tuo impero.</p></article>
+</section>
+<div class="actions"><a id="action" class="primary" href="./">APRI NEL GIOCO</a><a class="secondary" href="./">TORNA ALLA HOME</a></div>
+<p class="note">Gli Eventi dal mondo fanno parte della simulazione di Marina Empire e cambiano periodicamente. Non rappresentano eventi nautici reali.</p>
+</main>
+<script>
+const EVENTS={
+ charter_boom:{icon:"🛥️",title:"Boom charter",detail:"Le richieste charter aumentano nelle marine. È un buon momento per cercare contratti, preparare la flotta e sfruttare i servizi dedicati agli ospiti.",bonus:"Domanda charter +18%",action:"VAI AI CONTRATTI",view:"missions",advice:"Cerca nuovi contratti"},
+ yard_rush:{icon:"🔧",title:"Cantiere sotto pressione",detail:"I cantieri stanno ricevendo più richieste del normale. Refit, manutenzione e interventi tecnici diventano più importanti.",bonus:"Domanda tecnica +20%",action:"APRI CANTIERE",view:"office",advice:"Prepara refit e manutenzione"},
+ owner_selloff:{icon:"💼",title:"Vendite armatori",detail:"Diversi armatori stanno mettendo sul mercato imbarcazioni e attrezzature. Controlla il Marketplace per cercare occasioni utili alla crescita.",bonus:"Prezzi yacht più favorevoli",action:"APRI MARKETPLACE",view:"marketplace",advice:"Cerca occasioni sul mercato"},
+ fuel_pressure:{icon:"⛽",title:"Pressione sui rifornimenti",detail:"Molte imbarcazioni stanno facendo rifornimento. Il traffico aumenta e i servizi marina diventano più richiesti.",bonus:"Traffico marina +30%",action:"APRI MARINA LIVE",view:"marinas",advice:"Controlla traffico e servizi"},
+ quiet_harbor:{icon:"⚓",title:"Porto tranquillo",detail:"La marina attraversa una fase più calma. È un buon momento per pianificare investimenti e preparare la prossima espansione.",bonus:"Occasioni acquisto migliori",action:"APRI MARKETPLACE",view:"marketplace",advice:"Pianifica i prossimi investimenti"},
+ vip_arrivals:{icon:"✨",title:"Arrivi VIP",detail:"Ospiti e yacht premium stanno arrivando in marina. Charter, concierge e servizi di alto livello possono generare nuove opportunità.",bonus:"Domanda servizi +25%",action:"APRI MARINA LIVE",view:"marinas",advice:"Preparati agli arrivi premium"},
+ regatta_day:{icon:"⛵",title:"Giornata di regata",detail:"Una regata regionale porta equipaggi, assistenza tecnica e più traffico nelle marine coinvolte.",bonus:"Traffico +20% · servizi +15%",action:"APRI MARINA LIVE",view:"marinas",advice:"Gestisci equipaggi e assistenza"},
+ superyacht_week:{icon:"🛳️",title:"Superyacht Week",detail:"Una settimana dedicata ai grandi yacht porta richieste di ormeggio, charter, equipaggio e servizi premium.",bonus:"Servizi premium +28%",action:"VAI AI CONTRATTI",view:"missions",advice:"Cerca contratti premium"}
+};
+const q=new URLSearchParams(location.search),id=q.get("event")||"vip_arrivals",e=EVENTS[id]||EVENTS.vip_arrivals,port=q.get("port")||"Marina attuale";
+icon.textContent=e.icon;title.textContent=e.title;detail.textContent=e.detail;bonus.textContent=e.bonus;document.getElementById("port").textContent=port.replace(/[-_]/g," ").replace(/\b\w/g,c=>c.toUpperCase());advice.textContent=e.advice;action.textContent=e.action;action.href="./?view="+encodeURIComponent(e.view)+"&from=world-event";
+const end=(Math.floor(Date.now()/900000)+1)*900000;function tick(){const m=Math.max(0,Math.ceil((end-Date.now())/60000));timer.textContent="Aggiornamento evento tra "+m+" min"}tick();setInterval(tick,30000);
+</script></body></html>
