@@ -7,7 +7,6 @@ const style=document.createElement("style");
 style.id="me-guidance-v1-style";
 style.textContent=`
 @media(max-width:899px){
- .me-guide-badge{position:absolute!important;z-index:30!important;top:-7px!important;right:-7px!important;min-width:22px!important;height:22px!important;padding:0 6px!important;border-radius:999px!important;background:#e52222!important;color:#fff!important;border:2px solid #ffb2a4!important;box-shadow:0 0 0 3px rgba(229,34,34,.16),0 4px 10px #0008!important;font-size:11px!important;font-weight:950!important;line-height:18px!important;text-align:center!important}
  .me-guide-target{position:relative!important;box-shadow:0 0 0 2px rgba(255,199,77,.42),0 0 22px rgba(255,188,62,.28)!important}
  #meGuideToast{position:fixed;z-index:99990;left:10px;right:10px;bottom:calc(78px + env(safe-area-inset-bottom,0px));display:none;grid-template-columns:auto minmax(0,1fr) auto;gap:9px;align-items:center;padding:10px 11px;border:1px solid #e0b45f;border-radius:13px;background:linear-gradient(145deg,rgba(6,31,44,.98),rgba(10,55,72,.98));box-shadow:0 12px 30px #0009}
  #meGuideToast.show{display:grid}
@@ -16,11 +15,8 @@ style.textContent=`
  #meGuideToast strong{display:block;margin-top:2px;color:#f5d99c;font-size:11px;line-height:1.15}
  #meGuideToast p{margin:3px 0 0;color:#c8d8dd;font-size:8px;line-height:1.25}
  #meGuideToast button{min-height:38px!important;padding:7px 9px!important;font-size:8px!important;font-weight:950!important}
- #meGuideBell{position:fixed;z-index:99970;right:12px;top:72px;width:43px;height:43px;border-radius:12px;border:1px solid #d6ad63;background:#0b3445;color:#f7d897;display:none;align-items:center;justify-content:center;font-size:20px;box-shadow:0 8px 20px #0008}
- body.me-premium-home-active #meGuideBell{display:flex}
- #meGuideBell b{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;border-radius:999px;background:#e52222;color:#fff;border:2px solid #ffb2a4;font-size:10px;line-height:16px}
 }
-@media(min-width:900px){#meGuideToast,#meGuideBell{display:none!important}}
+@media(min-width:900px){#meGuideToast{display:none!important}}
 `;
 document.head.appendChild(style);
 
@@ -85,7 +81,6 @@ function badge(action){
  clearBadges();
  const el=targetEl(action);if(!el)return;
  el.classList.add("me-guide-target");
- const b=document.createElement("span");b.className="me-guide-badge";b.textContent="1";el.appendChild(b);
 }
 
 function ensureUI(){
@@ -94,11 +89,6 @@ function ensureUI(){
   toast=document.createElement("div");toast.id="meGuideToast";
   toast.innerHTML='<div class="me-guide-icon">🎯</div><div><small>PROSSIMA AZIONE</small><strong></strong><p></p></div><button type="button">APRI</button>';
   document.body.appendChild(toast);
- }
- let bell=document.getElementById("meGuideBell");
- if(!bell){
-  bell=document.createElement("button");bell.id="meGuideBell";bell.type="button";bell.innerHTML='🔔<b>1</b>';document.body.appendChild(bell);
-  bell.addEventListener("click",()=>showToast(getNext(),true));
  }
  return toast;
 }
@@ -142,7 +132,6 @@ function sync(){
  ensureUI();
  const a=getNext();
  badge(a);
- const bell=document.querySelector("#meGuideBell b");if(bell)bell.textContent="1";
  const home=document.getElementById("home");
  const onHome=home&&!home.classList.contains("hide");
  if(onHome)showToast(a);
