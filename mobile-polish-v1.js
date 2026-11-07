@@ -5,7 +5,7 @@ window.__ME_MOBILE_POLISH_V1__=true;
 
 const style=document.createElement("style");
 style.textContent=`
-@media(max-width:740px){
+@media(max-width:899px){
  #missions>.me-lux-page-head{position:relative!important}
  #meMobileMissionClose{
    position:absolute;right:10px;top:10px;z-index:3;min-height:38px;padding:7px 10px;
@@ -32,7 +32,7 @@ style.textContent=`
 document.head.appendChild(style);
 
 function ensureMissionClose(){
- if(window.innerWidth>740)return;
+ if(window.innerWidth>899)return;
  const missions=document.getElementById("missions");
  if(!missions)return;
  let b=document.getElementById("meMobileMissionFixedHome");
@@ -46,7 +46,7 @@ function ensureMissionClose(){
  b.style.display=visible?"block":"none";
 }
 function polishLocked(){
- if(window.innerWidth>740)return;
+ if(window.innerWidth>899)return;
  document.querySelectorAll("button:disabled").forEach(b=>{
   const t=(b.textContent||"").trim().toLowerCase();
   if(t.includes("avvia prima la tua partita")){
@@ -78,13 +78,13 @@ function pruneNpc(){
  }
 }
 function polishLabels(){
- if(window.innerWidth>740)return;
+ if(window.innerWidth>899)return;
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
  nodes.forEach(n=>{if(n.nodeValue&&n.nodeValue.includes("AZIONECONSIGLIATA"))n.nodeValue=n.nodeValue.replaceAll("AZIONECONSIGLIATA","AZIONE CONSIGLIATA")});
 }
 function missionGuidance(){
- if(window.innerWidth>740)return;
+ if(window.innerWidth>899)return;
  let s=null;try{s=typeof state!=="undefined"?state:null}catch(_){}
  const list=document.getElementById("missionList");if(!list)return;
  let hint=document.getElementById("meMobileSetupHint");
@@ -93,7 +93,7 @@ function missionGuidance(){
  if(!hint){hint=document.createElement("div");hint.id="meMobileSetupHint";hint.textContent="⚓ Completa prima la configurazione iniziale: yacht + marina. Subito dopo comparirà la prima missione.";list.insertAdjacentElement("beforebegin",hint)}
 }
 function ensureCrewRefitTools(){
- if(window.innerWidth>740)return;
+ if(window.innerWidth>899)return;
  const home=document.querySelector("#home .me-mobile-home-dashboard")||document.getElementById("home");
  if(!home)return;
  let bar=document.getElementById("meMobileCrewRefitTools");
