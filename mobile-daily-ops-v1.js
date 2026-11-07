@@ -14,7 +14,7 @@ const DAILY_POOL=[
 const style=document.createElement("style");
 style.id="me-mobile-daily-ops-v1-style";
 style.textContent=`
-@media(max-width:740px){
+@media(max-width:899px){
   #home .me-objectives{display:none!important}
   #meMobileDailyOps{
     order:-12!important;
@@ -82,7 +82,7 @@ style.textContent=`
     margin-top:7px!important;color:#8da9b4!important;font-size:8px!important;text-align:center!important
   }
 }
-@media(min-width:741px){#meMobileDailyOps{display:none!important}}
+@media(min-width:900px){#meMobileDailyOps{display:none!important}}
 `;
 document.head.appendChild(style);
 
@@ -106,7 +106,7 @@ function openPanel(id){
  if(typeof showTab==="function")showTab(id);
 }
 function ensure(){
- if(typeof innerWidth!=="undefined"&&innerWidth>740)return null;
+ if(typeof innerWidth!=="undefined"&&innerWidth>899)return null;
  const home=document.querySelector("#home .me-mobile-home-dashboard");
  if(!home)return null;
  let box=document.getElementById("meMobileDailyOps");
@@ -145,7 +145,7 @@ function ensure(){
  return box;
 }
 function render(){
- if(typeof innerWidth!=="undefined"&&innerWidth>740)return;
+ if(typeof innerWidth!=="undefined"&&innerWidth>899)return;
  const box=ensure(),a=api();
  if(!box||!a||typeof state==="undefined"||!state?.name)return;
  const tutorialDone=!!window.meRegisteredPlayer||(Number(state.voyages)||0)>=2;
