@@ -48,6 +48,108 @@ style.textContent=`
 document.head.appendChild(style);
 
 let mode="boats",marketFilter="all",seed=Math.floor(Date.now()/3600000);
+const EVENT_MARKET={
+ eventId:"toy_weekend",
+ items:new Set(["sup","efoil","seabob","floating_platform"]),
+ client:null,
+ user:null,
+ loading:false,
+ listings:[],
+ status:"",
+ initialized:false
+};
+function eventMarketActive(){
+ const ev=window.MarinaEmpireWorldEvents?.current?.();
+ return ev?.id===EVENT_MARKET.eventId;
+}
+function eventMarketSupabase(){
+ if(EVENT_MARKET.client)return EVENT_MARKET.client;
+ if(!window.supabase?.createClient)return null;
+ EVENT_MARKET.client=window.supabase.createClient(
+  "https://zrdetqvnjmqkfyajxjgp.supabase.co",
+  "sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw",
+  {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}
+ );
+ return EVENT_MARKET.client;
+}
+async function refreshEventMarket(){
+ if(!eventMarketActive()){EVENT_MARKET.listings=[];EVENT_MARKET.status="";return render();}
+ const client=eventMarketSupabase();
+ if(!client){EVENT_MARKET.status="Mercato evento online non disponibile.";return render();}
+ EVENT_MARKET.loading=true;render();
+ try{
+  const {data:auth,error:authError}=await client.auth.getUser();
+  EVENT_MARKET.user=authError?null:auth?.user||null;
+  if(!EVENT_MARKET.user){
+   EVENT_MARKET.status="Accedi con un account registrato per usare il mercato tra giocatori.";
+   EVENT_MARKET.listings=[];
+  }else{
+   const {data,error}=await client.from("me_event_market_listings")
+    .select("id,event_id,seller_id,seller_name,item_id,item_name,quantity,unit_price,status,created_at,expires_at")
+    .eq("event_id",EVENT_MARKET.eventId)
+    .eq("status","open")
+    .gt("expires_at",new Date().toISOString())
+    .order("created_at",{ascending:false})
+    .limit(50);
+   if(error)throw error;
+   EVENT_MARKET.listings=data||[];
+   EVENT_MARKET.status="";
+  }
+ }catch(e){EVENT_MARKET.status=e?.message||"Mercato evento non disponibile."}
+ finally{EVENT_MARKET.loading=false;render();}
+}
+function eventMarketHTML(s){
+ if(!eventMarketActive())return "";
+ const inv=s.inventory||{},eventItems=ITEMS.filter(i=>EVENT_MARKET.items.has(i.id));
+ const own=EVENT_MARKET.listings.filter(x=>x.seller_id===EVENT_MARKET.user?.id);
+ const others=EVENT_MARKET.listings.filter(x=>x.seller_id!==EVENT_MARKET.user?.id);
+ const inventoryRows=eventItems.map(i=>{
+  const qty=Math.max(0,Number(inv[i.id])||0),suggest=Math.max(50,Math.round(i.base*1.08));
+  return '<article class="me-market-card"><span class="me-market-badge">EVENTO · WATER TOYS</span><h3>'+i.icon+' '+i.name+'</h3><p>Posseduti: '+qty+' · domanda evento elevata</p><div class="me-market-actions"><input type="number" min="50" max="100000" step="50" value="'+suggest+'" data-event-price="'+i.id+'" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(214,181,117,.35);background:#081f2e;color:#fff"><button type="button" class="gold" data-event-list="'+i.id+'" '+(qty<1||!EVENT_MARKET.user?'disabled':'')+'>METTI IN VENDITA</button></div></article>';
+ }).join("");
+ const listingRows=others.map(x=>{
+  const total=Number(x.unit_price)*Number(x.quantity||1);
+  return '<article class="me-market-card"><span class="me-market-badge">VENDITORE · '+String(x.seller_name||"Comandante").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+'</span><h3>🤝 '+String(x.item_name||x.item_id).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+'</h3><p>Quantità '+Number(x.quantity||1)+' · prezzo unitario '+money(x.unit_price)+'</p><div class="me-market-price">'+money(total)+' crediti</div><div class="me-market-actions"><button type="button" class="gold" data-event-buy="'+x.id+'" '+(!EVENT_MARKET.user?'disabled':'')+'>ACQUISTA DAL GIOCATORE</button></div></article>';
+ }).join("");
+ const ownRows=own.map(x=>'<article class="me-market-card"><span class="me-market-badge">TUO ANNUNCIO</span><h3>📣 '+x.item_name+'</h3><p>'+x.quantity+' × '+money(x.unit_price)+' crediti</p><div class="me-market-actions"><button type="button" data-event-cancel="'+x.id+'">RITIRA ANNUNCIO</button></div></article>').join("");
+ return '<section class="me-market-card" style="grid-column:1/-1;border-color:#e0b85f"><span class="me-market-badge">🌊 MERCATO EVENTO · WEEKEND WATER TOYS</span><h3>Vendi ai giocatori i prodotti richiesti dall’evento</h3><p>SUP, E-Foil, Seabob e piattaforme hanno una domanda speciale. Gli annunci durano 60 minuti.</p><div class="me-market-actions"><button type="button" class="gold" data-event-refresh>AGGIORNA OFFERTE</button><button type="button" data-event-claim '+(!EVENT_MARKET.user?'disabled':'')+'>RISCUOTI VENDITE</button></div><p class="me-market-status">'+(EVENT_MARKET.loading?"Aggiornamento mercato...":EVENT_MARKET.status||"Mercato evento online attivo.")+'</p><h3>📦 Il tuo inventario evento</h3><div class="me-market-grid">'+inventoryRows+'</div><h3 style="margin-top:14px">🛒 Offerte degli altri giocatori</h3><div class="me-market-grid">'+(listingRows||'<div class="me-market-card"><p>Nessuna offerta pubblicata dagli altri giocatori in questo momento.</p></div>')+'</div>'+(ownRows?'<h3 style="margin-top:14px">📣 I tuoi annunci</h3><div class="me-market-grid">'+ownRows+'</div>':"")+'</section>';
+}
+async function eventMarketAction(kind,arg){
+ const client=eventMarketSupabase();
+ if(!client)return setStatus("Mercato evento online non disponibile.");
+ const {data:auth,error:authError}=await client.auth.getUser();
+ if(authError||!auth?.user)return setStatus("Accedi con un account registrato per usare il mercato evento.");
+ try{
+  let result;
+  if(kind==="list"){
+   const input=document.querySelector('[data-event-price="'+arg+'"]');
+   const price=Math.max(50,Math.floor(Number(input?.value)||0));
+   result=await client.rpc("me_event_market_create_listing",{p_event_id:EVENT_MARKET.eventId,p_item_id:arg,p_unit_price:price,p_quantity:1});
+  }else if(kind==="buy"){
+   result=await client.rpc("me_event_market_buy_listing",{p_listing_id:arg});
+  }else if(kind==="cancel"){
+   result=await client.rpc("me_event_market_cancel_listing",{p_listing_id:arg});
+  }else if(kind==="claim"){
+   result=await client.rpc("me_event_market_claim_payouts");
+  }
+  if(result?.error)throw result.error;
+  const payload=result?.data;
+  const row=Array.isArray(payload)?payload[0]:payload;
+  if(row?.game_state){
+   try{
+    const uid=auth.user.id;
+    window.MarinaLocalSaveContext?.select(uid);
+    const handle=window.MarinaLocalSaveContext?.capture?.();
+    if(handle)window.MarinaLocalSaveContext?.writeGame?.(handle,row.game_state);
+   }catch(_){}
+  }
+  if(kind==="claim")setStatus((row?.claimed_amount||0)>0?"Vendite riscosse: +"+money(row.claimed_amount)+" crediti.":"Nessuna vendita da riscuotere.");
+  else setStatus(kind==="buy"?"Acquisto completato dal giocatore.":kind==="cancel"?"Annuncio ritirato.":"Annuncio pubblicato nel mercato evento.");
+  window.dispatchEvent(new Event("marina-empire-updated"));
+  await refreshEventMarket();
+ }catch(e){setStatus(e?.message||"Operazione mercato evento non riuscita.");}
+}
+
 
 function econ(){return window.MarinaEmpireMarketplaceEconomy}
 function snap(){return econ()?.snapshot?.()||{coins:0,owned:[],inventory:{},registered:false,port:"rimini"}}
@@ -166,6 +268,11 @@ function bind(root){
  root.querySelectorAll("[data-sell-item]").forEach(b=>b.addEventListener("click",()=>{
   const i=ITEMS.find(x=>x.id===b.dataset.sellItem);const r=econ()?.sellItem?.(i,Number(b.dataset.price));setStatus(r?.message);if(r?.ok)setTimeout(render,500);
  }));
+ root.querySelectorAll("[data-event-refresh]").forEach(b=>b.addEventListener("click",()=>refreshEventMarket()));
+ root.querySelectorAll("[data-event-list]").forEach(b=>b.addEventListener("click",()=>eventMarketAction("list",b.dataset.eventList)));
+ root.querySelectorAll("[data-event-buy]").forEach(b=>b.addEventListener("click",()=>eventMarketAction("buy",b.dataset.eventBuy)));
+ root.querySelectorAll("[data-event-cancel]").forEach(b=>b.addEventListener("click",()=>eventMarketAction("cancel",b.dataset.eventCancel)));
+ root.querySelectorAll("[data-event-claim]").forEach(b=>b.addEventListener("click",()=>eventMarketAction("claim")));
  root.querySelectorAll("[data-fulfill-demand]").forEach(b=>b.addEventListener("click",()=>{
   const demand={id:b.dataset.fulfillDemand,kind:b.dataset.kind,targetId:b.dataset.target,value:Number(b.dataset.value),repGain:Number(b.dataset.rep)};
   const r=econ()?.fulfillDemand?.(demand);setStatus(r?.message);if(r?.ok)setTimeout(render,500);
@@ -229,14 +336,15 @@ function render(){
  const root=document.getElementById("meMarketplaceApp");
  if(!root)return;
  const s=snap();
- root.innerHTML=headerHTML(s)+marketPulseHTML(s)+demandHTML(s)+(mode==="boats"?boatsHTML(s):itemsHTML(s));
+ root.innerHTML=headerHTML(s)+eventMarketHTML(s)+marketPulseHTML(s)+demandHTML(s)+(mode==="boats"?boatsHTML(s):itemsHTML(s));
  bind(root);
 }
 function boot(){
  render();
  document.querySelectorAll('[data-tab="marketplace"],[data-mobile-more-tab="marketplace"]').forEach(b=>b.addEventListener("click",()=>setTimeout(render,50)));
  window.addEventListener("marina-empire-updated",()=>setTimeout(render,50));
- window.addEventListener("marina-world-event",()=>setTimeout(render,50));
+ window.addEventListener("marina-world-event",()=>{setTimeout(render,50);setTimeout(refreshEventMarket,100)});
+ if(eventMarketActive())setTimeout(refreshEventMarket,250);
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
