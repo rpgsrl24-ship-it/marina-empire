@@ -16,10 +16,10 @@ a{color:inherit;text-decoration:none}.shell{width:min(1100px,100%);margin:auto;p
 .heroText{position:absolute;z-index:2;left:18px;right:18px;bottom:18px}.tag{display:inline-flex;padding:7px 10px;border:1px solid #7ce7ff80;border-radius:999px;background:#062d42dd;color:#a9efff;font-size:10px;font-weight:900;letter-spacing:.08em}
 h1{margin:10px 0 7px;font:800 clamp(30px,9vw,58px)/.98 Georgia,serif;color:#f3d597}.hero p{max-width:700px;margin:0;color:#d8e5e8;line-height:1.45}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.card{border:1px solid #bd9a6068;border-radius:16px;padding:14px;background:linear-gradient(145deg,#0d3a50,#071f31);box-shadow:0 9px 24px #0005}.card b{display:block;color:#f1d292;margin-bottom:5px}.card p{margin:0;color:#adc2ca;font-size:12px;line-height:1.45}
-.missions{margin-top:12px}.mission{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;margin:8px 0;padding:12px;border:1px solid #4c8194;border-radius:14px;background:#0a3145}.mission .ico{font-size:25px}.mission strong{display:block;color:#f1d492}.mission small{display:block;margin-top:3px;color:#9eb8c2}.reward{color:#77e9a1;font-weight:900;font-size:11px;text-align:right}
+.missions{margin-top:12px}.mission{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;margin:8px 0;padding:12px;border:1px solid #4c8194;border-radius:14px;background:#0a3145}.mission .ico{font-size:25px}.mission strong{display:block;color:#f1d492}.mission small{display:block;margin-top:3px;color:#9eb8c2}.reward{color:#77e9a1;font-weight:900;font-size:11px;text-align:right}.mission button{min-width:122px;border:1px solid #e7c57e;border-radius:10px;padding:10px 12px;background:linear-gradient(130deg,#f6dd9a,#b47f33);color:#102333;font-weight:900;cursor:pointer}.mission button:disabled{opacity:.45;cursor:not-allowed}.eventStatus{margin-top:12px;border:1px solid #5aa2b9;border-radius:16px;padding:14px;background:#071f31}.eventStatusTop{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.eventStatus strong{color:#f3d597}.eventBalance{font-size:12px;color:#a9c5ce}.activeJob{margin-top:10px;padding:12px;border:1px solid #d9b86b;border-radius:12px;background:#102f40}.activeJob h3{margin:0 0 5px;color:#f6d996}.activeJob p{margin:4px 0;color:#b8ccd2;font-size:12px}.bar{height:10px;border-radius:999px;overflow:hidden;background:#04131e;border:1px solid #315768;margin:10px 0}.bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,#74dfff,#e7c57e);transition:width .4s}.claim{width:100%;border:1px solid #8ce7a8;border-radius:10px;padding:11px;background:#123f31;color:#d9ffe5;font-weight:900}.claim:disabled{opacity:.45}.eventMessage{margin-top:8px;font-size:12px;color:#b8d7df}
 .promo{margin-top:12px;border:1px solid #e4bd6c;border-radius:18px;padding:17px;background:linear-gradient(135deg,#143b4e,#523b1d);box-shadow:0 10px 28px #0006}.promo h2{margin:0 0 5px;font:800 24px Georgia,serif;color:#ffe2a4}.promo p{margin:0;color:#e5edf0;line-height:1.5}.cta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.cta a{flex:1 1 180px;text-align:center;padding:12px;border-radius:11px;font-weight:900}.primary{background:linear-gradient(130deg,#f6dd9a,#b47f33);color:#102333}.secondary{border:1px solid #d1aa63;background:#08293b}
 .note{margin-top:11px;color:#809eaa;font-size:10px;line-height:1.45}
-@media(max-width:700px){.shell{padding:9px 9px 84px}.grid{grid-template-columns:1fr}.hero{min-height:360px;border-radius:17px}.mission{grid-template-columns:auto 1fr}.reward{grid-column:2;text-align:left}.brand{font-size:20px}}
+@media(max-width:700px){.shell{padding:9px 9px 84px}.grid{grid-template-columns:1fr}.hero{min-height:360px;border-radius:17px}.mission{grid-template-columns:auto 1fr}.reward{grid-column:2;text-align:left}.mission button{grid-column:1/-1;width:100%}.brand{font-size:20px}}
 </style>
 </head>
 <body>
@@ -40,10 +40,15 @@ h1{margin:10px 0 7px;font:800 clamp(30px,9vw,58px)/.98 Georgia,serif;color:#f3d5
   </section>
 
   <section class="card missions">
-    <b>MISSIONI EVENTO</b>
-    <div class="mission"><div class="ico">🏄</div><div><strong>SUP Experience</strong><small>Prepara l'attrezzatura per gli ospiti di uno yacht.</small></div><div class="reward">+ CREDITI / PRESTIGIO</div></div>
-    <div class="mission"><div class="ico">⚡</div><div><strong>E-Foil Session</strong><small>Organizza una sessione premium in una baia vicina.</small></div><div class="reward">+ CREDITI / PRESTIGIO</div></div>
-    <div class="mission"><div class="ico">🤿</div><div><strong>Water Toys Concierge</strong><small>Gestisci una richiesta completa di toys per un charter.</small></div><div class="reward">+ CREDITI / PRESTIGIO</div></div>
+    <b>MISSIONI EVENTO · GIOCABILI</b>
+    <div class="mission"><div class="ico">🏄</div><div><strong>SUP Experience</strong><small>Prepara tavole, pagaie e briefing per gli ospiti dello yacht.</small></div><div class="reward">Costo 120 · Premio 650 · +10 prestigio</div><button type="button" data-water-job="sup">AVVIA · 2 MIN</button></div>
+    <div class="mission"><div class="ico">⚡</div><div><strong>E-Foil Session</strong><small>Organizza sicurezza, batterie e transfer per una sessione premium.</small></div><div class="reward">Costo 250 · Premio 1.200 · +18 prestigio</div><button type="button" data-water-job="efoil">AVVIA · 4 MIN</button></div>
+    <div class="mission"><div class="ico">🤿</div><div><strong>Water Toys Concierge</strong><small>Coordina una richiesta completa di toys per un charter VIP.</small></div><div class="reward">Costo 420 · Premio 1.800 · +28 prestigio</div><button type="button" data-water-job="concierge">AVVIA · 6 MIN</button></div>
+  </section>
+
+  <section class="eventStatus" id="waterEventStatus">
+    <div class="eventStatusTop"><strong>🎮 CENTRO OPERATIVO WATER TOYS</strong><span class="eventBalance" id="waterEventBalance">Caricamento partita…</span></div>
+    <div id="waterEventBody" class="eventMessage">Sto verificando il salvataggio di Marina Empire.</div>
   </section>
 
   <section class="promo">
@@ -56,5 +61,101 @@ h1{margin:10px 0 7px;font:800 clamp(30px,9vw,58px)/.98 Georgia,serif;color:#f3d5
     <div class="note">Area promozionale integrata nel mondo di Marina Empire. I contenuti del gioco non rappresentano prezzi o disponibilità commerciali in tempo reale.</div>
   </section>
 </main>
+<script src="./local-save-context.js"></script>
+<script>
+"use strict";
+(()=>{
+ const jobs={
+  sup:{id:"sup",icon:"🏄",name:"SUP Experience",cost:120,reward:650,prestige:10,duration:120000},
+  efoil:{id:"efoil",icon:"⚡",name:"E-Foil Session",cost:250,reward:1200,prestige:18,duration:240000},
+  concierge:{id:"concierge",icon:"🤿",name:"Water Toys Concierge",cost:420,reward:1800,prestige:28,duration:360000}
+ };
+ const balance=document.getElementById("waterEventBalance"),body=document.getElementById("waterEventBody");
+ let handle=null,game=null,timer=null;
+ const fmt=n=>Math.max(0,Math.floor(Number(n)||0)).toLocaleString("it-IT");
+ const esc=s=>String(s||"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+ function ensureContext(){
+  const ctx=window.MarinaLocalSaveContext;if(!ctx)return false;
+  handle=ctx.capture();
+  if(handle)return true;
+  try{
+   const raw=localStorage.getItem("sb-zrdetqvnjmqkfyajxjgp-auth-token"),session=raw?JSON.parse(raw):null,user=session&&session.user;
+   if(user&&user.id&&user.email_confirmed_at&&!user.is_anonymous)ctx.select(user.id);else ctx.select(null);
+   handle=ctx.capture();
+  }catch(_){handle=null}
+  return !!handle;
+ }
+ function read(){
+  if(!ensureContext())return null;
+  game=window.MarinaLocalSaveContext.readGame(handle);
+  return game;
+ }
+ function write(next){
+  if(!handle||!window.MarinaLocalSaveContext.writeGame(handle,next))return false;
+  game=next;return true;
+ }
+ function slot(){return Math.floor(Date.now()/900000)}
+ function recordKey(id){return slot()+":"+id}
+ function active(){return game&&game.waterToysActivity&&typeof game.waterToysActivity==="object"?game.waterToysActivity:null}
+ function history(){return game&&game.waterToysHistory&&typeof game.waterToysHistory==="object"&&!Array.isArray(game.waterToysHistory)?game.waterToysHistory:{}}
+ function refreshButtons(){
+  const a=active(),h=history();
+  document.querySelectorAll("[data-water-job]").forEach(btn=>{
+   const j=jobs[btn.dataset.waterJob],done=!!h[recordKey(j.id)],poor=!game||Number(game.coins)<j.cost;
+   btn.disabled=!!a||done||poor||!game?.setupComplete;
+   btn.textContent=done?"COMPLETATO":a?"ATTIVITÀ IN CORSO":poor?"CREDITI INSUFFICIENTI":!game?.setupComplete?"CONFIGURA PRIMA IL GIOCO":"AVVIA · "+Math.round(j.duration/60000)+" MIN";
+  });
+ }
+ function render(){
+  if(!read()){
+   balance.textContent="Nessuna partita attiva";
+   body.innerHTML='Apri Marina Empire, crea o carica la tua partita e poi torna qui per partecipare all’evento.';
+   refreshButtons();return;
+  }
+  balance.textContent=esc(game.name)+" · "+fmt(game.coins)+" crediti · "+fmt(game.prestige)+" prestigio";
+  const a=active();
+  if(!a){
+   body.innerHTML='<strong>Scegli un incarico.</strong> Il costo viene scalato alla partenza. Al termine torna qui e riscuoti la ricompensa.';
+   refreshButtons();return;
+  }
+  const j=jobs[a.id]||{name:a.name||"Attività Water Toys",icon:"🌊",duration:Math.max(1,Number(a.until)-Number(a.startedAt))};
+  const left=Math.max(0,Number(a.until)-Date.now()),total=Math.max(1,Number(a.until)-Number(a.startedAt)),pct=Math.max(0,Math.min(100,100-left/total*100));
+  const mm=Math.floor(left/60000),ss=Math.floor((left%60000)/1000);
+  body.innerHTML='<div class="activeJob"><h3>'+j.icon+' '+esc(j.name)+'</h3><p>'+(left>0?'Operazione in corso · '+mm+':'+String(ss).padStart(2,"0")+' rimanenti':'Operazione completata · premio pronto')+'</p><div class="bar"><span style="width:'+pct+'%"></span></div><p>Premio: <b>+'+fmt(a.reward)+' crediti</b> · +'+fmt(a.prestige)+' prestigio</p><button class="claim" type="button" id="waterClaim" '+(left>0?'disabled':'')+'>RISCUOTI PREMIO</button></div>';
+  document.getElementById("waterClaim")?.addEventListener("click",claim);
+  refreshButtons();
+ }
+ function start(id){
+  if(!read())return render();
+  const j=jobs[id],h=history();
+  if(!j||active()||h[recordKey(id)]||!game.setupComplete||Number(game.coins)<j.cost)return render();
+  const now=Date.now(),next={...game};
+  next.coins=Math.max(0,Number(next.coins)-j.cost);
+  next.waterToysActivity={id:j.id,name:j.name,startedAt:now,until:now+j.duration,cost:j.cost,reward:j.reward,prestige:j.prestige,slot:slot()};
+  next.waterToysStarted=Math.max(0,Math.floor(Number(next.waterToysStarted)||0))+1;
+  if(!write(next)){body.textContent="Salvataggio non riuscito. Riapri il gioco e riprova.";return}
+  render();
+ }
+ function claim(){
+  if(!read())return render();
+  const a=active();if(!a||Date.now()<Number(a.until))return render();
+  const next={...game},h=history(),key=(Number.isFinite(Number(a.slot))?Number(a.slot):slot())+":"+a.id;
+  if(h[key]){next.waterToysActivity=null;write(next);return render()}
+  next.coins=Math.max(0,Number(next.coins))+Math.max(0,Number(a.reward)||0);
+  next.prestige=Math.max(0,Number(next.prestige))+Math.max(0,Number(a.prestige)||0);
+  next.earnings=Math.max(0,Number(next.earnings)||0)+Math.max(0,Number(a.reward)||0);
+  next.waterToysCompleted=Math.max(0,Math.floor(Number(next.waterToysCompleted)||0))+1;
+  next.waterToysHistory={...h,[key]:{id:a.id,at:Date.now(),reward:a.reward,prestige:a.prestige}};
+  next.lastWaterToysEvent={id:a.id,name:a.name,reward:a.reward,prestige:a.prestige,at:Date.now()};
+  next.waterToysActivity=null;
+  if(!write(next)){body.textContent="Premio non registrato: salvataggio cambiato. Rientra nel gioco e riapri l’evento.";return}
+  render();
+ }
+ document.addEventListener("click",e=>{const btn=e.target.closest("[data-water-job]");if(btn)start(btn.dataset.waterJob)});
+ render();
+ timer=setInterval(render,1000);
+ window.addEventListener("beforeunload",()=>clearInterval(timer));
+})();
+</script>
 </body>
 </html>
