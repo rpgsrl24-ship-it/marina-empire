@@ -123,6 +123,14 @@ async function trial(browser,origin,name,viewport,mobile) {
       await goTab(page,'credits',true);
       await page.waitForFunction(()=>!document.getElementById('credits')?.classList.contains('hide'));
       await goTab(page,'home',true);
+      await goTab(page,'marinas',true);
+      await page.waitForFunction(()=>document.body.classList.contains('me-ml3-active'));
+      assert.equal(await page.locator('#meMobileMarinaLivePremium').isVisible(),true,name+': premium Marina Live 2/12 is visible on mobile');
+      assert.ok((await page.locator('#meMobileMarinaLivePremium').innerText()).includes('MARINA LIVE'),name+': Marina Live premium title is rendered');
+      assert.ok((await page.locator('#meMobileMarinaLivePremium').innerText()).includes('2/12'),name+': Marina Live page number 2/12 is rendered');
+      assert.equal(await page.locator('.ml3-bottom').isVisible(),true,name+': premium Marina Live bottom navigation is visible');
+      assert.equal(await page.locator('.ml3-hero').isVisible(),true,name+': premium Marina Live hero image is visible');
+      await goTab(page,'home',true);
       await goTab(page,'map',true);
       await page.locator('#interactiveMapDisplay').waitFor({state:'visible'});
       await page.waitForTimeout(500);
