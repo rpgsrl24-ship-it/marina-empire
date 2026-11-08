@@ -48,6 +48,83 @@ style.textContent=`
 document.head.appendChild(style);
 
 let mode="boats",marketFilter="all",seed=Math.floor(Date.now()/3600000);
+
+const REAL_MARKET={
+ client:null,user:null,pass:null,listings:[],loading:false,status:"",initialized:false,
+ productUrl:"https://rpgyacht.com/prodotto/marina-empire-%c2%b7-venditore-reale-%c2%b7-30-giorni/"
+};
+function realMarketClient(){
+ if(REAL_MARKET.client)return REAL_MARKET.client;
+ if(!window.supabase?.createClient)return null;
+ REAL_MARKET.client=window.supabase.createClient(
+  "https://zrdetqvnjmqkfyajxjgp.supabase.co",
+  "sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw",
+  {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}
+ );
+ return REAL_MARKET.client;
+}
+function euro(cents){return (Math.max(0,Number(cents)||0)/100).toLocaleString("it-IT",{style:"currency",currency:"EUR"})}
+function esc(v){return String(v??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]))}
+function realPassActive(){return !!(REAL_MARKET.pass&&new Date(REAL_MARKET.pass.active_until).getTime()>Date.now())}
+async function refreshRealMarket(){
+ const client=realMarketClient();if(!client){REAL_MARKET.status="Marketplace reale non disponibile.";return render()}
+ REAL_MARKET.loading=true;render();
+ try{
+  const {data:auth,error:authError}=await client.auth.getUser();
+  REAL_MARKET.user=authError?null:auth?.user||null;
+  if(REAL_MARKET.user){
+   await client.rpc("me_claim_real_seller_pass");
+   const {data:pass}=await client.from("me_real_seller_passes").select("active_until").eq("user_id",REAL_MARKET.user.id).maybeSingle();
+   REAL_MARKET.pass=pass||null;
+  }else REAL_MARKET.pass=null;
+  const {data,error}=await client.from("me_real_market_listings")
+    .select("id,seller_id,seller_name,title,category,price_eur_cents,item_condition,location,description,event_id,status,created_at,expires_at")
+    .eq("status","active")
+    .gt("expires_at",new Date().toISOString())
+    .order("created_at",{ascending:false})
+    .limit(60);
+  if(error)throw error;
+  REAL_MARKET.listings=data||[];REAL_MARKET.status="";
+ }catch(e){REAL_MARKET.status=e?.message||"Marketplace reale temporaneamente non disponibile."}
+ finally{REAL_MARKET.loading=false;render()}
+}
+function realMarketHTML(){
+ const own=REAL_MARKET.listings.filter(x=>x.seller_id===REAL_MARKET.user?.id);
+ const others=REAL_MARKET.listings.filter(x=>x.seller_id!==REAL_MARKET.user?.id);
+ const pass=realPassActive(),until=pass?new Date(REAL_MARKET.pass.active_until).toLocaleDateString("it-IT"):"";
+ const cards=others.map(x=>'<article class="me-market-card"><span class="me-market-badge">'+esc(x.category)+(x.event_id==="toy_weekend"?" · 🌊 EVENTO WATER TOYS":"")+'</span><h3>💶 '+esc(x.title)+'</h3><div class="me-market-price">'+euro(x.price_eur_cents)+'</div><p>'+esc(x.item_condition)+' · '+esc(x.location)+'</p><p>'+esc(x.description)+'</p><div class="me-market-actions"><button type="button" class="gold" data-real-contact="'+x.id+'" '+(!REAL_MARKET.user?'disabled':'')+'>CONTATTA IL VENDITORE</button></div></article>').join("");
+ const ownCards=own.map(x=>'<article class="me-market-card"><span class="me-market-badge">TUO ANNUNCIO</span><h3>📣 '+esc(x.title)+'</h3><div class="me-market-price">'+euro(x.price_eur_cents)+'</div><p>'+esc(x.location)+' · scade '+new Date(x.expires_at).toLocaleDateString("it-IT")+'</p><div class="me-market-actions"><button type="button" data-real-sold="'+x.id+'">SEGNA VENDUTO</button><button type="button" data-real-withdraw="'+x.id+'">RITIRA</button></div></article>').join("");
+ const form=pass?'<div class="me-market-card"><span class="me-market-badge">NUOVO ANNUNCIO REALE</span><h3>Pubblica in euro</h3><input id="meRealTitle" maxlength="80" placeholder="Titolo prodotto" style="width:100%;margin:4px 0;padding:8px;border-radius:8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><select id="meRealCategory"><option>Water Toys</option><option>Attrezzature</option><option>Elettronica</option><option>Ricambi</option><option>Servizi</option><option>Altro</option></select><select id="meRealCondition"><option>Nuovo</option><option>Come nuovo</option><option>Usato</option><option>Da revisionare</option></select></div><input id="meRealPrice" type="number" min="1" step="0.01" placeholder="Prezzo €" style="width:100%;margin:4px 0;padding:8px;border-radius:8px"><input id="meRealLocation" maxlength="80" placeholder="Località" style="width:100%;margin:4px 0;padding:8px;border-radius:8px"><textarea id="meRealDescription" maxlength="1200" placeholder="Descrizione, condizioni, spedizione/ritiro…" style="width:100%;min-height:90px;margin:4px 0;padding:8px;border-radius:8px"></textarea><div style="display:grid;grid-template-columns:1fr 2fr;gap:6px"><select id="meRealContactType"><option value="email">Email</option><option value="phone">Telefono</option><option value="whatsapp">WhatsApp</option><option value="other">Altro</option></select><input id="meRealContact" maxlength="160" placeholder="Contatto mostrato agli interessati"></div><label style="display:block;margin-top:7px;font-size:10px"><input id="meRealEvent" type="checkbox"> Evidenzia durante Weekend Water Toys</label><div class="me-market-actions"><button type="button" class="gold" data-real-create>PUBBLICA ANNUNCIO</button></div></div>':
+ '<div class="me-market-card"><span class="me-market-badge">VENDITORE REALE</span><h3>Pubblica prodotti nautici in euro</h3><p>Pass 30 giorni · €1,99 · fino a 5 annunci attivi. Trattativa e pagamento del bene direttamente tra venditore e cliente.</p><div class="me-market-actions"><a class="gold" href="'+REAL_MARKET.productUrl+'" target="_blank" rel="noopener" style="display:block;text-align:center;padding:9px;border-radius:9px;background:#c49a55;color:#061a25;font-weight:800">ATTIVA 30 GIORNI · €1,99</a><button type="button" data-real-refresh>HO GIÀ PAGATO · AGGIORNA</button></div></div>';
+ return '<section class="me-market-card" style="grid-column:1/-1;border-color:#75b8c8"><span class="me-market-badge">💶 MARKETPLACE REALE</span><h3>Compra e vendi prodotti nautici reali</h3><p>Gli annunci sono reali. Marina Empire mette in contatto venditore e interessato; prezzo, accordi, pagamento e consegna del bene restano tra le parti.</p><p class="me-market-status">'+(REAL_MARKET.loading?"Aggiornamento…":REAL_MARKET.status||(pass?"Venditore Reale attivo fino al "+until:"Puoi consultare gratis gli annunci. Per pubblicare serve il pass Venditore Reale."))+'</p><div class="me-market-grid">'+form+'</div><h3 style="margin-top:14px">🛍️ Annunci reali</h3><div class="me-market-grid">'+(cards||'<div class="me-market-card"><p>Nessun annuncio reale disponibile in questo momento.</p></div>')+'</div>'+(ownCards?'<h3 style="margin-top:14px">📣 I tuoi annunci reali</h3><div class="me-market-grid">'+ownCards+'</div>':"")+'</section>';
+}
+async function realMarketAction(kind,id){
+ const client=realMarketClient();if(!client)return setStatus("Marketplace reale non disponibile.");
+ const {data:auth,error:authError}=await client.auth.getUser();
+ if(authError||!auth?.user)return setStatus("Accedi con un account registrato.");
+ try{
+  if(kind==="create"){
+   const title=document.getElementById("meRealTitle")?.value||"",category=document.getElementById("meRealCategory")?.value||"",condition=document.getElementById("meRealCondition")?.value||"",location=document.getElementById("meRealLocation")?.value||"",description=document.getElementById("meRealDescription")?.value||"",contactType=document.getElementById("meRealContactType")?.value||"",contact=document.getElementById("meRealContact")?.value||"",price=Math.round(Number(document.getElementById("meRealPrice")?.value||0)*100),event=document.getElementById("meRealEvent")?.checked?"toy_weekend":null;
+   const {error}=await client.rpc("me_real_market_create_listing",{p_title:title,p_category:category,p_price_eur_cents:price,p_condition:condition,p_location:location,p_description:description,p_contact_type:contactType,p_contact_value:contact,p_event_id:event});
+   if(error)throw error;setStatus("Annuncio reale pubblicato.");
+  }else if(kind==="contact"){
+   const {data,error}=await client.rpc("me_real_market_get_contact",{p_listing_id:id});if(error)throw error;
+   const type=data?.type||"",value=data?.value||"";
+   if(type==="email")location.href="mailto:"+value;
+   else if(type==="phone")location.href="tel:"+value;
+   else if(type==="whatsapp"){const digits=value.replace(/[^0-9]/g,"");window.open("https://wa.me/"+digits,"_blank","noopener")}
+   else prompt("Contatto del venditore:",value);
+   return;
+  }else if(kind==="sold"){
+   const {error}=await client.rpc("me_real_market_mark_sold",{p_listing_id:id});if(error)throw error;setStatus("Annuncio segnato come venduto.");
+  }else if(kind==="withdraw"){
+   const {error}=await client.rpc("me_real_market_withdraw_listing",{p_listing_id:id});if(error)throw error;setStatus("Annuncio ritirato.");
+  }else if(kind==="refresh"){
+   await client.rpc("me_claim_real_seller_pass");
+  }
+  await refreshRealMarket();
+ }catch(e){setStatus(e?.message||"Operazione non riuscita.")}
+}
 const EVENT_MARKET={
  eventId:"toy_weekend",
  items:new Set(["sup","efoil","seabob","floating_platform"]),
@@ -268,6 +345,11 @@ function bind(root){
  root.querySelectorAll("[data-sell-item]").forEach(b=>b.addEventListener("click",()=>{
   const i=ITEMS.find(x=>x.id===b.dataset.sellItem);const r=econ()?.sellItem?.(i,Number(b.dataset.price));setStatus(r?.message);if(r?.ok)setTimeout(render,500);
  }));
+ root.querySelectorAll("[data-real-refresh]").forEach(b=>b.addEventListener("click",()=>realMarketAction("refresh")));
+ root.querySelectorAll("[data-real-create]").forEach(b=>b.addEventListener("click",()=>realMarketAction("create")));
+ root.querySelectorAll("[data-real-contact]").forEach(b=>b.addEventListener("click",()=>realMarketAction("contact",b.dataset.realContact)));
+ root.querySelectorAll("[data-real-sold]").forEach(b=>b.addEventListener("click",()=>realMarketAction("sold",b.dataset.realSold)));
+ root.querySelectorAll("[data-real-withdraw]").forEach(b=>b.addEventListener("click",()=>realMarketAction("withdraw",b.dataset.realWithdraw)));
  root.querySelectorAll("[data-event-refresh]").forEach(b=>b.addEventListener("click",()=>refreshEventMarket()));
  root.querySelectorAll("[data-event-list]").forEach(b=>b.addEventListener("click",()=>eventMarketAction("list",b.dataset.eventList)));
  root.querySelectorAll("[data-event-buy]").forEach(b=>b.addEventListener("click",()=>eventMarketAction("buy",b.dataset.eventBuy)));
@@ -336,7 +418,7 @@ function render(){
  const root=document.getElementById("meMarketplaceApp");
  if(!root)return;
  const s=snap();
- root.innerHTML=headerHTML(s)+eventMarketHTML(s)+marketPulseHTML(s)+demandHTML(s)+(mode==="boats"?boatsHTML(s):itemsHTML(s));
+ root.innerHTML=headerHTML(s)+realMarketHTML()+eventMarketHTML(s)+marketPulseHTML(s)+demandHTML(s)+(mode==="boats"?boatsHTML(s):itemsHTML(s));
  bind(root);
 }
 function boot(){
@@ -345,6 +427,7 @@ function boot(){
  window.addEventListener("marina-empire-updated",()=>setTimeout(render,50));
  window.addEventListener("marina-world-event",()=>{setTimeout(render,50);setTimeout(refreshEventMarket,100)});
  if(eventMarketActive())setTimeout(refreshEventMarket,250);
+ setTimeout(refreshRealMarket,320);
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
