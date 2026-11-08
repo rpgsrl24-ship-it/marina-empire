@@ -288,7 +288,7 @@ function runPrimary(){
     setTimeout(()=>document.getElementById("meQuickStart")?.click(),160);
     return;
   }
-  if(action.target==="marinaLive"){openPanel("office",{marinaLive:true});return}
+  if(action.target==="marinaLive"){openPanel("marinas");return}
   if(action.target==="services"){
     document.getElementById("meMobileHomeServices")?.scrollIntoView({behavior:"smooth",block:"center"});
     return;
