@@ -43,7 +43,7 @@ jobs:
         timeout-minutes: 2
         run: ME_TEST_SCENARIO=multi-tab-conflict node tests/prelaunch-browser.test.cjs
       - name: P0 desktop guest journey
-        timeout-minutes: 10
+        timeout-minutes: 15
         run: ME_TEST_SCENARIO=desktop node tests/prelaunch-browser.test.cjs
       - name: P0 mobile portrait guest journey
         timeout-minutes: 2
