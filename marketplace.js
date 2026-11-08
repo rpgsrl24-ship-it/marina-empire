@@ -66,9 +66,9 @@ async function refreshOfficialStore(){
  OFFICIAL_STORE.loading=true;render();
  try{
   const {data,error}=await client.from("me_official_store_items")
-   .select("product_id,seller_name,name,sku,category,price_eur_cents,stock_qty,product_url,image_url,featured_event,active,updated_at")
+   .select("product_id,seller_name,name,sku,category,price_eur_cents,stock_qty,product_url,image_url,featured_event,active,updated_at,availability_label")
    .eq("active",true)
-   .gt("stock_qty",0)
+   .or("stock_qty.gt.0,availability_label.not.is.null")
    .order("featured_event",{ascending:false,nullsFirst:false})
    .order("name",{ascending:true});
   if(error)throw error;
@@ -85,7 +85,7 @@ function officialStoreHTML(){
  });
  const cards=items.map(x=>{
   const featured=current?.id&&x.featured_event===current.id;
-  return '<article class="me-market-card" style="'+(featured?'border-color:#e0b85f;box-shadow:0 0 0 1px rgba(224,184,95,.18) inset':'')+'"><span class="me-market-badge">✅ RPG YACHT · VENDITORE UFFICIALE'+(featured?' · EVENTO':'')+'</span><h3>🏪 '+esc(x.name)+'</h3><p>'+esc(x.category)+' · Disponibili: '+Math.max(0,Number(x.stock_qty)||0)+(x.sku?' · SKU '+esc(x.sku):'')+'</p><div class="me-market-price">'+euro(x.price_eur_cents)+'</div><div class="me-market-actions"><a class="gold" href="'+esc(x.product_url)+'" target="_blank" rel="noopener" style="display:block;text-align:center;padding:9px;border-radius:9px;background:#c49a55;color:#061a25;font-weight:800">ACQUISTA SU RPG YACHT</a></div></article>';
+  return '<article class="me-market-card" style="'+(featured?'border-color:#e0b85f;box-shadow:0 0 0 1px rgba(224,184,95,.18) inset':'')+'"><span class="me-market-badge">✅ RPG YACHT · VENDITORE UFFICIALE'+(featured?' · EVENTO':'')+'</span><h3>🏪 '+esc(x.name)+'</h3><p>'+esc(x.category)+' · '+(x.availability_label?esc(x.availability_label):'Disponibili: '+Math.max(0,Number(x.stock_qty)||0))+(x.sku?' · SKU '+esc(x.sku):'')+'</p><div class="me-market-price">'+euro(x.price_eur_cents)+'</div><div class="me-market-actions"><a class="gold" href="'+esc(x.product_url)+'" target="_blank" rel="noopener" style="display:block;text-align:center;padding:9px;border-radius:9px;background:#c49a55;color:#061a25;font-weight:800">ACQUISTA SU RPG YACHT</a></div></article>';
  }).join("");
  return '<section class="me-market-card" style="grid-column:1/-1;border-color:#d6b575"><span class="me-market-badge">⚓ CATALOGO UFFICIALE RPG YACHT</span><h3>Prodotti reali disponibili a magazzino</h3><p>Questi articoli provengono dallo stock ufficiale RPG Yacht. Prezzo e disponibilità sono indicati in euro; l’acquisto viene completato sul sito RPG Yacht.</p><p class="me-market-status">'+(OFFICIAL_STORE.loading?"Aggiornamento catalogo…":OFFICIAL_STORE.status||"Stock ufficiale disponibile.")+'</p><div class="me-market-grid">'+cards+'</div></section>';
 }
