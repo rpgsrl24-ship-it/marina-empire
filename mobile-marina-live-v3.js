@@ -12,7 +12,7 @@ st.textContent=`
  body.me-ml3-active .stats,
  body.me-ml3-active #meCompactHud,
  body.me-ml3-active>.nav,
- body.me-ml3-active .shell>.nav{display:none!important}
+ body.me-ml3-active .shell>.nav,body.me-ml3-active #meMobileSheetBar,body.me-ml3-active .mobile-game-nav,body.me-ml3-active #meMobileMore{display:none!important}
  #marinas.me-ml3-ready{margin:0!important;padding:0 0 98px!important;background:linear-gradient(180deg,#041d2d 0%,#062a3d 48%,#031824 100%)!important}
  #marinas.me-ml3-ready> :not(#meMobileMarinaLivePremium){display:none!important}
  #meMobileMarinaLivePremium{display:flex!important;flex-direction:column;gap:9px;width:100%;margin:0;padding:0;color:#f6f3ea}
