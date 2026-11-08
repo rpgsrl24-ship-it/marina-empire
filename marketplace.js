@@ -49,6 +49,46 @@ document.head.appendChild(style);
 
 let mode="boats",marketFilter="all",seed=Math.floor(Date.now()/3600000);
 
+
+const OFFICIAL_STORE={client:null,items:[],loading:false,status:""};
+function officialStoreClient(){
+ if(OFFICIAL_STORE.client)return OFFICIAL_STORE.client;
+ if(!window.supabase?.createClient)return null;
+ OFFICIAL_STORE.client=window.supabase.createClient(
+  "https://zrdetqvnjmqkfyajxjgp.supabase.co",
+  "sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw",
+  {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}
+ );
+ return OFFICIAL_STORE.client;
+}
+async function refreshOfficialStore(){
+ const client=officialStoreClient();if(!client){OFFICIAL_STORE.status="Catalogo RPG Yacht non disponibile.";return render()}
+ OFFICIAL_STORE.loading=true;render();
+ try{
+  const {data,error}=await client.from("me_official_store_items")
+   .select("product_id,seller_name,name,sku,category,price_eur_cents,stock_qty,product_url,image_url,featured_event,active,updated_at")
+   .eq("active",true)
+   .gt("stock_qty",0)
+   .order("featured_event",{ascending:false,nullsFirst:false})
+   .order("name",{ascending:true});
+  if(error)throw error;
+  OFFICIAL_STORE.items=data||[];OFFICIAL_STORE.status="";
+ }catch(e){OFFICIAL_STORE.status=e?.message||"Catalogo RPG Yacht temporaneamente non disponibile."}
+ finally{OFFICIAL_STORE.loading=false;render()}
+}
+function officialStoreHTML(){
+ const current=window.MarinaEmpireWorldEvents?.current?.();
+ if(!OFFICIAL_STORE.items.length&&!OFFICIAL_STORE.loading)return "";
+ const items=[...OFFICIAL_STORE.items].sort((a,b)=>{
+  const ae=current?.id&&a.featured_event===current.id?1:0,be=current?.id&&b.featured_event===current.id?1:0;
+  return be-ae||String(a.name).localeCompare(String(b.name),"it");
+ });
+ const cards=items.map(x=>{
+  const featured=current?.id&&x.featured_event===current.id;
+  return '<article class="me-market-card" style="'+(featured?'border-color:#e0b85f;box-shadow:0 0 0 1px rgba(224,184,95,.18) inset':'')+'"><span class="me-market-badge">✅ RPG YACHT · VENDITORE UFFICIALE'+(featured?' · EVENTO':'')+'</span><h3>🏪 '+esc(x.name)+'</h3><p>'+esc(x.category)+' · Disponibili: '+Math.max(0,Number(x.stock_qty)||0)+(x.sku?' · SKU '+esc(x.sku):'')+'</p><div class="me-market-price">'+euro(x.price_eur_cents)+'</div><div class="me-market-actions"><a class="gold" href="'+esc(x.product_url)+'" target="_blank" rel="noopener" style="display:block;text-align:center;padding:9px;border-radius:9px;background:#c49a55;color:#061a25;font-weight:800">ACQUISTA SU RPG YACHT</a></div></article>';
+ }).join("");
+ return '<section class="me-market-card" style="grid-column:1/-1;border-color:#d6b575"><span class="me-market-badge">⚓ CATALOGO UFFICIALE RPG YACHT</span><h3>Prodotti reali disponibili a magazzino</h3><p>Questi articoli provengono dallo stock ufficiale RPG Yacht. Prezzo e disponibilità sono indicati in euro; l’acquisto viene completato sul sito RPG Yacht.</p><p class="me-market-status">'+(OFFICIAL_STORE.loading?"Aggiornamento catalogo…":OFFICIAL_STORE.status||"Stock ufficiale disponibile.")+'</p><div class="me-market-grid">'+cards+'</div></section>';
+}
 const REAL_MARKET={
  client:null,user:null,pass:null,listings:[],loading:false,status:"",initialized:false,
  productUrl:"https://rpgyacht.com/prodotto/marina-empire-%c2%b7-venditore-reale-%c2%b7-30-giorni/"
@@ -418,7 +458,7 @@ function render(){
  const root=document.getElementById("meMarketplaceApp");
  if(!root)return;
  const s=snap();
- root.innerHTML=headerHTML(s)+realMarketHTML()+eventMarketHTML(s)+marketPulseHTML(s)+demandHTML(s)+(mode==="boats"?boatsHTML(s):itemsHTML(s));
+ root.innerHTML=headerHTML(s)+officialStoreHTML()+realMarketHTML()+eventMarketHTML(s)+marketPulseHTML(s)+demandHTML(s)+(mode==="boats"?boatsHTML(s):itemsHTML(s));
  bind(root);
 }
 function boot(){
@@ -428,6 +468,7 @@ function boot(){
  window.addEventListener("marina-world-event",()=>{setTimeout(render,50);setTimeout(refreshEventMarket,100)});
  if(eventMarketActive())setTimeout(refreshEventMarket,250);
  setTimeout(refreshRealMarket,320);
+ setTimeout(refreshOfficialStore,380);
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
