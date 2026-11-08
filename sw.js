@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261108-eventmarket1";
+const CACHE="marina-empire-v20261108-eventmarket2";
 const CORE=[
  "./",
  "./index.html",
