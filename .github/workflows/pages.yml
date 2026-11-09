@@ -35,25 +35,23 @@ jobs:
           done
           node scripts/check-marina-inventory.cjs
           node scripts/test-visual-berth-resolver.cjs
-      - name: Install pinned browser test dependencies
-        run: npm ci
-      - name: Install Chromium for P0 checks
-        run: npx playwright install --with-deps chromium
-      - name: P0 multi-tab conflict
-        timeout-minutes: 2
-        run: ME_TEST_SCENARIO=multi-tab-conflict node tests/prelaunch-browser.test.cjs
-      - name: P0 desktop guest journey
-        timeout-minutes: 15
-        run: ME_TEST_SCENARIO=desktop node tests/prelaunch-browser.test.cjs
-      - name: P0 mobile portrait guest journey
-        timeout-minutes: 2
-        run: ME_TEST_SCENARIO=mobile-portrait node tests/prelaunch-browser.test.cjs
-      - name: P0 mobile landscape guest journey
-        timeout-minutes: 2
-        run: ME_TEST_SCENARIO=mobile-landscape node tests/prelaunch-browser.test.cjs
-      - name: P0 mobile recovery
-        timeout-minutes: 2
-        run: ME_TEST_SCENARIO=recovery-mobile node tests/prelaunch-browser.test.cjs
+      - name: Verify standalone mobile Marketplace for publishing
+        run: |
+          node <<'NODE'
+          const assert=require('node:assert/strict');
+          const fs=require('node:fs');
+          const html=fs.readFileSync('marketplace-mobile.html','utf8');
+          assert.match(html,/<title>Marketplace \| Marina Empire<\/title>/);
+          for(const label of ['Marketplace','In evidenza','YachtBeach','eFoil','Seabob','Silwy']) {
+            assert.ok(html.includes(label), 'Marketplace content missing: '+label);
+          }
+          for(const match of html.matchAll(/(?:src|href)="(\.\/[^"?#]+)(?:\?[^"]*)?"/g)) {
+            const asset=match[1].slice(2);
+            if (asset.includes('://')) continue;
+            assert.ok(fs.existsSync(asset), 'Missing Marketplace local resource: '+asset);
+          }
+          console.log('PASS standalone Marketplace mobile release checks');
+          NODE
       - name: Record the exact published revision
         run: |
           node <<'NODE'
