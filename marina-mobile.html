@@ -16,7 +16,7 @@
 <header class="head"><div class="top"><a class="round" href="./mobile-home.html?v=20261109-fast1">☰</a><div class="brand"><b>⚓ MARINA EMPIRE</b><small>IL GESTIONALE NAUTICO ONLINE</small></div><div class="round">👨‍✈️</div></div><div class="hud"><div><span>🪙 MONETE</span><b id="coins">—</b></div><div><span>⭐ PRESTIGIO</span><b id="prestige">—</b></div><div><span>⛽ CARBURANTE</span><b id="fuel">—</b></div></div><div class="hero"><i>⚓</i><div><h1>Base – La tua Marina</h1><p>Gestisci il tuo porto, i pontili e i servizi.</p></div></div></header>
 <nav class="tabs"><button class="on" data-tab="overview">🏠 Panoramica</button><button data-tab="pontoons">🛥 Pontili</button><button data-tab="services">🛠 Servizi</button><button data-tab="structures">🏢 Strutture</button><button data-tab="upgrade">⬆ Upgrade</button></nav>
 <section class="selector"><label>MARINA SELEZIONATA</label><select id="marinaSelect"></select></section>
-<section class="panorama"><img src="./anteprima/assets/render-2026/marine.jpg" alt="Marina al tramonto"><span id="ownedBadge" class="badge">—</span><div class="marina-name"><strong id="marinaName">—</strong><small id="marinaStatus">—</small></div></section>
+<section class="panorama"><img id="marinaHeroImg" src="./anteprima/assets/render-2026/marine.jpg" alt="Marina"><span id="ownedBadge" class="badge">—</span><div class="marina-name"><strong id="marinaName">—</strong><small id="marinaStatus">—</small></div></section>
 <section class="grid"><article class="card"><h3>⚓ Livello Marina</h3><p id="levelLabel">—</p><div class="bar"><i id="levelBar"></i></div><div class="stat"><span>Livello sviluppo</span><b id="level">—</b></div><div class="stat"><span>Operatività</span><b id="ops">—</b></div><div class="stat"><span>Servizio principale</span><b id="serviceMain">—</b></div></article><article class="card"><h3>🛥 Pontili e ormeggi</h3><div class="stat"><span>Pontili attivi</span><b id="pontoons">—</b></div><div class="stat"><span>Ormeggi totali</span><b id="capacity">—</b></div><div class="stat"><span>Disponibili</span><b id="available">—</b></div><div class="stat"><span>Occupati</span><b id="occupied">—</b></div></article></section>
 <section class="services">
 <button class="service action" id="refuel" type="button"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><b>⛽ Rifornimento</b></button>
@@ -32,7 +32,7 @@
 <section id="upgradePanel" class="panel"><h3>⬆ Upgrade</h3><p id="upgradeText"></p><button class="btn gold" id="goOffice">GESTIONE AVANZATA</button></section>
 </main><div id="toast" class="toast hide"></div>
 <nav class="bottom"><a href="./mobile-home.html?v=20261109-fast1"><b>⌂</b>HOME</a><a href="./missions-mobile.html?v=20261109-missionsstandalone3"><b>◉</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a class="on" href="./marina-mobile.html?v=20261109-marina1"><b>⚓</b>MARINA</a><a href="./map-mobile.html?v=20261109-mapstandalone5"><b>📍</b>MAPPA</a><a href="./marketplace-mobile.html?v=20261109-market12"><b>🛒</b>MARKET</a></nav>
-<script src="./local-save-context.js"></script><script src="./mobile-marina-lite-v1.js?v=20261109-marinalite1"></script>
+<script src="./local-save-context.js"></script><script src="./marina-photos-v1.js?v=20261109-photos1"></script><script src="./mobile-marina-lite-v1.js?v=20261109-marinalite1"></script>
 <script>
 const fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
 function toastMsg(t){toast.textContent=t;toast.classList.remove("hide");clearTimeout(window.__tt);window.__tt=setTimeout(()=>toast.classList.add("hide"),2300)}
@@ -42,7 +42,7 @@ function render(){
  coins.textContent=fmt(g.coins);prestige.textContent=fmt(g.prestige);
  fuel.textContent=Math.round((Number(g.fuel)||0)/(Number(s.boat.tank)||1)*100)+"%";
  marinaSelect.innerHTML=api.ports.map(p=>'<option value="'+p.id+'" '+(p.id===s.id?'selected':'')+'>'+p.name+'</option>').join("");
- marinaName.textContent=s.name;ownedBadge.textContent=s.id==="rose"?"BASE RPG":s.owned?"TUA MARINA":"MARINA VISITATA";
+ marinaName.textContent=s.name;window.MarinaEmpireMarinaPhotos?.apply(marinaHeroImg,s.id);ownedBadge.textContent=s.id==="rose"?"BASE RPG":s.owned?"TUA MARINA":"MARINA VISITATA";
  marinaStatus.textContent=(g.port===s.id?"📍 Yacht presente · ":"")+"Livello "+s.level+" · "+s.oper.label;
  level.textContent="Liv. "+s.level;ops.textContent=s.oper.level+"/5";levelLabel.textContent=s.oper.label;serviceMain.textContent=s.oper.service;
  levelBar.style.width=Math.min(100,s.level*20)+"%";
