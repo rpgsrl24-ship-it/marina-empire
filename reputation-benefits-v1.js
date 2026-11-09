@@ -64,6 +64,6 @@ function missionBonus(){
  const bonus=Math.round(base*b.mission/100);if(bonus<=0)return;
  st.coins=(Number(st.coins)||0)+bonus;st.repMissionBonus[key]=bonus;save();msg("Bonus reputazione missione: +"+bonus.toLocaleString("it-IT")+" crediti");
 }
-function boot(){draw();wrapRefuel();setInterval(()=>{draw();wrapRefuel();missionBonus()},2500);window.addEventListener("marina-empire-updated",()=>setTimeout(draw,60))}
+function visible(){const m=document.getElementById("marinas");return !document.hidden&&m&&!m.classList.contains("hide")} function boot(){draw();wrapRefuel();setInterval(()=>{wrapRefuel();missionBonus();if(visible())draw()},15000);window.addEventListener("marina-empire-updated",()=>{if(visible())setTimeout(draw,150)})}
 window.MarinaEmpireReputationBenefits={benefits,level,rep};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",boot,{once:true}):boot();
 })();
