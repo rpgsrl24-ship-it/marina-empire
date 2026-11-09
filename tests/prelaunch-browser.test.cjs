@@ -123,6 +123,13 @@ async function trial(browser,origin,name,viewport,mobile) {
       await goTab(page,'credits',true);
       await page.waitForFunction(()=>!document.getElementById('credits')?.classList.contains('hide'));
       await goTab(page,'home',true);
+      await goTab(page,'fleet',true);
+      await page.waitForFunction(()=>document.body.classList.contains('me-fleet4-active'));
+      assert.equal(await page.locator('#meFleetPremiumTop').isVisible(),true,name+': premium Fleet 4/12 is visible on mobile');
+      assert.ok((await page.locator('#meFleetPremiumTop').innerText()).includes('FLOTTA'),name+': Fleet premium title is rendered');
+      assert.ok((await page.locator('#meFleetPremiumTop').innerText()).includes('4/12'),name+': Fleet page number 4/12 is rendered');
+      assert.equal(await page.locator('.mf4-bottom').isVisible(),true,name+': premium Fleet bottom navigation is visible');
+      await goTab(page,'home',true);
       await goTab(page,'marinas',true);
       await page.waitForFunction(()=>document.body.classList.contains('me-ml3-active'));
       assert.equal(await page.locator('#meMobileMarinaLivePremium').isVisible(),true,name+': premium Marina Live 2/12 is visible on mobile');
