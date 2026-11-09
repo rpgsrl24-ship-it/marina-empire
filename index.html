@@ -4129,11 +4129,14 @@ button.addEventListener("click",async()=>{
   try{if(typeof state!=="undefined")document.getElementById("playerName").value=state.name||""}catch(_){}
  });
 })();
-</script><script id="me-pwa-register-v1">
+</script><script id="me-pwa-register-v2">
 (()=>{
  if(!("serviceWorker" in navigator))return;
- window.addEventListener("load",()=>{
-  navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(()=>{});
+ window.addEventListener("load",async()=>{
+  try{
+   const reg=await navigator.serviceWorker.register("./sw.js?v=20261109-cleanmobile1",{scope:"./",updateViaCache:"none"});
+   await reg.update();
+  }catch(_){}
  });
 })();
 </script><script id="me-pwa-install-v1">
