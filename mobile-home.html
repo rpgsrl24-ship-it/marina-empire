@@ -1,0 +1,39 @@
+<!doctype html><html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#04131f"><title>Marina Empire Mobile</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#03121d;color:#fff;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}a,button{font:inherit}.page{width:min(620px,100%);margin:auto;min-height:100vh;padding:10px 10px 92px;background:radial-gradient(circle at 50% -10%,#0f4770 0,#06283d 28%,#03131e 62%,#020c13 100%)}
+.top{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:6px 4px 8px}.brand b{display:block;font:800 22px Georgia,serif;color:#f0d08f;letter-spacing:.04em}.brand small{display:block;color:#a9bdc7;font-size:7px;font-weight:900;letter-spacing:.1em}.menu{font-size:26px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}.stat{padding:8px 5px;border:1px solid #385b69;border-radius:12px;background:#08273a;text-align:center}.stat span{display:block;color:#8fa9b4;font-size:6px;font-weight:900}.stat b{font-size:11px}
+.live{padding:13px;border:1px solid #6b5428;border-radius:18px;background:linear-gradient(180deg,#09283a,#061d2b);margin-bottom:10px}.live.red{border-color:#6b2530;background:linear-gradient(180deg,#351019,#1c0910)}.eyebrow{color:#c7a763;font-size:7px;font-weight:950}.live h3{margin:4px 0 2px;font-size:14px}.live p{margin:0;color:#9cb0b9;font-size:8px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:8px 0 10px}.quick a{min-height:105px;padding:10px 7px;border:1px solid #5e5337;border-radius:16px;background:#06263b;color:#f5e7be;text-decoration:none;display:flex;flex-direction:column;justify-content:space-between;font-size:7px;font-weight:950}.quick b{font-size:28px}.badge{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#b7881c;color:#fff;font-size:10px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.tile{min-height:148px;padding:10px 8px;border:1px solid #4b4a37;border-radius:16px;background:linear-gradient(180deg,#08283d,#041b2a);color:#fff;text-decoration:none;display:flex;flex-direction:column;justify-content:space-between}.tile strong{font-size:8px;line-height:1.2}.tile b{font-size:24px}.tile.img{background:linear-gradient(180deg,#00101944,#001019aa),url("./anteprima/assets/render-2026/marine.jpg") center/cover}.tile.map{background:linear-gradient(180deg,#00101944,#001019aa),url("./anteprima/assets/render-2026/mappa.jpg") center/cover}
+.progress{margin-top:11px;padding:12px;border:1px solid #465a61;border-radius:18px;background:#061f2e}.progress small{color:#718d99;font-size:7px;font-weight:900}.progress strong{display:block;margin-top:4px;color:#d8b866;font-size:12px}.progress p{margin:4px 0 0;color:#90a4ad;font-size:8px}
+.bottom{position:fixed;left:7px;right:7px;bottom:7px;max-width:606px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:5px;border:1px solid #4a5560;border-radius:16px;background:#03111cf4;z-index:99}.bottom a{min-height:58px;border-radius:10px;color:#fff;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:6px;font-weight:900}.bottom a b{font-size:19px;margin-bottom:3px}.bottom .on{background:#153e52;border:1px solid #b18d43;color:#f1d69c}
+@media(max-width:430px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}.quick{grid-template-columns:repeat(2,1fr)}}
+</style></head><body><main class="page">
+<div class="top"><div class="brand"><b>MARINA EMPIRE</b><small>THE NAUTICAL BUSINESS GAME</small></div><div class="menu">☰</div></div>
+<div class="stats"><div class="stat"><span>MONETE</span><b id="coins">10.000</b></div><div class="stat"><span>PRESTIGIO</span><b id="prestige">0</b></div><div class="stat"><span>CARBURANTE</span><b id="fuel">100%</b></div><div class="stat"><span>STATO</span><b id="condition">100%</b></div></div>
+<section class="live"><div class="eyebrow">🌍 EVENTO MONDO</div><h3>Porto tranquillo</h3><p>Occasioni acquisto migliori · evento dinamico Marina Empire</p></section>
+<section class="live red"><div class="eyebrow">🚨 EMERGENZA LIVE</div><h3>Manovra critica</h3><p>Yacht in ingresso richiede supporto immediato all'ormeggio.</p></section>
+<nav class="quick"><a href="./?view=missions&mobileLegacy=1"><span class="badge">1</span><b>📋</b>PRENDI INCARICO</a><a href="./?view=missions&mobileLegacy=1"><span class="badge">2</span><b>🎯</b>NUOVA MISSIONE</a><a href="./?view=missions&mobileLegacy=1"><span class="badge">3</span><b>🤝</b>CONTRATTI & CHARTER</a><a href="./?view=office&mobileLegacy=1"><span class="badge">4</span><b>🛠</b>CANTIERE & REFIT</a></nav>
+<section class="grid">
+<a class="tile" href="./?view=fleet&mobileLegacy=1"><b>🛥️</b><strong>FLOTTA</strong></a>
+<a class="tile" href="./?view=marinas&mobileLegacy=1"><b>⚓</b><strong>LA TUA MARINA</strong></a>
+<a class="tile map" href="./?view=map&mobileLegacy=1"><b>🗺️</b><strong>MAPPA</strong></a>
+<a class="tile img" href="./?view=office&mobileLegacy=1"><b>🌅</b><strong>EQUIPAGGIO</strong></a>
+<a class="tile" href="./?view=missions&mobileLegacy=1"><b>🤝</b><strong>CONTRATTI / CHARTER</strong></a>
+<a class="tile" href="./marketplace-mobile.html?v=20261109-market12"><b>🛒</b><strong>MARKETPLACE</strong></a>
+<a class="tile" href="./?view=community&mobileLegacy=1"><b>💬</b><strong>COMMUNITY</strong></a>
+<a class="tile" href="./?view=profile&mobileLegacy=1"><b>📊</b><strong>PROFILO / STAT.</strong></a>
+<a class="tile img" href="./?view=credits&mobileLegacy=1"><b>💳</b><strong>STORE / CREDITI</strong></a>
+<a class="tile" href="./?view=office&mobileLegacy=1"><b>🔧</b><strong>CANTIERE / REFIT</strong></a>
+<a class="tile" href="./?view=office&mobileLegacy=1"><b>◇</b><strong>DIREZIONE</strong></a>
+<a class="tile" href="./?view=headquarters&mobileLegacy=1"><b>🏝️</b><strong>BASE RPG</strong></a>
+</section>
+<section class="progress"><small>PROGRESSIONE & OBIETTIVI</small><strong>Completa la prima missione</strong><p>0 / 1 missione</p></section>
+<nav class="bottom"><a class="on" href="./mobile-home.html"><b>⌂</b>HOME</a><a href="./?view=map&mobileLegacy=1"><b>🗺️</b>MAPPA</a><a href="./?view=missions&mobileLegacy=1"><b>🎯</b>MISSIONI</a><a href="./?view=fleet&mobileLegacy=1"><b>🛥️</b>FLOTTA</a><a href="./?view=home&mobileLegacy=1"><b>☰</b>ALTRO</a></nav>
+</main>
+<script src="./local-save-context.js"></script><script>
+(()=>{try{const c=window.MarinaLocalSaveContext;let h=c&&c.capture(),g=h&&c.readGame(h);if(!g){c&&c.select(null);h=c&&c.capture();g=h&&c.readGame(h)}if(g){coins.textContent=Number(g.coins||0).toLocaleString("it-IT");prestige.textContent=Number(g.prestige||0).toLocaleString("it-IT");const tank=Number(g.tank||g.fuelMax||300),f=Number(g.fuel||0);fuel.textContent=Math.max(0,Math.min(100,Math.round(tank?f/tank*100:0)))+"%";condition.textContent=Math.max(0,Math.min(100,Math.round(Number(g.condition??100))))+"%";}}catch(_){}})();
+</script></body></html>
