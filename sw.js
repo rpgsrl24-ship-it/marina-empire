@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261109-map-standalone3";
+const CACHE="marina-empire-v20261109-map-standalone4";
 const CORE=[
  "./",
  "./index.html",
