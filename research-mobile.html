@@ -24,7 +24,7 @@ let cat="technology";
 function toastMsg(t){toast.textContent=t;toast.classList.remove("hide");clearTimeout(window.__rt);window.__rt=setTimeout(()=>toast.classList.add("hide"),2300)}
 function render(){
  const api=window.MarinaEmpireResearchLite;if(!api)return;const s=api.snapshot(),g=s.game;
- coins.textContent=fmt(g.coins);prestige.textContent=fmt(g.prestige);fuel.textContent=Math.round((Number(g.fuel)||0)/4)+"%";
+ coins.textContent=fmt(g.coins);prestige.textContent=fmt(g.prestige);const tanks={voyager:400,open:300,yacht:550,yacht14:700,yacht20:1100,yacht30:1700,luna:900};const tank=tanks[g.boat]||400;fuel.textContent=Math.max(0,Math.min(100,Math.round((Number(g.fuel)||0)/tank*100)))+"%";
  labBar.style.width=Math.round(s.labProgress)+"%";labPct.textContent=Math.round(s.labProgress)+"%";labLevel.textContent="Liv. "+s.level;
  const filtered=s.projects.filter(p=>p.category===cat);
  projects.innerHTML=filtered.map(p=>{
