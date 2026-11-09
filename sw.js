@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261109-marketforce10";
+const CACHE="marina-empire-v20261109-cleanmobile1";
 const CORE=[
  "./",
  "./index.html",
@@ -27,13 +27,17 @@ self.addEventListener("fetch",event=>{
  const url=new URL(req.url);
  if(url.origin!==self.location.origin)return;
 
- if(req.mode==="navigate"){
+ const isFreshAsset=req.mode==="navigate"||/\.(?:html?|js|css)$/i.test(url.pathname);
+
+ if(isFreshAsset){
   event.respondWith(
-   fetch(req).then(res=>{
-    const copy=res.clone();
-    caches.open(CACHE).then(cache=>cache.put("./index.html",copy)).catch(()=>{});
+   fetch(req,{cache:"no-store"}).then(res=>{
+    if(res&&res.ok){
+     const copy=res.clone();
+     caches.open(CACHE).then(cache=>cache.put(req.mode==="navigate"?"./index.html":req,copy)).catch(()=>{});
+    }
     return res;
-   }).catch(()=>caches.match("./index.html"))
+   }).catch(()=>req.mode==="navigate"?caches.match("./index.html"):caches.match(req))
   );
   return;
  }
