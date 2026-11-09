@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261109-marketroute8";
+const CACHE="marina-empire-v20261109-pageaudit1";
 const CORE=[
  "./",
  "./index.html",
