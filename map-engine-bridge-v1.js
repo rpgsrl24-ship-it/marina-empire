@@ -27,6 +27,8 @@ function portList(){
     return {id:p.id,name:p.name,x:Number((point[0]/10).toFixed(3)),y:Number((point[1]/8.5).toFixed(3))};
   });
 }
+const cruiseByBoat={voyager:18,open:26,yacht:22,yacht14:24,yacht20:20,yacht30:17,luna:14};
+function cruiseKnots(id){return Number(cruiseByBoat[id])||18}
 function preview(dest){
   const s=safeState(),target=ports.find(p=>p.id===dest);
   if(!target||dest===s.port)return {ok:false,reason:"Seleziona una marina diversa dalla posizione attuale"};
@@ -45,6 +47,8 @@ function preview(dest){
     destinationName:target.name,
     distance:Number(plan?.distance)||0,
     fuel:Number(plan?.fuel)||0,
+    cruiseKnots:cruiseKnots(s.boat),
+    etaMinutesReal:Math.max(1,Math.round(((Number(plan?.distance)||0)/cruiseKnots(s.boat))*60)),
     stops:Array.isArray(plan?.stops)?plan.stops.map(id=>({id,name:port(id).name})):[],
     route:projectedRoute(s.port,dest),
     mission:mission?{
@@ -64,7 +68,7 @@ function tripSnapshot(){
   if(!t)return null;
   const duration=Math.max(1,Number(t.sec)||1),remaining=Math.max(0,(Number(t.until)||Date.now())-Date.now());
   const progress=Math.max(0,Math.min(1,1-remaining/(duration*1000)));
-  const origin=String(t.origin||s.port),dest=String(t.dest||s.port);
+  const origin=String(t.origin||s.port),dest=String(t.dest||s.port),distance=seaMiles(origin,dest),knots=cruiseKnots(s.boat);
   return {
     id:String(t.id||""),
     name:String(t.mission?.name||"Missione attiva"),
@@ -75,6 +79,9 @@ function tripSnapshot(){
     reward:Number(t.mission?.reward)||0,
     prestige:Number(t.mission?.prestige)||0,
     progress,
+    distance:Number(distance)||0,
+    cruiseKnots:knots,
+    etaMinutesReal:Math.max(1,Math.round(((Number(distance)||0)*(1-progress)/knots)*60)),
     remainingSec:Math.max(0,Math.ceil(remaining/1000)),
     route:projectedRoute(origin,dest)
   };
