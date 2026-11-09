@@ -102,7 +102,7 @@ function drawCareer(){
  box.querySelector("[data-lw-milestone]")?.addEventListener("click",e=>claimMilestone(Number(e.currentTarget.dataset.lwMilestone)));
 }
 function draw(){drawContracts();drawCareer();ensureTraffic()}
-function boot(){draw();setInterval(draw,1000);window.addEventListener("marina-empire-updated",()=>setTimeout(draw,40));document.addEventListener("click",e=>{if(e.target.closest("[data-tab='missions'],[data-mobile-tab='missions'],[data-mm5-go='missions'],[data-mf4-go='missions']"))setTimeout(draw,80)})}
+function visible(){const m=document.getElementById("missions");return !document.hidden&&m&&!m.classList.contains("hide")} function boot(){draw();setInterval(()=>{if(visible())draw()},10000);window.addEventListener("marina-empire-updated",()=>{if(visible())setTimeout(draw,120)});document.addEventListener("click",e=>{if(e.target.closest("[data-tab='missions'],[data-mobile-tab='missions'],[data-mm5-go='missions'],[data-mf4-go='missions']"))setTimeout(draw,120)})}
 window.MarinaEmpireLivingWorld={offers,rank:rankData,active};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",boot,{once:true}):boot();
 })();
