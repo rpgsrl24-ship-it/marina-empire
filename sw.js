@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261109-chain1";
+const CACHE="marina-empire-v20261109-dra1";
 const CORE=[
  "./",
  "./index.html",
