@@ -2551,7 +2551,7 @@ const worldWeather=window.MarinaEmpireWorldEvents?.weatherFor?.(state.port)||nul
 const weather=worldWeather?simulatedWeatherById(worldWeather.id):simulatedWeatherFor(m.id,nextVoyageSerial);
 const missionDuration=Number(m.sec)*(worldWeather?.duration||weather.duration);const legSeconds=Math.max(10,Math.ceil((Number.isFinite(missionDuration)&&missionDuration>0?missionDuration:60)/(plan.legs.length-1)));
 if(!meAtomicPersist(()=>{state.coins-=m.cost;state.fuel-=first;state.boat=m.boat;state.voyageSerial=nextVoyageSerial;state.trip={voyageId:state.voyageSerial,id:m.id,origin:state.port,dest:m.dest,legs:plan.legs,legIndex:0,legSeconds,sec:legSeconds,fuelRate:burn,weather:weather.id,weatherWear:(worldWeather?.wear||weather.wear),weatherLabel:(worldWeather?.label||weather.label),mission:m,until:Date.now()+legSeconds*1000}}))return notice("Partenza annullata: salvataggio non confermato.");
-window.MarinaEmpireTraffic?.track("play_start",true);window.MarinaEmpireAuthenticatedActivity?.track("play_start");showTab("map");render();voyageHeartbeat();}
+window.MarinaEmpireTraffic?.track("play_start",true);window.MarinaEmpireAuthenticatedActivity?.track("play_start");if(!window.__ME_ENGINE_QUIET__){showTab("map");render();voyageHeartbeat();}}
 window.MarinaEmpireEmergencyNavigation={
  start(em){
   if(state.trip)return {ok:false,message:"Hai già una navigazione in corso."};
