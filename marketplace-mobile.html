@@ -1,0 +1,56 @@
+<!doctype html><html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#063c67"><title>Marketplace | Marina Empire</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#eaf6fb;color:#0a2940;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}button,input,a{font:inherit}a{text-decoration:none;color:inherit}
+.page{width:min(620px,100%);margin:auto;min-height:100vh;background:linear-gradient(180deg,#073d68 0,#0b73aa 24%,#eaf6fb 24%,#f8fcfe 100%);padding-bottom:92px}
+.hero{padding:10px 10px 14px;background:linear-gradient(180deg,#003d6e99,#005e9dcc),url("./anteprima/assets/render-2026/marine.jpg") center/cover;color:white}
+.top{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}.avatar{width:58px;height:58px;border-radius:50%;border:3px solid #fff;background:linear-gradient(#123a55,#061e2b);display:grid;place-items:center;font-size:29px;position:relative}.lvl{position:absolute;bottom:-8px;left:6px;right:6px;background:#113b5e;border:2px solid #fff;border-radius:999px;text-align:center;font-size:7px;font-weight:900}.brand{text-align:center}.brand b{font:800 22px Georgia,serif;letter-spacing:.05em}.brand small{display:block;font-size:6.5px;font-weight:900;letter-spacing:.1em}.menu{font-size:30px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);margin:10px auto 8px;max-width:490px;border:1px solid #76c3ee;border-radius:999px;overflow:hidden;background:#0a4b78e6}.stats div{padding:8px 5px;text-align:center;border-right:1px solid #76c3ee;font-size:7px;font-weight:900}.stats div:last-child{border-right:0}.stats b{font-size:13px}.title{text-align:center}.title h1{margin:3px 0 0;font-size:31px;line-height:1}.title p{margin:5px 0 0;font-size:9px}
+.tabs{display:grid;grid-template-columns:1.25fr 1.05fr .8fr .9fr;gap:6px;margin-top:11px}.tabs a,.tabs button{min-height:45px;border:1px solid #71cff3;border-radius:999px;background:#0a4b77;color:#fff;font-size:8px;font-weight:950;display:flex;align-items:center;justify-content:center}.tabs .active{background:linear-gradient(180deg,#159df3,#0869da);box-shadow:0 0 14px #50d8ff}.tabs .sell{background:linear-gradient(180deg,#f9d45f,#c7911b);color:#4d3300;border-color:#ffde78}
+.main{padding:10px}.search{display:grid;grid-template-columns:1fr 52px;gap:7px}.search input{min-height:50px;padding:10px 14px;border:2px solid #8fc8e8;border-radius:17px;background:#fff;color:#123;font-size:16px}.search button{border:2px solid #8fc8e8;border-radius:17px;background:#fff;font-size:20px}
+.cats{display:flex;gap:7px;overflow-x:auto;margin-top:9px;padding-bottom:3px;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}.cat{flex:0 0 91px;min-height:77px;border:1px solid #abcde0;border-radius:14px;background:linear-gradient(#fff,#e8f4f9);color:#0b2b42;font-size:7px;font-weight:950}.cat b{display:block;font-size:23px;margin-bottom:4px}
+.sec{margin-top:11px}.sec-h{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:13px;background:linear-gradient(90deg,#f7d256,#fff0b4 72%,transparent);font-size:8px}.sec-h strong{font-size:16px}.sec-h span{font-weight:950;color:#184f91}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:7px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:7px}.card{overflow:hidden;border:1px solid #bad5e4;border-radius:14px;background:#fff;box-shadow:0 4px 14px #0d487020}.img{height:110px;background:url("./anteprima/assets/render-2026/hero-yacht.jpg") center/cover}.card:nth-child(2) .img{background-image:url("./anteprima/assets/render-2026/charter.jpg")}.card:nth-child(3) .img{background-image:url("./anteprima/assets/render-2026/flotta.jpg")}.card:nth-child(4) .img{background-image:url("./anteprima/assets/render-2026/marine.jpg")}.body{padding:7px}.tag{display:inline-block;margin-bottom:4px;padding:3px 6px;border-radius:7px;background:#0d5fb8;color:#fff;font-size:5.7px;font-weight:950}.tag.used{background:#d73931}.card h3{margin:0;font-size:10px;line-height:1.25}.price{margin-top:4px;color:#0c3193;font-size:14px;font-weight:950}.meta{margin-top:3px;color:#506d7c;font-size:6.5px}
+.banners{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}.banner{min-height:107px;padding:12px;border-radius:15px;color:#fff;display:flex;align-items:flex-end;background:linear-gradient(90deg,#002d52b5,#002d523b),url("./anteprima/assets/render-2026/charter.jpg") center/cover}.banner:nth-child(2){background-image:linear-gradient(90deg,#002d52b5,#002d523b),url("./anteprima/assets/render-2026/marine.jpg")}.banner strong{font-size:18px;display:block}.banner small{font-size:7px}
+.bottom{position:fixed;left:7px;right:7px;bottom:7px;max-width:606px;margin:auto;z-index:99;display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:5px;border-radius:16px;background:#06243af5;border:1px solid #58c1eb;box-shadow:0 8px 24px #0008}.bottom a{min-height:53px;border-radius:10px;color:#fff;font-size:5.8px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center}.bottom a b{font-size:18px;margin-bottom:3px}.bottom .active{background:linear-gradient(180deg,#1ccaff,#0768f3);box-shadow:0 0 12px #4addff}
+@media(max-width:430px){.tabs{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(2,1fr);border-radius:15px}.stats div:nth-child(2){border-right:0}.grid3{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}.banners{grid-template-columns:1fr}.title h1{font-size:28px}}
+</style></head><body>
+<main class="page">
+<section class="hero">
+<div class="top"><div class="avatar">👨‍✈️<span class="lvl" id="level">Lv. 1</span></div><div class="brand"><b>MARINA EMPIRE®</b><small>THE NAUTICAL BUSINESS GAME</small></div><div class="menu">☰</div></div>
+<div class="stats"><div>🪙 <b id="coins">10.000</b></div><div>⭐ <b id="prestige">0</b></div><div>⛽ <b id="fuel">100%</b></div><div>🛠 <b id="condition">100%</b></div></div>
+<div class="title"><h1>🛒 Marketplace</h1><p>Compra · Vendi · Scambia · Equipaggia la tua flotta</p></div>
+<div class="tabs"><a class="active" href="./marketplace-mobile.html">🛒 Marketplace</a><a href="./?view=marketplace&market=mine">🏷 I miei annunci</a><a class="sell" href="./?view=marketplace&market=sell">＋ Vendi</a><button type="button">♡ Preferiti</button></div>
+</section>
+<section class="main">
+<div class="search"><input id="search" placeholder="Cerca barche, accessori, water toys…"><button type="button">☷</button></div>
+<div class="cats"><button class="cat"><b>🛥️</b>IMBARCAZIONI</button><button class="cat"><b>🚤</b>PWC</button><button class="cat"><b>🏄</b>EFOIL</button><button class="cat"><b>🛟</b>WATER TOYS</button><button class="cat"><b>⚙️</b>ACCESSORI</button><button class="cat"><b>⚓</b>POSTI BARCA</button><button class="cat"><b>🏷️</b>OFFERTE</button></div>
+<section class="sec"><div class="sec-h"><strong>⭐ In evidenza</strong><span>Vedi tutti ›</span></div><div class="grid3">
+<article class="card"><div class="img"></div><div class="body"><span class="tag">RPG Yacht</span><h3>Piattaforma YachtBeach 4 × 3 m con piscina</h3><div class="price">€ 3.000</div><div class="meta">Nuovo</div></div></article>
+<article class="card"><div class="img"></div><div class="body"><span class="tag used">Usato</span><h3>eFoil – Ottime condizioni</h3><div class="price">€ 4.990</div><div class="meta">Usato</div></div></article>
+<article class="card"><div class="img"></div><div class="body"><span class="tag">RPG Yacht</span><h3>Seabob F5 S</h3><div class="price">€ 11.900</div><div class="meta">Nuovo</div></div></article>
+</div></section>
+<section class="sec"><div class="sec-h"><strong>📍 Annunci vicino alla tua marina</strong><span>Rimini – Darsena ›</span></div><div class="grid4">
+<article class="card"><div class="img"></div><div class="body"><h3>Prestige 42</h3><div class="price">€ 320.000</div><div class="meta">📍 Rimini (RN)</div></div></article>
+<article class="card"><div class="img"></div><div class="body"><h3>PWC GTX 300</h3><div class="price">€ 15.900</div><div class="meta">📍 Rimini (RN)</div></div></article>
+<article class="card"><div class="img"></div><div class="body"><h3>Passerella inox</h3><div class="price">€ 1.450</div><div class="meta">📍 Rimini (RN)</div></div></article>
+<article class="card"><div class="img"></div><div class="body"><h3>Bicchieri Silwy (set 4)</h3><div class="price">€ 59,90</div><div class="meta">📍 Rimini (RN)</div></div></article>
+</div></section>
+<div class="banners"><a class="banner" href="./weekend-water-toys.html"><div><strong>Weekend Water Toys</strong><small>Le migliori offerte per il tuo divertimento in mare</small></div></a><a class="banner" href="./evento-mondo.html"><div><strong>Eventi dal mondo</strong><small>Fiere, regate, novità e lanci dal settore nautico</small></div></a></div>
+</section>
+<nav class="bottom"><a href="./?view=home"><b>⌂</b>HOME</a><a href="./?view=marinas"><b>⚓</b>MARINE</a><a href="./?view=missions"><b>🎯</b>MISSIONI</a><a class="active" href="./marketplace-mobile.html"><b>🛒</b>MARKET</a><a href="./?view=fleet"><b>🛥️</b>FLOTTA</a><a href="./?view=community"><b>👥</b>COMMUNITY</a><a href="./?view=profile"><b>👤</b>PROFILO</a></nav>
+</main>
+<script src="./local-save-context.js"></script>
+<script>
+(()=>{try{
+ const ctx=window.MarinaLocalSaveContext;let h=ctx&&ctx.capture(),g=h&&ctx.readGame(h);
+ if(!g){try{ctx&&ctx.select(null);h=ctx&&ctx.capture();g=h&&ctx.readGame(h)}catch(_){}}
+ if(g){
+  coins.textContent=Number(g.coins||0).toLocaleString("it-IT");prestige.textContent=Number(g.prestige||0).toLocaleString("it-IT");
+  level.textContent="Lv. "+(1+Math.floor(Math.max(0,Number(g.prestige||0))/200));
+  const tank=Number(g.tank||g.fuelMax||300),f=Number(g.fuel||0);fuel.textContent=Math.max(0,Math.min(100,Math.round(tank?f/tank*100:0)))+"%";
+  condition.textContent=Math.max(0,Math.min(100,Math.round(Number(g.condition??100))))+"%";
+ }
+}catch(_){}})();
+</script></body></html>
