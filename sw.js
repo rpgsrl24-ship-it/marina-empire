@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261109-market12";
+const CACHE="marina-empire-v20261109-missions4";
 const CORE=[
  "./",
  "./index.html",
