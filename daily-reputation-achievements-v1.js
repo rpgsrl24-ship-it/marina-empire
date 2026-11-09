@@ -77,6 +77,6 @@ function drawAch(){
  box.querySelectorAll("[data-dra-ach]").forEach(b=>b.addEventListener("click",()=>claimAch(b.dataset.draAch)));
 }
 function draw(){ensureBoxes();drawDaily();drawRep();drawAch()}
-function boot(){draw();setInterval(draw,3000);window.addEventListener("marina-empire-updated",()=>setTimeout(draw,60));document.addEventListener("click",e=>{if(e.target.closest("[data-tab='marinas'],[data-tab='profile'],[data-mobile-more-tab='marinas'],[data-mobile-more-tab='profile']"))setTimeout(draw,80)})}
+function visible(){const ids=["marinas","profile"];return !document.hidden&&ids.some(id=>{const el=document.getElementById(id);return el&&!el.classList.contains("hide")})} function boot(){draw();setInterval(()=>{if(visible())draw()},15000);window.addEventListener("marina-empire-updated",()=>{if(visible())setTimeout(draw,150)});document.addEventListener("click",e=>{if(e.target.closest("[data-tab='marinas'],[data-tab='profile'],[data-mobile-more-tab='marinas'],[data-mobile-more-tab='profile']"))setTimeout(draw,120)})}
 window.MarinaEmpireDailyReputation={daily,currentRep,repLevel,achievements:ACH};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",boot,{once:true}):boot();
 })();
