@@ -57,21 +57,11 @@ async function goTab(page,id,mobile) {
         else await page.locator(`#navigation [data-tab="${id}"]`).click();
       } else await page.locator(`#navigation [data-tab="${id}"]`).click();
     } else if (mobile) {
-      const premiumSelectors=[
-        `[data-mm3-go="${id}"]`,
-        `[data-ml3-go="${id}"]`,
-        `[data-mf4-go="${id}"]`
-      ];
-      let handled=false;
-      for(const selector of premiumSelectors){
-        const premium=page.locator(selector).first();
-        if(await premium.count()&&await premium.isVisible()){
-          await page.evaluate((target)=>{ if(typeof showTab==="function") showTab(target); },id);
-          handled=true;
-          break;
-        }
-      }
-      if(!handled){
+      const routed=await page.evaluate((target)=>{
+        if(typeof showTab==="function"){showTab(target);return true}
+        return false;
+      },id);
+      if(!routed){
         const quick=page.locator(`[data-mobile-tab="${id}"]`);
         if (await quick.isVisible()) await quick.click();
         else if(await page.locator('#meMobileMoreToggle').isVisible()) {await page.locator('#meMobileMoreToggle').click(); await page.locator(`[data-mobile-more-tab="${id}"]`).click();}
