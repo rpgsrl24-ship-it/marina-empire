@@ -17,11 +17,13 @@ style.textContent=`
  body.me-missions3-active>.nav,
  body.me-missions3-active .shell>.nav{display:none!important}
  #missions.me-missions3-ready{
-   display:block!important;position:fixed!important;inset:0!important;z-index:91000!important;
+   position:fixed!important;inset:0!important;z-index:91000!important;
    overflow-y:auto!important;overflow-x:hidden!important;padding:8px 8px 96px!important;
    background:radial-gradient(circle at 50% -12%,rgba(32,91,113,.52),transparent 34%),linear-gradient(180deg,#041d2d,#062a3d 48%,#031824)!important;
    overscroll-behavior:contain!important
  }
+ #missions.me-missions3-ready.hide{display:none!important}
+ #missions.me-missions3-ready:not(.hide){display:block!important}
  #missions.me-missions3-ready>.me-lux-page-head{display:none!important}
  #missions.me-missions3-ready>.panel{margin:0 0 9px!important;border:1px solid rgba(192,153,86,.55)!important;border-radius:14px!important;background:linear-gradient(145deg,#0d354a,#071f31)!important;box-shadow:0 7px 20px #0004!important}
  #missions.me-missions3-ready>#firstVoyageGuide{padding:10px 11px!important}
@@ -166,7 +168,7 @@ function sync(){
 }
 function boot(){
  if(width()>899)return;
- render();sync();
+ sync();
  const section=document.getElementById("missions");
  if(section)new MutationObserver(()=>setTimeout(sync,25)).observe(section,{attributes:true,attributeFilter:["class","style"]});
  const list=document.getElementById("missionList");
