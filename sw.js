@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261109-missionsrender2";
+const CACHE="marina-empire-v20261109-fleetrender2";
 const CORE=[
  "./",
  "./index.html",
