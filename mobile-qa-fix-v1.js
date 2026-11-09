@@ -14,7 +14,7 @@ html,body{overflow-x:hidden!important}
 #office table{display:block!important;max-width:100%!important;overflow-x:auto!important}
 #map select,#marinas select{width:100%!important;max-width:100%!important;min-width:0!important}
 #map input[type="number"],#map input[type="text"],#map select{font-size:16px!important}
-#map .map-info-bar button,#marinas button{white-space:normal!important}
+#map .map-info-bar button,#marinas button{white-space:normal!important}#marinas .me-marina-advertising{display:none!important}#marinas .marina-business-heading,#marinas #businessList{display:none!important}
 #meMobileMore{z-index:99999!important}
 body.me-missions3-active .mobile-game-nav,body.me-fleet4-active .mobile-game-nav,body.me-map5-active .mobile-game-nav,body.me-marinas6-active .mobile-game-nav,body.me-sec-active .mobile-game-nav{display:none!important}
 body.me-missions3-active #navigation,body.me-fleet4-active #navigation,body.me-map5-active #navigation,body.me-marinas6-active #navigation,body.me-sec-active #navigation{display:none!important}
