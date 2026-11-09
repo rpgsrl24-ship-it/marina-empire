@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261109-premiumnav1";
+const CACHE="marina-empire-v20261109-premiumroute2";
 const CORE=[
  "./",
  "./index.html",
