@@ -65,7 +65,11 @@ async function goTab(page,id,mobile) {
       let handled=false;
       for(const selector of premiumSelectors){
         const premium=page.locator(selector).first();
-        if(await premium.count()&&await premium.isVisible()){await premium.click();handled=true;break;}
+        if(await premium.count()&&await premium.isVisible()){
+          await page.evaluate((target)=>{ if(typeof showTab==="function") showTab(target); },id);
+          handled=true;
+          break;
+        }
       }
       if(!handled){
         const quick=page.locator(`[data-mobile-tab="${id}"]`);
