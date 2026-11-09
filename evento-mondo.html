@@ -36,4 +36,4 @@ const EVENTS={
 const q=new URLSearchParams(location.search),id=q.get("event")||"vip_arrivals",e=EVENTS[id]||EVENTS.vip_arrivals,port=q.get("port")||"Marina attuale";
 icon.textContent=e.icon;title.textContent=e.title;detail.textContent=e.detail;bonus.textContent=e.bonus;document.getElementById("port").textContent=port.replace(/[-_]/g," ").replace(/\b\w/g,c=>c.toUpperCase());advice.textContent=e.advice;action.textContent=e.action;action.href="./?view="+encodeURIComponent(e.view)+"&from=world-event";
 const end=(Math.floor(Date.now()/900000)+1)*900000;function tick(){const m=Math.max(0,Math.ceil((end-Date.now())/60000));timer.textContent="Aggiornamento evento tra "+m+" min"}tick();setInterval(tick,30000);
-</script></body></html>
+</script><script src="./mobile-standalone-premium-v1.js?v=20261109-standalone1"></script></body></html>
