@@ -26,7 +26,7 @@ st.textContent=`
    linear-gradient(180deg,#05283b 0%,#073248 46%,#031824 100%)!important;
   overscroll-behavior:contain!important
  }
- #marinas.me-ml3-ready.hide{display:none!important}
+ #marinas.me-ml3-ready.hide{display:none!important;visibility:hidden!important;pointer-events:none!important;z-index:-1!important}\n #marinas.me-ml3-ready.hide #meMobileMarinaLivePremium,#marinas.me-ml3-ready.hide .ml3-bottom-wrap{display:none!important;pointer-events:none!important}
  #marinas.me-ml3-ready:not(.hide){display:block!important}
  #marinas.me-ml3-ready> :not(#meMobileMarinaLivePremium){display:none!important}
  #meMobileMarinaLivePremium{display:flex!important;flex-direction:column;gap:9px;width:100%;margin:0;padding:0;color:#f6f3ea}
