@@ -29,8 +29,8 @@
 <section class="alert em"><div class="ico">🚨</div><div><small>EMERGENZA LIVE</small><strong>Intervento disponibile</strong><span>Controlla le richieste operative della marina.</span></div><a href="./?view=marinas&mobileLegacy=1">›</a></section>
 <nav class="actions">
 <a href="./?view=marinas&mobileLegacy=1"><span class="step">1</span><b>📋</b>NUOVO INCARICO</a>
-<a href="./?view=missions&mobileLegacy=1"><span class="step">2</span><b>🎯</b>NUOVA<br>MISSIONE</a>
-<a href="./?view=missions&mobileLegacy=1"><span class="step">3</span><b>🤝</b>CONTRATTI<br>& CHARTER</a>
+<a href="./?view=missions&open=missions&mobileLegacy=1"><span class="step">2</span><b>🎯</b>NUOVA<br>MISSIONE</a>
+<a href="./?view=missions&open=missions&mobileLegacy=1"><span class="step">3</span><b>🤝</b>CONTRATTI<br>& CHARTER</a>
 <a href="./?view=office&mobileLegacy=1"><span class="step">4</span><b>🛠️</b>CANTIERE<br>& REFIT</a>
 </nav>
 <section class="grid">
@@ -38,7 +38,7 @@
 <a class="tile" href="./?view=marinas&mobileLegacy=1"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><span class="i">⚓</span><span class="l">LA TUA MARINA</span></a>
 <a class="tile" href="./?view=map&mobileLegacy=1"><img src="./assets/italia-nautica.jpg" alt=""><span class="i">🗺️</span><span class="l">MAPPA</span></a>
 <a class="tile" href="./?view=office&mobileLegacy=1"><img src="./anteprima/assets/render-2026/hero-yacht.jpg" alt=""><span class="i">👥</span><span class="l">EQUIPAGGIO</span></a>
-<a class="tile" href="./?view=missions&mobileLegacy=1"><img src="./anteprima/assets/render-2026/charter.jpg" alt=""><span class="i">🤝</span><span class="l">CONTRATTI / CHARTER</span></a>
+<a class="tile" href="./?view=missions&open=missions&mobileLegacy=1"><img src="./anteprima/assets/render-2026/charter.jpg" alt=""><span class="i">🤝</span><span class="l">CONTRATTI / CHARTER</span></a>
 <a class="tile" href="./marketplace-mobile.html?v=20261109-market12"><img src="./anteprima/assets/render-2026/cantieri.jpg" alt=""><span class="i">🛒</span><span class="l">MARKETPLACE</span></a>
 <a class="tile" href="./?view=community&mobileLegacy=1"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><span class="i">💬</span><span class="l">COMMUNITY</span></a>
 <a class="tile" href="./?view=profile&mobileLegacy=1"><img src="./anteprima/assets/render-2026/economia.jpg" alt=""><span class="i">📊</span><span class="l">PROFILO / STAT.</span></a>
@@ -49,7 +49,7 @@
 </section>
 <div class="services"><a href="./?view=office&mobileLegacy=1">⛽ PIENO</a><a href="./?view=office&mobileLegacy=1">🔧 MANUTENZIONE</a><a href="./?view=home&mobileLegacy=1">↩ ESCI</a></div>
 <section class="progress"><small>PROGRESSIONE & OBIETTIVI</small><strong>Continua il tuo impero</strong><span>Obiettivi, diario e servizi rapidi</span></section>
-<nav class="bottom"><a class="on" href="./mobile-home.html"><b>⌂</b>HOME</a><a href="./?view=map&mobileLegacy=1"><b>🗺️</b>MAPPA</a><a href="./?view=missions&mobileLegacy=1"><b>🎯</b>MISSIONI</a><a href="./?view=fleet&mobileLegacy=1"><b>🛥️</b>FLOTTA</a><a href="./?view=home&mobileLegacy=1"><b>☰</b>ALTRO</a></nav>
+<nav class="bottom"><a class="on" href="./mobile-home.html"><b>⌂</b>HOME</a><a href="./?view=map&mobileLegacy=1"><b>🗺️</b>MAPPA</a><a href="./?view=missions&open=missions&mobileLegacy=1"><b>🎯</b>MISSIONI</a><a href="./?view=fleet&mobileLegacy=1"><b>🛥️</b>FLOTTA</a><a href="./?view=home&mobileLegacy=1"><b>☰</b>ALTRO</a></nav>
 </main>
 <script src="./local-save-context.js"></script><script>
 (()=>{try{const c=window.MarinaLocalSaveContext;let h=c&&c.capture(),g=h&&c.readGame(h);if(!g){c&&c.select(null);h=c&&c.capture();g=h&&c.readGame(h)}if(g){coins.textContent=Number(g.coins||0).toLocaleString("it-IT");prestige.textContent=Number(g.prestige||0).toLocaleString("it-IT");const tank=Number(g.tank||g.fuelMax||300),fv=Number(g.fuel||0);fuel.textContent=Math.max(0,Math.min(100,Math.round(tank?fv/tank*100:0)))+"%";condition.textContent=Math.max(0,Math.min(100,Math.round(Number(g.condition??100))))+"%";}}catch(_){}})();
