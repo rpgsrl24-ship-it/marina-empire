@@ -106,8 +106,9 @@ window.MarinaEmpireMapBridge={
     if(!p.ok)return {ok:false,message:p.reason||"Rotta non disponibile",preview:p};
     if(!p.mission)return {ok:false,message:"Non c'è una missione disponibile per questa destinazione.",preview:p};
     if(!p.mission.ready)return {ok:false,message:p.mission.reason||"Missione non pronta",preview:p};
-    try{launch(p.mission.id);return {ok:true,active:true,snapshot:snapshot()}}
+    try{window.__ME_ENGINE_QUIET__=true;launch(p.mission.id);return {ok:true,active:true,snapshot:snapshot()}}
     catch(e){return {ok:false,message:String(e?.message||e),preview:p}}
+    finally{window.__ME_ENGINE_QUIET__=false}
   }
 };
 })();
