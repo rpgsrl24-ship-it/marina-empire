@@ -129,6 +129,15 @@ async function trial(browser,origin,name,viewport,mobile) {
       await goTab(page,'credits',true);
       await page.waitForFunction(()=>!document.getElementById('credits')?.classList.contains('hide'));
       await goTab(page,'home',true);
+      await goTab(page,'missions',true);
+      await page.waitForFunction(()=>document.body.classList.contains('me-missions3-active'));
+      assert.equal(await page.locator('#meMissionsPremiumTop').isVisible(),true,name+': approved Missions 3/12 premium page is visible');
+      assert.ok((await page.locator('#meMissionsPremiumTop').innerText()).includes('MISSIONI'),name+': Missions title is rendered');
+      assert.ok((await page.locator('#meMissionsPremiumTop').innerText()).includes('3/12'),name+': Missions page number is rendered');
+      assert.equal(await page.locator('.mm3-tabs').isVisible(),true,name+': Missions premium tabs are visible');
+      assert.equal(await page.locator('#missionList').isVisible(),true,name+': real mission list remains visible');
+      assert.equal(await page.locator('.mm3-bottom').isVisible(),true,name+': Missions 12-page navigation is visible');
+      await goTab(page,'home',true);
       await goTab(page,'marinas',true);
       await page.waitForFunction(()=>document.body.classList.contains('me-ml3-active'));
       assert.equal(await page.locator('#meMobileMarinaLivePremium').isVisible(),true,name+': premium Marina Live 2/12 is visible on mobile');
