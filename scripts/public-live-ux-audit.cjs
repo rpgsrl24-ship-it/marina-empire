@@ -106,7 +106,7 @@ async function runScenario(browser,name,viewport,mobile){
     const firstText=(await firstCard.innerText()).trim();
     assert.match(firstText,/Rimini/i,name+': first mission must originate in Rimini');
     await first.click();
-    await page.waitForURL(/map-mobile\.html/,{timeout:20000});
+    await page.waitForFunction(()=>location.pathname.endsWith('/map-mobile.html'),{timeout:20000});
     await page.locator('#routeStatus').waitFor({state:'visible',timeout:15000});
     await page.waitForFunction(()=>document.querySelector('#routeStatus')?.textContent?.includes('→'),{timeout:15000});
     await page.screenshot({path:path.join(OUT,name+'-map-active.png'),fullPage:false,animations:'disabled'});
