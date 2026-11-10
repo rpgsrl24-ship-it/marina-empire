@@ -1,40 +1,69 @@
-// Marina Empire release smoke checks. Run: node tests/smoke.cjs
+// Marina Empire modern mobile release smoke checks. Run: node tests/smoke.cjs
 const fs=require('node:fs');
 const vm=require('node:vm');
 const assert=require('node:assert/strict');
-const html=fs.readFileSync('index.html','utf8');
-const scripts=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
-  .filter(m=>!/(?:\bsrc\s*=|\btype\s*=\s*["'](?:application\/json|importmap))/i.test(m[1]));
-assert(scripts.length>0,'No inline game scripts found');
-for(let i=0;i<scripts.length;i++)new vm.Script(scripts[i][2],{filename:'index.html:inline-script-'+(i+1)});
-for(const match of html.matchAll(/<script\b[^>]*\bsrc=["'](\.\/[^"']+\.js)["'][^>]*><\/script>/gi)){
-  const path=match[1].slice(2);
-  assert(fs.existsSync(path),'Missing local script: '+path);
-  new vm.Script(fs.readFileSync(path,'utf8'),{filename:path});
-}
-const required=['function launch(id)','function finishVoyage()','function voyageHeartbeat()','function renderMissionChoices()','function renderOfficeMissions()','function showTab(id)','id="cloudEmail"','id="voyageArrivalNotice"'];
-for(const token of required)assert(html.includes(token),'Missing game element: '+token);
-const gate='!window.meRegisteredPlayer&&(Number(state.voyages)||0)>=2';
-assert(html.includes(gate),'Free guest trial gate missing');
-assert(html.includes('if(id==="office"&&state.setupComplete){renderOfficeMissions()}'),'Office mission refresh missing');
-assert(html.includes('if(id==="missions"&&state.setupComplete){renderMissionChoices()}'),'Mission tab refresh missing');
-assert(html.includes('if(!window.meRegisteredPlayer&&(Number(state.voyages)||0)>=2){showTab("profile");'),'Guest mission launch guard missing');
-assert(html.includes('window.meRegisteredPlayer=!!account?.email_confirmed_at'),'Verified account check missing');
-assert(html.includes('function finishVoyage()'),'Voyage completion handler missing');
-assert(html.includes('if(!state.trip){const guide=$("meArrivalGuide")'),'Idle voyage guide reset missing');
-assert(html.includes('const cinema=$("voyageCinema");if(cinema)cinema.classList.add("hide")'),'Idle helm cleanup missing');
-assert(html.includes('if(id==="profile"&&!window.meRegisteredPlayer'),'Guest account navigation missing');
-assert(html.includes('function marinaPortfolioSummary()'),'Marina portfolio accounting missing');
-assert(html.includes('function careerOpportunityHtml()'),'Career progression panel missing');
-assert(html.includes('function renderCareer()'),'Career dashboard missing');
-for(const id of ['cloudEmail','voyageArrivalNotice','missionList','officeMissions']){
-  const occurrences=[...html.matchAll(new RegExp('\\bid=["\\x27]'+id+'["\\x27]','g'))].length;
-  assert.equal(occurrences,1,'Expected one element with id='+id+', found '+occurrences);
+
+const read=p=>fs.readFileSync(p,'utf8');
+const index=read('index.html');
+
+// Root is now a minimal compatibility router, never the old game shell.
+assert(index.includes('mobile-home.html?v=20261110-fast3'),'Root router must target the current Home');
+assert(index.includes('missions-mobile.html?v=20261110-missions7'),'Root router must preserve Missioni aliases');
+assert(index.includes('map-mobile.html?v=20261110-map14'),'Root router must preserve Mappa aliases');
+assert(index.includes('marina-mobile.html?v=20261110-marina3'),'Root router must preserve Marina aliases');
+assert(index.includes('marketplace-mobile.html?v=20261110-market13'),'Root router must preserve Marketplace aliases');
+assert(!index.includes('function launch(id)'),'Legacy monolithic game shell must not return');
+assert(!index.includes('mobileLegacy'),'Root router must not expose legacy mode');
+
+// Parse every inline router script.
+for(const [i,m] of [...index.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].entries()){
+  if(!/\bsrc\s*=/i.test(m[1]))new vm.Script(m[2],{filename:'index.html:inline-'+(i+1)});
 }
 
-assert(html.includes('guestTrialJobsUsed'),'Extended guest Marina Live trial counter missing');
-console.log('PASS: '+scripts.length+' inline scripts parse; '+required.length+' essential elements and extended guest gate present.');
+const pages=[
+ 'mobile-home.html','missions-mobile.html','map-mobile.html','marina-mobile.html',
+ 'fleet-mobile.html','marketplace-mobile.html','community-mobile.html','profile-mobile.html',
+ 'direction-mobile.html','ranking-mobile.html','alliance-mobile.html','research-mobile.html',
+ 'activities-mobile.html','office-mobile.html'
+];
+for(const p of pages)assert(fs.existsSync(p),'Missing modern page: '+p);
 
-// Verify that administrator daily metrics remain available.
-assert(html.includes('Attività giornaliera · oggi e ieri (ora italiana)'),'Missing daily admin report');
-assert(html.includes('timeZone:"Europe/Rome"'),'Missing Italian time zone');
+// Verify all local script references used by modern pages exist and parse.
+for(const p of pages){
+ const html=read(p);
+ for(const m of html.matchAll(/<script\b[^>]*\bsrc=["']\.\/([^"'?]+\.js)(?:\?[^"']*)?["'][^>]*><\/script>/gi)){
+   assert(fs.existsSync(m[1]),p+' references missing script '+m[1]);
+   new vm.Script(read(m[1]),{filename:m[1]});
+ }
+}
+
+// Mission and map flow must use only the standalone engine.
+const missions=read('missions-mobile.html');
+const map=read('map-mobile.html');
+const engine=read('mobile-map-lite-v2.js');
+assert(missions.includes('mobile-map-lite-v2.js'),'Missioni must load the standalone map/mission engine');
+assert(map.includes('mobile-map-lite-v2.js'),'Mappa must load the standalone map/mission engine');
+assert(!map.includes('mobileLegacy'),'Mappa must not call legacy mode');
+assert(!map.includes('id="mapEngine"'),'Mappa must not embed the legacy engine iframe');
+for(const token of ['function missionCatalog()','function startMission(id)','function pulse()','lastArrival']){
+ assert(engine.includes(token),'Standalone engine missing '+token);
+}
+
+// Core modern pages and safe commerce guard.
+assert(read('marina-mobile.html').includes('mobile-marina-lite-v1.js'),'Marina must use the standalone marina engine');
+assert(read('fleet-mobile.html').includes('mobile-fleet-lite-v1.js'),'Flotta must use the standalone fleet engine');
+assert(read('research-mobile.html').includes('mobile-research-lite-v1.js'),'Ricerca must use the standalone research engine');
+assert(read('marketplace-mobile.html').includes('credit-sync-guard.js'),'Marketplace must load modern credit safeguards');
+assert(read('credit-purchase-rc.js').includes('typeof window.meCreditCheckoutReady!=="function"'),'Checkout must fail closed without the sync guard');
+
+// Explicitly reject the old UI bundles that caused stale pages.
+const obsolete=[
+ 'mobile-home-clean-v4.js','mobile-home-premium-v1.js','mobile-first-v5.js',
+ 'mobile-marina-live-v2.js','mobile-marina-live-v3.js','mobile-map-premium-v1.js',
+ 'mobile-marinas-premium-v1.js','mobile-missions-premium-v1.js','mobile-missions-new-v1.js',
+ 'mobile-community-premium-v2.js','mobile-office-premium-v2.js','mobile-profile-headquarters-premium-v1.js',
+ 'mobile-marketplace-premium-v2.js','mobile-marketplace-final-v9.js','marketplace-standalone-route-v12.js'
+];
+for(const p of obsolete)assert(!fs.existsSync(p),'Obsolete legacy UI file still present: '+p);
+
+console.log('PASS: modern standalone mobile architecture is complete and legacy shell/UI bundles are absent.');
