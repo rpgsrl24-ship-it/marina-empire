@@ -33,7 +33,8 @@ test('weather selection is deterministic and can produce every profile',()=>{
 test('weather changes duration and wear but never route or fuel formula',()=>{
  assert(html.includes('missionDuration=Number(m.sec)*(worldWeather?.duration||weather.duration)'));
  assert(html.includes('const worldWear=Number(trip.weatherWear)||weather.wear'));
- assert(html.includes('appliedWear=Math.max(0,worldWear*refitWear)'));
+ assert(html.includes('researchWear=window.MarinaEmpireResearchEffects?.wearMultiplier?.()||1'));
+ assert(html.includes('appliedWear=Math.max(0,worldWear*refitWear*researchWear)'));
  assert(html.includes('state.condition=Math.max(0,state.condition-appliedWear)'));
  assert(html.includes('weather:weather.id'));
  assert(!html.includes('fuelRate:burn*weather'));
