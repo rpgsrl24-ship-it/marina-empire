@@ -50,11 +50,12 @@ async function startCheckout(productId){
   if(!CONFIG.enabled){setStatus("Acquisti in attivazione finale. Nessun addebito viene avviato.",true);return;}
   const user=await currentUser();
   if(!user){setStatus("Per acquistare crediti devi prima accedere con un account Marina Empire verificato.",true);document.querySelector('[data-tab="profile"]')?.click();return;}
-  if(typeof window.meCreditCheckoutReady==="function"){
-    setStatus("Verifica della partita online prima del checkout…");
-    const ready=await window.meCreditCheckoutReady();
-    if(!ready){setStatus("Sincronizza la partita online prima di acquistare crediti.",true);return;}
+  if(typeof window.meCreditCheckoutReady!=="function"){
+    setStatus("Controllo sicurezza partita non disponibile. Acquisto bloccato.",true);return;
   }
+  setStatus("Verifica della partita online prima del checkout…");
+  const ready=await window.meCreditCheckoutReady();
+  if(!ready){setStatus("Sincronizza la partita online prima di acquistare crediti.",true);return;}
   busy=true;
   document.querySelectorAll("[data-me-credit-product]").forEach(b=>b.disabled=true);
   setStatus("Preparazione del checkout sicuro RPG Yacht…");
