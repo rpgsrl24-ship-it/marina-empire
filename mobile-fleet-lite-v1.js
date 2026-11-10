@@ -11,9 +11,10 @@ const boats=[
 ];
 const portNames={rose:"Isola delle Rose",rimini:"Rimini",ancona:"Ancona",lignano:"Lignano",cervia:"Cervia",bari:"Bari",ravenna:"Marina di Ravenna",pescara:"Marina di Pescara",brindisi:"Marina di Brindisi",salerno:"Marina d’Arechi — Salerno",nettuno:"Marina di Nettuno",scarlino:"Marina di Scarlino",loano:"Marina di Loano",portocervo:"Marina di Porto Cervo",capodorlando:"Marina di Capo d’Orlando"};
 function context(){const c=window.MarinaLocalSaveContext;if(!c)return null;let h=c.capture();if(!h){c.select(null);h=c.capture()}return h?{c,h}:null}
-function read(){const x=context();return x?.c.readGame(x.h)||null}
+function defaultGame(){return{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],fleetFuel:{},fleetCondition:{},fleetPorts:{},completed:[],trip:null,voyages:0,setupComplete:true,voyageSerial:0}}
+function read(){const x=context();if(!x)return null;let g=x.c.readGame(x.h);if(g)return g;const fresh=defaultGame();if(x.c.writeGame(x.h,fresh))g=x.c.readGame(x.h);return g||fresh}
 function write(game){const x=context();return !!(x&&x.c.writeGame(x.h,game))}
-function safeGame(){return read()||{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],fleetFuel:{},fleetCondition:{},fleetPorts:{}}}
+function safeGame(){return read()||defaultGame()}
 function snapshot(){
  const g=safeGame(),owned=Array.isArray(g.owned)?g.owned:["voyager"],active=g.boat||"voyager";
  return {
