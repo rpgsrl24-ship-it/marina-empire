@@ -27,7 +27,48 @@ function plan(from,to,tank,burn){const cap=Math.max(1,Number(tank)||1),reserve=M
 function project(lat,lon){return{x:(lon-6.2)/(19.4-6.2)*100,y:(48-lat)/(48-35)*100}}
 function getHandle(){const c=window.MarinaLocalSaveContext;if(!c)return null;let h=c.capture();if(!h){c.select(null);h=c.capture()}return h}
 function read(){const c=window.MarinaLocalSaveContext,h=getHandle();return c&&h?c.readGame(h):null}
-function snapshot(){const s=read()||{coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],voyages:0};const b=boats.find(x=>x.id===s.boat)||boats[0];return{state:s,tank:b.tank,boatName:b.name,ports:ports.map(p=>({id:p.id,name:p.name,x:illustrated[p.id]?.[0]??50,y:illustrated[p.id]?.[1]??50})),trip:s.trip||null}}
+function mutate(fn){
+ const c=window.MarinaLocalSaveContext,h=getHandle();if(!c||!h)return false;
+ const s=c.readGame(h);if(!s)return false;
+ fn(s);return c.writeGame(h,s);
+}
+function tripView(s,b){
+ const t=s?.trip;if(!t)return null;
+ const duration=Math.max(1,Number(t.sec)||1),remaining=Math.max(0,(Number(t.until)||Date.now())-Date.now());
+ const progress=Math.max(0,Math.min(1,1-remaining/(duration*1000)));
+ const origin=String(t.origin||s.port),dest=String(t.dest||s.port),route=routePoints(origin,dest).map(([lat,lon])=>project(lat,lon));
+ const distance=seaMiles(origin,dest),knots=Number(b?.knots)||18;
+ return {id:String(t.id||""),name:String(t.mission?.name||"Missione attiva"),origin,originName:(ports.find(x=>x.id===origin)||ports[1]).name,dest,destinationName:(ports.find(x=>x.id===dest)||ports[1]).name,reward:Number(t.mission?.reward)||0,prestige:Number(t.mission?.prestige)||0,progress,distance,cruiseKnots:knots,etaMinutesReal:Math.max(1,Math.round((distance*(1-progress)/knots)*60)),remainingSec:Math.max(0,Math.ceil(remaining/1000)),route};
+}
+function snapshot(){const s=read()||{coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],voyages:0};const b=boats.find(x=>x.id===s.boat)||boats[0];return{state:s,tank:b.tank,boatName:b.name,ports:ports.map(p=>({id:p.id,name:p.name,x:illustrated[p.id]?.[0]??50,y:illustrated[p.id]?.[1]??50})),trip:tripView(s,b)}}
 function preview(dest){const shot=snapshot(),s=shot.state,b=boats.find(x=>x.id===s.boat)||boats[0],p=ports.find(x=>x.id===dest);if(!p||dest===s.port)return{ok:false,reason:"Seleziona una marina diversa"};const pl=plan(s.port,dest,b.tank,b.burn);const eta=Math.max(1,Math.round((pl.distance/b.knots)*60));const cost=Math.max(250,Math.round(pl.distance*7*b.mult))+b.crew;const reward=Math.max(1200,Math.round(pl.distance*20*b.mult));let fuelNow=Math.max(0,Math.min(b.tank,Number(s.fuel)||0)),refuel=0,ready=!!pl.possible&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id));if(pl.possible){for(let i=0;i<pl.legs.length-1;i++){const req=Math.ceil(seaMiles(pl.legs[i],pl.legs[i+1])*b.burn);if(i>0){const liters=Math.max(0,req+pl.reserve-fuelNow);refuel+=liters*3;fuelNow+=liters}if(fuelNow<req+pl.reserve)ready=false;fuelNow-=Math.min(fuelNow,req)}}const total=cost+refuel;if(Number(s.coins)||0<total)ready=false;const route=routePoints(s.port,dest).map(([lat,lon])=>project(lat,lon));return{ok:pl.possible,reason:pl.reason||"",origin:s.port,originName:(ports.find(x=>x.id===s.port)||ports[1]).name,dest,destinationName:p.name,distance:pl.distance,fuel:pl.fuel,cruiseKnots:b.knots,etaMinutesReal:eta,route,mission:{id:"R_"+b.id+"_"+s.port+"_"+dest,name:"Trasferimento nautico verso "+p.name,reward,prestige:Math.max(15,Math.round(pl.distance*.4*b.mult)),ready,reason:ready?"":"Controlla carburante, crediti e stato yacht",total}}}
-window.MarinaEmpireMapLite={snapshot,preview,read};
+function pulse(){
+ const s=read();if(!s?.trip)return {active:false,snapshot:snapshot()};
+ const t=s.trip;
+ if(t.id!=="INTRO_RIMINI_CERVIA")return {active:true,needsAuthoritativeEngine:true,snapshot:snapshot()};
+ let changed=false;
+ if(!Number.isFinite(Number(t.sec))||Number(t.sec)>20||(Number(t.until)-Date.now())>20000){
+   changed=mutate(g=>{if(!g.trip||g.trip.id!=="INTRO_RIMINI_CERVIA")return;g.trip.sec=20;g.trip.legSeconds=20;g.trip.until=Date.now()+20000;});
+ }
+ const now=Date.now(),fresh=read(),ft=fresh?.trip;
+ if(ft&&Number(ft.until)<=now){
+   mutate(g=>{
+     const trip=g.trip;if(!trip||trip.id!=="INTRO_RIMINI_CERVIA")return;
+     const m=trip.mission||{},reward=Math.max(0,Number(m.reward)||500),prestige=Math.max(0,Number(m.prestige)||50),dest=String(m.dest||trip.dest||"cervia");
+     g.port=dest;
+     g.completed=Array.isArray(g.completed)?g.completed:[];
+     if(!g.completed.includes(trip.id))g.completed.push(trip.id);
+     g.coins=Math.max(0,Number(g.coins)||0)+reward;
+     g.prestige=Math.max(0,Number(g.prestige)||0)+prestige;
+     g.voyages=Math.max(0,Number(g.voyages)||0)+1;
+     g.earnings=Math.max(0,Number(g.earnings)||0)+reward;
+     g.condition=Math.max(0,(Number(g.condition??100)||100)-Math.max(0,Number(trip.weatherWear)||3));
+     g.lastArrival={destination:dest,reward,baseReward:reward,crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),mission:String(m.name||"PRIMA MISSIONE · RPG Academy 8 · Rimini - Cervia"),emergency:false};
+     g.lastDockedBridge={origin:String(trip.origin||"rimini"),destination:dest,at:Date.now()};
+     g.trip=null;
+   });
+ }
+ return {active:!!read()?.trip,changed,snapshot:snapshot()};
+}
+window.MarinaEmpireMapLite={snapshot,preview,read,pulse};
 })();
