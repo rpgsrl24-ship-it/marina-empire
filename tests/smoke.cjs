@@ -45,7 +45,7 @@ assert(missions.includes('mobile-map-lite-v2.js'),'Missioni must load the standa
 assert(map.includes('mobile-map-lite-v2.js'),'Mappa must load the standalone map/mission engine');
 assert(!map.includes('mobileLegacy'),'Mappa must not call legacy mode');
 assert(!map.includes('id="mapEngine"'),'Mappa must not embed the legacy engine iframe');
-for(const token of ['function missionCatalog()','function startMission(id)','function pulse()','lastArrival']){
+for(const token of ['function missionCatalog()','function startMission(id,expectedDest)','function pulse()','lastArrival']){
  assert(engine.includes(token),'Standalone engine missing '+token);
 }
 
