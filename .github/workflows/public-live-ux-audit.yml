@@ -4,6 +4,12 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'mobile-home.html'
+      - 'map-mobile.html'
+      - 'missions-mobile.html'
+      - 'marina-mobile.html'
+      - 'mobile-map-lite-v2.js'
+      - 'local-save-context.js'
       - 'scripts/public-live-ux-audit.cjs'
       - '.github/workflows/public-live-ux-audit.yml'
   workflow_dispatch:
