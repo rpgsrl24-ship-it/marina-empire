@@ -6,7 +6,7 @@
 <script>
 const content=document.getElementById("content");let tab="available";
 function api(){return window.MarinaEmpireMapLite||null}
-function snap(){try{const a=api();return a?{state:a.snapshot().state,tank:a.snapshot().tank,missions:a.missionCatalog()}:null}catch(e){return null}}
+function snap(){try{const a=api();if(!a)return null;a.pulse?.();const s=a.snapshot();return{state:s.state,tank:s.tank,missions:a.missionCatalog()}}catch(e){return null}}
 function gameState(){return snap()?.state||null}
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
