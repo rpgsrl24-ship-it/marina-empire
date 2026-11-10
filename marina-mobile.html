@@ -12,7 +12,7 @@
 .panel{display:none;margin:0 8px 10px;padding:12px;border:1px solid #b5d8e7;border-radius:18px;background:#fff}.panel.on{display:block}.panel h3{margin:0 0 8px}.panel .row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #e6eef2;font-size:9px}.panel .row:last-child{border-bottom:0}.btn{width:100%;min-height:46px;border:1px solid #b6d5e4;border-radius:14px;background:linear-gradient(180deg,#159df3,#0869da);color:white;font-weight:950}.btn.gold{background:linear-gradient(180deg,#f6cf57,#d99a16);color:#17334c;border-color:#efbd3e}.btn:disabled{opacity:.45}.toast{position:fixed;z-index:50;left:50%;bottom:86px;transform:translateX(-50%);max-width:88%;padding:10px 14px;border-radius:999px;background:#082e4be8;color:white;font-size:9px;font-weight:800;box-shadow:0 8px 25px #001f3366}.hide{display:none!important}
 .bottom{position:fixed;z-index:30;left:6px;right:6px;bottom:6px;max-width:608px;margin:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:5px;border:1px solid #58c1eb;border-radius:18px;background:#f8fcfef5;box-shadow:0 8px 26px #00395855;backdrop-filter:blur(12px)}.bottom a{min-width:0;min-height:58px;border-radius:12px;color:#0a456f;font-size:5.5px;font-weight:950;text-decoration:none;text-align:center;padding:6px 1px}.bottom a b{display:block;margin-bottom:3px;font-size:19px}.bottom a.on{background:linear-gradient(180deg,#159df3,#0869da);color:#fff}
 @media(max-width:390px){.panorama img{height:230px}.grid{grid-template-columns:1fr}.bottom a{font-size:5px}}
-</style></head><body><main class="app">
+button.service:target{outline:3px solid #ffd65c;outline-offset:3px;box-shadow:0 0 22px #ffd65c88}</style></head><body><main class="app">
 <header class="head"><div class="top"><a class="round" href="./mobile-home.html?v=20261110-fast2">☰</a><div class="brand"><b>⚓ MARINA EMPIRE</b><small>IL GESTIONALE NAUTICO ONLINE</small></div><div class="round">👨‍✈️</div></div><div class="hud"><div><span>🪙 MONETE</span><b id="coins">—</b></div><div><span>⭐ PRESTIGIO</span><b id="prestige">—</b></div><div><span>⛽ CARBURANTE</span><b id="fuel">—</b></div></div><div class="hero"><i>⚓</i><div><h1>Base – La tua Marina</h1><p>Gestisci il tuo porto, i pontili e i servizi.</p></div></div></header>
 <nav class="tabs"><button class="on" data-tab="overview">🏠 Panoramica</button><button data-tab="pontoons">🛥 Pontili</button><button data-tab="services">🛠 Servizi</button><button data-tab="structures">🏢 Strutture</button><button data-tab="upgrade">⬆ Upgrade</button></nav>
 <section class="selector"><label>MARINA SELEZIONATA</label><select id="marinaSelect"></select></section>
@@ -59,4 +59,12 @@ repair.onclick=()=>{const r=window.MarinaEmpireMarinaLite.repair();toastMsg(r.me
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));const map={overview:"overview",pontoons:"pontoonsPanel",services:"servicesPanel",structures:"structuresPanel",upgrade:"upgradePanel"};document.getElementById(map[b.dataset.tab])?.classList.add("on")});
 goMap.onclick=()=>location.assign("./map-mobile.html?v=20261109-mapstandalone5");goMarket.onclick=()=>location.assign("./marketplace-mobile.html?v=20261109-market12");goOffice.onclick=()=>location.assign("./?view=office&mobileLegacy=1");
 render();
+
+(function(){
+ const id=(location.hash||"").slice(1);
+ if(id!=="refuel"&&id!=="repair")return;
+ const target=document.getElementById(id);
+ if(!target)return;
+ setTimeout(()=>{target.scrollIntoView({behavior:"smooth",block:"center"});target.focus({preventScroll:true});},180);
+})();
 </script></body></html>
