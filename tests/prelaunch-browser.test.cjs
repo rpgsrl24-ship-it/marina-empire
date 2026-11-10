@@ -81,7 +81,7 @@ async function trial(browser,origin,name,viewport,mobile) {
   page.on('response',r=>{if(r.url().startsWith(origin) && r.status()>=400) missing.push(`${r.status()} ${new URL(r.url()).pathname}`);});
   await page.clock.setFixedTime(new Date('2026-11-02T09:00:00Z'));
   try {
-    await page.goto(origin,{waitUntil:'load'});
+    await page.goto(origin+'?mobileLegacy=1',{waitUntil:'load'});
     if (mobile) {
       const mobileNav = page.locator('.mobile-game-nav');
       const desktopNav = page.locator('#navigation');
@@ -381,7 +381,7 @@ async function corruptSaveRecovery(browser,origin) {
   const page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   try {
-    await page.goto(origin,{waitUntil:'load'});
+    await page.goto(origin+'?mobileLegacy=1',{waitUntil:'load'});
     const panel=page.locator('#meLocalSaveRecovery');
     await panel.waitFor({state:'visible'});
     assert.equal(await page.locator('#welcome').isVisible(),true,'Recovery must be available over the welcome screen');
@@ -427,8 +427,8 @@ async function multiTabConflict(browser,origin) {
   const first=await context.newPage(),stale=await context.newPage(),errors=[];
   stale.on('pageerror',e=>errors.push(e.stack||e.message));
   try {
-    await first.goto(origin,{waitUntil:'domcontentloaded',timeout:30000});
-    await stale.goto(origin,{waitUntil:'domcontentloaded',timeout:30000});
+    await first.goto(origin+'?mobileLegacy=1',{waitUntil:'domcontentloaded',timeout:30000});
+    await stale.goto(origin+'?mobileLegacy=1',{waitUntil:'domcontentloaded',timeout:30000});
     await first.waitForFunction(()=>typeof window.meCanWriteLocalSave==='function');
     await stale.waitForFunction(()=>typeof window.meCanWriteLocalSave==='function');
     const latest=await first.evaluate(key=>{
