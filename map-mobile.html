@@ -50,12 +50,15 @@ function bootMap(){
  const lite=window.MarinaEmpireMapLite||null;
  if(!missionBootHandled&&lite){
    missionBootHandled=true;
-   const pending=new URLSearchParams(location.search).get("mission");
-   if(pending&&!lite.snapshot()?.trip){
-     const started=lite.startMission?.(pending);
+   const params=new URLSearchParams(location.search),pending=params.get("mission"),expectedDest=params.get("dest");
+   let savedPending=null;try{savedPending=JSON.parse(sessionStorage.getItem("marina_empire_pending_mission")||"null")}catch(_){}
+   const safeId=pending||savedPending?.id||"",safeDest=expectedDest||savedPending?.dest||"";
+   if(safeId&&!lite.snapshot()?.trip){
+     const started=lite.startMission?.(safeId,safeDest);
      if(!started?.ok){
        alert("Impossibile avviare la missione: "+(started?.message||"errore"));
      }else{
+       try{sessionStorage.removeItem("marina_empire_pending_mission")}catch(_){}
        try{history.replaceState(null,"","./map-mobile.html?v=20261110-map14")}catch(_){}
      }
    }
