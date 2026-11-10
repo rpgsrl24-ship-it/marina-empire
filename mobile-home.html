@@ -58,7 +58,7 @@
  if(!g)return;
  const fmt=n=>Number(n||0).toLocaleString("it-IT");
  coins.textContent=fmt(g.coins);prestige.textContent=fmt(g.prestige);
- const tank=Number(g.tank||g.fuelMax||300),fv=Number(g.fuel||0);
+ const tanks={voyager:400,open:300,yacht:550,yacht14:700,yacht20:1100,yacht30:1700,luna:900};const tank=Number(g.tank||g.fuelMax||tanks[g.boat]||400),fv=Number(g.fuel||0);
  fuel.textContent=Math.max(0,Math.min(100,Math.round(tank?fv/tank*100:0)))+"%";
  condition.textContent=Math.max(0,Math.min(100,Math.round(Number(g.condition??100))))+"%";
  const names={rimini:"Rimini",cervia:"Cervia",ancona:"Ancona",lignano:"Lignano",ravenna:"Ravenna",pescara:"Pescara",bari:"Bari",brindisi:"Brindisi",salerno:"Salerno",nettuno:"Nettuno",scarlino:"Scarlino",loano:"Loano",portocervo:"Porto Cervo",capodorlando:"Capo d'Orlando",rose:"Isola delle Rose"};
