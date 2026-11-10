@@ -4,7 +4,7 @@
   "short_name": "Marina Empire",
   "description": "Simulatore nautico e gestione di marine italiane",
   "lang": "it",
-  "start_url": "./mobile-home.html?v=20261110-final1",
+  "start_url": "./mobile-home.html?v=20261110-fast3",
   "scope": "./",
   "display": "standalone",
   "background_color": "#071c2a",
