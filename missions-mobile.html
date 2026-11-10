@@ -18,9 +18,10 @@ content.addEventListener("click",e=>{
  const b=e.target.closest("[data-start]");
  if(!b||b.disabled)return;
  e.preventDefault();
- const id=b.dataset.start||"";
- if(!id)return;
- location.assign("./map-mobile.html?v=20261110-map14&mission="+encodeURIComponent(id));
+ const id=b.dataset.start||"",dest=b.dataset.dest||"";
+ if(!id||!dest)return;
+ try{sessionStorage.setItem("marina_empire_pending_mission",JSON.stringify({id,dest,at:Date.now()}))}catch(_){}
+ location.assign("./map-mobile.html?v=20261110-map14&mission="+encodeURIComponent(id)+"&dest="+encodeURIComponent(dest));
 });
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));render()});
 let bootAttempts=0;function boot(){if(api()){render();setInterval(syncHud,1500);return}bootAttempts++;if(bootAttempts>75){content.className="empty";content.innerHTML="<b>Missioni non disponibili</b><span>Ricarica la pagina dalla Home. Se il problema continua, il motore missioni non è stato caricato.</span>";return}setTimeout(boot,80)}boot();
