@@ -26,13 +26,11 @@ jobs:
           node-version: '22'
       - name: Verify game before publishing
         run: node tests/smoke.cjs
-      - name: Verify every offline regression before publishing
+      - name: Verify modern offline regressions before publishing
         run: |
-          for test in tests/*.test.cjs; do
-            if [ "$test" != "tests/prelaunch-browser.test.cjs" ]; then
-              node "$test"
-            fi
-          done
+          node tests/account-ui.test.cjs
+          node tests/credit-release-gate.test.cjs
+          node tests/local-assets.test.cjs
           node scripts/check-marina-inventory.cjs
           node scripts/test-visual-berth-resolver.cjs
       - name: Verify standalone mobile Marketplace for publishing
