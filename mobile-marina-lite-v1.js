@@ -6,7 +6,8 @@ const ports=[
 const economy={rimini:{price:8000000,income:80000},ancona:{price:11000000,income:110000},lignano:{price:12000000,income:120000},cervia:{price:6500000,income:65000},bari:{price:18000000,income:180000},ravenna:{price:9500000,income:95000},pescara:{price:9000000,income:90000},brindisi:{price:14000000,income:140000},salerno:{price:22000000,income:220000},nettuno:{price:16000000,income:160000},scarlino:{price:28000000,income:280000},loano:{price:26000000,income:260000},portocervo:{price:85000000,income:850000},capodorlando:{price:24000000,income:240000}};
 const boats={voyager:{name:"RPG Academy 8",tank:400,price:0},open:{name:"RPG Open 7",tank:300,price:80000},yacht:{name:"RPG Cruiser 12",tank:550,price:350000},yacht14:{name:"RPG Prestige 14",tank:700,price:650000},yacht20:{name:"RPG Elite 20",tank:1100,price:1800000},yacht30:{name:"RPG Majesty 30",tank:1700,price:6000000},luna:{name:"RPG Imperial 60",tank:900,price:45000000}};
 function context(){const c=window.MarinaLocalSaveContext;if(!c)return null;let h=c.capture();if(!h){c.select(null);h=c.capture()}return h?{c,h}:null}
-function read(){const x=context();return x?.c.readGame(x.h)||null}
+function defaultGame(){return{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],trip:null,reservations:[],voyages:0,setupComplete:true,voyageSerial:0,marinas:{}}}
+function read(){const x=context();if(!x)return null;let g=x.c.readGame(x.h);if(g)return g;const fresh=defaultGame();if(x.c.writeGame(x.h,fresh))g=x.c.readGame(x.h);return g||fresh}
 function write(game){const x=context();return !!(x&&x.c.writeGame(x.h,game))}
 function portName(id){return ports.find(p=>p.id===id)?.name||id||"Rimini"}
 function selectedId(game){let id=null;try{id=sessionStorage.getItem("marina_empire_selected_marina")}catch(_){};id=id||game?.investmentMarina||game?.homeMarina||game?.port||"rimini";return ports.some(p=>p.id===id)?id:"rimini"}
