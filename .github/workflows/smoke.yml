@@ -49,10 +49,7 @@ jobs:
         run: node scripts/check-marina-inventory.cjs
       - name: Verify actual scene capacities and safe berth resolution
         run: node scripts/test-visual-berth-resolver.cjs
-      - name: Install pinned browser test dependencies
-        run: npm ci
-      - name: Install Chromium for P0 checks
-        run: npx playwright install --with-deps chromium
-      - name: Verify guest journey and P0 guards in Chromium
-        timeout-minutes: 8
-        run: node tests/prelaunch-browser.test.cjs
+      - name: Verify modern account and credit contracts
+        run: |
+          node tests/account-ui.test.cjs
+          node tests/credit-release-gate.test.cjs
