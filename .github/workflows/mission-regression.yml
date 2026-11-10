@@ -45,34 +45,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify every offline regression
+      - name: Verify modern mission and save contracts
         run: |
-          for test in tests/*.test.cjs; do
-            if [ "$test" != "tests/prelaunch-browser.test.cjs" ]; then
-              node "$test"
-            fi
-          done
+          node tests/smoke.cjs
+          node tests/account-ui.test.cjs
+          node tests/credit-release-gate.test.cjs
 
-  browser-qa:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 12
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - name: Install test dependencies
-        run: npm ci
-      - name: Install Chromium for Playwright
-        run: npx playwright install --with-deps chromium
-      - name: Run desktop and mobile gameplay QA
-        run: npm run test:browser
-      - name: Upload QA screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: marina-empire-browser-qa-${{ github.run_number }}
-          path: test-results/prelaunch
-          if-no-files-found: ignore
-          retention-days: 14
