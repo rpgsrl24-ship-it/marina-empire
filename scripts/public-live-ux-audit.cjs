@@ -56,17 +56,21 @@ async function pageAudit(page,label){
   },label);
 }
 
-async function clickTrial(page){
-  await page.locator('#playerName').fill('Audit Live');
-  await page.locator('#play').click();
-  await page.locator('#confirmSetup').waitFor({state:'visible',timeout:15000});
-  await page.locator('#setupMarina').selectOption('rimini');
-  await page.locator('#confirmSetup').click();
-  await page.locator('#missionList [data-mission]:enabled').first().waitFor({state:'visible',timeout:15000});
+async function seedUnifiedGame(context){
+  await context.addInitScript(()=>{
+    const game={
+      name:'Audit Live',coins:10000,prestige:0,fuel:300,condition:100,port:'rimini',
+      boat:'voyager',owned:['voyager'],completed:[],trip:null,reservations:[],voyages:0,
+      setupComplete:true,voyageSerial:0
+    };
+    localStorage.setItem('marina_empire_local_context_v1',JSON.stringify({version:1,accountId:null,revision:'live-audit-v2'}));
+    localStorage.setItem('marina_empire_beta_test_session',JSON.stringify(game));
+  });
 }
 
 async function runScenario(browser,name,viewport,mobile){
   const context=await browser.newContext({viewport,isMobile:mobile,hasTouch:mobile,deviceScaleFactor:1});
+  await seedUnifiedGame(context);
   await blockPrivateAndPaid(context);
   const page=await context.newPage();
   const errors=[],badResponses=[];
@@ -80,74 +84,61 @@ async function runScenario(browser,name,viewport,mobile){
 
   try{
     await page.goto(LIVE,{waitUntil:'domcontentloaded',timeout:30000});
+    await page.waitForURL(/mobile-home\.html/,{timeout:15000});
     await page.waitForLoadState('load',{timeout:30000});
-    await page.screenshot({path:path.join(OUT,name+'-welcome.png'),fullPage:false,animations:'disabled'});
-    const welcome=await pageAudit(page,name+' welcome');
-    assert.equal(welcome.horizontalOverflow,false,name+': welcome has horizontal overflow');
-    assert.equal(welcome.clipped.length,0,name+': welcome has clipped actions '+JSON.stringify(welcome.clipped));
+    await page.screenshot({path:path.join(OUT,name+'-home.png'),fullPage:false,animations:'disabled'});
+    const home=await pageAudit(page,name+' home');
+    assert.equal(home.horizontalOverflow,false,name+': home has horizontal overflow');
+    assert.equal(home.clipped.length,0,name+': home has clipped actions '+JSON.stringify(home.clipped));
 
-    await clickTrial(page);
+    const missionLink=page.locator('a[href*="missions-mobile.html"]').first();
+    await missionLink.waitFor({state:'visible',timeout:15000});
+    await missionLink.click();
+    await page.waitForURL(/missions-mobile\.html/,{timeout:15000});
+    await page.locator('[data-start]:enabled').first().waitFor({state:'visible',timeout:20000});
     await page.screenshot({path:path.join(OUT,name+'-missions.png'),fullPage:false,animations:'disabled'});
     const missions=await pageAudit(page,name+' missions');
     assert.equal(missions.horizontalOverflow,false,name+': missions has horizontal overflow');
     assert.equal(missions.clipped.length,0,name+': missions has clipped actions '+JSON.stringify(missions.clipped));
 
-    const first=page.locator('#missionList [data-mission]:enabled').first();
-    const firstText=(await first.innerText()).trim();
+    const first=page.locator('[data-start]:enabled').first();
+    const firstCard=first.locator('xpath=ancestor::article[1]');
+    const firstText=(await firstCard.innerText()).trim();
+    assert.match(firstText,/Rimini/i,name+': first mission must originate in Rimini');
     await first.click();
-    await page.waitForFunction(()=>!!JSON.parse(localStorage.getItem('marina_empire_beta_test_session'))?.trip,{timeout:15000});
-    await page.locator('#voyageCinema').waitFor({state:'visible',timeout:15000});
-    await page.locator('#cinemaSea').scrollIntoViewIfNeeded();
-    await page.screenshot({path:path.join(OUT,name+'-voyage.png'),fullPage:false,animations:'disabled'});
-    const voyage=await pageAudit(page,name+' voyage');
-    const geometry=await page.evaluate(()=>{
-      const rect=id=>{const el=document.getElementById(id);if(!el)return null;const r=el.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};
-      return {
-        gps:rect('voyageRouteMap'),
-        sea:rect('cinemaSea'),
-        controls:rect('meHelmControls'),
-        weather:(document.getElementById('meBridgeWeather')?.textContent||'').trim(),
-        title:(document.getElementById('cinemaTitle')?.textContent||'').trim()
-      };
-    });
-    assert.equal(voyage.horizontalOverflow,false,name+': voyage has horizontal overflow');
-    assert.equal(voyage.clipped.length,0,name+': voyage has clipped actions '+JSON.stringify(voyage.clipped));
-    assert.ok(geometry.gps&&geometry.gps.w>70&&geometry.gps.h>45,name+': GPS is too small');
-    assert.ok(geometry.sea&&geometry.gps.x>=geometry.sea.x-2&&geometry.gps.right<=geometry.sea.right+2,name+': GPS outside helm');
-    assert.ok(geometry.controls&&geometry.controls.x>=-2&&geometry.controls.right<=viewport.width+2,name+': helm controls outside viewport');
-    assert.match(geometry.weather,/METEO SIMULATO/,name+': weather label missing');
+    await page.waitForURL(/map-mobile\.html/,{timeout:20000});
+    await page.locator('#routeStatus').waitFor({state:'visible',timeout:15000});
+    await page.waitForFunction(()=>document.querySelector('#routeStatus')?.textContent?.includes('→'),{timeout:15000});
+    await page.screenshot({path:path.join(OUT,name+'-map-active.png'),fullPage:false,animations:'disabled'});
+    const map=await pageAudit(page,name+' map active');
+    assert.equal(map.horizontalOverflow,false,name+': map has horizontal overflow');
+    assert.equal(map.clipped.length,0,name+': map has clipped actions '+JSON.stringify(map.clipped));
 
-    if(mobile){
-      const expand=page.locator('#meVoyageExpand');
-      if(await expand.isVisible()){
-        await expand.click();
-        await page.waitForFunction(()=>document.body.classList.contains('me-voyage-focus'));
-        await page.screenshot({path:path.join(OUT,name+'-voyage-expanded.png'),fullPage:false,animations:'disabled'});
-        const expanded=await pageAudit(page,name+' expanded');
-        assert.equal(expanded.horizontalOverflow,false,name+': expanded helm has horizontal overflow');
-        assert.equal(expanded.clipped.length,0,name+': expanded helm has clipped actions '+JSON.stringify(expanded.clipped));
-      }
-    }
+    const active=await page.evaluate(()=>({
+      route:(document.getElementById('routeStatus')?.textContent||'').trim(),
+      destination:(document.getElementById('destination')?.textContent||'').trim(),
+      mission:(document.getElementById('missionText')?.textContent||'').trim(),
+      save:JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'null')
+    }));
+    assert.ok(active.save?.trip,name+': accepted mission must create an active trip');
+    assert.ok(active.route.includes('Cervia')&&active.destination.includes('Cervia'),name+': accepted mission route/destination must stay synchronized to Cervia');
+    assert.match(active.mission,/RPG Academy 8/i,name+': map must show the accepted mission');
 
-    const trip=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).trip);
-    await page.clock.setFixedTime(new Date(trip.until+1000));
-    await page.waitForFunction(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session'))?.trip===null,{timeout:15000});
+    const trip=active.save.trip;
+    await page.clock.setFixedTime(new Date(Number(trip.until)+1500));
+    await page.waitForFunction(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'null')?.trip===null,{timeout:20000});
+    await page.waitForTimeout(300);
     await page.screenshot({path:path.join(OUT,name+'-arrival.png'),fullPage:false,animations:'disabled'});
-    const arrival=await pageAudit(page,name+' arrival');
-    assert.equal(arrival.horizontalOverflow,false,name+': arrival has horizontal overflow');
-    assert.equal(arrival.clipped.length,0,name+': arrival has clipped actions '+JSON.stringify(arrival.clipped));
+    const arrivalSave=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'null'));
+    assert.equal(arrivalSave?.port,'cervia',name+': arrival must move player to Cervia');
+    assert.ok(Number(arrivalSave?.prestige)>0,name+': arrival must credit prestige');
+    assert.ok(Array.isArray(arrivalSave?.completed)&&arrivalSave.completed.length>0,name+': arrival must mark mission completed');
 
     console.log('LIVE_AUDIT '+JSON.stringify({
-      scenario:name,
-      viewport,
-      firstMission:firstText.slice(0,120),
-      welcome,
-      missions,
-      voyage,
-      arrival,
-      geometry,
-      runtimeErrors:errors,
-      badResponses
+      scenario:name,viewport,firstMission:firstText.slice(0,140),
+      route:active.route,destination:active.destination,mission:active.mission,
+      arrival:{port:arrivalSave.port,coins:arrivalSave.coins,prestige:arrivalSave.prestige,voyages:arrivalSave.voyages},
+      home,missions,map,runtimeErrors:errors,badResponses
     }));
     assert.deepEqual(errors,[],name+': runtime errors '+JSON.stringify(errors));
     assert.deepEqual(badResponses,[],name+': missing/bad live assets '+JSON.stringify(badResponses));
