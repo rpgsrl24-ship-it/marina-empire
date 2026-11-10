@@ -103,7 +103,8 @@ h1{margin:10px 0 7px;font:800 clamp(30px,9vw,58px)/.98 Georgia,serif;color:#f3d5
   const a=active(),h=history();
   document.querySelectorAll("[data-water-job]").forEach(btn=>{
    const j=jobs[btn.dataset.waterJob],done=!!h[recordKey(j.id)],poor=!game||Number(game.coins)<j.cost;
-   btn.disabled=!!a||done||poor||!game?.setupComplete;
+   btn.disabled=!!a||done;
+   btn.dataset.blockedReason=done?"Attività già completata in questo evento.":a?"Completa prima l’attività in corso.":poor?("Servono "+fmt(j.cost)+" crediti per avviare questa attività."):!game?.setupComplete?"Configura prima il comandante dalla Home.":"";
    btn.textContent=done?"COMPLETATO":a?"ATTIVITÀ IN CORSO":poor?"CREDITI INSUFFICIENTI":!game?.setupComplete?"CONFIGURA PRIMA IL GIOCO":"AVVIA · "+Math.round(j.duration/60000)+" MIN";
   });
  }
@@ -152,7 +153,7 @@ h1{margin:10px 0 7px;font:800 clamp(30px,9vw,58px)/.98 Georgia,serif;color:#f3d5
   if(!write(next)){body.textContent="Premio non registrato: salvataggio cambiato. Rientra nel gioco e riapri l’evento.";return}
   render();
  }
- document.addEventListener("click",e=>{const btn=e.target.closest("[data-water-job]");if(btn)start(btn.dataset.waterJob)});
+ document.addEventListener("click",e=>{const btn=e.target.closest("[data-water-job]");if(!btn)return;const reason=btn.dataset.blockedReason||"";if(reason){body.innerHTML="<strong>Attività non disponibile.</strong> "+esc(reason);return}start(btn.dataset.waterJob)});
  render();
  timer=setInterval(render,1000);
  window.addEventListener("beforeunload",()=>clearInterval(timer));
