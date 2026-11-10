@@ -47,9 +47,14 @@ function snapshot(){
 window.MarinaEmpireMissionBridge={
   snapshot,
   start(id){
-    try{launch(String(id||""));return {ok:true,snapshot:snapshot()}}
-    catch(e){return {ok:false,message:String(e?.message||e),snapshot:snapshot()}}
+    const missionId=String(id||"");
+    try{
+      launch(missionId);
+      const after=snapshot();
+      const ok=!!after?.state?.trip&&String(after.state.trip.id||"")===missionId;
+      return {ok,message:ok?"":"La missione non è stata avviata dal motore.",snapshot:after};
+    }catch(e){return {ok:false,message:String(e?.message||e),snapshot:snapshot()}}
   },
-  version:"missions-bridge-v1"
+  version:"missions-bridge-v2"
 };
 })();
