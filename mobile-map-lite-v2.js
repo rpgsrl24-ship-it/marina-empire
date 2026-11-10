@@ -66,8 +66,9 @@ function missionCatalog(){
  }
  return list;
 }
-function startMission(id){
+function startMission(id,expectedDest){
  const mission=missionCatalog().find(m=>m.id===String(id||""));if(!mission)return{ok:false,message:"Missione non disponibile"};
+ if(expectedDest&&String(mission.dest)!==String(expectedDest))return{ok:false,message:"Destinazione missione non coerente"};
  if(!mission.ready)return{ok:false,message:mission.reason||"Missione non pronta"};
  const ok=mutate(g=>{
    if(g.trip)return;
