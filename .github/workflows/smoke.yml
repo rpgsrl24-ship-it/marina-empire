@@ -53,3 +53,4 @@ jobs:
         run: |
           node tests/account-ui.test.cjs
           node tests/credit-release-gate.test.cjs
+          node tests/marina-services.test.cjs
