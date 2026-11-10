@@ -19,8 +19,8 @@ button.service:target{outline:3px solid #ffd65c;outline-offset:3px;box-shadow:0 
 <section class="panorama"><img id="marinaHeroImg" src="./anteprima/assets/render-2026/marine.jpg" alt="Marina"><span id="ownedBadge" class="badge">—</span><div class="marina-name"><strong id="marinaName">—</strong><small id="marinaStatus">—</small></div></section>
 <section class="grid"><article class="card"><h3>⚓ Livello Marina</h3><p id="levelLabel">—</p><div class="bar"><i id="levelBar"></i></div><div class="stat"><span>Livello sviluppo</span><b id="level">—</b></div><div class="stat"><span>Operatività</span><b id="ops">—</b></div><div class="stat"><span>Servizio principale</span><b id="serviceMain">—</b></div></article><article class="card"><h3>🛥 Pontili e ormeggi</h3><div class="stat"><span>Pontili attivi</span><b id="pontoons">—</b></div><div class="stat"><span>Ormeggi totali</span><b id="capacity">—</b></div><div class="stat"><span>Disponibili</span><b id="available">—</b></div><div class="stat"><span>Occupati</span><b id="occupied">—</b></div></article></section>
 <section class="services">
-<button class="service action" id="refuel" type="button"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><b>⛽ Rifornimento</b></button>
-<button class="service action" id="repair" type="button"><img src="./anteprima/assets/render-2026/flotta.jpg" alt=""><b>🔧 Manutenzione</b></button>
+<button class="service action" id="refuel" type="button"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><b>⛽ Rifornimento</b><small id="refuelInfo">—</small></button>
+<button class="service action" id="repair" type="button"><img src="./anteprima/assets/render-2026/flotta.jpg" alt=""><b>🔧 Manutenzione</b><small id="repairInfo">—</small></button>
 <a class="service" href="./research-mobile.html?v=20261109-research1"><img src="./anteprima/assets/render-2026/flotta.jpg" alt=""><b>🏗 Cantiere</b></a>
 <a class="service" href="./marketplace-mobile.html?v=20261110-market13"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><b>🛒 Market</b></a>
 </section>
@@ -42,6 +42,10 @@ function render(){
  const s=api.snapshot(),g=s.game;
  coins.textContent=fmt(g.coins);prestige.textContent=fmt(g.prestige);
  fuel.textContent=Math.round((Number(g.fuel)||0)/(Number(s.boat.tank)||1)*100)+"%";
+ const tank=Math.max(1,Number(s.boat.tank)||1),fuelNow=Math.max(0,Math.min(tank,Number(g.fuel)||0)),missing=Math.max(0,tank-fuelNow),refuelCost=Math.round(missing*3);
+ refuelInfo.textContent=missing>0?Math.round(missing)+" L mancanti · "+fmt(refuelCost)+" crediti":"Serbatoio pieno";
+ const conditionNow=Math.max(0,Math.min(100,Number(g.condition??100))),fullRepair=Math.round(1000*(1+(Number(s.boat.price)||0)/100000)),repairCost=Math.max(100,Math.round(fullRepair*((100-conditionNow)/100)));
+ repairInfo.textContent=conditionNow<100?"Stato "+Math.round(conditionNow)+"% · "+fmt(repairCost)+" crediti":"Yacht al 100%";
  marinaSelect.innerHTML=api.ports.map(p=>'<option value="'+p.id+'" '+(p.id===s.id?'selected':'')+'>'+p.name+'</option>').join("");
  marinaName.textContent=s.name;window.MarinaEmpireMarinaPhotos?.apply(marinaHeroImg,s.id);ownedBadge.textContent=s.id==="rose"?"BASE RPG":s.owned?"TUA MARINA":"MARINA VISITATA";
  marinaStatus.textContent=(g.port===s.id?"📍 Yacht presente · ":"")+"Livello "+s.level+" · "+s.oper.label;
