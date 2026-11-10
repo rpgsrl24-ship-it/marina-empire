@@ -60,6 +60,13 @@ function pulseAuthoritativeEngine(){
  try{
   const t=mapW?.state?.trip;
   if(!t)return;
+  if(t.id==="INTRO_RIMINI_CERVIA"){
+    const maxIntroMs=20000,remaining=Number(t.until)-Date.now();
+    if(!Number.isFinite(Number(t.sec))||Number(t.sec)>20||remaining>maxIntroMs){
+      t.sec=20;t.legSeconds=20;t.until=Date.now()+maxIntroMs;
+      try{mapW.persist?.()}catch(_){}
+    }
+  }
   if(Number.isFinite(Number(t.until))&&Date.now()>=Number(t.until)&&typeof mapW.finishVoyage==="function"){
     mapW.finishVoyage();
   }else if(typeof mapW.voyageHeartbeat==="function"){
