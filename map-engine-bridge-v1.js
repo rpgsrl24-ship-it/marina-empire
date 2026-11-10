@@ -96,10 +96,30 @@ function snapshot(){
     trip:tripSnapshot()
   };
 }
+function pulse(){
+  try{
+    const t=state?.trip;
+    if(!t)return {active:false,snapshot:snapshot()};
+    if(t.id==="INTRO_RIMINI_CERVIA"){
+      const maxIntroSec=20,remaining=Number(t.until)-Date.now();
+      if(!Number.isFinite(Number(t.sec))||Number(t.sec)>maxIntroSec||remaining>maxIntroSec*1000){
+        t.sec=maxIntroSec;t.legSeconds=maxIntroSec;t.until=Date.now()+maxIntroSec*1000;
+        try{persist()}catch(_){}
+      }
+    }
+    if(Number.isFinite(Number(t.until))&&Date.now()>=Number(t.until)&&typeof finishVoyage==="function"){
+      finishVoyage();
+    }else if(typeof voyageHeartbeat==="function"){
+      voyageHeartbeat();
+    }
+    return {active:!!state?.trip,snapshot:snapshot()};
+  }catch(e){return {active:!!state?.trip,error:String(e?.message||e),snapshot:snapshot()}}
+}
 window.MarinaEmpireMapBridge={
-  version:"map-bridge-v1",
+  version:"map-bridge-v2",
   snapshot,
   preview,
+  pulse,
   navigate(dest){
     if(state?.trip)return {ok:true,active:true,snapshot:snapshot()};
     const p=preview(String(dest||""));
