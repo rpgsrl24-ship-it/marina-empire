@@ -125,9 +125,9 @@ async function runScenario(browser,name,viewport,mobile){
     assert.match(active.mission,/RPG Academy 8/i,name+': map must show the accepted mission');
 
     const trip=active.save.trip;
-    await page.clock.setFixedTime(new Date(Number(trip.until)+1500));
-    await page.waitForFunction(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'null')?.trip===null,{timeout:20000});
-    await page.waitForTimeout(300);
+    const naturalWait=Math.max(20000,Math.min(120000,Number(trip.until)-Date.now()+15000));
+    await page.waitForFunction(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'null')?.trip===null,{timeout:naturalWait});
+    await page.waitForTimeout(800);
     await page.screenshot({path:path.join(OUT,name+'-arrival.png'),fullPage:false,animations:'disabled'});
     const arrivalSave=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'null'));
     assert.equal(arrivalSave?.port,'cervia',name+': arrival must move player to Cervia');
