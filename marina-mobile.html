@@ -57,7 +57,7 @@ marinaSelect.onchange=()=>{if(window.MarinaEmpireMarinaLite.setSelected(marinaSe
 refuel.onclick=()=>{const r=window.MarinaEmpireMarinaLite.refuel();toastMsg(r.message);render()};
 repair.onclick=()=>{const r=window.MarinaEmpireMarinaLite.repair();toastMsg(r.message);render()};
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));const map={overview:"overview",pontoons:"pontoonsPanel",services:"servicesPanel",structures:"structuresPanel",upgrade:"upgradePanel"};document.getElementById(map[b.dataset.tab])?.classList.add("on")});
-goMap.onclick=()=>location.assign("./map-mobile.html?v=20261109-mapstandalone5");goMarket.onclick=()=>location.assign("./marketplace-mobile.html?v=20261109-market12");goOffice.onclick=()=>location.assign("./?view=office&mobileLegacy=1");
+goMap.onclick=()=>location.assign("./map-mobile.html?v=20261109-mapstandalone5");goMarket.onclick=()=>location.assign("./marketplace-mobile.html?v=20261109-market12");goOffice.onclick=()=>location.assign("./direction-mobile.html?v=20261110-direction1");
 render();
 
 (function(){
