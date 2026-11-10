@@ -32,6 +32,7 @@ jobs:
           node tests/credit-release-gate.test.cjs
           node tests/local-assets.test.cjs
           node tests/marina-services.test.cjs
+          node tests/mission-selection.test.cjs
           node scripts/check-marina-inventory.cjs
           node scripts/test-visual-berth-resolver.cjs
       - name: Verify standalone mobile Marketplace for publishing
