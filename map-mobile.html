@@ -58,7 +58,13 @@ document.getElementById("mapEngine")?.addEventListener("load",()=>{try{mapW=docu
 setTimeout(bootMap,1200);
 function pulseAuthoritativeEngine(){
  try{
-  if(mapW&&typeof mapW.voyageHeartbeat==="function"&&mapW.state?.trip)mapW.voyageHeartbeat();
+  const t=mapW?.state?.trip;
+  if(!t)return;
+  if(Number.isFinite(Number(t.until))&&Date.now()>=Number(t.until)&&typeof mapW.finishVoyage==="function"){
+    mapW.finishVoyage();
+  }else if(typeof mapW.voyageHeartbeat==="function"){
+    mapW.voyageHeartbeat();
+  }
  }catch(e){console.warn("Heartbeat mappa",e)}
 }
 setInterval(pulseAuthoritativeEngine,500);
