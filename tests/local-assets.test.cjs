@@ -5,8 +5,12 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 
 const root = path.resolve(__dirname, '..');
-const pending = ['index.html', 'beta-test/index.html', 'admin.html', 'pubblicita.html',
-  'isola-delle-rose-originale.html', 'marine-deluxe-originali.html', 'voyage-3d.html'];
+const pending = ['index.html', 'mobile-home.html', 'missions-mobile.html', 'map-mobile.html',
+  'fleet-mobile.html', 'marina-mobile.html', 'research-mobile.html', 'marketplace-mobile.html',
+  'activities-mobile.html', 'community-mobile.html', 'profile-mobile.html', 'direction-mobile.html',
+  'alliance-mobile.html', 'ranking-mobile.html', 'weekend-water-toys.html', 'evento-mondo.html',
+  'beta-test/index.html', 'admin.html', 'pubblicita.html', 'isola-delle-rose-originale.html',
+  'marine-deluxe-originali.html'];
 const inspected = new Set();
 const checked = new Set();
 const errors = [];
