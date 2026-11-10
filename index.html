@@ -34,7 +34,8 @@
   alliance:"./alliance-mobile.html?v=20261110-alliance1",
   ranking:"./ranking-mobile.html?v=20261110-ranking1"
  };
- const target=routes[view]||"./mobile-home.html?v=20261110-fast3";
+ const creditReturn=q.get("credit_purchase")==="success";
+ const target=creditReturn?"./marketplace-mobile.html?v=20261110-market13&credit_purchase=success":(routes[view]||"./mobile-home.html?v=20261110-fast3");
  location.replace(target+location.hash);
 }catch(_){location.replace("./mobile-home.html?v=20261110-fast3")}})();
 </script>
