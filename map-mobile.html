@@ -10,24 +10,11 @@
 <section id="arrivalBox" class="arrival"><strong id="arrivalTitle">⚓ Arrivo completato</strong><span id="arrivalText"></span></section><section id="missionBox" class="mission" hidden><h3>👑 Missione collegata</h3><p id="missionText"></p><a data-safe-nav="./missions-mobile.html?v=20261110-missions7" href="./missions-mobile.html?v=20261110-missions7">VAI ALLA MISSIONE →</a></section>
 </main>
 <nav class="bottom"><a data-safe-nav="./mobile-home.html?v=20261110-fast3" href="./mobile-home.html?v=20261110-fast3"><b>⌂</b>HOME</a><a data-safe-nav="./missions-mobile.html?v=20261110-missions7" href="./missions-mobile.html?v=20261110-missions7"><b>◉</b>MISSIONI</a><a data-safe-nav="./fleet-mobile.html?v=20261109-fleet1" href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a data-safe-nav="./marina-mobile.html?v=20261110-marina3" href="./marina-mobile.html?v=20261110-marina3"><b>⚓</b>MARINA</a><a class="on" href="./map-mobile.html?v=20261110-map14"><b>📍</b>MAPPA</a><a data-safe-nav="./marketplace-mobile.html?v=20261110-market13" href="./marketplace-mobile.html?v=20261110-market13"><b>🛒</b>MARKET</a></nav>
-<iframe id="mapEngine" data-src="./?mobileLegacy=1&engine=map-v1" title="Motore Mappa Marina Empire"></iframe><script src="./local-save-context.js"></script><script src="./marina-photos-v1.js?v=20261109-photos1"></script><script src="./mobile-map-lite-v2.js?v=20261110-engine2"></script>
+<script src="./local-save-context.js"></script><script src="./marina-photos-v1.js?v=20261109-photos1"></script><script src="./mobile-map-lite-v2.js?v=20261110-engine2"></script>
 <script>
-let selected=null,lastShot=null,mapW=null,authLoading=false,missionBootHandled=false;
-function ensureAuthEngine(){
- const engine=document.getElementById("mapEngine");
- if(!engine||mapW||authLoading)return;
- authLoading=true;
- engine.src=engine.dataset.src||"./?mobileLegacy=1&engine=map-v1";
-}
+let selected=null,lastShot=null,missionBootHandled=false;
 const fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
-function bridge(){
- try{
-  const lite=window.MarinaEmpireMapLite||null;
-  const liteShot=lite?.snapshot?.();
-  if(liteShot?.trip?.id==="INTRO_RIMINI_CERVIA")return lite;
-  return mapW?.MarinaEmpireMapBridge||lite||null;
- }catch(e){return window.MarinaEmpireMapLite||null}
-}
+function bridge(){return window.MarinaEmpireMapLite||null}
 function line(points){if(!Array.isArray(points)||points.length<2)return "";return points.map((p,i)=>(i?"L":"M")+Number(p.x).toFixed(2)+" "+Number(p.y).toFixed(2)).join(" ")}
 function syncPorts(shot){ports.innerHTML=(shot.ports||[]).map(p=>'<button class="port '+(p.id===shot.state.port?'current ':'')+(p.id===selected?'selected':'')+'" style="left:'+p.x+'%;top:'+p.y+'%" data-port="'+p.id+'"><b>⚓</b><span>'+p.name+'</span></button>').join("");ports.querySelectorAll("[data-port]").forEach(b=>b.onclick=()=>{selected=b.dataset.port;render()})}
 function tripProgressPosition(route,progress){if(!route?.length)return null;if(route.length===1)return route[0];const i=Math.min(route.length-2,Math.floor(progress*(route.length-1))),local=progress*(route.length-1)-i,a=route[i],b=route[i+1];return{x:a.x+(b.x-a.x)*local,y:a.y+(b.y-a.y)*local}}
@@ -73,25 +60,11 @@ function bootMap(){
      }
    }
  }
- const liteShot=lite?.snapshot?.();
- if(liteShot?.trip&&liteShot.trip.id!=="INTRO_RIMINI_CERVIA")ensureAuthEngine();
  const b=bridge();if(!b){setTimeout(bootMap,120);return}
  const shot=b.snapshot();selected=shot.trip?.dest||shot.ports.find(p=>p.id!==shot.state.port)?.id||null;render();setInterval(render,1500)
 }
-document.getElementById("mapEngine")?.addEventListener("load",()=>{authLoading=false;try{mapW=document.getElementById("mapEngine").contentWindow;mapW.__ME_ENGINE_QUIET__=true}catch(_){};bootMap()});
 setTimeout(bootMap,400);
-function pulseAuthoritativeEngine(){
- try{
-  const lite=window.MarinaEmpireMapLite;
-  if(lite&&typeof lite.pulse==="function"){
-    const r=lite.pulse();
-    if(r?.active&&!r?.needsAuthoritativeEngine)return;
-    if(r?.needsAuthoritativeEngine)ensureAuthEngine();
-  }
-  const auth=mapW?.MarinaEmpireMapBridge;
-  if(auth&&typeof auth.pulse==="function")auth.pulse();
- }catch(e){console.warn("Heartbeat mappa",e)}
-}
+function pulseAuthoritativeEngine(){try{window.MarinaEmpireMapLite?.pulse?.()}catch(e){console.warn("Heartbeat mappa",e)}}
 setInterval(pulseAuthoritativeEngine,500);
 window.addEventListener("focus",pulseAuthoritativeEngine);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)pulseAuthoritativeEngine()});
