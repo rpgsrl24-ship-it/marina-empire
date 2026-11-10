@@ -55,6 +55,7 @@
 (()=>{try{
  const c=window.MarinaLocalSaveContext;let h=c&&c.capture(),g=h&&c.readGame(h);
  if(!g){c&&c.select(null);h=c&&c.capture();g=h&&c.readGame(h)}
+ if(!g&&c&&h){const fresh={name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],trip:null,reservations:[],voyages:0,setupComplete:true,voyageSerial:0,marinas:{}};if(c.writeGame(h,fresh))g=c.readGame(h)}
  if(!g)return;
  const fmt=n=>Number(n||0).toLocaleString("it-IT");
  coins.textContent=fmt(g.coins);prestige.textContent=fmt(g.prestige);
