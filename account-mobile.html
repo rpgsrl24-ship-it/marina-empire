@@ -7,10 +7,11 @@
 <header class="head"><div class="top"><a class="round" href="./profile-mobile.html?v=20261110-profile1">‹</a><div class="brand"><b>⚓ MARINA EMPIRE</b><small>ACCOUNT & CLOUD</small></div><a class="round" href="./mobile-home.html?v=20261110-fast3">⌂</a></div><div class="hero"><h1>Account comandante</h1><p>Accedi per associare la partita a un account verificato. Il salvataggio guest resta sul dispositivo e viene copiato nello slot account al primo accesso se l'account non ha ancora un salvataggio locale.</p></div></header>
 <section class="card"><div id="accountStatus" class="status">Controllo account…</div><div id="accountInfo" class="meta"></div></section>
 <section class="card" id="authCard"><div class="fields"><input id="email" type="email" autocomplete="email" placeholder="Email"><input id="password" type="password" autocomplete="current-password" minlength="8" placeholder="Password (min. 8 caratteri)"></div><div class="actions"><button id="login">ACCEDI</button><button id="register" class="alt">REGISTRATI</button><button id="reset" class="alt">RECUPERA PASSWORD</button><button id="logout" class="danger" hidden disabled>ESCI DALL'ACCOUNT</button></div><div class="meta">La registrazione può richiedere la conferma email. Nessuna password viene salvata nel gioco.</div></section>
+<section class="card" id="cloudCard"><strong>☁️ Sincronizzazione cloud</strong><div id="cloudStatus" class="meta">Disponibile dopo l'accesso con email confermata.</div><div class="actions"><button id="syncNow" class="alt" hidden disabled>SINCRONIZZA</button><button id="keepLocal" hidden disabled>USA QUESTO DISPOSITIVO</button><button id="useCloud" class="alt" hidden disabled>SCARICA DAL CLOUD</button></div><div class="meta">In caso di differenze tra due dispositivi, Marina Empire non sovrascrive automaticamente la partita: scegli esplicitamente quale versione mantenere.</div></section>
 <section class="card"><strong>Installazione app</strong><div class="meta">Quando il browser supporta l'installazione PWA, il pulsante qui sotto diventa disponibile.</div><button class="install" data-pwa-install hidden disabled>INSTALLA APP</button></section>
 </main><nav class="bottom"><a href="./mobile-home.html?v=20261110-fast3">HOME</a><a href="./profile-mobile.html?v=20261110-profile1">PROFILO</a><a class="on" href="./account-mobile.html">ACCOUNT</a><a href="./marketplace-mobile.html?v=20261110-market13">STORE</a></nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
-<script src="./local-save-context.js"></script><script src="./pwa-install.js?v=20261111-pwa1"></script>
+<script src="./local-save-context.js"></script><script src="./cloud-sync-modern.js?v=20261111-cloud1"></script><script src="./pwa-install.js?v=20261111-pwa1"></script>
 <script>
 const URL="https://zrdetqvnjmqkfyajxjgp.supabase.co",KEY="sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw";
 const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
@@ -22,28 +23,48 @@ function guestSnapshot(){
  ctx.select(null);const h=ctx.capture();return h?ctx.readGame(h):null;
 }
 function attachLocalAccount(user){
- const ctx=window.MarinaLocalSaveContext;if(!ctx||!user?.id)return false;
+ const ctx=window.MarinaLocalSaveContext;if(!ctx||!user?.id)return{ok:false,created:false};
  const guest=guestSnapshot();
- if(!ctx.select(user.id))return false;
- const h=ctx.capture();if(!h)return false;
+ if(!ctx.select(user.id))return{ok:false,created:false};
+ const h=ctx.capture();if(!h)return{ok:false,created:false};
  const existing=ctx.readGame(h);
- if(!existing&&guest)return ctx.writeGame(h,guest);
- return true;
+ if(!existing&&guest)return{ok:ctx.writeGame(h,guest),created:true};
+ return{ok:true,created:false};
+}
+const cloud=window.MarinaCloudSync?window.MarinaCloudSync({client,localContext:window.MarinaLocalSaveContext}):null;
+let cloudBusy=false,cloudConflict=false;
+function cloudUi(text,conflict=false){
+ cloudStatus.textContent=text;cloudConflict=conflict;
+ const signed=!logout.hidden;
+ syncNow.hidden=!signed;syncNow.disabled=!signed||cloudBusy;
+ keepLocal.hidden=useCloud.hidden=!conflict;
+ keepLocal.disabled=useCloud.disabled=cloudBusy;
+}
+function cloudText(status){
+ return ({uploaded:"Partita caricata nel cloud.",downloaded:"Partita cloud scaricata su questo dispositivo.",synced:"Partita già sincronizzata.",["downloaded-existing-account"]:"Trovato un salvataggio cloud esistente: caricato su questo dispositivo.",["uploaded-local-changes"]:"Modifiche locali salvate nel cloud.",["downloaded-remote-changes"]:"Modifiche da un altro dispositivo scaricate.",conflict:"Conflitto rilevato: scegli quale partita mantenere.",guest:"Accedi con email confermata per usare il cloud.",["no-local"]:"Nessun salvataggio locale valido.",["no-remote"]:"Nessun salvataggio cloud disponibile."})[status]||"Sincronizzazione non disponibile.";
+}
+async function reconcileCloud(created=false){
+ if(!cloud)return cloudUi("Modulo cloud non disponibile.");
+ cloudBusy=true;cloudUi("Sincronizzazione in corso…");
+ try{const r=await cloud.reconcile({localWasCreatedFromGuest:created});cloudUi(cloudText(r.status),r.status==="conflict");return r}
+ catch(e){cloudUi("Errore cloud: "+(e?.message||"riprovare"));return{ok:false,status:"error"}}
+ finally{cloudBusy=false;syncNow.disabled=false}
 }
 async function refresh(){
  try{
   const {data,error}=await client.auth.getUser();if(error)throw error;
   const u=data?.user;
   if(u){
-   attachLocalAccount(u);
+   const attached=attachLocalAccount(u);
    msg("Account collegato","good");
    accountInfo.textContent=(u.email||"Account verificato")+" · "+(u.email_confirmed_at?"email confermata":"conferma email in attesa");
    logout.hidden=false;logout.disabled=false;login.disabled=register.disabled=true;
+   if(u.email_confirmed_at&&attached.ok)await reconcileCloud(attached.created);else cloudUi("Conferma l'email per attivare la sincronizzazione cloud.");
   }else{
    window.MarinaLocalSaveContext?.select(null);
    msg("Stai giocando come ospite");
    accountInfo.textContent="Puoi continuare a giocare senza account oppure registrarti per associare la partita.";
-   logout.hidden=true;logout.disabled=true;login.disabled=register.disabled=false;
+   logout.hidden=true;logout.disabled=true;login.disabled=register.disabled=false;cloudUi("Accedi con email confermata per usare il cloud.");
   }
  }catch(e){msg("Controllo account non disponibile. La partita guest resta utilizzabile.","bad")}
 }
@@ -55,5 +76,8 @@ login.onclick=()=>run(async()=>{const e=email.value.trim(),p=password.value;if(!
 register.onclick=()=>run(async()=>{const e=email.value.trim(),p=password.value;if(!e||p.length<8)throw new Error("Inserisci email valida e password di almeno 8 caratteri");const r=await client.auth.signUp({email:e,password:p,options:{emailRedirectTo:location.origin+location.pathname}});if(r.error)throw r.error;password.value="";msg("Registrazione inviata. Controlla la conferma email.","good")});
 reset.onclick=()=>run(async()=>{const e=email.value.trim();if(!e)throw new Error("Inserisci l'email");const r=await client.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;msg("Se l'account esiste, riceverai le istruzioni per il recupero.","good")});
 logout.onclick=()=>run(async()=>{const r=await client.auth.signOut({scope:"local"});if(r.error)throw r.error;window.MarinaLocalSaveContext?.select(null);msg("Disconnesso. Continui come ospite.","good")});
+syncNow.onclick=()=>reconcileCloud(false);
+keepLocal.onclick=()=>run(async()=>{if(!cloud)throw new Error("Cloud non disponibile");cloudBusy=true;cloudUi("Caricamento di questo dispositivo nel cloud…");const r=await cloud.forceUpload();cloudBusy=false;cloudUi(cloudText(r.status),false);});
+useCloud.onclick=()=>run(async()=>{if(!cloud)throw new Error("Cloud non disponibile");cloudBusy=true;cloudUi("Scaricamento della partita cloud…");const r=await cloud.forceDownload();cloudBusy=false;cloudUi(cloudText(r.status),false);});
 client.auth.onAuthStateChange(()=>setTimeout(refresh,0));refresh();
 </script></body></html>
