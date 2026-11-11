@@ -23,9 +23,12 @@
 <script src="./local-save-context.js"></script><script>
 const fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
 const BIZ={sup:["SUP / Kayak","./anteprima/assets/render-2026/marine.jpg"],school:["Scuola Nautica","./anteprima/assets/render-2026/cantieri.jpg"],charter:["Agenzia Charter","./anteprima/assets/render-2026/charter.jpg"],water:["Centro Water Toys","./anteprima/assets/render-2026/hero-yacht.jpg"],luxury:["Charter Maxi Yacht","./anteprima/assets/render-2026/hero-yacht.jpg"]};
-(()=>{try{const c=window.MarinaLocalSaveContext;let h=c&&c.capture(),g=h&&c.readGame(h);if(!g){c&&c.select(null);h=c&&c.capture();g=h&&c.readGame(h)}if(!g){activityList.innerHTML='<article class="activity"><div class="activitybody"><strong>Avvia prima la partita</strong><span>Entra dalla Home.</span></div></article>';return}
+function renderDirection(){try{const c=window.MarinaLocalSaveContext;let h=c&&c.capture(),g=h&&c.readGame(h);if(!g){c&&c.select(null);h=c&&c.capture();g=h&&c.readGame(h)}if(!g){activityList.innerHTML='<article class="activity"><div class="activitybody"><strong>Avvia prima la partita</strong><span>Entra dalla Home.</span></div></article>';return}
 const mc=Object.values(g.marinas||{}).filter(Boolean).length, bizEntries=Object.entries(g.businesses||{}).filter(([,v])=>v), bc=bizEntries.length, earn=Number(g.earnings)||0;
 coins.textContent=fmt(g.coins);prestige.textContent=fmt(g.prestige);earnings.textContent=fmt(earn);mCoins.textContent=fmt(g.coins);mEarn.textContent=fmt(earn);mMarinas.textContent=mc;mBusinesses.textContent=bc;bCoins.textContent=fmt(g.coins);bEarn.textContent=fmt(earn);bVoy.textContent=fmt(g.voyages||0);
 activityList.innerHTML=(bizEntries.length?bizEntries.slice(0,3).map(([key])=>{const id=key.split(":").pop(),b=BIZ[id]||[id,"./anteprima/assets/render-2026/economia.jpg"];return '<article class="activity"><div class="activitypic" style="background-image:url(&quot;'+b[1]+'&quot;)"></div><div class="activitybody"><strong>'+b[0]+'</strong><span>Attiva</span></div></article>'}).join(""):'<article class="activity"><div class="activitybody"><strong>Nessuna attività</strong><span>Apri Attività nautiche per investire.</span></div></article>');
-}catch(_){}})();
+}catch(_){}}
+renderDirection();
+window.addEventListener("pageshow",renderDirection);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)renderDirection()});
 </script></body></html>
