@@ -15,12 +15,12 @@
  const q=new URLSearchParams(location.search);
  const view=(q.get("view")||"").toLowerCase();
  const routes={
-  home:"./mobile-home.html?v=20261110-fast3",
-  missions:"./missions-mobile.html?v=20261110-missions7",
-  mission:"./missions-mobile.html?v=20261110-missions7",
-  map:"./map-mobile.html?v=20261110-map14",
-  marinas:"./marina-mobile.html?v=20261110-marina3",
-  marina:"./marina-mobile.html?v=20261110-marina3",
+  home:"./mobile-home.html?v=20261111-home6",
+  missions:"./missions-mobile.html?v=20261111-missions8",
+  mission:"./missions-mobile.html?v=20261111-missions8",
+  map:"./map-mobile.html?v=20261111-map15",
+  marinas:"./marina-mobile.html?v=20261111-marina4",
+  marina:"./marina-mobile.html?v=20261111-marina4",
   fleet:"./fleet-mobile.html?v=20261109-fleet1",
   flotta:"./fleet-mobile.html?v=20261109-fleet1",
   marketplace:"./marketplace-mobile.html?v=20261110-market13",
@@ -35,16 +35,16 @@
   ranking:"./ranking-mobile.html?v=20261110-ranking1"
  };
  const creditReturn=q.get("credit_purchase")==="success";
- const target=creditReturn?"./marketplace-mobile.html?v=20261110-market13&credit_purchase=success":(routes[view]||"./mobile-home.html?v=20261110-fast3");
+ const target=creditReturn?"./marketplace-mobile.html?v=20261110-market13&credit_purchase=success":(routes[view]||"./mobile-home.html?v=20261111-home6");
  location.replace(target+location.hash);
-}catch(_){location.replace("./mobile-home.html?v=20261110-fast3")}})();
+}catch(_){location.replace("./mobile-home.html?v=20261111-home6")}})();
 </script>
-<noscript><meta http-equiv="refresh" content="0;url=./mobile-home.html?v=20261110-fast3"></noscript>
+<noscript><meta http-equiv="refresh" content="0;url=./mobile-home.html?v=20261111-home6"></noscript>
 <style>html,body{margin:0;min-height:100%;display:grid;place-items:center;background:#eaf7fc;color:#0a3153;font-family:system-ui,sans-serif}a{color:#075f91;font-weight:800}</style>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Marina Empire">
 <link rel="apple-touch-icon" href="./app-icon.svg">
 </head>
-<body><a href="./mobile-home.html?v=20261110-fast3">Apri Marina Empire</a></body>
+<body><a href="./mobile-home.html?v=20261111-home6">Apri Marina Empire</a></body>
 </html>
