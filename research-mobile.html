@@ -26,15 +26,24 @@ function render(){
  const api=window.MarinaEmpireResearchLite;if(!api)return;const s=api.snapshot(),g=s.game;
  coins.textContent=fmt(g.coins);prestige.textContent=fmt(g.prestige);const tanks={voyager:400,open:300,yacht:550,yacht14:700,yacht20:1100,yacht30:1700,luna:900};const tank=tanks[g.boat]||400;fuel.textContent=Math.max(0,Math.min(100,Math.round((Number(g.fuel)||0)/tank*100)))+"%";
  labBar.style.width=Math.round(s.labProgress)+"%";labPct.textContent=Math.round(s.labProgress)+"%";labLevel.textContent="Liv. "+s.level;
- const filtered=s.projects.filter(p=>p.category===cat);
+ const filtered=s.projects.filter(p=>p.category===cat),names=Object.fromEntries(s.projects.map(x=>[x.id,x.name]));
  projects.innerHTML=filtered.map(p=>{
-  const status=p.state==="complete"?"✅ Completata":p.state==="active"?"⏱ "+api.formatDuration(p.remaining):p.state==="locked"?"🔒 Bloccata":"Disponibile";
-  const cls=p.state;
-  const btn=p.state==="complete"?"COMPLETATA":p.state==="active"?"IN CORSO":p.state==="locked"?"BLOCCATA":"AVVIA";
-  return '<article class="project"><div class="pic">'+p.icon+'</div><div><h3>'+p.name+'</h3><p>'+p.desc+'</p><div class="state '+cls+'">'+status+'</div><div class="progress"><i style="width:'+p.progress+'%"></i></div><p>'+p.benefit+(p.state==="available"?" · "+fmt(p.cost)+" crediti":"")+'</p></div><button class="action '+(p.state==="available"?"gold":"")+'" data-start="'+p.id+'" '+(p.state!=="available"?"disabled":"")+'>'+btn+'</button></article>';
+  const affordable=(Number(g.coins)||0)>=Number(p.cost||0);
+  const missing=Math.max(0,Number(p.cost||0)-(Number(g.coins)||0));
+  const reqNames=(p.requires||[]).map(id=>names[id]||id);
+  const status=p.state==="complete"?"✅ Completata":p.state==="active"?"⏱ "+api.formatDuration(p.remaining):p.state==="locked"?"🔒 Richiede: "+(reqNames.join(", ")||"ricerca precedente"):affordable?"✅ Disponibile":"🪙 Mancano "+fmt(missing)+" crediti";
+  const cls=p.state==="available"&&!affordable?"locked":p.state;
+  const btn=p.state==="complete"?"COMPLETATA":p.state==="active"?"IN CORSO":p.state==="locked"?"BLOCCATA":affordable?"AVVIA":"CREDITI INSUFFICIENTI";
+  const disabled=p.state!=="available"||!affordable;
+  const details=p.benefit+" · "+fmt(p.cost)+" crediti"+(reqNames.length?" · Richiede: "+reqNames.join(", "):"");
+  return '<article class="project"><div class="pic">'+p.icon+'</div><div><h3>'+p.name+'</h3><p>'+p.desc+'</p><div class="state '+cls+'">'+status+'</div><div class="progress"><i style="width:'+p.progress+'%"></i></div><p>'+details+'</p></div><button class="action '+(p.state==="available"&&affordable?"gold":"")+'" data-start="'+p.id+'" '+(disabled?"disabled":"")+'>'+btn+'</button></article>';
  }).join("")||'<article class="project"><div class="pic">⚗️</div><div><h3>Nessun progetto in questa categoria</h3><p>Completa le ricerche precedenti per sbloccare nuovi progetti.</p></div></article>';
  const next=s.projects.find(p=>p.state==="available")||s.projects.find(p=>p.state==="active")||s.projects[s.projects.length-1];
- recommended.textContent=next?.name||"Centro Ricerca";recommendedBenefit.textContent=next?.benefit||"Tutte le ricerche completate";recommendedAction.textContent=next?.state==="available"?"AVVIA RICERCA":next?.state==="active"?"IN CORSO":"COMPLETATO";recommendedAction.disabled=next?.state!=="available";recommendedAction.dataset.id=next?.id||"";
+ const nextAffordable=next?.state==="available"&&(Number(g.coins)||0)>=Number(next.cost||0);
+ recommended.textContent=next?.name||"Centro Ricerca";
+ recommendedBenefit.textContent=next?.state==="available"&&!nextAffordable?"Servono "+fmt(Math.max(0,Number(next.cost||0)-(Number(g.coins)||0)))+" crediti · "+(next?.benefit||""):next?.benefit||"Tutte le ricerche completate";
+ recommendedAction.textContent=next?.state==="available"?(nextAffordable?"AVVIA RICERCA":"CREDITI INSUFFICIENTI"):next?.state==="active"?"IN CORSO":"COMPLETATO";
+ recommendedAction.disabled=next?.state!=="available"||!nextAffordable;recommendedAction.dataset.id=next?.id||"";
  document.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>{const r=api.start(b.dataset.start);toastMsg(r.message);render()});
 }
 document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{cat=b.dataset.cat;document.querySelectorAll("[data-cat]").forEach(x=>x.classList.toggle("on",x===b));render()});
