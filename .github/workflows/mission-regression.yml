@@ -59,4 +59,5 @@ jobs:
           node tests/account-pwa-modern.test.cjs
           node tests/cloud-sync-modern.test.cjs
           node tests/pwa-offline-core.test.cjs
+          node tests/ui-content-consistency.test.cjs
 
