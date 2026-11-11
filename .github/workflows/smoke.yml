@@ -57,3 +57,4 @@ jobs:
           node tests/mission-selection.test.cjs
           node tests/fleet-switching.test.cjs
           node tests/research-upgrade.test.cjs
+          node tests/marketplace-credits.test.cjs
