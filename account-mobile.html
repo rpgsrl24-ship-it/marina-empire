@@ -6,7 +6,7 @@
 </style></head><body><main class="app">
 <header class="head"><div class="top"><a class="round" href="./profile-mobile.html?v=20261110-profile1">‹</a><div class="brand"><b>⚓ MARINA EMPIRE</b><small>ACCOUNT & CLOUD</small></div><a class="round" href="./mobile-home.html?v=20261110-fast3">⌂</a></div><div class="hero"><h1>Account comandante</h1><p>Accedi per associare la partita a un account verificato. Il salvataggio guest resta sul dispositivo e viene copiato nello slot account al primo accesso se l'account non ha ancora un salvataggio locale.</p></div></header>
 <section class="card"><div id="accountStatus" class="status">Controllo account…</div><div id="accountInfo" class="meta"></div></section>
-<section class="card" id="authCard"><div class="fields"><input id="email" type="email" autocomplete="email" placeholder="Email"><input id="password" type="password" autocomplete="current-password" minlength="8" placeholder="Password (min. 8 caratteri)"></div><div class="actions"><button id="login">ACCEDI</button><button id="register" class="alt">REGISTRATI</button><button id="reset" class="alt">RECUPERA PASSWORD</button><button id="logout" class="danger" disabled>ESCI DALL'ACCOUNT</button></div><div class="meta">La registrazione può richiedere la conferma email. Nessuna password viene salvata nel gioco.</div></section>
+<section class="card" id="authCard"><div class="fields"><input id="email" type="email" autocomplete="email" placeholder="Email"><input id="password" type="password" autocomplete="current-password" minlength="8" placeholder="Password (min. 8 caratteri)"></div><div class="actions"><button id="login">ACCEDI</button><button id="register" class="alt">REGISTRATI</button><button id="reset" class="alt">RECUPERA PASSWORD</button><button id="logout" class="danger" hidden disabled>ESCI DALL'ACCOUNT</button></div><div class="meta">La registrazione può richiedere la conferma email. Nessuna password viene salvata nel gioco.</div></section>
 <section class="card"><strong>Installazione app</strong><div class="meta">Quando il browser supporta l'installazione PWA, il pulsante qui sotto diventa disponibile.</div><button class="install" data-pwa-install hidden disabled>INSTALLA APP</button></section>
 </main><nav class="bottom"><a href="./mobile-home.html?v=20261110-fast3">HOME</a><a href="./profile-mobile.html?v=20261110-profile1">PROFILO</a><a class="on" href="./account-mobile.html">ACCOUNT</a><a href="./marketplace-mobile.html?v=20261110-market13">STORE</a></nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
@@ -38,12 +38,12 @@ async function refresh(){
    attachLocalAccount(u);
    msg("Account collegato","good");
    accountInfo.textContent=(u.email||"Account verificato")+" · "+(u.email_confirmed_at?"email confermata":"conferma email in attesa");
-   logout.disabled=false;login.disabled=register.disabled=true;
+   logout.hidden=false;logout.disabled=false;login.disabled=register.disabled=true;
   }else{
    window.MarinaLocalSaveContext?.select(null);
    msg("Stai giocando come ospite");
    accountInfo.textContent="Puoi continuare a giocare senza account oppure registrarti per associare la partita.";
-   logout.disabled=true;login.disabled=register.disabled=false;
+   logout.hidden=true;logout.disabled=true;login.disabled=register.disabled=false;
   }
  }catch(e){msg("Controllo account non disponibile. La partita guest resta utilizzabile.","bad")}
 }
