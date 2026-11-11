@@ -38,6 +38,7 @@ jobs:
           node tests/marketplace-credits.test.cjs
           node tests/direction-balance.test.cjs
           node tests/account-pwa-modern.test.cjs
+          node tests/cloud-sync-modern.test.cjs
           node scripts/check-marina-inventory.cjs
           node scripts/test-visual-berth-resolver.cjs
       - name: Verify standalone mobile Marketplace for publishing
