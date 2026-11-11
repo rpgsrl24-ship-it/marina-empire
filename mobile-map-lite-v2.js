@@ -69,11 +69,12 @@ function missionCatalog(){
  return list;
 }
 function startMission(id,expectedDest){
+ const before=read();if(before?.trip)return{ok:false,message:"Viaggio già in corso"};
  const mission=missionCatalog().find(m=>m.id===String(id||""));if(!mission)return{ok:false,message:"Missione non disponibile"};
  if(expectedDest&&String(mission.dest)!==String(expectedDest))return{ok:false,message:"Destinazione missione non coerente"};
  if(!mission.ready)return{ok:false,message:mission.reason||"Missione non pronta"};
  const ok=mutate(g=>{
-   if(g.trip)return;
+   if(g.trip)throw new Error("Viaggio già in corso");
    const b=boats.find(x=>x.id===g.boat)||boats[0],duration=mission.id==="INTRO_RIMINI_CERVIA"?20:Math.max(20,Math.min(45,Math.round(mission.distance*.35)));
    g.setupComplete=true;g.homeMarina=g.homeMarina||g.port;g.investmentMarina=g.investmentMarina||g.port;
    g.coins=Math.max(0,Number(g.coins)||0)-Math.max(0,Number(mission.cost)||0);
@@ -81,7 +82,10 @@ function startMission(id,expectedDest){
    g.voyageSerial=Math.max(0,Number(g.voyageSerial)||0)+1;
    g.trip={voyageId:g.voyageSerial,id:mission.id,origin:g.port,dest:mission.dest,legs:[g.port,mission.dest],legIndex:0,legSeconds:duration,sec:duration,fuelRate:b.burn,weather:"calm",weatherWear:3,weatherLabel:"CALMO",mission:{id:mission.id,name:mission.name,dest:mission.dest,boat:mission.boat,reward:mission.reward,cost:mission.cost,fuel:mission.fuel,prestige:mission.prestige,sec:duration},until:Date.now()+duration*1000};
  });
- return ok?{ok:true,snapshot:snapshot()}:{ok:false,message:"Salvataggio della partenza non riuscito"};
+ if(!ok)return{ok:false,message:"Salvataggio della partenza non riuscito"};
+ const saved=read(),trip=saved?.trip;
+ if(!trip||String(trip.id)!==String(mission.id)||String(trip.dest)!==String(mission.dest))return{ok:false,message:"Partenza non confermata"};
+ return{ok:true,snapshot:snapshot()};
 }
 function pulse(){
  const s=read();if(!s?.trip)return {active:false,snapshot:snapshot()};
@@ -94,10 +98,13 @@ function pulse(){
      const trip=g.trip;if(!trip)return;
      const m=trip.mission||{},id=String(trip.id||m.id||""),reward=Math.max(0,Number(m.reward)||0),prestige=Math.max(0,Number(m.prestige)||0),dest=String(m.dest||trip.dest||g.port);
      g.completed=Array.isArray(g.completed)?g.completed:[];
-     const settled=id&&g.completed.includes(id);
+     g.settledVoyages=Array.isArray(g.settledVoyages)?g.settledVoyages:[];
+     const voyageId=Number(trip.voyageId)||0;
+     const settled=voyageId>0&&g.settledVoyages.includes(voyageId);
      g.port=dest;
      if(!settled){
-       if(id)g.completed.push(id);
+       if(id&&!g.completed.includes(id))g.completed.push(id);
+       if(voyageId>0)g.settledVoyages.push(voyageId);
        g.coins=Math.max(0,Number(g.coins)||0)+reward;
        g.prestige=Math.max(0,Number(g.prestige)||0)+prestige;
        g.voyages=Math.max(0,Number(g.voyages)||0)+1;
