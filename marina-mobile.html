@@ -22,7 +22,7 @@ button.service:target{outline:3px solid #ffd65c;outline-offset:3px;box-shadow:0 
 <button class="service action" id="refuel" type="button"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><b>⛽ Rifornimento</b><small id="refuelInfo">—</small></button>
 <button class="service action" id="repair" type="button"><img src="./anteprima/assets/render-2026/flotta.jpg" alt=""><b>🔧 Manutenzione</b><small id="repairInfo">—</small></button>
 <a class="service" href="./research-mobile.html?v=20261109-research1"><img src="./anteprima/assets/render-2026/flotta.jpg" alt=""><b>🏗 Cantiere</b></a>
-<a class="service" href="./marketplace-mobile.html?v=20261110-market13"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><b>🛒 Market</b></a>
+<a class="service" href="./marketplace-mobile.html?v=20261112-market14"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><b>🛒 Market</b></a>
 </section>
 <section class="income"><div><small>ENTRATE MARINA STIMATE / GIORNO</small><strong id="netIncome">—</strong></div><div>📈</div></section>
 <section id="jobsPanel" class="panel"><h3>📋 Nuovo incarico</h3><p id="jobText">Caricamento incarico…</p><div class="row"><span>Ricompensa</span><b id="jobReward">—</b></div><button class="btn gold" id="jobAction" type="button">APRI INCARICO</button></section>
@@ -32,7 +32,7 @@ button.service:target{outline:3px solid #ffd65c;outline-offset:3px;box-shadow:0 
 <section id="structuresPanel" class="panel"><h3>🏢 Strutture</h3><p id="structureText"></p><button class="btn" id="goMarket">APRI MARKETPLACE</button></section>
 <section id="upgradePanel" class="panel"><h3>⬆ Upgrade</h3><p id="upgradeText"></p><button class="btn gold" id="goOffice">GESTIONE AVANZATA</button></section>
 </main><div id="toast" class="toast hide"></div>
-<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a class="on" href="./marina-mobile.html?v=20261111-marina4"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261110-market13"><b>🛒</b>MARKET</a></nav>
+<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a class="on" href="./marina-mobile.html?v=20261111-marina4"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261112-market14"><b>🛒</b>MARKET</a></nav>
 <script src="./local-save-context.js"></script><script src="./marina-photos-v1.js?v=20261109-photos1"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script>
 <script>
 const fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -68,7 +68,7 @@ refuel.onclick=()=>{const r=window.MarinaEmpireMarinaLite.refuel();toastMsg(r.me
 repair.onclick=()=>{const r=window.MarinaEmpireMarinaLite.repair();toastMsg(r.message);render()};
 jobAction.onclick=()=>{const r=window.MarinaEmpireMarinaLite.completeJob();toastMsg(r.message);render()};
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));const map={overview:"overview",pontoons:"pontoonsPanel",services:"servicesPanel",structures:"structuresPanel",upgrade:"upgradePanel"};document.getElementById(map[b.dataset.tab])?.classList.add("on")});
-goMap.onclick=()=>location.assign("./map-mobile.html?v=20261111-map16");goMarket.onclick=()=>location.assign("./marketplace-mobile.html?v=20261110-market13");goOffice.onclick=()=>location.assign("./direction-mobile.html?v=20261110-direction1");
+goMap.onclick=()=>location.assign("./map-mobile.html?v=20261111-map16");goMarket.onclick=()=>location.assign("./marketplace-mobile.html?v=20261112-market14");goOffice.onclick=()=>location.assign("./direction-mobile.html?v=20261112-direction2");
 render();
 
 (function(){
