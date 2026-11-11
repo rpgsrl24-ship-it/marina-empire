@@ -1,6 +1,6 @@
 <!doctype html><html lang="it"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#063c67"><title>Marina Empire Mobile</title>
+<meta name="theme-color" content="#063c67"><link rel="manifest" href="./manifest.webmanifest"><title>Marina Empire Mobile</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#eaf6fb;color:#0a2940;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}button,a{font:inherit}.page{width:min(620px,100%);margin:auto;min-height:100vh;padding:7px 8px 92px;background:linear-gradient(180deg,#073d68 0,#0b73aa 25%,#eaf6fb 25%,#f8fcfe 100%)}
 .brand{text-align:center;color:#fff;padding:4px 0 5px;text-shadow:0 2px 8px #00335688}.brand b{font:800 22px Georgia,serif;letter-spacing:.08em}.brand small{display:block;margin-top:2px;color:#d9f3ff;font-size:7px;font-weight:900;letter-spacing:.14em}
@@ -41,17 +41,17 @@
 <a class="tile" href="./missions-mobile.html?v=20261110-missions7"><img src="./anteprima/assets/render-2026/charter.jpg" alt=""><span class="i">🤝</span><span class="l">CONTRATTI / CHARTER</span></a>
 <a class="tile" href="./marketplace-mobile.html?v=20261110-market13"><img src="./anteprima/assets/render-2026/cantieri.jpg" alt=""><span class="i">🛒</span><span class="l">MARKETPLACE</span></a>
 <a class="tile" href="./community-mobile.html?v=20261110-community3"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><span class="i">💬</span><span class="l">COMMUNITY</span></a><a class="tile" href="./alliance-mobile.html?v=20261110-alliance1"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><span class="i">👥</span><span class="l">ALLEANZA / CLUB</span></a><a class="tile" href="./ranking-mobile.html?v=20261110-ranking1"><img src="./anteprima/assets/render-2026/hero-yacht.jpg" alt=""><span class="i">🏆</span><span class="l">CLASSIFICA</span></a>
-<a class="tile" href="./profile-mobile.html?v=20261110-profile1"><img src="./anteprima/assets/render-2026/economia.jpg" alt=""><span class="i">👤</span><span class="l">PROFILO / ACCOUNT</span></a>
+<a class="tile" href="./account-mobile.html"><img src="./anteprima/assets/render-2026/economia.jpg" alt=""><span class="i">👤</span><span class="l">ACCOUNT / ACCESSO</span></a>
 <a class="tile" href="./marketplace-mobile.html?v=20261110-market13"><img src="./anteprima/assets/render-2026/hero-yacht.jpg" alt=""><span class="i">💳</span><span class="l">STORE / CREDITI</span></a>
 <a class="tile" href="./research-mobile.html?v=20261109-research1"><img src="./anteprima/assets/render-2026/cantieri.jpg" alt=""><span class="i">🔧</span><span class="l">CANTIERE / REFIT</span></a>
 <a class="tile" href="./activities-mobile.html?v=20261110-activities1"><img src="./anteprima/assets/render-2026/charter.jpg" alt=""><span class="i">⛵</span><span class="l">ATTIVITÀ NAUTICHE</span></a><a class="tile" href="./direction-mobile.html?v=20261110-direction1"><img src="./anteprima/assets/render-2026/economia.jpg" alt=""><span class="i">🏛️</span><span class="l">DIREZIONE</span></a>
 <a class="tile" href="./isola-delle-rose-originale.html"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><span class="i">🏝️</span><span class="l">BASE RPG</span></a>
 </section>
-<div class="services"><a href="./marina-mobile.html?v=20261110-marina3#refuel">⛽ PIENO</a><a href="./marina-mobile.html?v=20261110-marina3#repair">🔧 MANUTENZIONE</a><a href="./mobile-home.html?v=20261110-fast3">↩ ESCI</a></div>
+<div class="services"><a href="./marina-mobile.html?v=20261110-marina3#refuel">⛽ PIENO</a><a href="./marina-mobile.html?v=20261110-marina3#repair">🔧 MANUTENZIONE</a><button data-pwa-install hidden disabled style="padding:10px 5px;border:1px solid #abcde0;border-radius:11px;background:linear-gradient(#fff,#e8f4f9);color:#0b2b42;font-size:8px;font-weight:900">INSTALLA APP</button><a href="./mobile-home.html?v=20261110-fast3">↩ ESCI</a></div>
 <a id="nextStepCard" class="progress" href="./missions-mobile.html?v=20261110-missions7" style="display:block;text-decoration:none;color:inherit"><small id="nextStepEyebrow">PROGRESSIONE & OBIETTIVI</small><strong id="nextStepTitle">Continua il tuo impero</strong><span id="nextStepText">Obiettivi, diario e servizi rapidi</span></a>
 <nav class="bottom"><a class="on" href="./mobile-home.html?v=20261110-fast3"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261110-map14"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261110-missions7"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a href="./activities-mobile.html?v=20261110-activities1"><b>⛵</b>ATTIVITÀ</a></nav>
 </main>
-<script src="./local-save-context.js"></script><script>
+<script src="./local-save-context.js"></script><script src="./pwa-install.js?v=20261111-pwa1"></script><script>
 (()=>{try{
  const c=window.MarinaLocalSaveContext;let h=c&&c.capture(),g=h&&c.readGame(h);
  if(!g){c&&c.select(null);h=c&&c.capture();g=h&&c.readGame(h)}
