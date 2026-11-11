@@ -57,4 +57,5 @@ jobs:
           node tests/marketplace-credits.test.cjs
           node tests/direction-balance.test.cjs
           node tests/account-pwa-modern.test.cjs
+          node tests/cloud-sync-modern.test.cjs
 
