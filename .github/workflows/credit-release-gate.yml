@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: marina-empire-credit-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   credit-release-gate:
     runs-on: ubuntu-latest
