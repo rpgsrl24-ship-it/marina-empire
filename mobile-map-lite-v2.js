@@ -51,8 +51,10 @@ function missionCatalog(){
    const dist=seaMiles("rimini","cervia"),fuelCost=Math.ceil(dist*b.burn),ready=!s.trip&&(Number(s.condition??100)>=30)&&(Number(s.fuel)||0)>=fuelCost+Math.ceil(b.tank*.15);
    list.push({id:"INTRO_RIMINI_CERVIA",name:"PRIMA MISSIONE · RPG Academy 8 · Rimini - Cervia",service:"Academy",dest:"cervia",destination:"Cervia",origin:originName,reward:500,prestige:50,cost:0,total:0,fuel:fuelCost,distance:dist,boat:"voyager",ready,reason:ready?"":"Controlla carburante e stato yacht"});
  }
+ const introActive=s.port==="rimini"&&b.id==="voyager"&&(Number(s.voyages)||0)===0&&!(Array.isArray(s.completed)&&s.completed.includes("INTRO_RIMINI_CERVIA"));
  for(const p of ports){
    if(p.id===s.port)continue;
+   if(introActive&&p.id==="cervia")continue;
    const pl=plan(s.port,p.id,b.tank,b.burn),direct=!!pl.possible&&Array.isArray(pl.legs)&&pl.legs.length===2;
    const distance=Number(pl.distance)||seaMiles(s.port,p.id),fuelCost=Math.ceil(distance*b.burn),cost=Math.max(250,Math.round(distance*7*b.mult))+b.crew,reward=Math.max(1200,Math.round(distance*20*b.mult)),prestige=Math.max(15,Math.round(distance*.4*b.mult));
    let ready=direct&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id))&&(Number(s.fuel)||0)>=fuelCost+Math.ceil(b.tank*.15)&&(Number(s.coins)||0)>=cost;
