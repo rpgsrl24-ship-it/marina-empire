@@ -1,11 +1,11 @@
-const CACHE="marina-empire-v20261111-modern1";
+const CACHE="marina-empire-v20261111-modern2";
 const CORE=[
  "./",
  "./index.html",
- "./mobile-home.html?v=20261110-fast3",
- "./missions-mobile.html?v=20261110-missions7",
- "./map-mobile.html?v=20261110-map14",
- "./marina-mobile.html?v=20261110-marina3",
+ "./mobile-home.html?v=20261111-home6",
+ "./missions-mobile.html?v=20261111-missions9",
+ "./map-mobile.html?v=20261111-map16",
+ "./marina-mobile.html?v=20261111-marina4",
  "./fleet-mobile.html?v=20261109-fleet1",
  "./profile-mobile.html?v=20261110-profile1",
  "./account-mobile.html",
@@ -38,7 +38,7 @@ self.addEventListener("fetch",event=>{
    fetch(req,{cache:"no-store"}).then(res=>{
     if(res&&res.ok)caches.open(CACHE).then(cache=>cache.put(req,res.clone())).catch(()=>{});
     return res;
-   }).catch(async()=>await caches.match(req)||await caches.match("./mobile-home.html?v=20261110-fast3")||await caches.match("./index.html"))
+   }).catch(async()=>await caches.match(req)||await caches.match("./mobile-home.html?v=20261111-home6")||await caches.match("./index.html"))
   );
   return;
  }
