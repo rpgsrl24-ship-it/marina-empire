@@ -11,7 +11,7 @@
 .main{padding:10px}.search{display:grid;grid-template-columns:1fr 52px;gap:7px}.search input{min-height:50px;padding:10px 14px;border:2px solid #8fc8e8;border-radius:17px;background:#fff;color:#123;font-size:16px}.search button{border:2px solid #8fc8e8;border-radius:17px;background:#fff;font-size:20px}
 .cats{display:flex;gap:7px;overflow-x:auto;margin-top:9px;padding-bottom:3px;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}.cat{flex:0 0 91px;min-height:77px;border:1px solid #abcde0;border-radius:14px;background:linear-gradient(#fff,#e8f4f9);color:#0b2b42;font-size:7px;font-weight:950}.cat b{display:block;font-size:23px;margin-bottom:4px}
 .sec{margin-top:11px}.sec-h{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:13px;background:linear-gradient(90deg,#f7d256,#fff0b4 72%,transparent);font-size:8px}.sec-h strong{font-size:16px}.sec-h span{font-weight:950;color:#184f91}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:7px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:7px}.card.hide{display:none}.cat.on{outline:2px solid #159df3;box-shadow:0 0 10px #159df355}.card{overflow:hidden;border:1px solid #bad5e4;border-radius:14px;background:#fff;box-shadow:0 4px 14px #0d487020}.img{height:110px;background:url("./anteprima/assets/render-2026/hero-yacht.jpg") center/cover}.card:nth-child(2) .img{background-image:url("./anteprima/assets/render-2026/charter.jpg")}.card:nth-child(3) .img{background-image:url("./anteprima/assets/render-2026/flotta.jpg")}.card:nth-child(4) .img{background-image:url("./anteprima/assets/render-2026/marine.jpg")}.body{padding:7px}.tag{display:inline-block;margin-bottom:4px;padding:3px 6px;border-radius:7px;background:#0d5fb8;color:#fff;font-size:5.7px;font-weight:950}.tag.used{background:#d73931}.card h3{margin:0;font-size:10px;line-height:1.25}.price{margin-top:4px;color:#0c3193;font-size:14px;font-weight:950}.meta{margin-top:3px;color:#506d7c;font-size:6.5px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:7px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:7px}.card.hide{display:none}.cat.on{outline:2px solid #159df3;box-shadow:0 0 10px #159df355}.card{overflow:hidden;border:1px solid #bad5e4;border-radius:14px;background:#fff;box-shadow:0 4px 14px #0d487020}.img{height:110px;background:url("./anteprima/assets/render-2026/hero-yacht.jpg") center/cover}.card:nth-child(2) .img{background-image:url("./anteprima/assets/render-2026/charter.jpg")}.card:nth-child(3) .img{background-image:url("./anteprima/assets/render-2026/flotta.jpg")}.card:nth-child(4) .img{background-image:url("./anteprima/assets/render-2026/marine.jpg")}.body{padding:7px}.tag{display:inline-block;margin-bottom:4px;padding:3px 6px;border-radius:7px;background:#0d5fb8;color:#fff;font-size:5.7px;font-weight:950}.tag.used{background:#d73931}.card h3{margin:0;font-size:10px;line-height:1.25}.price{margin-top:4px;color:#0c3193;font-size:14px;font-weight:950}.meta{margin-top:3px;color:#506d7c;font-size:6.5px}.creditBuy{width:100%;margin-top:7px;min-height:34px;border:0;border-radius:10px;background:linear-gradient(180deg,#f6cf57,#d99a16);color:#17334c;font-size:8px;font-weight:950}.creditBuy:disabled{opacity:.5}.creditState{display:block;margin-top:4px;font-size:7px;font-weight:900;color:#247c45}
 .banners{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}.banner{min-height:107px;padding:12px;border-radius:15px;color:#fff;display:flex;align-items:flex-end;background:linear-gradient(90deg,#002d52b5,#002d523b),url("./anteprima/assets/render-2026/charter.jpg") center/cover}.banner:nth-child(2){background-image:linear-gradient(90deg,#002d52b5,#002d523b),url("./anteprima/assets/render-2026/marine.jpg")}.banner strong{font-size:18px;display:block}.banner small{font-size:7px}
 .bottom{position:fixed;left:7px;right:7px;bottom:7px;max-width:606px;margin:auto;z-index:99;display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:5px;border-radius:16px;background:#06243af5;border:1px solid #58c1eb;box-shadow:0 8px 24px #0008}.bottom a{min-height:53px;border-radius:10px;color:#fff;font-size:5.8px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center}.bottom a b{font-size:18px;margin-bottom:3px}.bottom .active{background:linear-gradient(180deg,#1ccaff,#0768f3);box-shadow:0 0 12px #4addff}
 @media(max-width:430px){.tabs{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(2,1fr);border-radius:15px}.stats div:nth-child(2){border-right:0}.grid3{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}.banners{grid-template-columns:1fr}.title h1{font-size:28px}}
@@ -31,6 +31,11 @@
 <article class="card" data-cat="efoil offerte"><div class="img"></div><div class="body"><span class="tag used">Usato</span><h3>eFoil – Ottime condizioni</h3><div class="price">€ 4.990</div><div class="meta">Usato</div></div></article>
 <article class="card" data-cat="water offerte"><div class="img"></div><div class="body"><span class="tag">RPG Yacht</span><h3>Seabob F5 S</h3><div class="price">€ 11.900</div><div class="meta">Nuovo</div></div></article>
 </div></section>
+<section class="sec" id="creditMarket"><div class="sec-h"><strong>🪙 Oggetti in crediti</strong><span>Solo economia di gioco</span></div><div class="grid3">
+<article class="card credit-card" data-cat="accessori" data-credit-id="captain_badge" data-credit-cost="2500"><div class="img"></div><div class="body"><span class="tag">DIGITALE</span><h3>Badge Capitano Argento</h3><div class="price">🪙 2.500</div><div class="meta">Collezionabile profilo · acquisto unico</div><span class="creditState" data-credit-state="captain_badge"></span><button class="creditBuy" data-credit-buy="captain_badge">ACQUISTA IN CREDITI</button></div></article>
+<article class="card credit-card" data-cat="accessori offerte" data-credit-id="marina_frame" data-credit-cost="3500"><div class="img"></div><div class="body"><span class="tag">DIGITALE</span><h3>Cornice Profilo Marina Blu</h3><div class="price">🪙 3.500</div><div class="meta">Collezionabile profilo · acquisto unico</div><span class="creditState" data-credit-state="marina_frame"></span><button class="creditBuy" data-credit-buy="marina_frame">ACQUISTA IN CREDITI</button></div></article>
+<article class="card credit-card" data-cat="offerte" data-credit-id="founder_flag" data-credit-cost="5000"><div class="img"></div><div class="body"><span class="tag">LIMITATO</span><h3>Bandiera Marina Empire</h3><div class="price">🪙 5.000</div><div class="meta">Collezionabile digitale · acquisto unico</div><span class="creditState" data-credit-state="founder_flag"></span><button class="creditBuy" data-credit-buy="founder_flag">ACQUISTA IN CREDITI</button></div></article>
+</div></section>
 <section class="sec"><div class="sec-h"><strong>📍 Annunci vicino alla tua marina</strong><span>Rimini – Darsena ›</span></div><div class="grid4">
 <article class="card" data-cat="imbarcazioni"><div class="img"></div><div class="body"><h3>Prestige 42</h3><div class="price">€ 320.000</div><div class="meta">📍 Rimini (RN)</div></div></article>
 <article class="card" data-cat="pwc"><div class="img"></div><div class="body"><h3>PWC GTX 300</h3><div class="price">€ 15.900</div><div class="meta">📍 Rimini (RN)</div></div></article>
@@ -46,12 +51,14 @@
 (()=>{try{
  const ctx=window.MarinaLocalSaveContext;let h=ctx&&ctx.capture(),g=h&&ctx.readGame(h);
  if(!g){try{ctx&&ctx.select(null);h=ctx&&ctx.capture();g=h&&ctx.readGame(h)}catch(_){}}
+ if(!g&&ctx&&h){const fresh={name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],trip:null,reservations:[],voyages:0,setupComplete:true,voyageSerial:0,marinas:{},marketInventory:[]};if(ctx.writeGame(h,fresh))g=ctx.readGame(h)}
  if(g){
   coins.textContent=Number(g.coins||0).toLocaleString("it-IT");prestige.textContent=Number(g.prestige||0).toLocaleString("it-IT");
   level.textContent="Lv. "+(1+Math.floor(Math.max(0,Number(g.prestige||0))/200));
-  const tank=Number(g.tank||g.fuelMax||300),f=Number(g.fuel||0);fuel.textContent=Math.max(0,Math.min(100,Math.round(tank?f/tank*100:0)))+"%";
+  const tanks={voyager:400,open:300,yacht:550,yacht14:700,yacht20:1100,yacht30:1700,luna:900};const tank=Number(g.tank||g.fuelMax||tanks[g.boat]||400),f=Number(g.fuel||0);fuel.textContent=Math.max(0,Math.min(100,Math.round(tank?f/tank*100:0)))+"%";
   condition.textContent=Math.max(0,Math.min(100,Math.round(Number(g.condition??100))))+"%";
  }
+ window.__marketCtx={ctx,h};
 }catch(_){}})();
 
 const cards=[...document.querySelectorAll(".card[data-cat]")],cats=[...document.querySelectorAll(".cat[data-filter]")];
@@ -69,4 +76,29 @@ function applyMarketFilter(){
 search.addEventListener("input",applyMarketFilter);
 cats.forEach(b=>b.addEventListener("click",()=>{activeFilter=activeFilter===b.dataset.filter?"":b.dataset.filter;applyMarketFilter()}));
 clearFilter.addEventListener("click",()=>{activeFilter="";search.value="";applyMarketFilter()});
+
+function marketGame(){const x=window.__marketCtx;return x?.ctx&&x.h?x.ctx.readGame(x.h):null}
+function marketWrite(game){const x=window.__marketCtx;return !!(x?.ctx&&x.h&&x.ctx.writeGame(x.h,game))}
+function refreshCreditMarket(){
+ const g=marketGame();if(!g)return;
+ const inv=Array.isArray(g.marketInventory)?g.marketInventory:[];
+ coins.textContent=Number(g.coins||0).toLocaleString("it-IT");
+ document.querySelectorAll("[data-credit-id]").forEach(card=>{
+  const id=card.dataset.creditId,cost=Number(card.dataset.creditCost)||0,owned=inv.includes(id);
+  const b=card.querySelector("[data-credit-buy]"),state=card.querySelector("[data-credit-state]");
+  if(state)state.textContent=owned?"✓ GIÀ ACQUISTATO":((Number(g.coins)||0)<cost?"Crediti insufficienti":"Disponibile");
+  if(b){b.disabled=owned||(Number(g.coins)||0)<cost;b.textContent=owned?"ACQUISTATO":((Number(g.coins)||0)<cost?"CREDITI INSUFFICIENTI":"ACQUISTA IN CREDITI")}
+ });
+}
+document.querySelectorAll("[data-credit-buy]").forEach(b=>b.addEventListener("click",()=>{
+ const card=b.closest("[data-credit-id]"),id=card?.dataset.creditId,cost=Number(card?.dataset.creditCost)||0,g=marketGame();
+ if(!g||!id||!cost)return;
+ g.marketInventory=Array.isArray(g.marketInventory)?g.marketInventory:[];
+ if(g.marketInventory.includes(id)){refreshCreditMarket();return}
+ const before=Math.max(0,Number(g.coins)||0);if(before<cost){refreshCreditMarket();return}
+ g.coins=before-cost;g.marketInventory.push(id);
+ if(!marketWrite(g)){g.coins=before;g.marketInventory=g.marketInventory.filter(x=>x!==id);return}
+ refreshCreditMarket();
+}));
+refreshCreditMarket();
 </script></body></html>
