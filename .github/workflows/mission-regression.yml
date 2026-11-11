@@ -14,23 +14,7 @@ on:
       - 'tests/**'
       - 'backend/**'
       - '.github/workflows/**'
-  push:
-    branches:
-      - main
-      - 'dev/mission-regression-2026-10-29'
-    paths:
-      - 'index.html'
-      - 'beta-test/**'
-      - '.github/workflows/pages.yml'
-      - 'admin.html'
-      - 'route-planner.js'
-      - 'local-save-context.js'
-      - 'save-state-guard.js'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'tests/**'
-      - 'backend/**'
-      - '.github/workflows/**'
+  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
@@ -60,4 +44,3 @@ jobs:
           node tests/cloud-sync-modern.test.cjs
           node tests/pwa-offline-core.test.cjs
           node tests/ui-content-consistency.test.cjs
-

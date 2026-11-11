@@ -1,30 +1,5 @@
 name: Marina Empire smoke tests
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'beta-test/**'
-      - '*.html'
-      - 'assets/**'
-      - 'advertising/**'
-      - 'anteprima/**'
-      - 'manifest.webmanifest'
-      - 'app-icon.svg'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'route-planner.js'
-      - 'local-save-context.js'
-      - 'save-state-guard.js'
-      - 'live-traffic.js'
-      - 'service-chains.js'
-      - 'marina-npc.js'
-      - 'marine-catalogo-approvato.json'
-      - 'marine-deluxe-originali.html'
-      - 'isola-delle-rose-originale.html'
-      - 'scripts/**'
-      - 'tests/**'
-      - '.github/workflows/**'
   pull_request:
   workflow_dispatch:
 permissions:

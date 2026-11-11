@@ -1,29 +1,25 @@
 name: Marina Empire public live UX audit
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'mobile-home.html'
-      - 'map-mobile.html'
-      - 'missions-mobile.html'
-      - 'marina-mobile.html'
-      - 'mobile-map-lite-v2.js'
-      - 'local-save-context.js'
-      - 'scripts/public-live-ux-audit.cjs'
-      - '.github/workflows/public-live-ux-audit.yml'
+  workflow_run:
+    workflows: ["Deploy Marina Empire"]
+    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: marina-empire-public-live-ux-${{ github.ref }}
+  group: marina-empire-public-live-ux-${{ github.event.workflow_run.head_branch || github.ref }}
   cancel-in-progress: true
 jobs:
   live-ux:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      TARGET_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_SHA }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -31,17 +27,17 @@ jobs:
         run: npm ci
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Wait for GitHub Pages to expose this commit
+      - name: Wait for GitHub Pages to expose deployed commit
         shell: bash
         run: |
           for i in $(seq 1 60); do
-            if curl -fsSL "https://rpgsrl24-ship-it.github.io/marina-empire/release.json?ts=$(date +%s)" | grep -Fq "$GITHUB_SHA"; then
-              echo "Public deployment matches $GITHUB_SHA"
+            if curl -fsSL "https://rpgsrl24-ship-it.github.io/marina-empire/release.json?ts=$(date +%s)" | grep -Fq "$TARGET_SHA"; then
+              echo "Public deployment matches $TARGET_SHA"
               exit 0
             fi
             sleep 5
           done
-          echo "Public deployment did not expose $GITHUB_SHA in time"
+          echo "Public deployment did not expose $TARGET_SHA in time"
           exit 1
       - name: Audit deployed public game on desktop and mobile
         run: node scripts/public-live-ux-audit.cjs
