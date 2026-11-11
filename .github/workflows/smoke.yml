@@ -61,3 +61,4 @@ jobs:
           node tests/direction-balance.test.cjs
           node tests/account-pwa-modern.test.cjs
           node tests/cloud-sync-modern.test.cjs
+          node tests/pwa-offline-core.test.cjs
