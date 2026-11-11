@@ -1,12 +1,19 @@
-const CACHE="marina-empire-v20261110-mobile-stable3";
+const CACHE="marina-empire-v20261111-modern1";
 const CORE=[
  "./",
  "./index.html",
+ "./mobile-home.html?v=20261110-fast3",
+ "./missions-mobile.html?v=20261110-missions7",
+ "./map-mobile.html?v=20261110-map14",
+ "./marina-mobile.html?v=20261110-marina3",
+ "./fleet-mobile.html?v=20261109-fleet1",
+ "./profile-mobile.html?v=20261110-profile1",
+ "./account-mobile.html",
+ "./marketplace-mobile.html?v=20261110-market13",
  "./manifest.webmanifest",
  "./app-icon.svg",
- "./credit-purchase-rc.js",
  "./local-save-context.js",
- "./save-state-guard.js"
+ "./pwa-install.js?v=20261111-pwa1"
 ];
 
 self.addEventListener("install",event=>{
@@ -15,9 +22,7 @@ self.addEventListener("install",event=>{
 });
 
 self.addEventListener("activate",event=>{
- event.waitUntil(
-  caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
- );
+ event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
  self.clients.claim();
 });
 
@@ -27,31 +32,32 @@ self.addEventListener("fetch",event=>{
  const url=new URL(req.url);
  if(url.origin!==self.location.origin)return;
 
- const isFreshAsset=req.mode==="navigate"||/\.(?:html?|js|css)$/i.test(url.pathname);
-
- if(isFreshAsset){
+ if(req.mode==="navigate"){
   event.respondWith(
    fetch(req,{cache:"no-store"}).then(res=>{
-    if(res&&res.ok){
-     const copy=res.clone();
-     caches.open(CACHE).then(cache=>cache.put(req.mode==="navigate"?"./index.html":req,copy)).catch(()=>{});
-    }
+    if(res&&res.ok)caches.open(CACHE).then(cache=>cache.put(req,res.clone())).catch(()=>{});
     return res;
-   }).catch(()=>req.mode==="navigate"?caches.match("./index.html"):caches.match(req))
+   }).catch(async()=>await caches.match(req)||await caches.match("./mobile-home.html?v=20261110-fast3")||await caches.match("./index.html"))
   );
   return;
  }
 
- event.respondWith(
-  caches.match(req).then(cached=>{
-   const network=fetch(req).then(res=>{
-    if(res&&res.ok){
-     const copy=res.clone();
-     caches.open(CACHE).then(cache=>cache.put(req,copy)).catch(()=>{});
-    }
+ const fresh=/\.(?:html?|js|css)$/i.test(url.pathname);
+ if(fresh){
+  event.respondWith(
+   fetch(req,{cache:"no-store"}).then(res=>{
+    if(res&&res.ok)caches.open(CACHE).then(cache=>cache.put(req,res.clone())).catch(()=>{});
     return res;
-   }).catch(()=>cached);
-   return cached||network;
-  })
- );
+   }).catch(()=>caches.match(req))
+  );
+  return;
+ }
+
+ event.respondWith(caches.match(req).then(cached=>{
+  const network=fetch(req).then(res=>{
+   if(res&&res.ok)caches.open(CACHE).then(cache=>cache.put(req,res.clone())).catch(()=>{});
+   return res;
+  }).catch(()=>cached);
+  return cached||network;
+ }));
 });
