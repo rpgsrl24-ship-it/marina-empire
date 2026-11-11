@@ -1,0 +1,59 @@
+<!doctype html><html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#075f91"><link rel="manifest" href="./manifest.webmanifest"><title>Marina Empire · Account</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#eaf7fc;color:#0a3153}body{padding-bottom:90px}.app{max-width:620px;margin:auto;min-height:100vh;background:linear-gradient(180deg,#064e7d 0,#0b75ab 25%,#eaf7fc 25%,#f9fdff 100%)}.head{padding:10px;color:#fff}.top{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}.round{width:44px;height:44px;border:2px solid #bcecff;border-radius:14px;display:grid;place-items:center;background:#064d78dd;color:#fff;text-decoration:none}.brand{text-align:center}.brand b{font:800 22px Georgia,serif}.brand small{display:block;font-size:7px}.hero{margin:13px 0 3px;padding:16px;border:1px solid #6ac9ef;border-radius:18px;background:#063d64dd}.hero h1{margin:0;font-size:25px}.hero p{margin:5px 0 0;font-size:9px;line-height:1.45}.card{margin:9px;padding:13px;border:1px solid #9bcde1;border-radius:17px;background:#fff;box-shadow:0 5px 16px #0d48701f}.status{padding:10px;border-radius:13px;background:#edf8fc;font-size:9px}.status.good{background:#e8f8ee;color:#18683a}.status.bad{background:#fff0ef;color:#a33a31}.fields{display:grid;gap:8px;margin-top:10px}.fields input{min-height:46px;padding:10px 12px;border:1px solid #9bcde1;border-radius:12px;font-size:15px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.actions button,.install{min-height:44px;border:1px solid #73c6eb;border-radius:12px;background:linear-gradient(180deg,#159df3,#0869da);color:#fff;font-weight:900;font-size:9px}.actions .alt{background:#fff;color:#0a5f92}.actions .danger{background:#fff0ef;color:#a33a31;border-color:#efb0ab}.meta{margin-top:9px;color:#5f7581;font-size:8px;line-height:1.45}.install{width:100%;margin-top:10px}.bottom{position:fixed;left:6px;right:6px;bottom:6px;max-width:608px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:5px;border:1px solid #58c1eb;border-radius:18px;background:#f8fcfef5}.bottom a{min-height:55px;border-radius:12px;color:#0a456f;text-decoration:none;display:grid;place-items:center;font-size:7px;font-weight:900}.bottom .on{background:#0c83c3;color:#fff}
+</style></head><body><main class="app">
+<header class="head"><div class="top"><a class="round" href="./profile-mobile.html?v=20261110-profile1">‹</a><div class="brand"><b>⚓ MARINA EMPIRE</b><small>ACCOUNT & CLOUD</small></div><a class="round" href="./mobile-home.html?v=20261110-fast3">⌂</a></div><div class="hero"><h1>Account comandante</h1><p>Accedi per associare la partita a un account verificato. Il salvataggio guest resta sul dispositivo e viene copiato nello slot account al primo accesso se l'account non ha ancora un salvataggio locale.</p></div></header>
+<section class="card"><div id="accountStatus" class="status">Controllo account…</div><div id="accountInfo" class="meta"></div></section>
+<section class="card" id="authCard"><div class="fields"><input id="email" type="email" autocomplete="email" placeholder="Email"><input id="password" type="password" autocomplete="current-password" minlength="8" placeholder="Password (min. 8 caratteri)"></div><div class="actions"><button id="login">ACCEDI</button><button id="register" class="alt">REGISTRATI</button><button id="reset" class="alt">RECUPERA PASSWORD</button><button id="logout" class="danger" disabled>ESCI DALL'ACCOUNT</button></div><div class="meta">La registrazione può richiedere la conferma email. Nessuna password viene salvata nel gioco.</div></section>
+<section class="card"><strong>Installazione app</strong><div class="meta">Quando il browser supporta l'installazione PWA, il pulsante qui sotto diventa disponibile.</div><button class="install" data-pwa-install hidden disabled>INSTALLA APP</button></section>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261110-fast3">HOME</a><a href="./profile-mobile.html?v=20261110-profile1">PROFILO</a><a class="on" href="./account-mobile.html">ACCOUNT</a><a href="./marketplace-mobile.html?v=20261110-market13">STORE</a></nav>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
+<script src="./local-save-context.js"></script><script src="./pwa-install.js?v=20261111-pwa1"></script>
+<script>
+const URL="https://zrdetqvnjmqkfyajxjgp.supabase.co",KEY="sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw";
+const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+let busy=false;
+const setBusy=v=>{busy=v;login.disabled=register.disabled=reset.disabled=v};
+function msg(t,kind=""){accountStatus.textContent=t;accountStatus.className="status"+(kind?" "+kind:"")}
+function guestSnapshot(){
+ const ctx=window.MarinaLocalSaveContext;if(!ctx)return null;
+ ctx.select(null);const h=ctx.capture();return h?ctx.readGame(h):null;
+}
+function attachLocalAccount(user){
+ const ctx=window.MarinaLocalSaveContext;if(!ctx||!user?.id)return false;
+ const guest=guestSnapshot();
+ if(!ctx.select(user.id))return false;
+ const h=ctx.capture();if(!h)return false;
+ const existing=ctx.readGame(h);
+ if(!existing&&guest)return ctx.writeGame(h,guest);
+ return true;
+}
+async function refresh(){
+ try{
+  const {data,error}=await client.auth.getUser();if(error)throw error;
+  const u=data?.user;
+  if(u){
+   attachLocalAccount(u);
+   msg("Account collegato","good");
+   accountInfo.textContent=(u.email||"Account verificato")+" · "+(u.email_confirmed_at?"email confermata":"conferma email in attesa");
+   logout.disabled=false;login.disabled=register.disabled=true;
+  }else{
+   window.MarinaLocalSaveContext?.select(null);
+   msg("Stai giocando come ospite");
+   accountInfo.textContent="Puoi continuare a giocare senza account oppure registrarti per associare la partita.";
+   logout.disabled=true;login.disabled=register.disabled=false;
+  }
+ }catch(e){msg("Controllo account non disponibile. La partita guest resta utilizzabile.","bad")}
+}
+async function run(fn){
+ if(busy)return;setBusy(true);
+ try{await fn()}catch(e){msg(e?.message||"Operazione non riuscita","bad")}finally{setBusy(false);refresh()}
+}
+login.onclick=()=>run(async()=>{const e=email.value.trim(),p=password.value;if(!e||!p)throw new Error("Inserisci email e password");const r=await client.auth.signInWithPassword({email:e,password:p});if(r.error)throw r.error;password.value="";msg("Accesso completato","good")});
+register.onclick=()=>run(async()=>{const e=email.value.trim(),p=password.value;if(!e||p.length<8)throw new Error("Inserisci email valida e password di almeno 8 caratteri");const r=await client.auth.signUp({email:e,password:p,options:{emailRedirectTo:location.origin+location.pathname}});if(r.error)throw r.error;password.value="";msg("Registrazione inviata. Controlla la conferma email.","good")});
+reset.onclick=()=>run(async()=>{const e=email.value.trim();if(!e)throw new Error("Inserisci l'email");const r=await client.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;msg("Se l'account esiste, riceverai le istruzioni per il recupero.","good")});
+logout.onclick=()=>run(async()=>{const r=await client.auth.signOut({scope:"local"});if(r.error)throw r.error;window.MarinaLocalSaveContext?.select(null);msg("Disconnesso. Continui come ospite.","good")});
+client.auth.onAuthStateChange(()=>setTimeout(refresh,0));refresh();
+</script></body></html>
