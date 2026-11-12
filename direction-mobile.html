@@ -20,7 +20,7 @@
 <div class="note">I valori mostrati derivano dal salvataggio della partita. Il grafico rappresenta una visualizzazione indicativa della progressione economica, non uno storico contabile reale.</div>
 </main>
 <nav class="bottom"><a href="./mobile-home.html?v=20261112-home7"><b>⌂</b>HOME</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>◉</b>MISSIONI</a><a href="./marina-mobile.html?v=20261112-marina5"><b>⚓</b>MARINA</a><a href="./activities-mobile.html?v=20261110-activities1"><b>⛵</b>ATTIVITÀ</a><a href="./community-mobile.html?v=20261112-community5"><b>👥</b>COMMUNITY</a><a class="on" href="./direction-mobile.html?v=20261112-direction2"><b>🏛️</b>DIREZIONE</a></nav>
-<script src="./local-save-context.js"></script><script>
+<script src="./local-save-context.js"></script><script src="./premium-fx.js?v=20261112-fx1"></script><script>
 const fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
 const BIZ={sup:["SUP / Kayak","./anteprima/assets/render-2026/marine.jpg"],school:["Scuola Nautica","./anteprima/assets/render-2026/cantieri.jpg"],charter:["Agenzia Charter","./anteprima/assets/render-2026/charter.jpg"],water:["Centro Water Toys","./anteprima/assets/render-2026/hero-yacht.jpg"],luxury:["Charter Maxi Yacht","./anteprima/assets/render-2026/hero-yacht.jpg"]};
 function renderDirection(){try{const c=window.MarinaLocalSaveContext;let h=c&&c.capture(),g=h&&c.readGame(h);if(!g){c&&c.select(null);h=c&&c.capture();g=h&&c.readGame(h)}if(!g){activityList.innerHTML='<article class="activity"><div class="activitybody"><strong>Avvia prima la partita</strong><span>Entra dalla Home.</span></div></article>';return}

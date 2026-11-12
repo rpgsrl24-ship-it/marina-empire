@@ -15,6 +15,7 @@ const CORE=[
  "./manifest.webmanifest",
  "./app-icon.svg",
  "./local-save-context.js",
+ "./premium-fx.js?v=20261112-fx1",
  "./marina-fx-v1.js?v=20261112-fx1",
  "./mobile-marina-lite-v1.js?v=20261112-marinalite3",
  "./cloud-sync-modern.js?v=20261111-cloud1",

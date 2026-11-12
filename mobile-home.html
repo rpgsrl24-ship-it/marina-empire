@@ -55,7 +55,7 @@
 <a id="nextStepCard" class="progress" href="./missions-mobile.html?v=20261111-missions9" style="display:block;text-decoration:none;color:inherit"><small id="nextStepEyebrow">PROGRESSIONE & OBIETTIVI</small><strong id="nextStepTitle">Continua il tuo impero</strong><span id="nextStepText">Obiettivi, diario e servizi rapidi</span></a>
 <nav class="bottom"><a class="on" href="./mobile-home.html?v=20261112-home7"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a href="./marina-mobile.html?v=20261112-marina5"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261112-market14"><b>🛒</b>MARKET</a></nav>
 </main>
-<script src="./local-save-context.js"></script><script src="./pwa-install.js?v=20261111-pwa1"></script><script>
+<script src="./local-save-context.js"></script><script src="./premium-fx.js?v=20261112-fx1"></script><script src="./pwa-install.js?v=20261111-pwa1"></script><script>
 (()=>{try{
  const c=window.MarinaLocalSaveContext;let h=c&&c.capture(),g=h&&c.readGame(h);
  if(!g){c&&c.select(null);h=c&&c.capture();g=h&&c.readGame(h)}
@@ -87,5 +87,6 @@
    title="Espandi il tuo impero";text="Hai completato il ciclo iniziale: sviluppa attività, flotta, ricerca e nuove opportunità.";href="./activities-mobile.html?v=20261110-activities1";
  }
  nextStepEyebrow.textContent=eyebrow;nextStepTitle.textContent=title;nextStepText.textContent=text;nextStepCard.href=href;
+ setTimeout(()=>window.MarinaEmpireFX?.highlight?.("#nextStepCard"),140);
 }catch(_){}})();
 </script><script src="./marina-fx-v1.js?v=20261112-fx1"></script></body></html>
