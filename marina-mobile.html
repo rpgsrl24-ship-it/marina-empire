@@ -66,7 +66,7 @@ function render(){
 marinaSelect.onchange=()=>{if(window.MarinaEmpireMarinaLite.setSelected(marinaSelect.value)){render();toastMsg("Marina selezionata")}};
 refuel.onclick=()=>{const r=window.MarinaEmpireMarinaLite.refuel();toastMsg(r.message);render()};
 repair.onclick=()=>{const r=window.MarinaEmpireMarinaLite.repair();toastMsg(r.message);render()};
-jobAction.onclick=()=>{const r=window.MarinaEmpireMarinaLite.completeJob();toastMsg(r.message);render()};
+jobAction.onclick=()=>{const r=window.MarinaEmpireMarinaLite.completeJob();toastMsg(r.message);render();if(r.ok&&window.MarinaEmpireFX){setTimeout(()=>window.MarinaEmpireFX.reward({title:"INCARICO COMPLETATO",subtitle:"MARINA LIVE",coins:r.reward,prestige:r.prestige,button:"TORNA ALLA MARINA"}),120)}};
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));const map={overview:"overview",pontoons:"pontoonsPanel",services:"servicesPanel",structures:"structuresPanel",upgrade:"upgradePanel"};document.getElementById(map[b.dataset.tab])?.classList.add("on")});
 goMap.onclick=()=>location.assign("./map-mobile.html?v=20261111-map16");goMarket.onclick=()=>location.assign("./marketplace-mobile.html?v=20261112-market14");goOffice.onclick=()=>location.assign("./direction-mobile.html?v=20261112-direction2");
 render();
@@ -87,4 +87,4 @@ render();
  if(!target)return;
  setTimeout(()=>{target.scrollIntoView({behavior:"smooth",block:"center"});target.focus({preventScroll:true});},80);
 })();
-</script></body></html>
+</script><script src="./marina-fx-v1.js?v=20261112-fx1"></script></body></html>

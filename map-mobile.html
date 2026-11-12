@@ -9,7 +9,7 @@
 <section class="cta"><div class="card"><span style="font-size:7px;color:#607986">DISTANZA</span><strong id="distance">— NM</strong></div><div class="card"><span style="font-size:7px;color:#607986">TEMPO STIMATO</span><strong id="time">—</strong></div><button id="navigate" class="go" type="button" data-blocked-reason="Seleziona una destinazione con una missione disponibile.">⛵ NAVIGA</button></section>
 <section id="arrivalBox" class="arrival"><strong id="arrivalTitle">⚓ Arrivo completato</strong><span id="arrivalText"></span><a href="./mobile-home.html?v=20261111-home6" style="display:inline-block;margin-top:9px;padding:8px 12px;border-radius:999px;background:#0a7db6;color:#fff;text-decoration:none;font-size:8px;font-weight:950">TORNA ALLA HOME →</a></section><section id="missionBox" class="mission" hidden><h3>👑 Missione collegata</h3><p id="missionText"></p><a data-safe-nav="./missions-mobile.html?v=20261111-missions9" href="./missions-mobile.html?v=20261111-missions9">VAI ALLA MISSIONE →</a></section>
 </main>
-<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a class="on" href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a href="./marina-mobile.html?v=20261111-marina4"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261112-market14"><b>🛒</b>MARKET</a></nav>
+<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a class="on" href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a href="./marina-mobile.html?v=20261112-marina5"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261112-market14"><b>🛒</b>MARKET</a></nav>
 <script src="./local-save-context.js"></script><script src="./marina-photos-v1.js?v=20261109-photos1"></script><script src="./mobile-map-lite-v2.js?v=20261111-engine4"></script>
 <script>
 let selected=null,lastShot=null,missionBootHandled=false;
@@ -26,6 +26,13 @@ if(!trip&&arrivalRecent){
  const destName=(shot.ports||[]).find(p=>p.id===lastArrival.destination)?.name||lastArrival.destination||"destinazione";
  arrivalTitle.textContent="⚓ ARRIVO A "+String(destName).toUpperCase();
  arrivalText.textContent=(lastArrival.mission||"Missione completata")+" · +"+fmt(lastArrival.reward)+" crediti · +"+fmt(lastArrival.prestige)+" prestigio";
+ try{
+   const rewardKey="me_reward_"+String(lastArrival.at||"");
+   if(!sessionStorage.getItem(rewardKey)&&window.MarinaEmpireFX){
+     sessionStorage.setItem(rewardKey,"1");
+     setTimeout(()=>window.MarinaEmpireFX.reward({title:"MISSIONE COMPLETATA",subtitle:"ARRIVO A "+String(destName).toUpperCase(),coins:lastArrival.reward,prestige:lastArrival.prestige,button:"CONTINUA"}),180);
+   }
+ }catch(_){}
 }
 const activeRoute=trip?.route||preview?.route||[];routePath.setAttribute("d",line(activeRoute));routePath.setAttribute("class",trip?"active":"");if(trip){const p=tripProgressPosition(trip.route,trip.progress);if(p){boatMark.hidden=false;boatMark.style.left=p.x+"%";boatMark.style.top=p.y+"%"}routeStatus.innerHTML='<strong>'+trip.originName+' → '+trip.destinationName+'</strong><div class="progress"><i style="width:'+Math.round(trip.progress*100)+'%"></i></div><p>'+Math.round(trip.progress*100)+'% · '+Math.ceil(trip.remainingSec/60)+' min demo rimanenti</p>';distance.textContent="IN NAVIGAZIONE";time.textContent=trip.etaMinutesReal>=60?Math.floor(trip.etaMinutesReal/60)+" h "+(trip.etaMinutesReal%60)+" min":trip.etaMinutesReal+" min";navigate.textContent="IN VIAGGIO";navigate.disabled=true;destination.innerHTML='<strong>'+trip.destinationName+'</strong><p>Destinazione della missione attiva</p>';missionBox.hidden=false;missionText.textContent=trip.name+" · +"+fmt(trip.reward)+" crediti · +"+fmt(trip.prestige)+" prestigio"}else{boatMark.hidden=true;if(preview?.ok){routeStatus.innerHTML='<strong>'+preview.originName+' → '+preview.destinationName+'</strong><div class="progress"><i style="width:100%"></i></div><p>Rotta pianificata · '+Math.round(preview.distance)+' NM · '+preview.fuel+' L stimati</p>';const photo=window.MarinaEmpireMarinaPhotos?.get(preview.dest)||{url:'./anteprima/assets/render-2026/marine.jpg',name:preview.destinationName};destination.innerHTML='<div class="dest"><img src="'+photo.url+'" alt="'+photo.name+'" onerror="this.onerror=null;this.src=\'./anteprima/assets/render-2026/marine.jpg\'"><div><strong>'+preview.destinationName+'</strong><p>'+preview.distance.toFixed(0)+' NM · '+preview.fuel+' L stimati</p></div></div>';distance.textContent=Math.round(preview.distance)+" NM";time.textContent=preview.etaMinutesReal>=60?Math.floor(preview.etaMinutesReal/60)+" h "+(preview.etaMinutesReal%60)+" min":preview.etaMinutesReal+" min";const canNavigate=!!(preview.mission&&preview.mission.ready);navigate.dataset.blockedReason=canNavigate?"":(preview.mission?.reason||"Questa destinazione non ha una missione pronta.");navigate.classList.toggle("blocked",!canNavigate);navigate.textContent=canNavigate?"⛵ NAVIGA":"ⓘ NON DISPONIBILE";if(preview.mission){missionBox.hidden=false;missionText.textContent=preview.mission.name+" · +"+fmt(preview.mission.reward)+" crediti · +"+fmt(preview.mission.prestige)+" prestigio"}else missionBox.hidden=true}else{routeStatus.innerHTML='<p>Nessuna rotta selezionata.</p>';destination.innerHTML='<p>'+(preview?.reason||"Tocca una marina sulla mappa.")+'</p>';distance.textContent="— NM";time.textContent="—";navigate.dataset.blockedReason=preview?.reason||"Seleziona una destinazione con una missione disponibile.";navigate.classList.add("blocked");navigate.textContent="ⓘ NON DISPONIBILE";missionBox.hidden=true}}
 }
@@ -39,7 +46,7 @@ document.addEventListener("click",e=>{
  if(!action)return;
  e.preventDefault();
  if(action==="map"){document.getElementById("map")?.scrollIntoView({behavior:"smooth",block:"start"});return}
- if(action==="marinas"){safeGo("./marina-mobile.html?v=20261111-marina4");return}
+ if(action==="marinas"){safeGo("./marina-mobile.html?v=20261112-marina5");return}
  if(action==="routes"){document.getElementById("routeStatus")?.scrollIntoView({behavior:"smooth",block:"center"});return}
  if(action==="destinations"){document.getElementById("destination")?.scrollIntoView({behavior:"smooth",block:"center"});return}
  if(action==="poi"){document.getElementById("missionBox")?.scrollIntoView({behavior:"smooth",block:"center"});return}
@@ -71,4 +78,4 @@ function pulseAuthoritativeEngine(){try{window.MarinaEmpireMapLite?.pulse?.()}ca
 setInterval(pulseAuthoritativeEngine,500);
 window.addEventListener("focus",pulseAuthoritativeEngine);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)pulseAuthoritativeEngine()});
-</script></body></html>
+</script><script src="./marina-fx-v1.js?v=20261112-fx1"></script></body></html>
