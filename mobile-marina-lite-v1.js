@@ -17,25 +17,35 @@ function snapshot(){const game=read()||{name:"Comandante",coins:10000,prestige:0
 function setSelected(id){if(!ports.some(p=>p.id===id))return false;try{sessionStorage.setItem("marina_empire_selected_marina",id)}catch(_){};const game=read();if(!game)return true;game.investmentMarina=id;write(game);return true}
 function refuel(){const game=read();if(!game)return{ok:false,message:"Salvataggio non disponibile"};const id=game.port||"rimini";try{sessionStorage.setItem("marina_empire_selected_marina",id)}catch(_){};if(game.trip)return{ok:false,message:"Rifornimento disponibile solo in marina"};const b=boats[game.boat]||boats.voyager,currentFuel=Math.max(0,Math.min(b.tank,Number(game.fuel)||0)),need=Math.max(0,b.tank-currentFuel);if(need<=0)return{ok:false,message:"Serbatoio già pieno"};const beforeCoins=Math.max(0,Number(game.coins)||0),cost=Math.max(0,Math.min(beforeCoins,Math.round(need*3)));if(beforeCoins<Math.round(need*3))return{ok:false,message:"Crediti insufficienti"};const nextCoins=beforeCoins-cost;if(!Number.isFinite(nextCoins)||nextCoins<0)return{ok:false,message:"Costo rifornimento non valido"};game.coins=nextCoins;game.fuel=b.tank;if(!write(game))return{ok:false,message:"Salvataggio non confermato"};const saved=read();if(!saved||Number(saved.coins)!==nextCoins||Number(saved.fuel)!==b.tank)return{ok:false,message:"Rifornimento non confermato"};return{ok:true,cost,beforeCoins,afterCoins:nextCoins,message:"Rifornimento completato · -"+cost.toLocaleString("it-IT")+" crediti"}}
 function repair(){const game=read();if(!game)return{ok:false,message:"Salvataggio non disponibile"};const id=game.port||"rimini";try{sessionStorage.setItem("marina_empire_selected_marina",id)}catch(_){};if(game.trip)return{ok:false,message:"Manutenzione disponibile solo in marina"};const b=boats[game.boat]||boats.voyager,condition=Math.max(0,Math.min(100,Number(game.condition??100)));if(condition>=100)return{ok:false,message:"Yacht già al 100%"};const full=Math.round(1000*(1+b.price/100000)),cost=Math.max(100,Math.round(full*((100-condition)/100))),beforeCoins=Math.max(0,Number(game.coins)||0);if(beforeCoins<cost)return{ok:false,message:"Crediti insufficienti"};const nextCoins=beforeCoins-cost;if(!Number.isFinite(nextCoins)||nextCoins<0)return{ok:false,message:"Costo manutenzione non valido"};game.coins=nextCoins;game.condition=100;if(!write(game))return{ok:false,message:"Salvataggio non confermato"};const saved=read();if(!saved||Number(saved.coins)!==nextCoins||Number(saved.condition)!==100)return{ok:false,message:"Manutenzione non confermata"};return{ok:true,cost,beforeCoins,afterCoins:nextCoins,message:"Manutenzione completata · -"+cost.toLocaleString("it-IT")+" crediti"}}
+const starterJobs=[
+ {id:"BERTH_ASSIST",type:"Assistenza ormeggio",label:"Assistenza ormeggio e controllo pontile",reward:250,prestige:10,reputation:5},
+ {id:"FUEL_DOCK_SUPPORT",type:"Supporto fuel dock",label:"Supporto rifornimento e controllo sicurezza",reward:400,prestige:15,reputation:8},
+ {id:"TENDER_COORDINATION",type:"Coordinamento tender",label:"Coordinamento arrivi e tender di servizio",reward:650,prestige:25,reputation:12}
+];
 function jobStatus(){
  const game=read();if(!game)return{ok:false,available:false,message:"Salvataggio non disponibile"};
- const id=selectedId(game),here=game.port===id,used=Math.max(0,Number(game.guestTrialJobsUsed)||0),voyages=Math.max(0,Number(game.voyages)||0);
- if(game.trip)return{ok:true,available:false,message:"Completa prima la navigazione in corso.",reward:250,prestige:10};
- if(!here)return{ok:true,available:false,message:"Raggiungi "+portName(id)+" per accettare un incarico locale.",reward:250,prestige:10};
- if(voyages<1)return{ok:true,available:false,message:"Completa prima la missione iniziale Rimini → Cervia.",reward:250,prestige:10};
- if(used>=1)return{ok:true,available:false,message:"Incarico gratuito già completato. Altri incarichi saranno disponibili con la progressione.",reward:250,prestige:10,completed:true};
- return{ok:true,available:true,message:"Assistenza ormeggio e controllo pontile · "+portName(id),reward:250,prestige:10};
+ const id=String(game.port||"rimini"),used=Math.max(0,Number(game.guestTrialJobsUsed)||0),voyages=Math.max(0,Number(game.voyages)||0);
+ const job=starterJobs[Math.min(used,starterJobs.length-1)];
+ if(game.trip)return{ok:true,available:false,message:"Completa prima la navigazione in corso.",reward:job.reward,prestige:job.prestige};
+ if(voyages<1)return{ok:true,available:false,message:"Completa prima la missione iniziale Rimini → Cervia.",reward:starterJobs[0].reward,prestige:starterJobs[0].prestige};
+ if(used>=starterJobs.length)return{ok:true,available:false,message:"Ciclo incarichi iniziali completato. Continua con missioni, attività e sviluppo della marina.",reward:0,prestige:0,completed:true};
+ if(voyages<=used)return{ok:true,available:false,message:"Completa una nuova missione per sbloccare il prossimo incarico Marina Live.",reward:job.reward,prestige:job.prestige};
+ return{ok:true,available:true,message:job.label+" · "+portName(id),reward:job.reward,prestige:job.prestige,jobId:job.id,type:job.type,reputation:job.reputation,stage:used+1};
 }
 function completeJob(){
  const status=jobStatus();if(!status.available)return{ok:false,message:status.message};
  const game=read();if(!game)return{ok:false,message:"Salvataggio non disponibile"};
- game.coins=Math.max(0,Number(game.coins)||0)+250;
- game.prestige=Math.max(0,Number(game.prestige)||0)+10;
+ const reward=Math.max(0,Number(status.reward)||0),prestigeGain=Math.max(0,Number(status.prestige)||0),port=String(game.port||"rimini");
+ game.coins=Math.max(0,Number(game.coins)||0)+reward;
+ game.prestige=Math.max(0,Number(game.prestige)||0)+prestigeGain;
  game.guestTrialJobsUsed=Math.max(0,Number(game.guestTrialJobsUsed)||0)+1;
  game.npcJobsCompleted=Math.max(0,Number(game.npcJobsCompleted)||0)+1;
- game.lastNpcJob={id:"MOBILE_MARINA_TRIAL_"+String(game.port||"rimini"),type:"Assistenza ormeggio",reward:250,cost:0,prestige:10,reputation:5,sector:"marina",port:String(game.port||"rimini"),at:Date.now()};
+ game.marinaOperations=game.marinaOperations||{};
+ const raw=game.marinaOperations[port]||{};
+ game.marinaOperations[port]={...raw,completed:Math.max(0,Number(raw.completed)||0)+1};
+ game.lastNpcJob={id:"MOBILE_MARINA_"+String(status.jobId||status.stage||game.guestTrialJobsUsed)+"_"+port,type:status.type||"Incarico Marina Live",reward,cost:0,prestige:prestigeGain,reputation:Math.max(0,Number(status.reputation)||0),sector:"marina",port,at:Date.now()};
  if(!write(game))return{ok:false,message:"Salvataggio incarico non confermato"};
- return{ok:true,message:"Incarico completato · +250 crediti · +10 prestigio",reward:250,prestige:10};
+ return{ok:true,message:"Incarico completato · +"+reward+" crediti · +"+prestigeGain+" prestigio",reward,prestige:prestigeGain};
 }
 window.MarinaEmpireMarinaLite={ports,snapshot,setSelected,refuel,repair,read,jobStatus,completeJob};
 })();
