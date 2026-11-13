@@ -48,6 +48,11 @@ window.meLoadSupabase=window.meLoadSupabase||function(){
 <script src="./local-save-context.js"></script><script src="./cloud-sync-modern.js?v=20261111-cloud1"></script><script src="./pwa-install.js?v=20261111-pwa1"></script>
 <script>
 (async()=>{
+const byId=id=>document.getElementById(id);
+const accountStatus=byId("accountStatus"),accountInfo=byId("accountInfo"),email=byId("email"),password=byId("password");
+const login=byId("login"),register=byId("register"),reset=byId("reset"),logout=byId("logout");
+const cloudStatus=byId("cloudStatus"),syncNow=byId("syncNow"),keepLocal=byId("keepLocal"),useCloud=byId("useCloud");
+if(!accountStatus||!email||!password||!login||!register||!reset){return}
 accountStatus.textContent="Connessione account…";
 try{await window.meLoadSupabase()}catch(e){
  accountStatus.textContent="Servizio account non raggiungibile. Tocca RIPROVA.";
