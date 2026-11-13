@@ -44,7 +44,13 @@ function tripView(s,b){
 function snapshot(){const s=read()||{coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],voyages:0};const b=boats.find(x=>x.id===s.boat)||boats[0],evApi=window.MarinaEmpireLegendaryEvents,active=evApi?.current?.()||null;const visible=ports.filter(p=>p.id!=="monaco"||active?.portId==="monaco"||s.port==="monaco"||s.trip?.dest==="monaco"||evApi?.completed?.(s,evApi.byPort?.("monaco")));return{state:s,tank:b.tank,boatName:b.name,ports:visible.map(p=>({id:p.id,name:p.name,x:illustrated[p.id]?.[0]??50,y:illustrated[p.id]?.[1]??50,legendary:p.id==="monaco"})),trip:tripView(s,b)}}
 function legendaryMission(s,b){
  const api=window.MarinaEmpireLegendaryEvents,ev=api?.current?.();if(!ev||api.completed?.(s,ev))return null;
- if(String(s.port)!==String(ev.gateway))return{locked:true,event:ev,reason:"Raggiungi prima "+ev.gatewayName+" per accedere al Porto Leggendario."};
+ const current=String(s.port||"rimini");
+ if(current!==String(ev.gateway)){
+   const distance=Math.max(80,seaMiles(current,ev.gateway)||220),fuelCost=Math.min(Math.max(35,Math.ceil(distance*.12)),Math.floor(b.tank*.35)),cost=500;
+   const ready=!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id))&&(Number(s.fuel)||0)>=fuelCost&&(Number(s.coins)||0)>=cost;
+   let reason="";if(s.trip)reason="Viaggio già in corso";else if((Number(s.condition??100))<30)reason="Manutenzione necessaria";else if((Number(s.fuel)||0)<fuelCost)reason="Carburante insufficiente";else if((Number(s.coins)||0)<cost)reason="Crediti insufficienti";
+   return{id:"LEGEND_GATEWAY_"+ev.id+"_"+current,name:"ROTTA EVENTO · RAGGIUNGI LOANO",service:"👑 ACCESSO PORTO LEGGENDARIO",dest:ev.gateway,destination:ev.gatewayName,origin:(ports.find(x=>x.id===current)||{}).name||current,reward:0,prestige:20,cost,total:cost,fuel:fuelCost,distance,boat:b.id,ready,reason,legendary:true,eventGateway:true,eventId:ev.id,badge:""};
+ }
  const pl=plan(s.port,ev.portId,b.tank,b.burn),distance=Number(pl.distance)||seaMiles(s.port,ev.portId),fuelCost=Math.ceil(distance*b.burn),cost=350;
  const ready=!!pl.possible&&Array.isArray(pl.legs)&&pl.legs.length===2&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id))&&(Number(s.fuel)||0)>=fuelCost+Math.ceil(b.tank*.15)&&(Number(s.coins)||0)>=cost;
  let reason="";if(!pl.possible)reason=pl.reason||"Rotta evento non disponibile";else if(s.trip)reason="Viaggio già in corso";else if((Number(s.condition??100))<30)reason="Manutenzione necessaria";else if((Number(s.fuel)||0)<fuelCost+Math.ceil(b.tank*.15))reason="Carburante insufficiente";else if((Number(s.coins)||0)<cost)reason="Crediti insufficienti";
