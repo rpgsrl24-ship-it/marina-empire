@@ -100,8 +100,15 @@ async function reconcileCloud(created=false){
 }
 async function refresh(){
  try{
-  const {data,error}=await client.auth.getUser();if(error)throw error;
-  const u=data?.user;
+  const sessionResult=await client.auth.getSession();
+  if(sessionResult.error)throw sessionResult.error;
+  const session=sessionResult.data?.session||null;
+  let u=null;
+  if(session){
+   const userResult=await client.auth.getUser();
+   if(userResult.error)throw userResult.error;
+   u=userResult.data?.user||null;
+  }
   if(u){
    const attached=attachLocalAccount(u);
    msg("Account collegato","good");
@@ -120,9 +127,9 @@ async function run(fn){
  if(busy)return;setBusy(true);
  try{await fn()}catch(e){msg(e?.message||"Operazione non riuscita","bad")}finally{setBusy(false);refresh()}
 }
-login.onclick=()=>run(async()=>{const e=email.value.trim(),p=password.value;if(!e||!p)throw new Error("Inserisci email e password");const r=await client.auth.signInWithPassword({email:e,password:p});if(r.error)throw r.error;password.value="";msg("Accesso completato","good")});
-register.onclick=()=>run(async()=>{const e=email.value.trim(),p=password.value;if(!e||p.length<8)throw new Error("Inserisci email valida e password di almeno 8 caratteri");const r=await client.auth.signUp({email:e,password:p,options:{emailRedirectTo:location.origin+location.pathname}});if(r.error)throw r.error;password.value="";msg("Registrazione inviata. Controlla la conferma email.","good")});
-reset.onclick=()=>run(async()=>{const e=email.value.trim();if(!e)throw new Error("Inserisci l'email");const r=await client.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;msg("Se l'account esiste, riceverai le istruzioni per il recupero.","good")});
+login.addEventListener("click",()=>{const e=email.value.trim(),p=password.value;if(!e||!p){msg("Inserisci email e password","bad");return}run(async()=>{const r=await client.auth.signInWithPassword({email:e,password:p});if(r.error)throw r.error;password.value="";msg("Accesso completato","good")})});
+register.addEventListener("click",()=>{const e=email.value.trim(),p=password.value;if(!e||p.length<8){msg("Inserisci email valida e password di almeno 8 caratteri","bad");return}run(async()=>{const r=await client.auth.signUp({email:e,password:p,options:{emailRedirectTo:location.origin+location.pathname}});if(r.error)throw r.error;password.value="";msg("Registrazione inviata. Controlla la conferma email.","good")})});
+reset.addEventListener("click",()=>{const e=email.value.trim();if(!e){msg("Inserisci l'email","bad");return}run(async()=>{const r=await client.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;msg("Se l'account esiste, riceverai le istruzioni per il recupero.","good")})});
 logout.onclick=()=>run(async()=>{const r=await client.auth.signOut({scope:"local"});if(r.error)throw r.error;window.MarinaLocalSaveContext?.select(null);location.replace("./mobile-home.html?v=20261113-home8#guest")});
 syncNow.onclick=()=>reconcileCloud(false);
 keepLocal.onclick=()=>run(async()=>{if(!cloud)throw new Error("Cloud non disponibile");cloudBusy=true;cloudUi("Caricamento di questo dispositivo nel cloud…");const r=await cloud.forceUpload();cloudBusy=false;cloudUi(cloudText(r.status),false);});
