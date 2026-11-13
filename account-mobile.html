@@ -61,7 +61,7 @@ try{await window.meLoadSupabase()}catch(e){
  login.onclick=()=>location.reload();
  return;
 }
-const URL="https://zrdetqvnjmqkfyajxjgp.supabase.co",KEY="sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw";
+const URL="https://zrdetqvnjmqkfyajxjgp.supabase.co",KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyZGV0cXZuam1xa2Z5YWp4amdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMwMTU4OTQsImV4cCI6MjEwODU5MTg5NH0.ytBVfKXCNzswzlhHlfmWTdDISUW58K0WP5FG-4rkf6Y";
 const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 let busy=false;
 const setBusy=v=>{busy=v;login.disabled=register.disabled=reset.disabled=v};
