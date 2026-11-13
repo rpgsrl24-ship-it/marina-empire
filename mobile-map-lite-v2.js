@@ -26,7 +26,7 @@ function seaMiles(a,b){const pts=routePoints(a,b);return pts.slice(1).reduce((n,
 function plan(from,to,tank,burn){const cap=Math.max(1,Number(tank)||1),reserve=Math.ceil(cap*.15),rate=Number(burn)||.85;if(!harborGPS[from]||!harborGPS[to]||from===to)return{possible:false,distance:0,reason:"Destinazione non valida",stops:[],legs:[]};const ids=ports.map(p=>p.id),dist=Object.fromEntries(ids.map(id=>[id,Infinity])),prev={},seen=new Set();dist[from]=0;while(seen.size<ids.length){const cur=ids.filter(id=>!seen.has(id)).sort((a,b)=>dist[a]-dist[b])[0];if(!cur||!Number.isFinite(dist[cur]))break;if(cur===to)break;seen.add(cur);for(const next of ids){if(next===cur||seen.has(next))continue;const nm=seaMiles(cur,next);if(!nm||Math.ceil(nm*rate)+reserve>cap)continue;const c=dist[cur]+nm;if(c<dist[next]){dist[next]=c;prev[next]=cur}}}if(!Number.isFinite(dist[to]))return{possible:false,distance:seaMiles(from,to),reason:"Autonomia insufficiente",stops:[],legs:[]};const legs=[to];let c=to;while(c!==from&&legs.length<=ids.length){c=prev[c];if(!c)break;legs.unshift(c)};if(legs[0]!==from)return{possible:false,distance:0,reason:"Rotta non disponibile",stops:[],legs:[]};const distance=legs.slice(1).reduce((sum,id,i)=>sum+seaMiles(legs[i],id),0),fuel=legs.slice(1).reduce((sum,id,i)=>sum+Math.ceil(seaMiles(legs[i],id)*rate),0);return{possible:true,distance,fuel,stops:legs.slice(1,-1),legs,reserve,burnRate:rate}}
 function project(lat,lon){return{x:(lon-6.2)/(19.4-6.2)*100,y:(48-lat)/(48-35)*100}}
 function getHandle(){const c=window.MarinaLocalSaveContext;if(!c)return null;let h=c.capture();if(!h){c.select(null);h=c.capture()}return h}
-function defaultGame(){return{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],trip:null,reservations:[],voyages:0,setupComplete:true,voyageSerial:0}}
+function defaultGame(){return{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],trip:null,reservations:[],voyages:0,setupComplete:true,voyageSerial:0,visitedPorts:["rimini"]}}
 function read(){const c=window.MarinaLocalSaveContext,h=getHandle();if(!c||!h)return null;let g=c.readGame(h);if(g)return g;const fresh=defaultGame();if(c.writeGame(h,fresh))g=c.readGame(h);return g||fresh}
 function mutate(fn){
  const c=window.MarinaLocalSaveContext,h=getHandle();if(!c||!h)return false;
@@ -76,7 +76,7 @@ function startMission(id,expectedDest){
  const ok=mutate(g=>{
    if(g.trip)throw new Error("Viaggio già in corso");
    const b=boats.find(x=>x.id===g.boat)||boats[0],duration=mission.id==="INTRO_RIMINI_CERVIA"?20:Math.max(20,Math.min(45,Math.round(mission.distance*.35)));
-   g.setupComplete=true;g.homeMarina=g.homeMarina||g.port;g.investmentMarina=g.investmentMarina||g.port;
+   g.setupComplete=true;g.homeMarina=g.homeMarina||g.port;g.investmentMarina=g.investmentMarina||g.port;g.visitedPorts=Array.isArray(g.visitedPorts)?g.visitedPorts:[];if(g.port&&!g.visitedPorts.includes(g.port))g.visitedPorts.push(g.port);
    g.coins=Math.max(0,Number(g.coins)||0)-Math.max(0,Number(mission.cost)||0);
    g.fuel=Math.max(0,Number(g.fuel)||0)-Math.max(0,Number(mission.fuel)||0);
    g.voyageSerial=Math.max(0,Number(g.voyageSerial)||0)+1;
@@ -96,11 +96,15 @@ function pulse(){
  const fresh=read(),ft=fresh?.trip;if(ft&&Number(ft.until)<=Date.now()){
    mutate(g=>{
      const trip=g.trip;if(!trip)return;
-     const m=trip.mission||{},id=String(trip.id||m.id||""),reward=Math.max(0,Number(m.reward)||0),prestige=Math.max(0,Number(m.prestige)||0),dest=String(m.dest||trip.dest||g.port);
+     const m=trip.mission||{},id=String(trip.id||m.id||""),reward=Math.max(0,Number(m.reward)||0),prestige=Math.max(0,Number(m.prestige)||0),origin=String(trip.origin||g.port||"rimini"),dest=String(m.dest||trip.dest||g.port);
      g.completed=Array.isArray(g.completed)?g.completed:[];
      g.settledVoyages=Array.isArray(g.settledVoyages)?g.settledVoyages:[];
      const voyageId=Number(trip.voyageId)||0;
      const settled=voyageId>0&&g.settledVoyages.includes(voyageId);
+     g.visitedPorts=Array.isArray(g.visitedPorts)?g.visitedPorts:[];
+     if(origin&&!g.visitedPorts.includes(origin))g.visitedPorts.push(origin);
+     const passportNew=!!dest&&!g.visitedPorts.includes(dest);
+     if(dest&&passportNew)g.visitedPorts.push(dest);
      g.port=dest;
      if(!settled){
        if(id&&!g.completed.includes(id))g.completed.push(id);
@@ -110,7 +114,7 @@ function pulse(){
        g.voyages=Math.max(0,Number(g.voyages)||0)+1;
        g.earnings=Math.max(0,Number(g.earnings)||0)+reward;
        g.condition=Math.max(0,(Number(g.condition??100)||100)-Math.max(0,Number(trip.weatherWear)||3));
-       g.lastArrival={destination:dest,reward,baseReward:reward,crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),mission:String(m.name||"Missione completata"),emergency:false};
+       g.lastArrival={destination:dest,reward,baseReward:reward,crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),mission:String(m.name||"Missione completata"),emergency:false,passportNew,passportCount:g.visitedPorts.length};
      }
      g.lastDockedBridge={origin:String(trip.origin||g.port),destination:dest,at:Date.now()};
      g.trip=null;

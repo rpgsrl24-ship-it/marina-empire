@@ -1,13 +1,13 @@
-const CACHE="marina-empire-v20261113-modern11";
+const CACHE="marina-empire-v20261113-modern12";
 const CORE=[
  "./",
  "./index.html",
  "./mobile-home.html?v=20261113-home8",
  "./missions-mobile.html?v=20261111-missions9",
- "./map-mobile.html?v=20261111-map16",
- "./marina-mobile.html?v=20261112-marina5",
+ "./map-mobile.html?v=20261113-map17",
+ "./marina-mobile.html?v=20261113-marina6",
  "./fleet-mobile.html?v=20261109-fleet1",
- "./profile-mobile.html?v=20261113-profile3",
+ "./profile-mobile.html?v=20261113-profile4",
  "./account-mobile.html?v=20261113-account6",
  "./marketplace-mobile.html?v=20261112-market14",
  "./community-mobile.html?v=20261112-community5",
@@ -16,9 +16,10 @@ const CORE=[
  "./app-icon.svg",
  "./local-save-context.js",
  "./commander-ranks-v1.js?v=20261113-rank1",
+ "./marina-progression-v1.js?v=20261113-prog1",
  "./premium-fx.js?v=20261112-fx1",
  "./marina-fx-v1.js?v=20261112-fx1",
- "./mobile-marina-lite-v1.js?v=20261112-marinalite3",
+ "./mobile-marina-lite-v1.js?v=20261113-marinalite4",
  "./cloud-sync-modern.js?v=20261111-cloud1",
  "./pwa-install.js?v=20261111-pwa1"
 ];
