@@ -8,15 +8,54 @@
 <meta name="apple-mobile-web-app-title" content="Marina Empire">
 <link rel="apple-touch-icon" href="./app-icon.svg">
 </head><body><main class="app">
-<header class="head"><div class="top"><a class="round" href="./profile-mobile.html?v=20261110-profile1">‹</a><div class="brand"><b>⚓ MARINA EMPIRE</b><small>ACCOUNT & CLOUD</small></div><a class="round" href="./mobile-home.html?v=20261111-home6">⌂</a></div><div class="hero"><h1>Account comandante</h1><p>Accedi per associare la partita a un account verificato. Il salvataggio guest resta sul dispositivo e viene copiato nello slot account al primo accesso se l'account non ha ancora un salvataggio locale.</p></div></header>
+<header class="head"><div class="top"><a class="round" href="./profile-mobile.html?v=20261113-profile3">‹</a><div class="brand"><b>⚓ MARINA EMPIRE</b><small>ACCOUNT & CLOUD</small></div><a class="round" href="./mobile-home.html?v=20261113-home8">⌂</a></div><div class="hero"><h1>Account comandante</h1><p>Accedi per associare la partita a un account verificato. Il salvataggio guest resta sul dispositivo e viene copiato nello slot account al primo accesso se l'account non ha ancora un salvataggio locale.</p></div></header>
 <section class="card"><div id="accountStatus" class="status">Controllo account…</div><div id="accountInfo" class="meta"></div></section>
 <section class="card" id="authCard"><div class="fields"><input id="email" type="email" autocomplete="email" placeholder="Email"><input id="password" type="password" autocomplete="current-password" minlength="8" placeholder="Password (min. 8 caratteri)"></div><div class="actions"><button id="login">ACCEDI</button><button id="register" class="alt">REGISTRATI</button><button id="reset" class="alt">RECUPERA PASSWORD</button><button id="logout" class="danger" hidden disabled>ESCI DALL'ACCOUNT</button></div><div class="meta">La registrazione può richiedere la conferma email. Nessuna password viene salvata nel gioco.</div></section>
 <section class="card" id="cloudCard"><strong>☁️ Sincronizzazione cloud</strong><div id="cloudStatus" class="meta">Disponibile dopo l'accesso con email confermata.</div><div class="actions"><button id="syncNow" class="alt" hidden disabled>SINCRONIZZA</button><button id="keepLocal" hidden disabled>USA QUESTO DISPOSITIVO</button><button id="useCloud" class="alt" hidden disabled>SCARICA DAL CLOUD</button></div><div class="meta">In caso di differenze tra due dispositivi, Marina Empire non sovrascrive automaticamente la partita: scegli esplicitamente quale versione mantenere.</div></section>
 <section class="card"><strong>Installazione app</strong><div class="meta">Quando il browser supporta l'installazione PWA, il pulsante qui sotto diventa disponibile.</div><button class="install" data-pwa-install hidden disabled>INSTALLA APP</button></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6">HOME</a><a href="./profile-mobile.html?v=20261110-profile1">PROFILO</a><a class="on" href="./account-mobile.html?v=20261112-account2">ACCOUNT</a><a href="./marketplace-mobile.html?v=20261112-market14">STORE</a></nav>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261113-home8">HOME</a><a href="./profile-mobile.html?v=20261113-profile3">PROFILO</a><a class="on" href="./account-mobile.html?v=20261112-account2">ACCOUNT</a><a href="./marketplace-mobile.html?v=20261112-market14">STORE</a></nav>
+<script>
+window.meLoadSupabase=window.meLoadSupabase||function(){
+ if(window.supabase&&typeof window.supabase.createClient==="function")return Promise.resolve(window.supabase);
+ if(window.__meSupabaseLoader)return window.__meSupabaseLoader;
+ const sources=[
+  "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js",
+  "https://unpkg.com/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"
+ ];
+ window.__meSupabaseLoader=new Promise((resolve,reject)=>{
+  let index=0;
+  const next=()=>{
+   if(index>=sources.length){reject(new Error("supabase_library_unavailable"));return}
+   const script=document.createElement("script"),src=sources[index++];
+   let done=false;
+   const finish=(ok)=>{
+    if(done)return;done=true;clearTimeout(timer);
+    script.onload=script.onerror=null;
+    if(ok&&window.supabase&&typeof window.supabase.createClient==="function"){resolve(window.supabase);return}
+    try{script.remove()}catch(_){}
+    next();
+   };
+   const timer=setTimeout(()=>finish(false),4500);
+   script.async=true;script.src=src;
+   script.onload=()=>finish(true);script.onerror=()=>finish(false);
+   document.head.appendChild(script);
+  };
+  next();
+ });
+ return window.__meSupabaseLoader;
+};
+</script>
 <script src="./local-save-context.js"></script><script src="./cloud-sync-modern.js?v=20261111-cloud1"></script><script src="./pwa-install.js?v=20261111-pwa1"></script>
 <script>
+(async()=>{
+accountStatus.textContent="Connessione account…";
+try{await window.meLoadSupabase()}catch(e){
+ accountStatus.textContent="Servizio account non raggiungibile. Tocca RIPROVA.";
+ accountStatus.className="status bad";
+ login.textContent="RIPROVA";login.disabled=false;register.disabled=true;reset.disabled=true;
+ login.onclick=()=>location.reload();
+ return;
+}
 const URL="https://zrdetqvnjmqkfyajxjgp.supabase.co",KEY="sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw";
 const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 let busy=false;
@@ -79,9 +118,10 @@ async function run(fn){
 login.onclick=()=>run(async()=>{const e=email.value.trim(),p=password.value;if(!e||!p)throw new Error("Inserisci email e password");const r=await client.auth.signInWithPassword({email:e,password:p});if(r.error)throw r.error;password.value="";msg("Accesso completato","good")});
 register.onclick=()=>run(async()=>{const e=email.value.trim(),p=password.value;if(!e||p.length<8)throw new Error("Inserisci email valida e password di almeno 8 caratteri");const r=await client.auth.signUp({email:e,password:p,options:{emailRedirectTo:location.origin+location.pathname}});if(r.error)throw r.error;password.value="";msg("Registrazione inviata. Controlla la conferma email.","good")});
 reset.onclick=()=>run(async()=>{const e=email.value.trim();if(!e)throw new Error("Inserisci l'email");const r=await client.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;msg("Se l'account esiste, riceverai le istruzioni per il recupero.","good")});
-logout.onclick=()=>run(async()=>{const r=await client.auth.signOut({scope:"local"});if(r.error)throw r.error;window.MarinaLocalSaveContext?.select(null);location.replace("./mobile-home.html?v=20261111-home6#guest")});
+logout.onclick=()=>run(async()=>{const r=await client.auth.signOut({scope:"local"});if(r.error)throw r.error;window.MarinaLocalSaveContext?.select(null);location.replace("./mobile-home.html?v=20261113-home8#guest")});
 syncNow.onclick=()=>reconcileCloud(false);
 keepLocal.onclick=()=>run(async()=>{if(!cloud)throw new Error("Cloud non disponibile");cloudBusy=true;cloudUi("Caricamento di questo dispositivo nel cloud…");const r=await cloud.forceUpload();cloudBusy=false;cloudUi(cloudText(r.status),false);});
 useCloud.onclick=()=>run(async()=>{if(!cloud)throw new Error("Cloud non disponibile");cloudBusy=true;cloudUi("Scaricamento della partita cloud…");const r=await cloud.forceDownload();cloudBusy=false;cloudUi(cloudText(r.status),false);});
 client.auth.onAuthStateChange(()=>setTimeout(refresh,0));refresh();
+})();
 </script></body></html>
