@@ -1,11 +1,11 @@
-const CACHE="marina-empire-v20261113-modern15";
+const CACHE="marina-empire-v20261113-modern16";
 const CORE=[
  "./",
  "./index.html",
- "./mobile-home.html?v=20261113-home10",
+ "./mobile-home.html?v=20261113-home11",
  "./missions-mobile.html?v=20261113-missions11",
  "./map-mobile.html?v=20261113-map19",
- "./marina-mobile.html?v=20261113-marina6",
+ "./marina-mobile.html?v=20261113-marina7",
  "./fleet-mobile.html?v=20261109-fleet1",
  "./profile-mobile.html?v=20261113-profile6",
  "./account-mobile.html?v=20261113-account6",
@@ -15,6 +15,7 @@ const CORE=[
  "./manifest.webmanifest",
  "./app-icon.svg",
  "./local-save-context.js",
+ "./vhf-live-v1.js?v=20261113-vhf1",
  "./commander-ranks-v1.js?v=20261113-rank1",
  "./marina-progression-v1.js?v=20261113-prog1",
  "./legendary-events-v1.js?v=20261113-legend2",
