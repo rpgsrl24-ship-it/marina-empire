@@ -119,6 +119,12 @@ async function syncButtons(){
     if(balanceEl)balanceEl.textContent=balance===null
       ?"Saldo crediti acquistati: accedi per visualizzarlo."
       :"Saldo crediti acquistati: "+fmt(balance);
+    const claimBtn=document.getElementById("meClaimWalletButton");
+    if(claimBtn){
+      claimBtn.hidden=!(Number(balance)>0&&user);
+      claimBtn.disabled=busy;
+      claimBtn.textContent=Number(balance)>0?"ACCREDITA "+fmt(balance)+" ALLA PARTITA":"NESSUN CREDITO DA ACCREDITARE";
+    }
   }catch{}
 }
 function bind(){
@@ -127,6 +133,23 @@ function bind(){
     btn.dataset.meBound="1";
     btn.addEventListener("click",()=>startCheckout(Number(btn.dataset.meCreditProduct)));
   });
+  const claimBtn=document.getElementById("meClaimWalletButton");
+  if(claimBtn&&claimBtn.dataset.meBound!=="1"){
+    claimBtn.dataset.meBound="1";
+    claimBtn.addEventListener("click",async()=>{
+      if(busy)return;
+      busy=true;claimBtn.disabled=true;setStatus("Accredito dei crediti acquistati nella partita…");
+      try{
+        if(typeof window.meClaimPurchasedCreditsAfterReturn!=="function")throw new Error("claim_unavailable");
+        const ok=await window.meClaimPurchasedCreditsAfterReturn(true);
+        if(!ok)throw new Error("claim_failed");
+        setStatus("Crediti acquistati accreditati nella partita.");
+      }catch(e){
+        console.warn("Marina Empire manual credit claim",e);
+        setStatus("Impossibile completare l'accredito. Riprova dopo aver sincronizzato la partita.",true);
+      }finally{busy=false;await syncButtons()}
+    });
+  }
   const url=new URL(window.location.href);
   if(url.searchParams.get("credit_purchase")==="success"){
     setStatus("Ordine ricevuto. Sto verificando l'accredito automatico nella partita.");
