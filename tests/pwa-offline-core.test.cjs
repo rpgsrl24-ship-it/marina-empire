@@ -7,10 +7,10 @@ const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
 const manifestAlias=JSON.parse(fs.readFileSync('manifest.json','utf8'));
 
 for(const path of [
- './mobile-home.html?v=20261110-fast3',
- './missions-mobile.html?v=20261110-missions7',
- './map-mobile.html?v=20261110-map14',
- './marina-mobile.html?v=20261110-marina3',
+ './mobile-home.html?v=20261111-home6',
+ './missions-mobile.html?v=20261111-missions9',
+ './map-mobile.html?v=20261111-map16',
+ './marina-mobile.html?v=20261111-marina4',
  './fleet-mobile.html?v=20261109-fleet1',
  './profile-mobile.html?v=20261110-profile1',
  './account-mobile.html',
@@ -20,11 +20,11 @@ for(const path of [
 ]) assert(sw.includes(JSON.stringify(path)), 'Offline core missing '+path);
 
 assert(sw.includes('fetch(req,{cache:"no-store"})'),'Navigation and fresh assets must prefer network');
-assert(sw.includes('caches.match("./mobile-home.html?v=20261110-fast3")'),'Offline navigation must fall back to modern Home');
+assert(sw.includes('caches.match("./mobile-home.html?v=20261111-home6")'),'Offline navigation must fall back to modern Home');
 assert(!sw.includes('mobileLegacy'),'Service worker must never reference legacy mode');
 assert(!sw.includes('home-old'),'Service worker must never reference old Home');
 
-assert.equal(manifest.start_url,'./mobile-home.html?v=20261110-fast3');
+assert.equal(manifest.start_url,'./mobile-home.html?v=20261111-home6');
 assert.equal(manifest.display,'standalone');
 assert.equal(manifest.scope,'./');
 assert.deepEqual(manifestAlias,manifest,'manifest.json compatibility alias must match manifest.webmanifest exactly');
