@@ -1,8 +1,8 @@
-const CACHE="marina-empire-v20261114-modern24";
+const CACHE="marina-empire-v20261114-modern25";
 const CORE=[
  "./",
  "./index.html",
- "./mobile-home.html?v=20261114-home13",
+ "./mobile-home.html?v=20261114-home14",
  "./missions-mobile.html?v=20261114-missions12",
  "./map-mobile.html?v=20261114-map20",
  "./marina-mobile.html?v=20261114-marina8",
@@ -10,11 +10,12 @@ const CORE=[
  "./profile-mobile.html?v=20261114-profile8",
  "./account-mobile.html?v=20261113-account6",
  "./marketplace-mobile.html?v=20261114-market17",
- "./community-mobile.html?v=20261112-community5",
+ "./community-mobile.html?v=20261114-community6",
  "./alliance-mobile.html?v=20261112-alliance2",
  "./manifest.webmanifest",
  "./app-icon.svg",
  "./local-save-context.js",
+ "./community-expansion-v1.js?v=20261114-world1",
  "./credit-sync-guard.js?v=20261114-guard3",
  "./credit-purchase-rc.js?v=20261114-credit4",
  "./daily-objective-v1.js?v=20261114-daily2",
@@ -51,7 +52,7 @@ self.addEventListener("fetch",event=>{
    fetch(req,{cache:"no-store"}).then(res=>{
     if(res&&res.ok)caches.open(CACHE).then(cache=>cache.put(req,res.clone())).catch(()=>{});
     return res;
-   }).catch(async()=>await caches.match(req)||await caches.match("./mobile-home.html?v=20261111-home6")||await caches.match("./index.html"))
+   }).catch(async()=>await caches.match(req)||await caches.match("./mobile-home.html?v=20261114-home14")||await caches.match("./index.html"))
   );
   return;
  }
