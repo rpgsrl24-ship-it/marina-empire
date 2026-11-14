@@ -69,7 +69,7 @@ repair.onclick=()=>{const r=window.MarinaEmpireMarinaLite.repair();toastMsg(r.me
 jobAction.onclick=()=>{const r=window.MarinaEmpireMarinaLite.completeJob();toastMsg(r.message);render()};
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));const map={overview:"overview",pontoons:"pontoonsPanel",services:"servicesPanel",structures:"structuresPanel",upgrade:"upgradePanel"};document.getElementById(map[b.dataset.tab])?.classList.add("on")});
 goMap.onclick=()=>location.assign("./map-mobile.html?v=20261111-map16");goMarket.onclick=()=>location.assign("./marketplace-mobile.html?v=20261110-market13");goOffice.onclick=()=>location.assign("./direction-mobile.html?v=20261110-direction1");
-render();
+// Ogni ingresso nella pagina Marina parte dalla posizione reale dello yacht.\n// Evita che una selezione rimasta in sessionStorage (es. Rimini) sopravviva a un arrivo in un altro porto.\ntry{\n const currentGame=window.MarinaEmpireMarinaLite?.read?.();\n const currentPort=String(currentGame?.port||"rimini");\n sessionStorage.setItem("marina_empire_selected_marina",currentPort);\n}catch(_){}\nrender();
 
 (function(){
  const id=(location.hash||"").slice(1);
