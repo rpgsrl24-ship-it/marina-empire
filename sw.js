@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261114-modern22";
+const CACHE="marina-empire-v20261114-modern23";
 const CORE=[
  "./",
  "./index.html",
@@ -15,7 +15,7 @@ const CORE=[
  "./manifest.webmanifest",
  "./app-icon.svg",
  "./local-save-context.js",
- "./credit-sync-guard.js?v=20261114-guard2",
+ "./credit-sync-guard.js?v=20261114-guard3",
  "./credit-purchase-rc.js?v=20261114-credit3",
  "./daily-objective-v1.js?v=20261114-daily2",
  "./vhf-live-v1.js?v=20261114-vhf3",

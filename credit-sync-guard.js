@@ -62,19 +62,15 @@ window.meCreditCheckoutReady=async function(){
    if(profile.error)throw profile.error;
    const saved=await c.from("player_progress").insert({user_id:user.id,game_state:snapshot,updated_at:new Date().toISOString()});
    if(saved.error)throw saved.error;
-   return true;
-  }
-  if(!validGame(remote.data.game_state))return false;
-  if(!sameGameState(remote.data.game_state,snapshot)){
-   const saved=await c.from("player_progress").update({game_state:snapshot,updated_at:new Date().toISOString()}).eq("user_id",user.id);
-   if(saved.error)throw saved.error;
+  }else if(!validGame(remote.data.game_state)){
+   return false;
   }
   return true;
  }catch(e){
   console.warn("Marina Empire credit sync guard",e);
   return false;
  }
-};
+}
 
 async function claimPurchasedCreditsAfterReturn(forceCheck=false){
  if(claimBusy)return false;
