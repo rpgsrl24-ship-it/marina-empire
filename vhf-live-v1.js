@@ -19,9 +19,10 @@ function resolved(game,id){return Array.isArray(game?.vhfHistory)&&game.vhfHisto
 function make(game){
  const voyages=Math.max(0,Math.floor(Number(game?.voyages)||0)),port=String(game?.port||"rimini");
  if(voyages<1||game?.trip)return null;
- const seed=dayKey()+"|"+port+"|"+voyages,template=CALLS[hash(seed)%CALLS.length];
+ const arrivalAt=Math.max(0,Math.floor(Number(game?.lastArrival?.at)||0)),voyageKey=arrivalAt||Math.max(0,Math.floor(Number(game?.voyageSerial)||voyages));
+ const seed=dayKey()+"|"+port+"|"+voyages+"|"+voyageKey,template=CALLS[hash(seed)%CALLS.length];
  return Object.freeze({
-  id:"VHF_"+dayKey().replaceAll("-","")+"_"+port+"_"+voyages+"_"+template.type,
+  id:"VHF_"+dayKey().replaceAll("-","")+"_"+port+"_"+voyages+"_"+voyageKey+"_"+template.type,
   port,voyages,type:template.type,icon:template.icon,channel:template.channel,title:template.title,message:template.message,
   reward:template.reward,prestige:template.prestige,duration:template.duration
  });

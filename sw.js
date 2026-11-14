@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261114-modern18";
+const CACHE="marina-empire-v20261114-modern19";
 const CORE=[
  "./",
  "./index.html",
@@ -16,7 +16,7 @@ const CORE=[
  "./app-icon.svg",
  "./local-save-context.js",
  "./daily-objective-v1.js?v=20261114-daily2",
- "./vhf-live-v1.js?v=20261114-vhf2",
+ "./vhf-live-v1.js?v=20261114-vhf3",
  "./commander-ranks-v1.js?v=20261113-rank1",
  "./marina-progression-v1.js?v=20261113-prog1",
  "./legendary-events-v1.js?v=20261113-legend2",
