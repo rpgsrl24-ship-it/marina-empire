@@ -22,7 +22,7 @@ function loadSupabase(){
  if(clientPromise)return clientPromise;
  clientPromise=new Promise((resolve,reject)=>{
    const s=document.createElement("script");
-   s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js";
+   s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js";
    s.onload=()=>window.supabase?.createClient?resolve(window.supabase):reject(new Error("supabase_unavailable"));
    s.onerror=()=>reject(new Error("supabase_unavailable"));
    document.head.appendChild(s);

@@ -1,8 +1,9 @@
 (function(){
 "use strict";
 const CONFIG={
-  enabled:false,
-  directCheckoutReady:false,
+  enabled:true,
+  directCheckoutReady:true,
+  liveProductIds:[38090],
   supabaseUrl:"https://zrdetqvnjmqkfyajxjgp.supabase.co",
   publishableKey:"sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw",
   packages:[
@@ -16,17 +17,44 @@ const CONFIG={
 window.MarinaEmpireCreditShopRC=Object.freeze(CONFIG);
 
 const fmt=n=>new Intl.NumberFormat("it-IT").format(Number(n)||0);
-let client=null,busy=false;
-function getClient(){
+let client=null,busy=false,loaderPromise=null;
+async function ensureSupabase(){
+  if(window.supabase?.createClient)return window.supabase;
+  if(loaderPromise)return loaderPromise;
+  loaderPromise=new Promise((resolve,reject)=>{
+    const sources=[
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js",
+      "https://unpkg.com/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js"
+    ];
+    let i=0;
+    const next=()=>{
+      if(i>=sources.length){reject(new Error("supabase_unavailable"));return}
+      const s=document.createElement("script"),src=sources[i++];
+      let done=false;
+      const finish=ok=>{
+        if(done)return;done=true;clearTimeout(timer);s.onload=s.onerror=null;
+        if(ok&&window.supabase?.createClient){resolve(window.supabase);return}
+        try{s.remove()}catch(_){}
+        next();
+      };
+      const timer=setTimeout(()=>finish(false),4500);
+      s.async=true;s.src=src;s.onload=()=>finish(true);s.onerror=()=>finish(false);
+      document.head.appendChild(s);
+    };
+    next();
+  });
+  return loaderPromise;
+}
+async function getClient(){
   if(client)return client;
-  if(!window.supabase?.createClient)throw new Error("Servizio account non disponibile");
-  client=window.supabase.createClient(CONFIG.supabaseUrl,CONFIG.publishableKey,{
+  const lib=await ensureSupabase();
+  client=lib.createClient(CONFIG.supabaseUrl,CONFIG.publishableKey,{
     auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
   });
   return client;
 }
 async function currentUser(){
-  const c=getClient();
+  const c=await getClient();
   const {data,error}=await c.auth.getUser();
   if(error||!data?.user?.id||!data.user.email_confirmed_at)return null;
   return data.user;
@@ -34,7 +62,7 @@ async function currentUser(){
 async function walletBalance(){
   const user=await currentUser();
   if(!user)return null;
-  const c=getClient();
+  const c=await getClient();
   const {data,error}=await c.from("me_credit_wallets").select("balance").eq("user_id",user.id).maybeSingle();
   if(error)throw error;
   return Number(data?.balance||0);
@@ -47,7 +75,7 @@ function setStatus(message,isError=false){
 }
 async function startCheckout(productId){
   if(busy)return;
-  if(!CONFIG.enabled){setStatus("Acquisti in attivazione finale. Nessun addebito viene avviato.",true);return;}
+  if(!CONFIG.enabled||!CONFIG.liveProductIds.includes(Number(productId))){setStatus("Questo pacchetto non è ancora disponibile.",true);return;}
   const user=await currentUser();
   if(!user){setStatus("Per acquistare crediti devi prima accedere con un account Marina Empire verificato.",true);document.querySelector('[data-tab="profile"]')?.click();return;}
   if(typeof window.meCreditCheckoutReady!=="function"){
@@ -60,7 +88,7 @@ async function startCheckout(productId){
   document.querySelectorAll("[data-me-credit-product]").forEach(b=>b.disabled=true);
   setStatus("Preparazione del checkout sicuro RPG Yacht…");
   try{
-    const c=getClient();
+    const c=await getClient();
     const {data,error}=await c.functions.invoke("marina-direct-checkout",{body:{product_id:Number(productId)}});
     if(error||!data?.checkout_url)throw new Error("checkout_unavailable");
     window.location.assign(data.checkout_url);
@@ -77,10 +105,9 @@ async function syncButtons(){
   let user=null;
   try{user=await currentUser()}catch{}
   buttons.forEach(btn=>{
-    btn.disabled=!CONFIG.enabled||!user||busy;
-    btn.textContent=!CONFIG.enabled
-      ?"ACQUISTA · ATTIVAZIONE FINALE"
-      :user?"ACQUISTA ORA":"ACCEDI PER ACQUISTARE";
+    const live=CONFIG.enabled&&CONFIG.liveProductIds.includes(Number(btn.dataset.meCreditProduct));
+    btn.disabled=!live||!user||busy;
+    btn.textContent=!live?"PROSSIMAMENTE":user?"ACQUISTA ORA":"ACCEDI PER ACQUISTARE";
   });
   const loginHint=document.getElementById("meCreditLoginHint");
   if(loginHint)loginHint.textContent=user

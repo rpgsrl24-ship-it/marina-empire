@@ -15,36 +15,36 @@
  const q=new URLSearchParams(location.search);
  const view=(q.get("view")||"").toLowerCase();
  const routes={
-  home:"./mobile-home.html?v=20261111-home6",
-  missions:"./missions-mobile.html?v=20261111-missions9",
-  mission:"./missions-mobile.html?v=20261111-missions9",
-  map:"./map-mobile.html?v=20261111-map16",
-  marinas:"./marina-mobile.html?v=20261111-marina4",
-  marina:"./marina-mobile.html?v=20261111-marina4",
+  home:"./mobile-home.html?v=20261114-home13",
+  missions:"./missions-mobile.html?v=20261114-missions12",
+  mission:"./missions-mobile.html?v=20261114-missions12",
+  map:"./map-mobile.html?v=20261114-map20",
+  marinas:"./marina-mobile.html?v=20261114-marina8",
+  marina:"./marina-mobile.html?v=20261114-marina8",
   fleet:"./fleet-mobile.html?v=20261109-fleet1",
   flotta:"./fleet-mobile.html?v=20261109-fleet1",
-  marketplace:"./marketplace-mobile.html?v=20261110-market13",
-  market:"./marketplace-mobile.html?v=20261110-market13",
-  community:"./community-mobile.html?v=20261110-community3",
-  profile:"./profile-mobile.html?v=20261110-profile1",
-  office:"./direction-mobile.html?v=20261110-direction1",
-  direction:"./direction-mobile.html?v=20261110-direction1",
+  marketplace:"./marketplace-mobile.html?v=20261114-market15",
+  market:"./marketplace-mobile.html?v=20261114-market15",
+  community:"./community-mobile.html?v=20261112-community5",
+  profile:"./profile-mobile.html?v=20261114-profile8",
+  office:"./direction-mobile.html?v=20261113-direction3",
+  direction:"./direction-mobile.html?v=20261113-direction3",
   activities:"./activities-mobile.html?v=20261110-activities1",
   research:"./research-mobile.html?v=20261109-research1",
-  alliance:"./alliance-mobile.html?v=20261110-alliance1",
+  alliance:"./alliance-mobile.html?v=20261112-alliance2",
   ranking:"./ranking-mobile.html?v=20261110-ranking1"
  };
  const creditReturn=q.get("credit_purchase")==="success";
- const target=creditReturn?"./marketplace-mobile.html?v=20261110-market13&credit_purchase=success":(routes[view]||"./mobile-home.html?v=20261111-home6");
+ const target=creditReturn?"./marketplace-mobile.html?v=20261114-market15&credit_purchase=success":(routes[view]||"./mobile-home.html?v=20261114-home13");
  location.replace(target+location.hash);
-}catch(_){location.replace("./mobile-home.html?v=20261111-home6")}})();
+}catch(_){location.replace("./mobile-home.html?v=20261114-home13")}})();
 </script>
-<noscript><meta http-equiv="refresh" content="0;url=./mobile-home.html?v=20261111-home6"></noscript>
+<noscript><meta http-equiv="refresh" content="0;url=./mobile-home.html?v=20261114-home13"></noscript>
 <style>html,body{margin:0;min-height:100%;display:grid;place-items:center;background:#eaf7fc;color:#0a3153;font-family:system-ui,sans-serif}a{color:#075f91;font-weight:800}</style>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Marina Empire">
 <link rel="apple-touch-icon" href="./app-icon.svg">
 </head>
-<body><a href="./mobile-home.html?v=20261111-home6">Apri Marina Empire</a></body>
+<body><a href="./mobile-home.html?v=20261114-home13">Apri Marina Empire</a></body>
 </html>

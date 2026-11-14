@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261114-modern20";
+const CACHE="marina-empire-v20261114-modern21";
 const CORE=[
  "./",
  "./index.html",
@@ -9,12 +9,14 @@ const CORE=[
  "./fleet-mobile.html?v=20261109-fleet1",
  "./profile-mobile.html?v=20261114-profile8",
  "./account-mobile.html?v=20261113-account6",
- "./marketplace-mobile.html?v=20261112-market14",
+ "./marketplace-mobile.html?v=20261114-market15",
  "./community-mobile.html?v=20261112-community5",
  "./alliance-mobile.html?v=20261112-alliance2",
  "./manifest.webmanifest",
  "./app-icon.svg",
  "./local-save-context.js",
+ "./credit-sync-guard.js?v=20261114-guard2",
+ "./credit-purchase-rc.js?v=20261114-credit2",
  "./daily-objective-v1.js?v=20261114-daily2",
  "./vhf-live-v1.js?v=20261114-vhf3",
  "./commander-ranks-v1.js?v=20261113-rank1",
