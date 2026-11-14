@@ -45,6 +45,7 @@ function completeJob(){
  const raw=game.marinaOperations[port]||{};
  game.marinaOperations[port]={...raw,completed:Math.max(0,Number(raw.completed)||0)+1};
  game.lastNpcJob={id:"MOBILE_MARINA_"+String(status.jobId||status.stage||game.guestTrialJobsUsed)+"_"+port,type:status.type||"Incarico Marina Live",reward,cost:0,prestige:prestigeGain,reputation:Math.max(0,Number(status.reputation)||0),sector:"marina",port,at:Date.now()};
+ window.MarinaEmpireDailyObjective?.record?.(game,"marina");
  if(!write(game))return{ok:false,message:"Salvataggio incarico non confermato"};
  const rep=reputation(port,game);
  return{ok:true,message:"Incarico completato · +"+reward+" crediti · +"+prestigeGain+" prestigio · "+rep.label,reward,prestige:prestigeGain,reputation:rep};

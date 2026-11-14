@@ -1,13 +1,13 @@
-const CACHE="marina-empire-v20261113-modern16";
+const CACHE="marina-empire-v20261114-modern17";
 const CORE=[
  "./",
  "./index.html",
- "./mobile-home.html?v=20261113-home11",
+ "./mobile-home.html?v=20261114-home12",
  "./missions-mobile.html?v=20261113-missions11",
  "./map-mobile.html?v=20261113-map19",
- "./marina-mobile.html?v=20261113-marina7",
+ "./marina-mobile.html?v=20261114-marina8",
  "./fleet-mobile.html?v=20261109-fleet1",
- "./profile-mobile.html?v=20261113-profile6",
+ "./profile-mobile.html?v=20261114-profile7",
  "./account-mobile.html?v=20261113-account6",
  "./marketplace-mobile.html?v=20261112-market14",
  "./community-mobile.html?v=20261112-community5",
@@ -15,14 +15,15 @@ const CORE=[
  "./manifest.webmanifest",
  "./app-icon.svg",
  "./local-save-context.js",
- "./vhf-live-v1.js?v=20261113-vhf1",
+ "./daily-objective-v1.js?v=20261114-daily1",
+ "./vhf-live-v1.js?v=20261114-vhf2",
  "./commander-ranks-v1.js?v=20261113-rank1",
  "./marina-progression-v1.js?v=20261113-prog1",
  "./legendary-events-v1.js?v=20261113-legend2",
  "./premium-fx.js?v=20261112-fx1",
  "./marina-fx-v1.js?v=20261112-fx1",
- "./mobile-marina-lite-v1.js?v=20261113-marinalite4",
- "./mobile-map-lite-v2.js?v=20261113-engine8",
+ "./mobile-marina-lite-v1.js?v=20261114-marinalite5",
+ "./mobile-map-lite-v2.js?v=20261114-engine9",
  "./cloud-sync-modern.js?v=20261111-cloud1",
  "./pwa-install.js?v=20261111-pwa1"
 ];

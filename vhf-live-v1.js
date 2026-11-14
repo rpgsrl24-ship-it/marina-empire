@@ -78,6 +78,7 @@ function complete(){
  game.vhfHistory.push({id:call.id,status:"completed",type:call.type,port,reward,prestige,at:Date.now()});
  game.vhfHistory=game.vhfHistory.slice(-60);
  game.lastVhfCall={id:call.id,type:call.type,title:call.title,port,reward,prestige,at:Date.now()};
+ window.MarinaEmpireDailyObjective?.record?.(game,"vhf");
  game.vhfActiveCall=null;
  if(!write(game))return{ok:false,message:"Salvataggio intervento non confermato"};
  const saved=read();
