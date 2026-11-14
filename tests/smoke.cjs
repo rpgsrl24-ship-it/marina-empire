@@ -7,10 +7,10 @@ const read=p=>fs.readFileSync(p,'utf8');
 const index=read('index.html');
 
 // Root is now a minimal compatibility router, never the old game shell.
-assert(index.includes('mobile-home.html?v=20261110-fast3'),'Root router must target the current Home');
-assert(index.includes('missions-mobile.html?v=20261110-missions7'),'Root router must preserve Missioni aliases');
-assert(index.includes('map-mobile.html?v=20261110-map14'),'Root router must preserve Mappa aliases');
-assert(index.includes('marina-mobile.html?v=20261110-marina3'),'Root router must preserve Marina aliases');
+assert(index.includes('mobile-home.html?v=20261111-home6'),'Root router must target the current Home');
+assert(index.includes('missions-mobile.html?v=20261111-missions9'),'Root router must preserve Missioni aliases');
+assert(index.includes('map-mobile.html?v=20261111-map16'),'Root router must preserve Mappa aliases');
+assert(index.includes('marina-mobile.html?v=20261111-marina4'),'Root router must preserve Marina aliases');
 assert(index.includes('marketplace-mobile.html?v=20261110-market13'),'Root router must preserve Marketplace aliases');
 assert(!index.includes('function launch(id)'),'Legacy monolithic game shell must not return');
 assert(!index.includes('mobileLegacy'),'Root router must not expose legacy mode');
