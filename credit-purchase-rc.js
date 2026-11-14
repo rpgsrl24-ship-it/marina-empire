@@ -3,7 +3,7 @@
 const CONFIG={
   enabled:true,
   directCheckoutReady:true,
-  liveProductIds:[38090],
+  liveProductIds:[38090,38091,38092,38093,38094],
   supabaseUrl:"https://zrdetqvnjmqkfyajxjgp.supabase.co",
   publishableKey:"sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw",
   packages:[

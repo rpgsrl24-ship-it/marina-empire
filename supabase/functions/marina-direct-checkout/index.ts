@@ -8,7 +8,7 @@ const PACKS: Record<number,{sku:string;credits:number;priceCents:number}> = {
   38094:{sku:"ME-CREDITS-2000000",credits:2000000,priceCents:9999}
 };
 const ORIGIN="https://rpgsrl24-ship-it.github.io";
-const LIVE_PRODUCT_IDS=new Set([38090]);
+const LIVE_PRODUCT_IDS=new Set([38090,38091,38092,38093,38094]);
 const PUBLIC_KEY="sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw";
 const env=(k:string)=>Deno.env.get(k)||"";
 const readSecretKey=()=>{
