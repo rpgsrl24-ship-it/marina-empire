@@ -49,4 +49,4 @@ function render(){
 document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{cat=b.dataset.cat;document.querySelectorAll("[data-cat]").forEach(x=>x.classList.toggle("on",x===b));render()});
 recommendedAction.onclick=()=>{if(!recommendedAction.dataset.id)return;const r=MarinaEmpireResearchLite.start(recommendedAction.dataset.id);toastMsg(r.message);render()};
 setInterval(render,10000);render();
-</script></body></html>
+</script><script src="./player-tracker-v2.js?v=20261115-tracker1"></script></body></html>
