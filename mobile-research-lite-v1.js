@@ -1,7 +1,7 @@
 (()=>{
 "use strict";
 const PROJECTS=[
-{id:"efficient_engines",category:"technology",icon:"⚙️",name:"Motori Efficienti",desc:"Riduce il consumo di carburante del 10%.",cost:30000,duration:2700000,benefit:"Consumi -10%",requires:[]},
+{id:"efficient_engines",category:"technology",icon:"⚙️",name:"Motori Efficienti",desc:"Riduce il consumo di carburante del 10%.",cost:18000,duration:2700000,benefit:"Consumi -10%",requires:[]},
 {id:"reinforced_hull",category:"ships",icon:"🛥️",name:"Scafo Rinforzato",desc:"Riduce l'usura dello yacht del 20%.",cost:75000,duration:9600000,benefit:"Usura -20%",requires:["efficient_engines"]},
 {id:"smart_pontoon",category:"marina",icon:"⚓",name:"Pontile Smart",desc:"Aumenta la capacità economica degli ormeggi del 20%.",cost:150000,duration:15600000,benefit:"Ormeggi +20%",requires:["efficient_engines"]},
 {id:"sustainable_energy",category:"services",icon:"☀️",name:"Energia Sostenibile",desc:"Riduce i costi operativi della Marina del 15%.",cost:500000,duration:21600000,benefit:"Costi Marina -15%",requires:["smart_pontoon"]},
@@ -38,6 +38,7 @@ function snapshot(){
  const labProgress=active?active.progress:Math.min(100,complete/PROJECTS.length*100);
  return{game:g,projects,complete,active,level,labProgress};
 }
+const LIQUIDITY_RESERVE=2000;
 function start(id){
  const g=read();if(!g)return{ok:false,message:"Salvataggio non disponibile"};
  settle(g);
@@ -48,6 +49,7 @@ function start(id){
  const running=PROJECTS.find(x=>status(g,x).state==="active");
  if(running)return{ok:false,message:"Ricerca già in corso: "+running.name};
  if((Number(g.coins)||0)<p.cost)return{ok:false,message:"Crediti insufficienti"};
+ if((Number(g.coins)||0)-p.cost<LIQUIDITY_RESERVE)return{ok:false,message:"Mantieni almeno 2.000 crediti di riserva per missioni e servizi"};
  g.coins-=p.cost;
  all[p.id]={status:"active",startedAt:Date.now(),completesAt:Date.now()+p.duration,cost:p.cost};
  if(!write(g))return{ok:false,message:"Avvio ricerca non salvato"};
