@@ -27,4 +27,4 @@ function bind(){document.querySelectorAll("[data-select]").forEach(b=>b.onclick=
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));document.getElementById(b.dataset.tab)?.classList.add("on")});
 toMarina.onclick=()=>location.assign("./marina-mobile.html?v=20261111-marina4");toResearch.onclick=()=>location.assign("./research-mobile.html?v=20261109-research1");
 render();
-</script></body></html>
+</script><script src="./player-tracker-v2.js?v=20261115-tracker1"></script></body></html>
