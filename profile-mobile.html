@@ -40,4 +40,4 @@ fleetCards.innerHTML=owned.slice(0,3).map(id=>{const b=BOATS[id]||[id,"./antepri
 const gf=Math.min(100,owned.length/2*100),gv=Math.min(100,(Number(g.voyages)||0)/5*100),gb=Math.min(100,bc/3*100);gFleet.style.width=gf+"%";gVoy.style.width=gv+"%";gBiz.style.width=gb+"%";gFleetTxt.textContent=Math.min(owned.length,2)+" / 2";gVoyTxt.textContent=Math.min(Number(g.voyages)||0,5)+" / 5";gBizTxt.textContent=Math.min(bc,3)+" / 3";
 }catch(_){}})();
 document.querySelectorAll(".tabs a").forEach(a=>a.addEventListener("click",()=>{document.querySelectorAll(".tabs a").forEach(x=>x.classList.toggle("on",x===a))}));function syncProfileTabFromHash(){const h=location.hash;if(!h||h==="#profileSummary")return;const a=[...document.querySelectorAll(".tabs a")].find(x=>x.getAttribute("href")===h);if(a)document.querySelectorAll(".tabs a").forEach(x=>x.classList.toggle("on",x===a))}window.addEventListener("hashchange",syncProfileTabFromHash);syncProfileTabFromHash();
-</script></body></html>
+</script><script src="./player-tracker-v2.js?v=20261115-tracker1"></script></body></html>
