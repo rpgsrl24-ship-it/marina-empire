@@ -28,4 +28,4 @@ content.addEventListener("click",e=>{
 });
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));render()});
 let bootAttempts=0;function boot(){if(api()){render();setInterval(syncHud,1500);return}bootAttempts++;if(bootAttempts>75){content.className="empty";content.innerHTML="<b>Missioni non disponibili</b><span>Ricarica la pagina dalla Home. Se il problema continua, il motore missioni non è stato caricato.</span>";return}setTimeout(boot,80)}boot();
-</script></body></html>
+</script><script src="./player-tracker-v2.js?v=20261115-tracker1"></script></body></html>
