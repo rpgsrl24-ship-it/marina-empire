@@ -12,7 +12,7 @@
 .actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:7px}.actions a{position:relative;min-width:0;min-height:78px;padding:16px 4px 8px;border:1px solid #abcde0;border-radius:12px;background:linear-gradient(#fff,#e8f4f9);color:#0b2b42;text-decoration:none;text-align:center;font-size:8px;font-weight:950;line-height:1.15}.actions b{display:block;margin-bottom:5px;font-size:19px}.step{position:absolute;top:5px;left:6px;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;background:#159df3;color:#fff;font-size:10px}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:7px}.tile{position:relative;overflow:hidden;min-height:82px;border:1px solid #bad5e4;border-radius:12px;background:#fff;color:#fff;text-decoration:none}.tile:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#02141f00 18%,#02141f55 52%,#02141fe8 88%);z-index:1}.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(1.22) saturate(1.22)}.tile .i{position:absolute;z-index:2;left:7px;top:7px;font-size:18px}.tile .l{position:absolute;z-index:2;left:7px;right:5px;bottom:7px;color:#fff0c9;font-size:7.5px;font-weight:950;line-height:1.1;text-shadow:0 2px 5px #000}
 .services{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:7px}.services a{padding:10px 5px;border:1px solid #abcde0;border-radius:11px;background:linear-gradient(#fff,#e8f4f9);color:#0b2b42;text-align:center;text-decoration:none;font-size:8px;font-weight:900}
-.progress{margin-top:7px;padding:10px 11px;border:1px solid #abcde0;border-radius:13px;background:#fff}.progress small{display:block;color:#506d7c;font-size:7px;font-weight:950}.progress strong{display:block;margin-top:2px;color:#0c3193;font-size:10px}.progress span{display:block;margin-top:3px;color:#506d7c;font-size:8px}
+.progress{margin-top:7px;padding:10px 11px;border:1px solid #abcde0;border-radius:13px;background:#fff}.progress small{display:block;color:#506d7c;font-size:7px;font-weight:950}.progress strong{display:block;margin-top:2px;color:#0c3193;font-size:10px}.progress span{display:block;margin-top:3px;color:#506d7c;font-size:8px}.retention{margin-top:7px;padding:10px 11px;border:1px solid #d8ba70;border-radius:13px;background:linear-gradient(145deg,#fff9e7,#edf8fc);display:grid;grid-template-columns:1fr 1fr;gap:7px}.retention article{padding:9px;border:1px solid #d9e3e9;border-radius:11px;background:#fff}.retention small{display:block;color:#7b6a3b;font-size:7px;font-weight:950}.retention strong{display:block;margin-top:3px;color:#0b426c;font-size:10px}.retention span{display:block;margin-top:4px;color:#607986;font-size:8px;line-height:1.3}.retention button{width:100%;min-height:36px;margin-top:7px;border:1px solid #d0a94a;border-radius:9px;background:linear-gradient(180deg,#f7d55d,#dda31a);color:#17334c;font-size:8px;font-weight:950}.retention button:disabled{opacity:.48}@media(max-width:430px){.retention{grid-template-columns:1fr}}
 .bottom{position:fixed;left:7px;right:7px;bottom:7px;max-width:606px;margin:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:5px;border:1px solid #58c1eb;border-radius:16px;background:#06243af5;z-index:99}.bottom a{min-height:58px;border-radius:10px;color:#fff;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:6px;font-weight:900}.bottom a b{font-size:19px;margin-bottom:3px}.bottom .on{background:linear-gradient(180deg,#1ccaff,#0768f3);border:1px solid #58c1eb;color:#fff}
 @media(max-width:430px){.scene{height:205px}.grid,.actions{grid-template-columns:repeat(4,minmax(0,1fr))}.tile{min-height:78px}.tile .l{font-size:7px}.actions a{font-size:7px;padding-left:2px;padding-right:2px}}
 </style><meta name="apple-mobile-web-app-capable" content="yes">
@@ -52,7 +52,7 @@
 <a class="tile" href="./isola-delle-rose-originale.html"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><span class="i">🏝️</span><span class="l">BASE RPG · ISOLA DELLE ROSE</span></a>
 </section>
 <div class="services"><a href="./marina-mobile.html?v=20261111-marina4#refuel">⛽ PIENO</a><a href="./marina-mobile.html?v=20261111-marina4#repair">🔧 MANUTENZIONE</a><button data-pwa-install hidden disabled style="padding:10px 5px;border:1px solid #abcde0;border-radius:11px;background:linear-gradient(#fff,#e8f4f9);color:#0b2b42;font-size:8px;font-weight:900">INSTALLA APP</button><a href="./account-mobile.html?v=20261111-account-exit1">↩ ESCI</a></div>
-<a id="nextStepCard" class="progress" href="./missions-mobile.html?v=20261111-missions9" style="display:block;text-decoration:none;color:inherit"><small id="nextStepEyebrow">PROGRESSIONE & OBIETTIVI</small><strong id="nextStepTitle">Continua il tuo impero</strong><span id="nextStepText">Obiettivi, diario e servizi rapidi</span></a>
+<section class="retention"><article><small>🔥 PREMIO GIORNALIERO</small><strong id="dailyRewardTitle">Continuità comandante</strong><span id="dailyRewardText">Rientra ogni giorno per aumentare il premio.</span><button id="dailyRewardBtn" type="button">RISCATTA</button></article><article><small>🎯 SFIDA DI OGGI</small><strong>Completa 1 missione</strong><span id="dailyMissionText">0 / 1 · premio 500 crediti + 10 prestigio</span><button id="dailyMissionBtn" type="button">VAI ALLA MISSIONE</button></article></section><a id="nextStepCard" class="progress" href="./missions-mobile.html?v=20261111-missions9" style="display:block;text-decoration:none;color:inherit"><small id="nextStepEyebrow">PROGRESSIONE & OBIETTIVI</small><strong id="nextStepTitle">Continua il tuo impero</strong><span id="nextStepText">Obiettivi, diario e servizi rapidi</span></a>
 <nav class="bottom"><a class="on" href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a href="./marina-mobile.html?v=20261111-marina4"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261110-market13"><b>🛒</b>MARKET</a></nav>
 </main>
 <script src="./local-save-context.js"></script><script src="./pwa-install.js?v=20261111-pwa1"></script><script>
@@ -70,6 +70,33 @@
  const marinaName=names[g.port]||g.port||"Rimini";
  if(homeMarinaStatus)homeMarinaStatus.textContent=marinaName+" · altre imbarcazioni · arrivi e partenze";
  const n=Math.max(0,Number(g.voyages)||0),guestJobs=Math.max(0,Number(g.guestTrialJobsUsed)||0),completed=Array.isArray(g.completed)?g.completed:[];
+ const today=(()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")})();
+ g.retention=g.retention&&typeof g.retention==="object"?g.retention:{};
+ const yesterday=(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")})();
+ const daily=g.retention.daily&&typeof g.retention.daily==="object"?g.retention.daily:{day:"",streak:0,baseVoyages:Number(g.voyages)||0,missionClaimed:false};
+ if(daily.day!==today&&daily.day!==yesterday){daily.streak=0}
+ if(daily.day!==today){daily.baseVoyages=Number(g.voyages)||0;daily.missionClaimed=false}
+ g.retention.daily=daily;
+ const persistRetention=()=>{try{c.writeGame(h,g)}catch(_){}};
+ const reward=Math.min(600,300+Math.max(0,Number(daily.streak)||0)*50);
+ if(dailyRewardTitle)dailyRewardTitle.textContent=daily.day===today?"🔥 "+Math.max(1,Number(daily.streak)||1)+" giorni di fila":"Premio di oggi · "+reward.toLocaleString("it-IT")+" crediti";
+ if(dailyRewardText)dailyRewardText.textContent=daily.day===today?"Premio già riscosso. Torna domani per continuare la serie.":"Mantieni la continuità: il premio cresce fino a 600 crediti.";
+ if(dailyRewardBtn){
+   dailyRewardBtn.disabled=daily.day===today;
+   dailyRewardBtn.textContent=daily.day===today?"RISCOSSO":"RISCATTA "+reward.toLocaleString("it-IT");
+   dailyRewardBtn.onclick=()=>{
+     if(daily.day===today)return;
+     daily.streak=daily.day===yesterday?Math.min(7,(Number(daily.streak)||0)+1):1;
+     daily.day=today;g.coins=(Number(g.coins)||0)+reward;persistRetention();location.reload();
+   };
+ }
+ const dailyMissionDone=(Number(g.voyages)||0)>Number(daily.baseVoyages||0);
+ if(dailyMissionText)dailyMissionText.textContent=(dailyMissionDone?"1":"0")+" / 1 · premio 500 crediti + 10 prestigio";
+ if(dailyMissionBtn){
+   if(daily.missionClaimed){dailyMissionBtn.disabled=true;dailyMissionBtn.textContent="PREMIO RISCOSSO";}
+   else if(dailyMissionDone){dailyMissionBtn.textContent="RISCATTA PREMIO";dailyMissionBtn.onclick=()=>{daily.missionClaimed=true;g.coins=(Number(g.coins)||0)+500;g.prestige=(Number(g.prestige)||0)+10;persistRetention();location.reload();};}
+   else {dailyMissionBtn.textContent="VAI ALLA MISSIONE";dailyMissionBtn.onclick=()=>{location.href="./missions-mobile.html?v=20261111-missions9"};}
+ }
  const introDone=n>0||completed.includes("INTRO_RIMINI_CERVIA")||String(g.port||"rimini")!=="rimini";
  let title="Prima missione",text="Parti da Rimini e raggiungi Cervia.",href="./missions-mobile.html?v=20261111-missions9",eyebrow="PROSSIMO PASSO";
  if(g.trip){
