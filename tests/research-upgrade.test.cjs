@@ -32,16 +32,16 @@ assert.equal(hull.state,'locked','Reinforced hull must be locked before prerequi
 
 const start=api.start('efficient_engines');
 assert.equal(start.ok,true,'Affordable first research must start');
-assert.equal(game.coins,10000,'Starting research must deduct exactly 30,000 credits');
+assert.equal(game.coins,22000,'Starting research must deduct exactly 18,000 credits');
 assert.equal(game.research.efficient_engines.status,'active');
 
 const again=api.start('efficient_engines');
 assert.equal(again.ok,false,'Same research cannot be purchased twice while active');
-assert.equal(game.coins,10000,'Second start attempt must not deduct coins');
+assert.equal(game.coins,22000,'Second start attempt must not deduct coins');
 
 const locked=api.start('reinforced_hull');
 assert.equal(locked.ok,false,'Dependent research must remain blocked while prerequisite is active');
-assert.equal(game.coins,10000,'Blocked research must not deduct coins');
+assert.equal(game.coins,22000,'Blocked research must not deduct coins');
 
 now += 2_700_001;
 snap=api.snapshot();
@@ -52,6 +52,6 @@ assert.equal(hull.state,'available','Reinforced hull must unlock after prerequis
 
 const unaffordable=api.start('reinforced_hull');
 assert.equal(unaffordable.ok,false,'Unaffordable unlocked research must be blocked');
-assert.equal(game.coins,10000,'Unaffordable research must not deduct coins');
+assert.equal(game.coins,22000,'Unaffordable research must not deduct coins');
 
 console.log('PASS: research costs, single-purchase behavior, prerequisites and affordability are correct.');
