@@ -81,8 +81,10 @@
    title="Primo viaggio completato";text="Sei a "+marinaName+": prova ora un incarico Marina Live.";href="./marina-mobile.html?v=20261111-marina4#jobs";
  }else if(n<2){
    title="Nuova missione";text="Riparti da "+marinaName+" e continua a far crescere prestigio e crediti.";href="./missions-mobile.html?v=20261111-missions9";
+ }else if((Number(g.coins)||0)<14000){
+   title="Consolida la tua cassa";text="Completa ancora missioni e incarichi: investi solo mantenendo almeno 2.000 crediti di riserva.";href="./missions-mobile.html?v=20261111-missions9";
  }else{
-   title="Espandi il tuo impero";text="Sblocca attività, flotta, ricerca e nuove opportunità.";href="./activities-mobile.html?v=20261110-activities1";
+   title="Espandi il tuo impero";text="Ora hai margine per investire senza bloccare missioni e servizi.";href="./activities-mobile.html?v=20261110-activities1";
  }
  nextStepEyebrow.textContent=eyebrow;nextStepTitle.textContent=title;nextStepText.textContent=text;nextStepCard.href=href;
 }catch(_){}})();
