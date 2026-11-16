@@ -10,7 +10,7 @@
 <section id="arrivalBox" class="arrival"><strong id="arrivalTitle">⚓ Arrivo completato</strong><span id="arrivalText"></span><a href="./mobile-home.html?v=20261111-home6" style="display:inline-block;margin-top:9px;padding:8px 12px;border-radius:999px;background:#0a7db6;color:#fff;text-decoration:none;font-size:8px;font-weight:950">TORNA ALLA HOME →</a></section><section id="missionBox" class="mission" hidden><h3>👑 Missione collegata</h3><p id="missionText"></p><a data-safe-nav="./missions-mobile.html?v=20261111-missions9" href="./missions-mobile.html?v=20261111-missions9">VAI ALLA MISSIONE →</a></section>
 </main>
 <nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a class="on" href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a href="./marina-mobile.html?v=20261111-marina4"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261110-market13"><b>🛒</b>MARKET</a></nav>
-<script src="./local-save-context.js"></script><script src="./marina-photos-v1.js?v=20261109-photos1"></script><script src="./mobile-map-lite-v2.js?v=20261111-engine4"></script>
+<script src="./local-save-context.js"></script><script src="./marina-photos-v1.js?v=20261109-photos1"></script><script src="./mobile-map-lite-v2.js?v=20261111-engine4"></script><script src="./player-tracker-v2.js?v=20261116-tracker2"></script>
 <script>
 let selected=null,lastShot=null,missionBootHandled=false;
 const fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -58,6 +58,7 @@ function bootMap(){
      if(!started?.ok){
        alert("Impossibile avviare la missione: "+(started?.message||"errore"));
      }else{
+       try{window.MarinaEmpirePlayerTracker?.startPlay?.()}catch(_){}
        try{sessionStorage.removeItem("marina_empire_pending_mission")}catch(_){}
        try{history.replaceState(null,"","./map-mobile.html?v=20261111-map16")}catch(_){}
      }
@@ -67,8 +68,26 @@ function bootMap(){
  const shot=b.snapshot();selected=shot.trip?.dest||shot.ports.find(p=>p.id!==shot.state.port)?.id||null;render();setInterval(render,1500)
 }
 setTimeout(bootMap,400);
-function pulseAuthoritativeEngine(){try{window.MarinaEmpireMapLite?.pulse?.()}catch(e){console.warn("Heartbeat mappa",e)}}
+function pulseAuthoritativeEngine(){try{
+ const lite=window.MarinaEmpireMapLite;
+ if(!lite)return;
+ const before=lite.snapshot?.();
+ const tripId=before?.trip?.id||"";
+ const voyageId=before?.state?.trip?.voyageId||0;
+ const r=lite.pulse?.();
+ const after=lite.snapshot?.();
+ if(tripId&&!after?.trip){
+   const key="marina_empire_mission_complete_"+String(voyageId||tripId);
+   let sent=false;try{sent=sessionStorage.getItem(key)==="1"}catch(_){}
+   if(!sent){
+     try{sessionStorage.setItem(key,"1")}catch(_){}
+     try{window.MarinaEmpirePlayerTracker?.startPlay?.()}catch(_){}
+     try{window.MarinaEmpirePlayerTracker?.track?.("mission_complete")}catch(_){}
+   }
+ }
+ return r;
+}catch(e){console.warn("Heartbeat mappa",e)}}
 setInterval(pulseAuthoritativeEngine,500);
 window.addEventListener("focus",pulseAuthoritativeEngine);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)pulseAuthoritativeEngine()});
-</script><script src="./player-tracker-v2.js?v=20261115-tracker1"></script></body></html>
+</script></body></html>
