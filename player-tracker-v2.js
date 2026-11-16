@@ -7,7 +7,7 @@ const KEY="sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw";
 const VISITOR_KEY="marina_empire_visitor_id_v2";
 const SESSION_KEY="marina_empire_session_id_v2";
 const PLAY_KEY="marina_empire_play_started_v2";
-let clientPromise=null,active=false,lastHeartbeat=0;
+let clientPromise=null,active=false,lastHeartbeat=0,playPending=false;
 
 function uuid(){try{return crypto.randomUUID()}catch(_){return "00000000-0000-4000-8000-"+Math.random().toString(16).slice(2).padEnd(12,"0").slice(0,12)}}
 function getId(storage,key){
@@ -47,15 +47,16 @@ async function send(eventType){
   return true;
  }catch(e){console.warn("Marina Empire player tracker",e);return false}
 }
-function startPlay(){
- if(active)return;
+async function startPlay(){
  active=true;
- try{
-  if(sessionStorage.getItem(PLAY_KEY)!=="1"){
-   sessionStorage.setItem(PLAY_KEY,"1");
-   send("play_start");
-  }
- }catch(_){send("play_start")}
+ let done=false;
+ try{done=sessionStorage.getItem(PLAY_KEY)==="1"}catch(_){}
+ if(done||playPending)return true;
+ playPending=true;
+ const ok=await send("play_start");
+ playPending=false;
+ if(ok){try{sessionStorage.setItem(PLAY_KEY,"1")}catch(_){}}
+ return ok;
 }
 function heartbeat(){
  if(!active||document.hidden)return;
