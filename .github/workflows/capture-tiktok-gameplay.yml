@@ -1,0 +1,41 @@
+name: Marina Empire - authentic TikTok gameplay capture
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/capture-tiktok-gameplay.cjs'
+      - '.github/workflows/capture-tiktok-gameplay.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Install FFmpeg for authentic TikTok MP4
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+      - name: Record original Marina Empire guest gameplay
+        run: node scripts/capture-tiktok-gameplay.cjs
+      - name: Verify finished TikTok MP4
+        run: |
+          test -s test-results/tiktok-gameplay/Marina_Empire_TikTok_Gameplay_Originale.mp4
+          ffprobe -v error -select_streams v:0 -show_entries stream=width,height,codec_name -of default=noprint_wrappers=1 test-results/tiktok-gameplay/Marina_Empire_TikTok_Gameplay_Originale.mp4
+      - name: Export authentic video and keyframes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: marina-empire-authentic-tiktok-video
+          path: test-results/tiktok-gameplay/
+          if-no-files-found: warn
+          retention-days: 7
