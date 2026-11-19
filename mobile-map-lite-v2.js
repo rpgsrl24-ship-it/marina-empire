@@ -17,7 +17,7 @@ const ad=new Set(["rose","rimini","ancona","lignano","cervia","bari","ravenna","
 const adSpine=[[45.42,13.65],[44.65,13.30],[43.9,13.35],[43.15,14.2],[42.45,14.7],[41.7,16.2],[40.8,18.5],[39.65,19.25]];
 const tySpine=[[44,8],[43.4,9.65],[42.7,10.4],[41.9,11.6],[41.25,12.75],[40.5,13.6],[39.4,13.9],[38.33,15.65]];
 const corr={otranto:[39.65,19.25],ionian:[37.55,17.5],messinaSouth:[37.95,15.7],messinaNorth:[38.33,15.65]};
-function straight(a,b){const lat=(a[0]+b[0])/2*Math.PI/180;return Math.round(Math.hypot((a[0]-b[0])*60,(a[1]-b[1])*60*Math.cos(lat))*1.12)}
+function straight(a,b){const rad=Math.PI/180,dLat=(b[0]-a[0])*rad,dLon=(b[1]-a[1])*rad,lat1=a[0]*rad,lat2=b[0]*rad;const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;return 3440.065*2*Math.asin(Math.min(1,Math.sqrt(h)))}
 function nearest(p,arr){return arr.reduce((best,v,i)=>straight(p,v)<straight(p,arr[best])?i:best,0)}
 function chain(p,q,spine){const i=nearest(p,spine),j=nearest(q,spine);return i<=j?spine.slice(i,j+1):spine.slice(j,i+1).reverse()}
 function waypoints(a,b){const A=coastal[a],B=coastal[b];if(!A||!B)return[];const aa=ad.has(a),bb=ad.has(b);if(aa&&bb)return chain(A,B,adSpine);if(!aa&&!bb)return chain(A,B,tySpine);const x=aa?A:B,y=aa?B:A;const mid=[...chain(x,corr.otranto,adSpine),corr.ionian,corr.messinaSouth,corr.messinaNorth,...chain(corr.messinaNorth,y,tySpine)];return aa?mid:mid.reverse()}
@@ -25,20 +25,36 @@ function routePoints(a,b){const A=harborGPS[a],B=harborGPS[b];if(!A||!B)return[]
 function seaMiles(a,b){const pts=routePoints(a,b);return pts.slice(1).reduce((n,p,i)=>n+straight(pts[i],p),0)}
 function plan(from,to,tank,burn){const cap=Math.max(1,Number(tank)||1),reserve=Math.ceil(cap*.15),rate=Number(burn)||.85;if(!harborGPS[from]||!harborGPS[to]||from===to)return{possible:false,distance:0,reason:"Destinazione non valida",stops:[],legs:[]};const ids=ports.map(p=>p.id),dist=Object.fromEntries(ids.map(id=>[id,Infinity])),prev={},seen=new Set();dist[from]=0;while(seen.size<ids.length){const cur=ids.filter(id=>!seen.has(id)).sort((a,b)=>dist[a]-dist[b])[0];if(!cur||!Number.isFinite(dist[cur]))break;if(cur===to)break;seen.add(cur);for(const next of ids){if(next===cur||seen.has(next))continue;const nm=seaMiles(cur,next);if(!nm||Math.ceil(nm*rate)+reserve>cap)continue;const c=dist[cur]+nm;if(c<dist[next]){dist[next]=c;prev[next]=cur}}}if(!Number.isFinite(dist[to]))return{possible:false,distance:seaMiles(from,to),reason:"Autonomia insufficiente",stops:[],legs:[]};const legs=[to];let c=to;while(c!==from&&legs.length<=ids.length){c=prev[c];if(!c)break;legs.unshift(c)};if(legs[0]!==from)return{possible:false,distance:0,reason:"Rotta non disponibile",stops:[],legs:[]};const distance=legs.slice(1).reduce((sum,id,i)=>sum+seaMiles(legs[i],id),0),fuel=legs.slice(1).reduce((sum,id,i)=>sum+Math.ceil(seaMiles(legs[i],id)*rate),0);return{possible:true,distance,fuel,stops:legs.slice(1,-1),legs,reserve,burnRate:rate}}
 function project(lat,lon){return{x:(lon-6.2)/(19.4-6.2)*100,y:(48-lat)/(48-35)*100}}
+function geoAt(from,to,progress){
+ const points=routePoints(from,to);
+ if(!points.length)return null;
+ if(points.length===1)return points[0];
+ const legs=points.slice(1).map((p,i)=>straight(points[i],p));
+ const total=legs.reduce((sum,n)=>sum+n,0);
+ if(!total)return points[0];
+ let rem=Math.max(0,Math.min(1,Number(progress)||0))*total;
+ for(let i=0;i<legs.length;i++){
+  if(rem<=legs[i]||i===legs.length-1){
+   const t=legs[i]?Math.max(0,Math.min(1,rem/legs[i])):0;
+   return [points[i][0]+(points[i+1][0]-points[i][0])*t,points[i][1]+(points[i+1][1]-points[i][1])*t];
+  }
+  rem-=legs[i];
+ }
+ return points[points.length-1];
+}
 function positionAt(route,progress){
  if(!Array.isArray(route)||!route.length)return null;
  if(route.length===1)return route[0];
- const lengths=route.slice(1).map((p,i)=>Math.hypot(p.x-route[i].x,p.y-route[i].y));
- const total=lengths.reduce((a,b)=>a+b,0);
+ const legs=route.slice(1).map((p,i)=>straight([48-route[i].y*13/100,6.2+route[i].x*13.2/100],[48-p.y*13/100,6.2+p.x*13.2/100]));
+ const total=legs.reduce((a,b)=>a+b,0);
  if(!total)return route[0];
- let distance=Math.max(0,Math.min(1,Number(progress)||0))*total;
- for(let i=0;i<lengths.length;i++){
-  const seg=lengths[i];
-  if(distance<=seg||i===lengths.length-1){
-   const ratio=seg?Math.max(0,Math.min(1,distance/seg)):0;
-   return{x:route[i].x+(route[i+1].x-route[i].x)*ratio,y:route[i].y+(route[i+1].y-route[i].y)*ratio};
+ let rem=Math.max(0,Math.min(1,Number(progress)||0))*total;
+ for(let i=0;i<legs.length;i++){
+  if(rem<=legs[i]||i===legs.length-1){
+   const t=legs[i]?Math.max(0,Math.min(1,rem/legs[i])):0;
+   return{x:route[i].x+(route[i+1].x-route[i].x)*t,y:route[i].y+(route[i+1].y-route[i].y)*t};
   }
-  distance-=seg;
+  rem-=legs[i];
  }
  return route[route.length-1];
 }
@@ -135,5 +151,5 @@ function pulse(){
  }
  return {active:!!read()?.trip,snapshot:snapshot()};
 }
-window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>{const p=positionAt(routePoints(from,to).map(([lat,lon])=>project(lat,lon)),progress);return p?[48-p.y*13/100,6.2+p.x*13.2/100]:null}};
+window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
 })();
