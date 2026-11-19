@@ -118,5 +118,5 @@ function pulse(){
  }
  return {active:!!read()?.trip,snapshot:snapshot()};
 }
-window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission};
+window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon))};
 })();
