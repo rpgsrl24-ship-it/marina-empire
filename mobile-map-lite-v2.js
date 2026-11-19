@@ -25,6 +25,23 @@ function routePoints(a,b){const A=harborGPS[a],B=harborGPS[b];if(!A||!B)return[]
 function seaMiles(a,b){const pts=routePoints(a,b);return pts.slice(1).reduce((n,p,i)=>n+straight(pts[i],p),0)}
 function plan(from,to,tank,burn){const cap=Math.max(1,Number(tank)||1),reserve=Math.ceil(cap*.15),rate=Number(burn)||.85;if(!harborGPS[from]||!harborGPS[to]||from===to)return{possible:false,distance:0,reason:"Destinazione non valida",stops:[],legs:[]};const ids=ports.map(p=>p.id),dist=Object.fromEntries(ids.map(id=>[id,Infinity])),prev={},seen=new Set();dist[from]=0;while(seen.size<ids.length){const cur=ids.filter(id=>!seen.has(id)).sort((a,b)=>dist[a]-dist[b])[0];if(!cur||!Number.isFinite(dist[cur]))break;if(cur===to)break;seen.add(cur);for(const next of ids){if(next===cur||seen.has(next))continue;const nm=seaMiles(cur,next);if(!nm||Math.ceil(nm*rate)+reserve>cap)continue;const c=dist[cur]+nm;if(c<dist[next]){dist[next]=c;prev[next]=cur}}}if(!Number.isFinite(dist[to]))return{possible:false,distance:seaMiles(from,to),reason:"Autonomia insufficiente",stops:[],legs:[]};const legs=[to];let c=to;while(c!==from&&legs.length<=ids.length){c=prev[c];if(!c)break;legs.unshift(c)};if(legs[0]!==from)return{possible:false,distance:0,reason:"Rotta non disponibile",stops:[],legs:[]};const distance=legs.slice(1).reduce((sum,id,i)=>sum+seaMiles(legs[i],id),0),fuel=legs.slice(1).reduce((sum,id,i)=>sum+Math.ceil(seaMiles(legs[i],id)*rate),0);return{possible:true,distance,fuel,stops:legs.slice(1,-1),legs,reserve,burnRate:rate}}
 function project(lat,lon){return{x:(lon-6.2)/(19.4-6.2)*100,y:(48-lat)/(48-35)*100}}
+function positionAt(route,progress){
+ if(!Array.isArray(route)||!route.length)return null;
+ if(route.length===1)return route[0];
+ const lengths=route.slice(1).map((p,i)=>Math.hypot(p.x-route[i].x,p.y-route[i].y));
+ const total=lengths.reduce((a,b)=>a+b,0);
+ if(!total)return route[0];
+ let distance=Math.max(0,Math.min(1,Number(progress)||0))*total;
+ for(let i=0;i<lengths.length;i++){
+  const seg=lengths[i];
+  if(distance<=seg||i===lengths.length-1){
+   const ratio=seg?Math.max(0,Math.min(1,distance/seg)):0;
+   return{x:route[i].x+(route[i+1].x-route[i].x)*ratio,y:route[i].y+(route[i+1].y-route[i].y)*ratio};
+  }
+  distance-=seg;
+ }
+ return route[route.length-1];
+}
 function getHandle(){const c=window.MarinaLocalSaveContext;if(!c)return null;let h=c.capture();if(!h){c.select(null);h=c.capture()}return h}
 function defaultGame(){return{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],trip:null,reservations:[],voyages:0,setupComplete:true,voyageSerial:0}}
 function read(){const c=window.MarinaLocalSaveContext,h=getHandle();if(!c||!h)return null;let g=c.readGame(h);if(g)return g;const fresh=defaultGame();if(c.writeGame(h,fresh))g=c.readGame(h);return g||fresh}
@@ -118,5 +135,5 @@ function pulse(){
  }
  return {active:!!read()?.trip,snapshot:snapshot()};
 }
-window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon))};
+window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon))};
 })();
