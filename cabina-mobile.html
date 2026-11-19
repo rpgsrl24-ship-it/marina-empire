@@ -21,7 +21,7 @@
 .quick-actions button:disabled{opacity:.55;background:#293f53}
 #actionMessage{margin:7px 12px 0;min-height:19px;color:#d2ebf9;text-align:center;font-size:11px}
 @media(max-width:480px){.scene{height:190px;min-height:190px}.chart{height:260px}.console{margin-top:-20px}.bottom{bottom:0}}
-.chart{border:9px solid #081a2b;box-shadow:0 0 0 2px #6a8ba0,0 8px 20px #0009}.console{background:linear-gradient(155deg,#375569,#081a30 65%);border-color:#7690a2}.scene{background:linear-gradient(180deg,#b0d8ed 0%,#d8e9ec 34%,#3e91a7 35%,#176781 65%,#073950 100%)}#nauticalScale{position:absolute;bottom:27px;right:9px;z-index:550;padding:6px 8px;border-radius:7px;border:1px solid #87b3c0;background:#0a3044e8;font:800 11px system-ui;text-align:center;color:white;pointer-events:none}#nauticalScaleBar{height:7px;width:65px;margin:5px auto 0;border:solid white;border-width:0 2px 2px;background:linear-gradient(90deg,#fff 50%,#12415e 50%)}#routeCallout{position:absolute;top:9px;right:8px;z-index:550;max-width:49%;background:#0a3044eb;padding:6px 8px;border-radius:8px;color:#fff;font:700 10px system-ui;text-align:right;pointer-events:none}.chart .gps-label{font-size:9px;max-width:47%}@media(max-width:480px){.chart{height:265px}}</style></head><body><main class="app">
+.chart{border:9px solid #081a2b;box-shadow:0 0 0 2px #6a8ba0,0 8px 20px #0009}.console{background:linear-gradient(155deg,#375569,#081a30 65%);border-color:#7690a2}.scene{background:linear-gradient(180deg,#b0d8ed 0%,#d8e9ec 34%,#3e91a7 35%,#176781 65%,#073950 100%)}#nauticalScale{position:absolute;bottom:27px;right:9px;z-index:550;padding:6px 8px;border-radius:7px;border:1px solid #87b3c0;background:#0a3044e8;font:800 11px system-ui;text-align:center;color:white;pointer-events:none}#nauticalScaleBar{height:7px;width:65px;margin:5px auto 0;border:solid white;border-width:0 2px 2px;background:linear-gradient(90deg,#fff 50%,#12415e 50%)}#routeCallout{position:absolute;top:9px;right:8px;z-index:550;max-width:49%;background:#0a3044eb;padding:6px 8px;border-radius:8px;color:#fff;font:700 10px system-ui;text-align:right;pointer-events:none}.chart .gps-label{font-size:9px;max-width:47%}@media(max-width:480px){.chart{height:265px}}.chart .leaflet-tooltip.port-label{background:#f4f5e8;color:#073850;font:800 11px system-ui;border:1px solid #547b89;border-radius:7px;box-shadow:0 3px 9px #002c4766;padding:4px 7px;white-space:nowrap}.chart .leaflet-tooltip.port-label:before{display:none}.chart .leaflet-control-attribution{background:#ffffffbd!important;font-size:8px!important}.chart{border:9px solid #172b3b;border-radius:17px}.console{background:linear-gradient(165deg,#536676,#26384a 29%,#0d2338 65%,#061422);border-color:#94a7b4}.scene:before{animation-duration:6s}.head{background:linear-gradient(175deg,#153e5e,#06172e)}@media(max-width:480px){.gps-details strong{font-size:13px}.quick-actions button{min-height:48px}}</style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div></div></header>
 <section class="mission"><h1 id="status">🛥️ MISSIONE IN CORSO · GPS ATTIVO</h1><div class="route-name" id="routeName">Caricamento missione…</div><div class="stats"><span id="distance">— NM</span><span id="eta">—</span><span id="percent">0%</span></div><div class="meter"><i id="progress"></i></div></section>
 <section class="scene" aria-label="Vista dal parabrezza dello yacht verso il mare"><div class="pane"></div><div class="bow"></div><div class="sea-note" id="seaNote">🌊 NAVIGAZIONE IN CORSO</div></section>
@@ -29,8 +29,8 @@
 <div class="quick-actions"><button id="fuelAction" type="button">⛽ FAI IL PIENO</button><button id="repairAction" type="button">🔧 MANUTENZIONE</button></div><p id="actionMessage" role="status"></p>
 <section id="arrival" class="arrival"><h2 id="arrivalTitle">⚓ ARRIVO COMPLETATO</h2><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9" style="color:#fff;font-weight:900">🎯 SCEGLI UNA NUOVA MISSIONE →</a></section>
 <div class="links"><a href="./map-mobile.html?v=20261119-map17">🗺️ VAI ALLA MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9">🎯 MISSIONI</a></div></main>
-<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261119-cabin6"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="./local-save-context.js"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./mobile-map-lite-v2.js?v=20261119-engine7"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script>
+<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261119-cabin7"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="./local-save-context.js"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./mobile-map-lite-v2.js?v=20261119-engine8"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script>
 <script>
 const $=id=>document.getElementById(id);
 const fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -72,6 +72,7 @@ function setMotion(active){
  $("gpsState").textContent=active?"● GPS ATTIVO · IN ROTTA":"● GPS ATTIVO · ORMEGGIATA";
 }
 let nauticalMap=null,nauticalLine=null,nauticalBoat=null,nauticalFrom=null,nauticalTo=null,lastRouteKey="";
+const portLabels={rimini:"Rimini",ravenna:"Marina di Ravenna",cervia:"Cervia",rose:"Isola delle Rose",ancona:"Ancona",lignano:"Lignano",pescara:"Pescara",bari:"Bari",brindisi:"Brindisi",loano:"Loano",scarlino:"Scarlino",salerno:"Salerno",nettuno:"Nettuno",portocervo:"Porto Cervo",capodorlando:"Capo d’Orlando"};
 function updateScaleNM(){
  if(!nauticalMap)return;
  const sz=nauticalMap.getSize();
@@ -103,11 +104,14 @@ function updateNauticalMap(from,to,progress){
  const api=window.MarinaEmpireMapLite,route=api?.routeGeoFor?.(from,to)||[];
  if(!nauticalMap||route.length<2)return;
  const key=from+"_"+to;
- $("routeCallout").textContent=from.toUpperCase()+" → "+to.toUpperCase();
+ $("routeCallout").textContent=(portLabels[from]||from)+" → "+(portLabels[to]||to);
  if(lastRouteKey!==key){
   lastRouteKey=key;
   nauticalLine.setLatLngs(route);
   nauticalFrom.setLatLng(route[0]);nauticalTo.setLatLng(route[route.length-1]);
+  nauticalFrom.unbindTooltip();nauticalTo.unbindTooltip();
+  nauticalFrom.bindTooltip(portLabels[from]||from,{permanent:true,direction:"top",offset:[0,-10],className:"port-label"});
+  nauticalTo.bindTooltip(portLabels[to]||to,{permanent:true,direction:"bottom",offset:[0,10],className:"port-label"});
   nauticalMap.invalidateSize();
   nauticalMap.fitBounds(L.latLngBounds(route),{padding:[45,52],maxZoom:13,animate:false});
   updateScaleNM();
