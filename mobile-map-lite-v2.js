@@ -135,5 +135,5 @@ function pulse(){
  }
  return {active:!!read()?.trip,snapshot:snapshot()};
 }
-window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon))};
+window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>{const p=positionAt(routePoints(from,to).map(([lat,lon])=>project(lat,lon)),progress);return p?[48-p.y*13/100,6.2+p.x*13.2/100]:null}};
 })();
