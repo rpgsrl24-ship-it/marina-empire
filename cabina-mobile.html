@@ -2,15 +2,35 @@
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#061b35"><title>Marina Empire · Cabina di comando</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#041325;color:#fff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;padding-bottom:88px}.app{max-width:620px;min-height:100dvh;margin:auto;background:#07182b}.head{padding:14px 14px 8px;background:linear-gradient(180deg,#061733,#0b2850)}.brand{display:flex;justify-content:space-between;align-items:center;gap:8px}.brand strong{font:800 clamp(19px,5vw,26px) Georgia,serif;letter-spacing:.06em}.brand a,.switch{color:#bce7ff;text-decoration:none;font-weight:800;border:1px solid #2889b7;border-radius:13px;background:#0a3156;padding:10px 12px}.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:13px}.hud div{background:#0a2a4b;border:1px solid #2b6991;border-radius:13px;padding:8px 4px;text-align:center}.hud small{display:block;color:#a6d8ef;font-size:9px;font-weight:800}.hud b{display:block;margin-top:3px;font-size:16px}.mission{margin:10px 12px 0;padding:13px;background:#092d51;border:1px solid #2b9dcc;border-radius:17px}.mission h1{margin:0 0 7px;font-size:15px;color:#f5c770}.mission .route-name{font-size:clamp(16px,4.5vw,23px);font-weight:900}.mission .stats{display:flex;justify-content:space-between;gap:6px;color:#bceaff;font-size:11px;margin-top:8px}.meter{height:8px;background:#204565;border-radius:20px;overflow:hidden;margin-top:12px}.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#16b6fb,#8deeff);transition:width .6s linear}.scene{position:relative;height:min(46vh,360px);min-height:230px;overflow:hidden;margin-top:8px;background:linear-gradient(180deg,#7fcaff 0%,#a7dfff 36%,#3a9ed0 36.5%,#085583 58%,#082b53 90%)} .scene.is-docked:before{animation:none;opacity:.32}.scene.is-docked .bow{opacity:.55}.scene:before{content:"";position:absolute;left:-30%;top:38%;height:75%;width:170%;background:repeating-linear-gradient(177deg,transparent 0 16px,#ffffff17 18px 20px,transparent 23px 42px);animation:waves 4s linear infinite}.scene:after{content:"";position:absolute;inset:0;border:solid #132c3e;border-width:0 22px 23px 22px;border-radius:10px 10px 44px 44px;box-shadow:inset 0 0 34px #061c4050;pointer-events:none}.pane{position:absolute;z-index:2;left:49%;top:0;bottom:0;width:16px;transform:translateX(-50%) skew(-4deg);background:linear-gradient(90deg,#091b2a,#33516b,#07192d);box-shadow:0 2px 8px #0009}.bow{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:65%;height:75px;background:linear-gradient(180deg,#cce6f1,#45677b 25%,#0c2038 60%);clip-path:polygon(49% 0,51% 0,100% 100%,0 100%);opacity:.9}.sea-note{position:absolute;top:14px;left:35px;z-index:3;background:#052742c9;border:1px solid #81d8fe8c;border-radius:10px;padding:8px;font-size:11px;font-weight:800}.console{position:relative;margin:-30px 8px 8px;background:linear-gradient(155deg,#183c59,#071b32 65%);border:3px solid #3b6178;box-shadow:0 -8px 22px #0009;border-radius:28px 28px 18px 18px;padding:14px 9px 18px;z-index:4}.console h2{text-align:center;font-size:12px;color:#a8e4ff;letter-spacing:.15em;margin:2px 0 12px}.controls{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}.chart{position:relative;height:270px;border-radius:14px;border:8px solid #07101e;box-shadow:0 0 0 2px #345c79,0 5px 15px #000a;background:radial-gradient(ellipse at 65% 40%,#168eb2,#055274 75%);overflow:hidden}.chart:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#b9e4ff1c 1px,transparent 1px),linear-gradient(90deg,#b9e4ff1c 1px,transparent 1px);background-size:10% 10%}.chart svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.chart path{fill:none;stroke:#84e8ff;stroke-width:1.2;stroke-dasharray:2 1;filter:drop-shadow(0 0 2px #ccffff)}.boat{position:absolute;transform:translate(-50%,-50%);font-size:25px;z-index:3;filter:drop-shadow(0 0 6px #fff)}.marker{position:absolute;transform:translate(-50%,-50%);max-width:100px;z-index:2;text-align:center}.marker b{display:block;font-size:20px}.marker span{font-size:10px;color:white;display:block;background:#062b4dcf;padding:4px;border-radius:10px}.marker{width:max-content;max-width:100px}.marker span{font-size:10px;line-height:1.15;white-space:normal;overflow-wrap:break-word}.marker:first-of-type{z-index:2}#boatMark{z-index:5}.gps-label{position:absolute;z-index:3;top:9px;left:9px;padding:5px 9px;border-radius:8px;background:#07334bdf;font-size:11px;color:#8fffae;font-weight:900}.gps-foot{position:absolute;bottom:7px;left:8px;z-index:3;background:#07334bdf;font-size:10px;padding:5px;border-radius:7px}.gauges{display:flex;justify-content:space-evenly;gap:10px}.gauge{border:3px solid #1e97d2;border-radius:50%;width:110px;height:110px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:radial-gradient(circle,#082441,#030b1a);box-shadow:inset 0 0 15px #0e83dd6b}.gauge small{font-size:9px;color:#ade8ff}.gauge b{font-size:23px}.links{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 12px 22px}.links a{min-height:48px;text-align:center;display:grid;place-items:center;border-radius:12px;background:#0a4976;color:white;text-decoration:none;font-weight:800;font-size:12px;border:1px solid #267baf}.arrival{display:none;margin:12px;padding:17px;background:#10462e;border:1px solid #56d09b;border-radius:15px}.arrival.show{display:block}.arrival h2{margin:0 0 7px;font-size:19px}.arrival p{font-size:12px}.bottom{position:fixed;z-index:12;left:5px;right:5px;bottom:5px;max-width:608px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);background:#061a30ed;border:1px solid #378aba;border-radius:18px;padding:7px;gap:4px}.bottom a{text-decoration:none;color:#cbebff;text-align:center;font-size:10px;font-weight:800;padding:9px 1px}.bottom b{display:block;font-size:20px}.bottom .on{background:#104c92;border-radius:12px}@keyframes waves{to{transform:translateY(36px)}}@media(prefers-reduced-motion:reduce){.scene:before{animation:none}}@media(min-width:500px){.controls{grid-template-columns:1fr 120px}.gauges{flex-direction:column}.gauge{width:105px;height:105px}}
-.chart{height:235px}.scene{height:180px;min-height:180px;background:linear-gradient(180deg,#70b3df 0%,#c1e5f6 36%,#3a9ed0 37%,#075e91 67%,#092d51 100%)}.console{margin-top:-22px}.marker{max-width:110px}.marker span{font-size:10px}.boat{font-size:26px}.chart .coast{fill:#c4cb9c;stroke:#f6e1a0;stroke-width:.7;opacity:.95}.chart .coastline-label{font-size:4px;fill:#1b4e64;font-weight:bold}.gps-foot{max-width:75%;font-size:9px}.bottom{background:#061a30f5}@media(max-width:480px){.head{padding:8px 12px 5px}.hud{margin-top:8px}.hud div{padding:6px 2px}.mission{margin:7px 10px 0;padding:9px}.mission h1{font-size:12px}.mission .route-name{font-size:17px}.scene{height:162px;min-height:162px}.console{padding:9px 8px 10px}.console h2{margin:1px 0 7px}.chart{height:215px}.gauge{width:86px;height:86px}.gauge b{font-size:19px}.gauges{gap:6px}.bottom a{padding:5px 0}}</style></head><body><main class="app">
+.chart{height:235px}.scene{height:180px;min-height:180px;background:linear-gradient(180deg,#70b3df 0%,#c1e5f6 36%,#3a9ed0 37%,#075e91 67%,#092d51 100%)}.console{margin-top:-22px}.marker{max-width:110px}.marker span{font-size:10px}.boat{font-size:26px}.chart .coast{fill:#c4cb9c;stroke:#f6e1a0;stroke-width:.7;opacity:.95}.chart .coastline-label{font-size:4px;fill:#1b4e64;font-weight:bold}.gps-foot{max-width:75%;font-size:9px}.bottom{background:#061a30f5}@media(max-width:480px){.head{padding:8px 12px 5px}.hud{margin-top:8px}.hud div{padding:6px 2px}.mission{margin:7px 10px 0;padding:9px}.mission h1{font-size:12px}.mission .route-name{font-size:17px}.scene{height:162px;min-height:162px}.console{padding:9px 8px 10px}.console h2{margin:1px 0 7px}.chart{height:215px}.gauge{width:86px;height:86px}.gauge b{font-size:19px}.gauges{gap:6px}.bottom a{padding:5px 0}}.scene{height:220px;min-height:220px;background:radial-gradient(ellipse at 74% 24%,#fff6c3 0%,#ffffff0d 14%,transparent 35%),linear-gradient(180deg,#78b8d7 0%,#b5ddec 32%,#287da1 33%,#11617d 51%,#073d62 100%)}
+.scene:before{top:33%;background:repeating-linear-gradient(176deg,transparent 0 16px,#d6f7ff30 18px 20px,transparent 22px 37px);opacity:.9}
+.scene:after{border-color:#122336}
+.scene .bow{background:linear-gradient(180deg,#e8eef1,#37556d 38%,#142a3b 90%)}
+.chart{height:270px;background:#bbdce1}
+#liveChart{position:absolute;inset:0;z-index:1;background:#b8d9e0}
+#liveChart .leaflet-control-attribution{font-size:8px!important;line-height:11px!important;background:#ffffffb7!important}
+#liveChart .leaflet-container{background:#b8d9e0}
+.chart>svg,.chart>.marker,.chart>.boat{display:none!important}
+.gps-label,.gps-foot{z-index:550}
+.gps-details{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}
+.gps-details div{border:1px solid #245879;border-radius:11px;background:#0b2a43;padding:8px;text-align:center}
+.gps-details small{display:block;color:#a8cfe3;font-size:10px}
+.gps-details strong{font-size:14px}
+.quick-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 12px 3px}
+.quick-actions button{min-height:49px;color:#fff;background:#15577f;border:1px solid #50b5e1;border-radius:13px;font-size:13px;font-weight:800}
+.quick-actions button:disabled{opacity:.55;background:#293f53}
+#actionMessage{margin:7px 12px 0;min-height:19px;color:#d2ebf9;text-align:center;font-size:11px}
+@media(max-width:480px){.scene{height:190px;min-height:190px}.chart{height:260px}.console{margin-top:-20px}.bottom{bottom:0}}
+</style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div></div></header>
 <section class="mission"><h1 id="status">🛥️ MISSIONE IN CORSO · GPS ATTIVO</h1><div class="route-name" id="routeName">Caricamento missione…</div><div class="stats"><span id="distance">— NM</span><span id="eta">—</span><span id="percent">0%</span></div><div class="meter"><i id="progress"></i></div></section>
 <section class="scene" aria-label="Vista dal parabrezza dello yacht verso il mare"><div class="pane"></div><div class="bow"></div><div class="sea-note" id="seaNote">🌊 NAVIGAZIONE IN CORSO</div></section>
-<section class="console"><h2>PLANCIA DI COMANDO · GPS LIVE</h2><div class="controls"><div class="chart" aria-label="GPS con rotta e barca sincronizzata"><div class="gps-label" id="gpsState">● GPS ATTIVO</div><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path id="coastShape" class="coast" d=""></path><path id="routePath" d=""></path></svg><div class="marker" id="originMark"></div><div class="marker" id="destMark"></div><div class="boat" id="boatMark" hidden>🛥️</div><div class="gps-foot">POSIZIONE SINCRONIZZATA CON MAPPA</div></div><div class="gauges"><div class="gauge"><small>VELOCITÀ</small><b id="speed">—</b><small>nodi</small></div><div class="gauge"><small>AVANZAMENTO</small><b id="progressGauge">—</b><small>missione</small></div></div></div></section>
+<section class="console"><h2>PLANCIA DI COMANDO · GPS LIVE</h2><div class="controls"><div class="chart" aria-label="GPS nautico con rotta e barca sincronizzata"><div id="liveChart"></div><div class="gps-label" id="gpsState">● GPS ATTIVO</div><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path id="coastShape" class="coast" d=""></path><path id="routePath" d=""></path></svg><div class="marker" id="originMark"></div><div class="marker" id="destMark"></div><div class="boat" id="boatMark" hidden>🛥️</div><div class="gps-foot">POSIZIONE SINCRONIZZATA CON MAPPA</div></div><div class="gauges"><div class="gauge"><small>VELOCITÀ</small><b id="speed">—</b><small>nodi</small></div><div class="gauge"><small>AVANZAMENTO</small><b id="progressGauge">—</b><small>missione</small></div></div><div class="gps-details"><div><small>📏 DISTANZA RESIDUA</small><strong id="distanceRemaining">— NM</strong></div><div><small>⏱️ ARRIVO DEMO</small><strong id="remainingTime">—</strong></div></div></div></section>
+<div class="quick-actions"><button id="fuelAction" type="button">⛽ FAI IL PIENO</button><button id="repairAction" type="button">🔧 MANUTENZIONE</button></div><p id="actionMessage" role="status"></p>
 <section id="arrival" class="arrival"><h2 id="arrivalTitle">⚓ ARRIVO COMPLETATO</h2><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9" style="color:#fff;font-weight:900">🎯 SCEGLI UNA NUOVA MISSIONE →</a></section>
 <div class="links"><a href="./map-mobile.html?v=20261119-map17">🗺️ VAI ALLA MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9">🎯 MISSIONI</a></div></main>
-<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261119-cabin4"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
-<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261119-engine6"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script>
+<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261119-cabin5"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="./local-save-context.js"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./mobile-map-lite-v2.js?v=20261119-engine7"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script>
 <script>
 const $=id=>document.getElementById(id);
 const fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -51,6 +71,57 @@ function setMotion(active){
  $("seaNote").textContent=active?"🌊 NAVIGAZIONE IN CORSO":"⚓ IMBARCAZIONE IN PORTO";
  $("gpsState").textContent=active?"● GPS ATTIVO · IN ROTTA":"● GPS ATTIVO · ORMEGGIATA";
 }
+let nauticalMap=null,nauticalLine=null,nauticalBoat=null,nauticalFrom=null,nauticalTo=null,lastRouteKey="";
+function initNauticalMap(){
+ if(nauticalMap||!window.L)return;
+ nauticalMap=L.map("liveChart",{zoomControl:false,scrollWheelZoom:false,touchZoom:false,dragging:false,doubleClickZoom:false,attributionControl:true});
+ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenStreetMap contributors"}).addTo(nauticalMap);
+ // Seamark layer is visual context; the game route is always calculated by its own engine.
+ L.tileLayer("https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png",{maxZoom:17,opacity:.8}).addTo(nauticalMap);
+ nauticalLine=L.polyline([],{color:"#00789a",weight:5,opacity:.95,dashArray:"9 7"}).addTo(nauticalMap);
+ nauticalBoat=L.circleMarker([44.07,12.58],{radius:10,weight:3,color:"#fff",fillColor:"#e9aa27",fillOpacity:1}).addTo(nauticalMap);
+ nauticalFrom=L.circleMarker([44.07,12.58],{radius:5,color:"#125a78",fillColor:"#fff",fillOpacity:1}).addTo(nauticalMap);
+ nauticalTo=L.circleMarker([44.07,12.58],{radius:5,color:"#125a78",fillColor:"#fff",fillOpacity:1}).addTo(nauticalMap);
+ setTimeout(()=>nauticalMap.invalidateSize(),150);
+}
+function updateNauticalMap(from,to,progress){
+ initNauticalMap();
+ const api=window.MarinaEmpireMapLite,route=api?.routeGeoFor?.(from,to)||[];
+ if(!nauticalMap||route.length<2)return;
+ const key=from+"_"+to;
+ if(lastRouteKey!==key){
+  lastRouteKey=key;
+  nauticalLine.setLatLngs(route);
+  nauticalFrom.setLatLng(route[0]);nauticalTo.setLatLng(route[route.length-1]);
+  nauticalMap.invalidateSize();
+  nauticalMap.fitBounds(L.latLngBounds(route),{padding:[38,45],maxZoom:12,animate:false});
+ }
+ const point=api.positionGeoAt?.(from,to,progress);
+ if(point)nauticalBoat.setLatLng(point);
+}
+const marinaApi=()=>window.MarinaEmpireMarinaLite;
+function syncOperations(trip){
+ const a=$("fuelAction"),b=$("repairAction"),api=marinaApi(),game=api?.read?.();
+ a.disabled=!!trip||!api;b.disabled=!!trip||!api;
+ a.title=b.title=trip?"Disponibile all’arrivo in marina":"";
+ if(game){
+  const full=Math.max(0,Number(window.MarinaEmpireMapLite?.snapshot?.().tank)||400);
+  a.textContent=trip?"⛽ PIENO · ALL’ARRIVO":"⛽ PIENO · "+Math.round((Number(game.fuel)||0)/full*100)+"%";
+  b.textContent=trip?"🔧 MANUT. · ALL’ARRIVO":"🔧 MANUTENZIONE · "+Math.round(Number(game.condition??100))+"%";
+ }
+}
+function actService(type){
+ const api=marinaApi(),g=api?.read?.();
+ if(!api||g?.trip){$("actionMessage").textContent="Operazione disponibile soltanto in marina.";return}
+ const snap=api.snapshot(),boat=snap?.boat||{},tank=Number(boat.tank)||400;
+ const cost=type==="fuel"?Math.round(Math.max(0,tank-(Number(g.fuel)||0))*3):Math.max(100,Math.round(Math.round(1000*(1+(Number(boat.price)||0)/100000))*Math.max(0,100-(Number(g.condition??100)))/100));
+ const title=type==="fuel"?"rifornimento":"manutenzione";
+ if(!confirm("Confermi "+title+"? Costo stimato: "+cost.toLocaleString("it-IT")+" crediti."))return;
+ const result=type==="fuel"?api.refuel():api.repair();
+ $("actionMessage").textContent=result?.message||"Operazione non disponibile";tick();
+}
+$("fuelAction").addEventListener("click",()=>actService("fuel"));
+$("repairAction").addEventListener("click",()=>actService("repair"));
 function tick(){
  const api=window.MarinaEmpireMapLite;if(!api)return;
  const before=api.snapshot();api.pulse?.();
@@ -58,6 +129,7 @@ function tick(){
  $("coins").textContent=fmt(s.coins);$("prestige").textContent=fmt(s.prestige);
  $("fuel").textContent=Math.round((Number(s.fuel)||0)/Math.max(1,Number(shot.tank)||1)*100)+"%";
  $("arrival").classList.toggle("show",!t&&!!s.lastArrival);
+ syncOperations(t);
  if(!t){
   setMotion(false);
   const arrived=s.lastArrival||null,docked=s.lastDockedBridge||null;
@@ -73,13 +145,14 @@ function tick(){
    window.MarinaEmpirePlayerTracker?.completeVoyage?.(arrived.voyageId);
   }
   const previous=docked?.origin&&docked?.destination?api.routeFor?.(docked.origin,docked.destination):null;
-  if(previous?.length>1)drawRoute(previous,1,docked.origin,docked.destination);
+  if(previous?.length>1){drawRoute(previous,1,docked.origin,docked.destination);updateNauticalMap(docked.origin,docked.destination,1)}
   else{
    $("routePath").setAttribute("d","");
    locate($("originMark"),null);locate($("destMark"),null);
    locate($("boatMark"),{x:50,y:50});
   }
   $("speed").textContent="0";$("progressGauge").textContent=arrived?"100%":"—";
+  $("distanceRemaining").textContent="0 NM";$("remainingTime").textContent="Arrivato";
   return;
  }
  setMotion(true);window.MarinaEmpirePlayerTracker?.startPlay?.();
@@ -90,6 +163,9 @@ function tick(){
  const pct=Math.round(t.progress*100);$("percent").textContent=pct+"%";$("progress").style.width=pct+"%";
  $("speed").textContent=String(t.cruiseKnots||"—");$("progressGauge").textContent=pct+"%";
  drawRoute(t.route||[],t.progress,t.originName,t.destinationName);
+ updateNauticalMap(t.origin,t.dest,t.progress);
+ $("distanceRemaining").textContent=Math.max(0,t.distance*(1-t.progress)).toFixed(1)+" NM";
+ $("remainingTime").textContent=t.remainingSec+" s demo";
 }
 setInterval(tick,750);tick();
 </script></body></html>
