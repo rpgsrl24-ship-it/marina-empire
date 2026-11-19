@@ -58,11 +58,25 @@ async function startPlay(){
  if(ok){try{sessionStorage.setItem(PLAY_KEY,"1")}catch(_){}}
  return ok;
 }
+const completionPending=new Set();
+async function completeVoyage(voyageId){
+ const id=String(voyageId||"").trim();
+ if(!id||id==="0")return false;
+ const key="marina_empire_reported_voyage_v1_"+visitorId+"_"+id;
+ try{if(localStorage.getItem(key)==="1")return true}catch(_){}
+ if(completionPending.has(key))return false;
+ completionPending.add(key);
+ try{
+  const ok=await send("mission_complete");
+  if(ok){try{localStorage.setItem(key,"1")}catch(_){}}
+  return ok;
+ }finally{completionPending.delete(key)}
+}
 function heartbeat(){
  if(!active||document.hidden)return;
  const now=Date.now();if(now-lastHeartbeat<55000)return;lastHeartbeat=now;send("heartbeat");
 }
-window.MarinaEmpirePlayerTracker=Object.freeze({track:send,startPlay,visitorId,sessionId});
+window.MarinaEmpirePlayerTracker=Object.freeze({track:send,startPlay,completeVoyage,visitorId,sessionId});
 send("page_view");
 ["pointerdown","keydown","touchstart"].forEach(name=>window.addEventListener(name,startPlay,{once:true,passive:true}));
 setInterval(heartbeat,60000);
