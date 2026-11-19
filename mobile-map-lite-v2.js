@@ -110,7 +110,7 @@ function pulse(){
        g.voyages=Math.max(0,Number(g.voyages)||0)+1;
        g.earnings=Math.max(0,Number(g.earnings)||0)+reward;
        g.condition=Math.max(0,(Number(g.condition??100)||100)-Math.max(0,Number(trip.weatherWear)||3));
-       g.lastArrival={destination:dest,reward,baseReward:reward,crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),mission:String(m.name||"Missione completata"),emergency:false};
+       g.lastArrival={destination:dest,reward,baseReward:reward,crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),voyageId,mission:String(m.name||"Missione completata"),emergency:false};
      }
      g.lastDockedBridge={origin:String(trip.origin||g.port),destination:dest,at:Date.now()};
      g.trip=null;
