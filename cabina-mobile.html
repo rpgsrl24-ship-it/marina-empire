@@ -51,6 +51,14 @@
 .instrumentPanel .dial{padding:6px 2px;border-color:#99825c}
 .instrumentPanel .dial b{font-size:18px}
 @media(max-width:460px){.helm{margin:0 5px}.sea-status{font-size:9px;padding:4px 6px}.gpsSlot{left:16.5%;width:67%;top:26.3%;height:29.8%}.instrumentPanel{padding:5px}.instrumentPanel .dial small{font-size:9px}}
+
+/* Fix v11: source artwork is 16:9 landscape, not portrait.
+   Crop its static demo header and align the live GPS to the embedded chartplotter. */
+.photo{aspect-ratio:1665/863!important;overflow:hidden;background:#081b2f}
+.photoImage{position:absolute;left:0;top:-8.7%;width:100%;height:auto;max-width:none;object-fit:initial;filter:none!important;transform:none!important}
+.gpsSlot{left:29.4%!important;top:28.6%!important;width:40.1%!important;height:32.9%!important;border-radius:1%!important;box-shadow:0 0 0 1px #13293b,0 0 0 2px #b89668!important}
+.gpsSlot .chart{width:100%;height:100%!important}
+@media(max-width:460px){.gpsSlot{left:29.4%!important;top:28.6%!important;width:40.1%!important;height:32.9%!important}.gpsSlot .gpshud span{font-size:7px}.gpsSlot .gpsfoot{display:none}}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <section class="mission"><h1 id="status">🛥️ CARICAMENTO PLANCIA</h1><div class="names" id="names">Preparazione GPS…</div><div class="stats"><div>DISTANZA RIMASTA<b id="remaining">— NM</b></div><div>ARRIVO DEMO<b id="eta">—</b></div><div>AVANZAMENTO<b id="pct">—</b></div></div><div class="track"><i id="track"></i></div></section>
@@ -58,7 +66,7 @@
 <section class="actions"><button id="refuel" type="button">⛽ PIENO<small id="refuelInfo">Solo in marina</small></button><button id="repair" type="button">🔧 MANUTENZIONE<small id="repairInfo">Solo in marina</small></button><a href="./map-mobile.html?v=20261119-map17">🗺️ VAI ALLA MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9">🎯 MISSIONI</a></section>
 <div id="notice" class="notice" role="status">Le operazioni di rifornimento e manutenzione sono disponibili quando l'imbarcazione è in porto.</div>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261120-cabin10"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261120-cabin11"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261120-engine7"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
