@@ -116,15 +116,26 @@ body.gpsFullscreen{overflow:hidden}
 .miniBoat{z-index:4;transition:left .8s linear,top .8s linear;white-space:nowrap}
 .miniWake{z-index:2;transition:left .8s linear,top .8s linear;width:12%}
 .miniState{z-index:5;bottom:2px;max-width:85%;overflow:hidden;text-overflow:ellipsis}
+
+.serviceConfirm[hidden]{display:none!important}
+.serviceConfirm{margin:8px 10px 12px;border:2px solid #e3c47e;border-radius:13px;padding:14px;background:#092b42;color:#fff;box-shadow:0 6px 18px #0005}
+.serviceConfirm strong{font-size:17px;color:#ffe0a2}
+.serviceConfirm p{font-size:13px;line-height:1.5}
+.serviceButtons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.serviceButtons button{border-radius:10px;border:1px solid #d2b77f;padding:12px 6px;background:#103b59;color:#fff;font-weight:800;min-height:44px}
+.serviceButtons #serviceApply{background:#136d8a;border-color:#69d0ef}
+.miniGps{cursor:zoom-in}
+.miniGps:focus-visible{outline:3px solid #ffdc83;outline-offset:2px}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <section class="mission"><h1 id="status">🛥️ CARICAMENTO PLANCIA</h1><div class="names" id="names">Preparazione GPS…</div><div class="stats"><div>DISTANZA RIMASTA<b id="remaining">— NM</b></div><div>ARRIVO DEMO<b id="eta">—</b></div><div>AVANZAMENTO<b id="pct">—</b></div></div><div class="track"><i id="track"></i></div></section>
-<div class="helm"><div class="photo" id="window"><img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Plancia di comando yacht con vista mare dal parabrezza e strumentazione di bordo"><span class="sea-status" id="seaLabel">🌊 VISTA MARE</span><div class="gpsSlot miniGps" aria-label="Monitor di bordo: imbarcazione in movimento"><div class="miniSea"><svg class="miniChart" viewBox="0 0 320 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H50C72 28 60 45 48 64C31 93 44 114 60 150H0Z" class="land"/><path d="M72 0C84 22 83 43 70 70C57 95 72 119 84 150" class="depth"/><path id="miniFullRoute" d="" fill="none" stroke="#71d9ff" stroke-width="3" stroke-dasharray="8 5" opacity=".8"/><path id="miniDoneRoute" d="" fill="none" stroke="#ffe6a6" stroke-width="4"/><circle id="miniStart" cx="45" cy="75" r="6" fill="#44dba9" stroke="white" stroke-width="2"/><circle id="miniEnd" cx="275" cy="75" r="6" fill="#ffc46a" stroke="white" stroke-width="2"/></svg><div class="miniWake" id="miniWake"></div><span class="miniBoat" id="miniBoat" aria-hidden="true">🛥️</span><span class="miniState" id="miniState">GPS · IN PORTO</span></div></div></div><div class="instrumentPanel"><div class="instrument"><div class="dial"><small>VELOCITÀ</small><b id="speed">—</b><small>nodi</small></div><div class="dial"><small>DIREZIONE</small><b id="heading">—</b><small>gradi</small></div><div class="dial"><small>STATO</small><b id="conditionGauge">—</b><small>barca</small></div></div></div></div>
-<section class="largeGps" id="largeGps" aria-label="Carta nautica grande"><div class="largeGpsTitle"><div><span class="eyebrow">🧭 CARTA NAUTICA IN TEMPO REALE</span><h2>Segui la tua imbarcazione</h2></div><span id="chartDistance">— NM</span></div><div class="chart"><div id="chartMap" style="height:100%;width:100%"></div><div class="fallback" id="fallback" hidden><div><strong>GPS nautico</strong><p id="fallbackMsg">Caricamento carta…</p></div></div><div class="gpshud"><span id="gpsLabel">● GPS LIVE</span><span id="gpsRoute">—</span></div><div class="gpsfoot"><b id="gpsBottom">Posizione sincronizzata con la missione</b></div><div class="gpsControls" aria-label="Controlli del GPS"><button type="button" id="zoomIn" aria-label="Ingrandisci GPS" title="Zoom avanti">+</button><button type="button" id="zoomOut" aria-label="Riduci GPS" title="Zoom indietro">−</button><button type="button" id="followBoat" aria-label="Segui imbarcazione" title="Segui barca">⌖</button><button type="button" id="fullGps" aria-label="Ingrandisci carta GPS a schermo intero" title="Espandi GPS">⛶</button></div></div><div class="gpsHint">Ingrandisci con due dita oppure tocca <b>⌖</b> per seguire automaticamente la barca.</div></section>
+<div class="helm"><div class="photo" id="window"><img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Plancia di comando yacht con vista mare dal parabrezza e strumentazione di bordo"><span class="sea-status" id="seaLabel">🌊 VISTA MARE</span><div class="gpsSlot miniGps" role="button" tabindex="0" title="Apri carta nautica ingrandita" aria-label="Apri carta nautica ingrandita dal monitor di bordo"><div class="miniSea"><svg class="miniChart" viewBox="0 0 320 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H50C72 28 60 45 48 64C31 93 44 114 60 150H0Z" class="land"/><path d="M72 0C84 22 83 43 70 70C57 95 72 119 84 150" class="depth"/><path id="miniFullRoute" d="" fill="none" stroke="#71d9ff" stroke-width="3" stroke-dasharray="8 5" opacity=".8"/><path id="miniDoneRoute" d="" fill="none" stroke="#ffe6a6" stroke-width="4"/><circle id="miniStart" cx="45" cy="75" r="6" fill="#44dba9" stroke="white" stroke-width="2"/><circle id="miniEnd" cx="275" cy="75" r="6" fill="#ffc46a" stroke="white" stroke-width="2"/></svg><div class="miniWake" id="miniWake"></div><span class="miniBoat" id="miniBoat" aria-hidden="true">🛥️</span><span class="miniState" id="miniState">GPS · IN PORTO</span></div></div></div><div class="instrumentPanel"><div class="instrument"><div class="dial"><small>VELOCITÀ</small><b id="speed">—</b><small>nodi</small></div><div class="dial"><small>DIREZIONE</small><b id="heading">—</b><small>gradi</small></div><div class="dial"><small>STATO</small><b id="conditionGauge">—</b><small>barca</small></div></div></div></div>
+<section class="largeGps" id="largeGps" aria-label="Carta nautica grande"><div class="largeGpsTitle"><div><span class="eyebrow">🧭 CARTA NAUTICA IN TEMPO REALE</span><h2>Segui la tua imbarcazione</h2></div><span id="chartDistance">— NM</span></div><div class="chart"><div id="chartMap" style="height:100%;width:100%"></div><div class="fallback" id="fallback" hidden><div><strong>GPS nautico</strong><p id="fallbackMsg">Caricamento carta…</p></div></div><div class="gpshud"><span id="gpsLabel">● GPS LIVE</span><span id="gpsRoute">—</span></div><div class="gpsfoot"><b id="gpsBottom">Posizione sincronizzata con la missione</b></div><div class="gpsControls" aria-label="Controlli del GPS"><button type="button" id="zoomIn" aria-label="Ingrandisci GPS" title="Zoom avanti">+</button><button type="button" id="zoomOut" aria-label="Riduci GPS" title="Zoom indietro">−</button><button type="button" id="followBoat" aria-label="Segui imbarcazione" title="Segui barca">⌖</button><button type="button" id="fullGps" aria-label="Ingrandisci carta GPS a schermo intero" title="Espandi GPS">⛶</button></div></div><div class="gpsHint" id="gpsHint" role="status">Tocca <b>+</b> o <b>−</b> per zoomare la carta grande; <b>⌖</b> segue la barca. Tocca il monitor della plancia per ingrandire.</div></section>
 <section class="actions"><button id="refuel" type="button">⛽ PIENO<small id="refuelInfo">Solo in marina</small></button><button id="repair" type="button">🔧 MANUTENZIONE<small id="repairInfo">Solo in marina</small></button><a href="./map-mobile.html?v=20261119-map17">🗺️ VAI ALLA MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9">🎯 MISSIONI</a></section>
 <div id="notice" class="notice" role="status">Le operazioni di rifornimento e manutenzione sono disponibili quando l'imbarcazione è in porto.</div>
+<section id="serviceConfirm" class="serviceConfirm" hidden aria-label="Conferma servizio di bordo"><strong id="serviceTitle">Servizio di bordo</strong><p id="serviceDescription"></p><div class="serviceButtons"><button id="serviceCancel" type="button">ANNULLA</button><button id="serviceApply" type="button">CONFERMA OPERAZIONE</button></div></section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261120-cabin16"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261120-cabin17"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261120-engine7"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
@@ -251,28 +262,67 @@ function render(){
  }
  if(map){$("fallback").hidden=true}else{$("fallback").hidden=false;$("fallbackMsg").textContent="Carta non disponibile: controlla la connessione. I dati della missione continuano a funzionare."}
 }
+let pendingService=null;
 function service(type){
- const marina=window.MarinaEmpireMarinaLite;if(!marina){note("Servizi temporaneamente non disponibili. Apri Marina per riprovare.");return}
- const s=marina.read?.();if(s?.trip){note("Operazione disponibile all'arrivo in marina.");return}
- const name=type==="refuel"?"rifornimento":"manutenzione";
- if(!confirm("Confermi "+name+"? Il gioco addebiterà i crediti previsti."))return;
- const result=type==="refuel"?marina.refuel():marina.repair();
- $("notice").dataset.manual="1";note(result?.message||"Operazione non riuscita");
- render();
+ const marina=window.MarinaEmpireMarinaLite;
+ if(!marina?.read){note("Servizi temporaneamente non disponibili: prova dalla Marina.");return}
+ const game=marina.read(),snap=window.MarinaEmpireMapLite?.snapshot?.();
+ if(!game){note("Salvataggio non disponibile: non è stato effettuato alcun addebito.");return}
+ if(game.trip||snap?.trip){note("Pieno e manutenzione sono disponibili solo quando la barca è ormeggiata.");return}
+ const condition=Math.max(0,Math.min(100,Number(game.condition??100)));
+ const tank=Math.max(1,Number(snap?.tank)||400);
+ const missingFuel=Math.max(0,tank-(Number(game.fuel)||0));
+ const cost=type==="refuel"?Math.round(missingFuel*3):Math.max(100,Math.round(1000*(1+(Number(game.boatPrice)||0)/100000)*((100-condition)/100)));
+ if(type==="refuel"&&missingFuel<=0){note("Il serbatoio è già pieno: non è necessario acquistare carburante.");return}
+ if(type==="repair"&&condition>=100){note("L'imbarcazione è già al 100%: manutenzione non necessaria.");return}
+ pendingService=type;
+ $("serviceTitle").textContent=type==="refuel"?"⛽ Conferma pieno":"🔧 Conferma manutenzione";
+ $("serviceDescription").textContent=type==="refuel"?"Il servizio ricaricherà il serbatoio. Costo previsto: "+fmt(cost)+" crediti.":"Il servizio ripristinerà lo stato barca al 100%. Il costo esatto sarà confermato dal gioco.";
+ $("serviceConfirm").hidden=false;
+ $("serviceConfirm").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
+$("serviceCancel").onclick=()=>{pendingService=null;$("serviceConfirm").hidden=true;note("Operazione annullata: nessun credito addebitato.")};
+$("serviceApply").onclick=()=>{
+ if(!pendingService)return;
+ const type=pendingService;pendingService=null;
+ $("serviceConfirm").hidden=true;
+ const marina=window.MarinaEmpireMarinaLite;
+ try{const result=type==="refuel"?marina?.refuel?.():marina?.repair?.();
+  $("notice").dataset.manual="1";note(result?.message||"Operazione non disponibile: nessun credito addebitato.");
+ }catch(error){note("Servizio non completato: "+(error?.message||"errore di salvataggio"))}
+ render();
+ $("notice").scrollIntoView({behavior:"smooth",block:"nearest"});
+};
 $("refuel").onclick=()=>service("refuel");$("repair").onclick=()=>service("repair");
 function fitRoute(){if(!map)return;if(routeBounds)map.fitBounds(routeBounds,{animate:false,maxZoom:13});else if(lastPosition)map.setView(lastPosition,12,{animate:false});followEnabled=false;syncFollow()}
-function syncFollow(){$("followBoat").setAttribute("aria-pressed",String(followEnabled));$("followBoat").title=followEnabled?"Segui barca: attivo":"Segui barca"}
-$("zoomIn").onclick=()=>{map?.zoomIn();followEnabled=false;syncFollow()};
-$("zoomOut").onclick=()=>{map?.zoomOut();followEnabled=false;syncFollow()};
-$("followBoat").onclick=()=>{followEnabled=!followEnabled;if(followEnabled&&lastPosition)map?.panTo(lastPosition,{animate:false});else fitRoute();syncFollow()};
+function gpsMessage(message){$("gpsHint").textContent=message}
+function syncFollow(){$("followBoat").setAttribute("aria-pressed",String(followEnabled));$("followBoat").title=followEnabled?"Segui barca: attivo":"Segui barca";$("followBoat").textContent=followEnabled?"◎":"⌖"}
+function zoomBy(delta){
+ if(!map){gpsMessage("Carta nautica non disponibile: verifica la connessione.");return}
+ const before=map.getZoom(),after=Math.max(map.getMinZoom(),Math.min(map.getMaxZoom(),before+delta));
+ if(after===before){gpsMessage(delta>0?"Zoom massimo raggiunto.":"Zoom minimo raggiunto.");return}
+ map.setZoom(after,{animate:false});followEnabled=false;syncFollow();
+ gpsMessage("Zoom "+after+" · modalità manuale. Premi ◎ per seguire la barca.");
+}
+$("zoomIn").onclick=()=>zoomBy(1);
+$("zoomOut").onclick=()=>zoomBy(-1);
+$("followBoat").onclick=()=>{
+ followEnabled=!followEnabled;
+ if(followEnabled&&lastPosition){map?.setView(lastPosition,Math.max(map.getZoom(),11),{animate:false})}
+ else if(!followEnabled&&map){gpsMessage("Modalità manuale: puoi spostare e ingrandire la carta.")}
+ syncFollow();
+ if(followEnabled)gpsMessage("Segui barca attivo: la carta resta centrata sulla posizione della missione.");
+};
 $("fullGps").onclick=()=>{
  const el=document.querySelector(".largeGps"),open=!el.classList.contains("expanded");
  el.classList.toggle("expanded",open);document.body.classList.toggle("gpsFullscreen",open);
  $("fullGps").textContent=open?"✕":"⛶";$("fullGps").setAttribute("aria-label",open?"Chiudi GPS a schermo intero":"Ingrandisci carta GPS a schermo intero");
  $("fullGps").title=open?"Chiudi carta":"Espandi carta";
  setTimeout(()=>map?.invalidateSize(),120);
+ gpsMessage(open?"Carta nautica ingrandita. Premi ✕ per tornare alla cabina.":"Carta nautica ridotta nella pagina.");
 };
+document.querySelector(".miniGps").addEventListener("click",()=>{if(!$("largeGps").classList.contains("expanded"))$("fullGps").click()});
+document.querySelector(".miniGps").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();if(!$("largeGps").classList.contains("expanded"))$("fullGps").click()}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.querySelector(".largeGps").classList.contains("expanded"))$("fullGps").click()});
 initChart();syncFollow();render();setInterval(render,900);
 window.addEventListener("focus",()=>{map?.invalidateSize();render()});
