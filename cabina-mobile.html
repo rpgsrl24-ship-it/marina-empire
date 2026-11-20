@@ -135,7 +135,7 @@ body.gpsFullscreen{overflow:hidden}
 <div id="notice" class="notice" role="status">Le operazioni di rifornimento e manutenzione sono disponibili quando l'imbarcazione è in porto.</div>
 <section id="serviceConfirm" class="serviceConfirm" hidden aria-label="Conferma servizio di bordo"><strong id="serviceTitle">Servizio di bordo</strong><p id="serviceDescription"></p><div class="serviceButtons"><button id="serviceCancel" type="button">ANNULLA</button><button id="serviceApply" type="button">CONFERMA OPERAZIONE</button></div></section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261120-cabin17"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261120-cabin18"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261120-engine7"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
@@ -229,9 +229,11 @@ function render(){
  $("chartDistance").textContent=active?Math.max(0,Math.round(t.distance*(1-progress)))+" NM":"0 NM";
  $("window").classList.toggle("docked",!active);
  $("seaLabel").textContent=active?"🌊 IN NAVIGAZIONE":"⚓ ORMEGGIATA";
- $("refuel").disabled=active;$("repair").disabled=active;
- $("refuelInfo").textContent=active?"All'arrivo":"Disponibile ora";
- $("repairInfo").textContent=active?"All'arrivo":"Disponibile ora";
+ const fullTank=Math.max(1,Number(window.MarinaEmpireMarinaLite?.snapshot?.()?.boat?.tank)||Number(shot.tank)||400);
+ const fuelNeedsService=(Number(s.fuel)||0)<fullTank-.01,conditionNeedsService=Number(s.condition??100)<100;
+ $("refuel").disabled=active||!fuelNeedsService;$("repair").disabled=active||!conditionNeedsService;
+ $("refuelInfo").textContent=active?"All'arrivo":fuelNeedsService?"Disponibile ora":"Serbatoio pieno";
+ $("repairInfo").textContent=active?"All'arrivo":conditionNeedsService?"Disponibile ora":"Stato già 100%";
  $("arrival").classList.toggle("show",!active&&!!s.lastArrival);
  if(t){
   const pct=Math.max(0,Math.min(100,Math.round(t.progress*100)));
@@ -270,7 +272,7 @@ function service(type){
  if(!game){note("Salvataggio non disponibile: non è stato effettuato alcun addebito.");return}
  if(game.trip||snap?.trip){note("Pieno e manutenzione sono disponibili solo quando la barca è ormeggiata.");return}
  const condition=Math.max(0,Math.min(100,Number(game.condition??100)));
- const tank=Math.max(1,Number(snap?.tank)||400);
+ const tank=Math.max(1,Number(marina.snapshot?.()?.boat?.tank)||Number(snap?.tank)||400);
  const missingFuel=Math.max(0,tank-(Number(game.fuel)||0));
  const cost=type==="refuel"?Math.round(missingFuel*3):Math.max(100,Math.round(1000*(1+(Number(game.boatPrice)||0)/100000)*((100-condition)/100)));
  if(type==="refuel"&&missingFuel<=0){note("Il serbatoio è già pieno: non è necessario acquistare carburante.");return}
