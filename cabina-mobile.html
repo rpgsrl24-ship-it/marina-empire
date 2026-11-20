@@ -103,10 +103,15 @@ body.gpsFullscreen{overflow:hidden}
 /* Mobile cockpit V14: compact chart, safe navigation clearance and legible controls. */
 @media(max-width:699px){body{padding-bottom:calc(100px + env(safe-area-inset-bottom))}.app{padding-bottom:calc(115px + env(safe-area-inset-bottom))}.largeGps .chart{height:clamp(245px,37dvh,370px)!important}.largeGps.expanded .chart{height:calc(96dvh - 90px)!important}.largeGps .gpsControls{top:46px;right:6px}.largeGps .gpsControls button{min-width:36px;min-height:36px}.bottom{bottom:calc(5px + env(safe-area-inset-bottom));padding:7px 5px}.gpsHint{padding-bottom:8px}.largeGpsTitle #chartDistance{color:#c8edff}}
 @media(max-width:390px){.largeGps .chart{height:clamp(235px,35dvh,320px)!important}.largeGps.expanded .chart{height:calc(96dvh - 90px)!important}}
+/* Live route in the helm GPS: same geography and progress as the full chart. */
+.miniChart{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.miniBoat{z-index:4;transition:left .8s linear,top .8s linear;white-space:nowrap}
+.miniWake{z-index:2;transition:left .8s linear,top .8s linear;width:12%}
+.miniState{z-index:5;bottom:2px;max-width:85%;overflow:hidden;text-overflow:ellipsis}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <section class="mission"><h1 id="status">🛥️ CARICAMENTO PLANCIA</h1><div class="names" id="names">Preparazione GPS…</div><div class="stats"><div>DISTANZA RIMASTA<b id="remaining">— NM</b></div><div>ARRIVO DEMO<b id="eta">—</b></div><div>AVANZAMENTO<b id="pct">—</b></div></div><div class="track"><i id="track"></i></div></section>
-<div class="helm"><div class="photo" id="window"><img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Plancia di comando yacht con vista mare dal parabrezza e strumentazione di bordo"><span class="sea-status" id="seaLabel">🌊 VISTA MARE</span><div class="gpsSlot miniGps" aria-label="Monitor di bordo: imbarcazione in movimento"><div class="miniSea"><div class="miniWake" id="miniWake"></div><span class="miniBoat" id="miniBoat" aria-hidden="true">🛥️</span><span class="miniState" id="miniState">GPS · IN PORTO</span></div></div></div><div class="instrumentPanel"><div class="instrument"><div class="dial"><small>VELOCITÀ</small><b id="speed">—</b><small>nodi</small></div><div class="dial"><small>DIREZIONE</small><b id="heading">—</b><small>gradi</small></div><div class="dial"><small>STATO</small><b id="conditionGauge">—</b><small>barca</small></div></div></div></div>
+<div class="helm"><div class="photo" id="window"><img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Plancia di comando yacht con vista mare dal parabrezza e strumentazione di bordo"><span class="sea-status" id="seaLabel">🌊 VISTA MARE</span><div class="gpsSlot miniGps" aria-label="Monitor di bordo: imbarcazione in movimento"><div class="miniSea"><svg class="miniChart" viewBox="0 0 320 150" preserveAspectRatio="none" aria-hidden="true"><path id="miniFullRoute" d="" fill="none" stroke="#71d9ff" stroke-width="3" stroke-dasharray="8 5" opacity=".8"/><path id="miniDoneRoute" d="" fill="none" stroke="#ffe6a6" stroke-width="4"/><circle id="miniStart" cx="45" cy="75" r="6" fill="#44dba9" stroke="white" stroke-width="2"/><circle id="miniEnd" cx="275" cy="75" r="6" fill="#ffc46a" stroke="white" stroke-width="2"/></svg><div class="miniWake" id="miniWake"></div><span class="miniBoat" id="miniBoat" aria-hidden="true">🛥️</span><span class="miniState" id="miniState">GPS · IN PORTO</span></div></div></div><div class="instrumentPanel"><div class="instrument"><div class="dial"><small>VELOCITÀ</small><b id="speed">—</b><small>nodi</small></div><div class="dial"><small>DIREZIONE</small><b id="heading">—</b><small>gradi</small></div><div class="dial"><small>STATO</small><b id="conditionGauge">—</b><small>barca</small></div></div></div></div>
 <section class="largeGps" id="largeGps" aria-label="Carta nautica grande"><div class="largeGpsTitle"><div><span class="eyebrow">🧭 CARTA NAUTICA IN TEMPO REALE</span><h2>Segui la tua imbarcazione</h2></div><span id="chartDistance">— NM</span></div><div class="chart"><div id="chartMap" style="height:100%;width:100%"></div><div class="fallback" id="fallback" hidden><div><strong>GPS nautico</strong><p id="fallbackMsg">Caricamento carta…</p></div></div><div class="gpshud"><span id="gpsLabel">● GPS LIVE</span><span id="gpsRoute">—</span></div><div class="gpsfoot"><b id="gpsBottom">Posizione sincronizzata con la missione</b></div><div class="gpsControls" aria-label="Controlli del GPS"><button type="button" id="zoomIn" aria-label="Ingrandisci GPS" title="Zoom avanti">+</button><button type="button" id="zoomOut" aria-label="Riduci GPS" title="Zoom indietro">−</button><button type="button" id="followBoat" aria-label="Segui imbarcazione" title="Segui barca">⌖</button><button type="button" id="fullGps" aria-label="Ingrandisci carta GPS a schermo intero" title="Espandi GPS">⛶</button></div></div><div class="gpsHint">Ingrandisci con due dita oppure tocca <b>⌖</b> per seguire automaticamente la barca.</div></section>
 <section class="actions"><button id="refuel" type="button">⛽ PIENO<small id="refuelInfo">Solo in marina</small></button><button id="repair" type="button">🔧 MANUTENZIONE<small id="repairInfo">Solo in marina</small></button><a href="./map-mobile.html?v=20261119-map17">🗺️ VAI ALLA MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9">🎯 MISSIONI</a></section>
 <div id="notice" class="notice" role="status">Le operazioni di rifornimento e manutenzione sono disponibili quando l'imbarcazione è in porto.</div>
@@ -171,10 +176,34 @@ function render(){
  $("conditionGauge").textContent=Math.round(Number(s.condition??100))+"%";
  const active=!!t;
  const progress=active?Math.max(0,Math.min(1,Number(t.progress)||0)):(s.lastArrival?1:0);
- const boatLeft=(18+progress*64)+"%";
- $("miniBoat").style.left=boatLeft;
- $("miniWake").style.left=boatLeft;
- $("miniState").textContent=active?"IN ROTTA · "+Math.round(progress*100)+"%":"⚓ IN PORTO";
+ const miniFrom=t?.origin||s.lastDockedBridge?.origin,miniTo=t?.dest||s.lastDockedBridge?.destination;
+ const miniRoute=miniFrom&&miniTo?(api.routeGeoFor?.(miniFrom,miniTo)||[]):[];
+ if(miniRoute.length>=2){
+  const lats=miniRoute.map(p=>p[0]),lons=miniRoute.map(p=>p[1]);
+  const minLat=Math.min(...lats),maxLat=Math.max(...lats),minLon=Math.min(...lons),maxLon=Math.max(...lons);
+  const latScale=Math.max(.02,maxLat-minLat),lonScale=Math.max(.02,maxLon-minLon);
+  const sx=250/lonScale,sy=102/latScale;
+  const scale=Math.min(sx,sy);
+  const cx=(minLon+maxLon)/2,cy=(minLat+maxLat)/2;
+  const points=miniRoute.map(([lat,lon])=>({x:160+(lon-cx)*scale,y:73-(lat-cy)*scale}));
+  const d=points.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join(" ");
+  $("miniFullRoute").setAttribute("d",d);
+  const fraction=Math.max(0,Math.min(1,progress));
+  const miniPosition=api.positionGeoAt?.(miniFrom,miniTo,fraction)||miniRoute[0];
+  const bx=160+(miniPosition[1]-cx)*scale,by=73-(miniPosition[0]-cy)*scale;
+  const completed=points.slice(0,Math.max(1,Math.floor(fraction*(points.length-1))+1));
+  completed.push({x:bx,y:by});
+  $("miniDoneRoute").setAttribute("d",completed.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join(" "));
+  $("miniStart").setAttribute("cx",points[0].x);$("miniStart").setAttribute("cy",points[0].y);
+  $("miniEnd").setAttribute("cx",points[points.length-1].x);$("miniEnd").setAttribute("cy",points[points.length-1].y);
+  $("miniBoat").style.left=(bx/320*100)+"%";$("miniBoat").style.top=(by/150*100)+"%";
+  $("miniWake").style.left=(bx/320*100)+"%";$("miniWake").style.top=((by+11)/150*100)+"%";
+ }else{
+  $("miniFullRoute").setAttribute("d","");$("miniDoneRoute").setAttribute("d","");
+  $("miniStart").setAttribute("cx",-20);$("miniEnd").setAttribute("cx",-20);
+  $("miniBoat").style.left="50%";$("miniBoat").style.top="48%";
+ }
+ $("miniState").textContent=active?"GPS LIVE · "+Math.round(progress*100)+"%":"⚓ IN PORTO";
  $("chartDistance").textContent=active?Math.max(0,Math.round(t.distance*(1-progress)))+" NM":"0 NM";
  $("window").classList.toggle("docked",!active);
  $("seaLabel").textContent=active?"🌊 IN NAVIGAZIONE":"⚓ ORMEGGIATA";
