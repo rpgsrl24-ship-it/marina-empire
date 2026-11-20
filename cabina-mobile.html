@@ -59,24 +59,40 @@
 .gpsSlot{left:29.4%!important;top:28.6%!important;width:40.1%!important;height:32.9%!important;border-radius:1%!important;box-shadow:0 0 0 1px #13293b,0 0 0 2px #b89668!important}
 .gpsSlot .chart{width:100%;height:100%!important}
 @media(max-width:460px){.gpsSlot{left:29.4%!important;top:28.6%!important;width:40.1%!important;height:32.9%!important}.gpsSlot .gpshud span{font-size:7px}.gpsSlot .gpsfoot{display:none}}
+
+/* Interactive GPS: touch pinch, zoom, follow and full-screen chart. */
+.gpsControls{position:absolute;z-index:750;top:28px;right:5px;display:flex;flex-direction:column;gap:3px}
+.gpsControls button{width:27px;height:27px;border:1px solid #b4d3e1;border-radius:5px;background:#06263de9;color:white;font-size:21px;font-weight:800;line-height:1;display:grid;place-items:center;padding:0;box-shadow:0 1px 4px #0008;touch-action:manipulation}
+.gpsControls button:focus-visible{outline:2px solid #f8d274;outline-offset:2px}
+.gpsControls button[aria-pressed="true"]{background:#166da1;border-color:#ffe1a6}
+.gpsSlot.expanded{position:fixed!important;left:2vw!important;top:calc(2vh + env(safe-area-inset-top))!important;width:96vw!important;height:calc(91dvh - env(safe-area-inset-top))!important;z-index:2000!important;border:4px solid #caa268!important;border-radius:16px!important;box-shadow:0 0 0 100vmax #01101ce8,0 5px 30px #000b!important}
+.gpsSlot.expanded .chart{border-radius:11px!important}
+.gpsSlot.expanded .gpsControls{top:45px;right:12px;gap:8px}
+.gpsSlot.expanded .gpsControls button{width:44px;height:44px;font-size:28px}
+.gpsSlot.expanded .gpsfoot{display:flex}
+.gpsSlot.expanded .gpshud{top:10px;left:10px;right:10px}
+.gpsSlot.expanded .gpshud span{font-size:11px!important;padding:8px!important}
+body.gpsFullscreen{overflow:hidden}
+@media(max-width:460px){.gpsControls{top:18px;right:2px;gap:2px}.gpsControls button{width:21px;height:21px;font-size:16px}.gpsSlot.expanded .gpsControls button{width:42px;height:42px}}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <section class="mission"><h1 id="status">🛥️ CARICAMENTO PLANCIA</h1><div class="names" id="names">Preparazione GPS…</div><div class="stats"><div>DISTANZA RIMASTA<b id="remaining">— NM</b></div><div>ARRIVO DEMO<b id="eta">—</b></div><div>AVANZAMENTO<b id="pct">—</b></div></div><div class="track"><i id="track"></i></div></section>
-<div class="helm"><div class="photo" id="window"><img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Plancia di comando yacht con vista mare dal parabrezza e strumentazione di bordo"><span class="sea-status" id="seaLabel">🌊 VISTA MARE</span><div class="gpsSlot"><div class="chart"><div id="chartMap" style="height:100%;width:100%"></div><div class="fallback" id="fallback" hidden><div><strong>GPS nautico</strong><p id="fallbackMsg">Caricamento carta…</p></div></div><div class="gpshud"><span id="gpsLabel">● GPS LIVE</span><span id="gpsRoute">—</span></div><div class="gpsfoot"><b id="gpsBottom">Rotta e posizione condivise con la mappa</b></div></div></div></div><div class="instrumentPanel"><div class="instrument"><div class="dial"><small>VELOCITÀ</small><b id="speed">—</b><small>nodi</small></div><div class="dial"><small>DIREZIONE</small><b id="heading">—</b><small>gradi</small></div><div class="dial"><small>STATO</small><b id="conditionGauge">—</b><small>barca</small></div></div></div></div>
+<div class="helm"><div class="photo" id="window"><img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Plancia di comando yacht con vista mare dal parabrezza e strumentazione di bordo"><span class="sea-status" id="seaLabel">🌊 VISTA MARE</span><div class="gpsSlot"><div class="chart"><div id="chartMap" style="height:100%;width:100%"></div><div class="fallback" id="fallback" hidden><div><strong>GPS nautico</strong><p id="fallbackMsg">Caricamento carta…</p></div></div><div class="gpshud"><span id="gpsLabel">● GPS LIVE</span><span id="gpsRoute">—</span></div><div class="gpsfoot"><b id="gpsBottom">Rotta e posizione condivise con la mappa</b></div>
+<div class="gpsControls" aria-label="Controlli del GPS"><button type="button" id="zoomIn" aria-label="Ingrandisci GPS" title="Zoom avanti">+</button><button type="button" id="zoomOut" aria-label="Riduci GPS" title="Zoom indietro">−</button><button type="button" id="followBoat" aria-label="Segui imbarcazione" title="Segui barca">⌖</button><button type="button" id="fullGps" aria-label="Ingrandisci carta GPS a schermo intero" title="Espandi GPS">⛶</button></div></div></div></div><div class="instrumentPanel"><div class="instrument"><div class="dial"><small>VELOCITÀ</small><b id="speed">—</b><small>nodi</small></div><div class="dial"><small>DIREZIONE</small><b id="heading">—</b><small>gradi</small></div><div class="dial"><small>STATO</small><b id="conditionGauge">—</b><small>barca</small></div></div></div></div>
 <section class="actions"><button id="refuel" type="button">⛽ PIENO<small id="refuelInfo">Solo in marina</small></button><button id="repair" type="button">🔧 MANUTENZIONE<small id="repairInfo">Solo in marina</small></button><a href="./map-mobile.html?v=20261119-map17">🗺️ VAI ALLA MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9">🎯 MISSIONI</a></section>
 <div id="notice" class="notice" role="status">Le operazioni di rifornimento e manutenzione sono disponibili quando l'imbarcazione è in porto.</div>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261120-cabin11"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261120-cabin12"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261120-engine7"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
 const marinaNames={rose:"Isola delle Rose",rimini:"Rimini",ancona:"Ancona",lignano:"Lignano",cervia:"Cervia",bari:"Bari",ravenna:"Marina di Ravenna",pescara:"Pescara",brindisi:"Brindisi",salerno:"Salerno",nettuno:"Nettuno",scarlino:"Scarlino",loano:"Loano",portocervo:"Porto Cervo",capodorlando:"Capo d'Orlando"};
-let map=null,routeLine=null,boatMarker=null,depMarker=null,arrMarker=null,activeVoyage="",lastPosition=null,centered=false;
+let map=null,routeLine=null,boatMarker=null,depMarker=null,arrMarker=null,activeVoyage="",lastPosition=null,centered=false,followEnabled=true,routeBounds=null;
 function note(message){$("notice").textContent=message}
 function initChart(){
  if(map||!window.L)return;
- map=L.map("chartMap",{zoomControl:true,attributionControl:true,preferCanvas:true});
+ map=L.map("chartMap",{zoomControl:false,attributionControl:true,preferCanvas:true,scrollWheelZoom:false,touchZoom:true});
  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:'© OpenStreetMap contributors'}).addTo(map);
  // Optional maritime seamarks; navigation visuals are for game use only.
  L.tileLayer("https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png",{maxZoom:17,opacity:.75,attribution:'© OpenSeaMap'}).addTo(map);
@@ -96,7 +112,8 @@ function setVoyage(api,from,to,progress,inMotion){
    routeLine=L.polyline(pts,{color:"#087fc8",weight:5,opacity:.9}).addTo(map);
    depMarker=L.circleMarker(pts[0],{radius:6,color:"#fff",weight:2,fillColor:"#19a4d7",fillOpacity:1}).addTo(map).bindTooltip(marinaNames[from]||from,{permanent:true,direction:"top",offset:[0,-4],className:"port-tooltip"});
    arrMarker=L.circleMarker(pts[pts.length-1],{radius:6,color:"#fff",weight:2,fillColor:"#f7aa2b",fillOpacity:1}).addTo(map).bindTooltip(marinaNames[to]||to,{permanent:true,direction:"bottom",offset:[0,5],className:"port-tooltip"});
-   map.fitBounds(L.latLngBounds(pts).pad(.58),{animate:false,maxZoom:13});
+   routeBounds=L.latLngBounds(pts).pad(.58);
+   map.fitBounds(routeBounds,{animate:false,maxZoom:13});
    centered=true;
   }
  }
@@ -105,7 +122,7 @@ function setVoyage(api,from,to,progress,inMotion){
  if(map){
   if(!boatMarker)boatMarker=L.marker(geo,{icon:L.divIcon({className:"",html:'<div style="font-size:27px;filter:drop-shadow(0 0 4px white)">🛥️</div>',iconSize:[32,32],iconAnchor:[16,16]})}).addTo(map);
   boatMarker.setLatLng(geo);
-  if(inMotion&&map.getBounds().contains(geo)===false)map.panTo(geo,{animate:false});
+  if(inMotion&&followEnabled)map.panTo(geo,{animate:false});
  }
  const prev=api.positionGeoAt?.(from,to,Math.max(0,progress-.003))||geo;
  const dy=(geo[0]-prev[0])*Math.PI/180,dx=(geo[1]-prev[1])*Math.cos(geo[0]*Math.PI/180)*Math.PI/180;
@@ -169,7 +186,20 @@ function service(type){
  render();
 }
 $("refuel").onclick=()=>service("refuel");$("repair").onclick=()=>service("repair");
-initChart();render();setInterval(render,900);
+function fitRoute(){if(!map)return;if(routeBounds)map.fitBounds(routeBounds,{animate:false,maxZoom:13});else if(lastPosition)map.setView(lastPosition,12,{animate:false});followEnabled=false;syncFollow()}
+function syncFollow(){$("followBoat").setAttribute("aria-pressed",String(followEnabled));$("followBoat").title=followEnabled?"Segui barca: attivo":"Segui barca"}
+$("zoomIn").onclick=()=>{map?.zoomIn();followEnabled=false;syncFollow()};
+$("zoomOut").onclick=()=>{map?.zoomOut();followEnabled=false;syncFollow()};
+$("followBoat").onclick=()=>{followEnabled=!followEnabled;if(followEnabled&&lastPosition)map?.panTo(lastPosition,{animate:false});else fitRoute();syncFollow()};
+$("fullGps").onclick=()=>{
+ const el=document.querySelector(".gpsSlot"),open=!el.classList.contains("expanded");
+ el.classList.toggle("expanded",open);document.body.classList.toggle("gpsFullscreen",open);
+ $("fullGps").textContent=open?"✕":"⛶";$("fullGps").setAttribute("aria-label",open?"Chiudi GPS a schermo intero":"Ingrandisci carta GPS a schermo intero");
+ $("fullGps").title=open?"Chiudi carta":"Espandi carta";
+ setTimeout(()=>map?.invalidateSize(),120);
+};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.querySelector(".gpsSlot").classList.contains("expanded"))$("fullGps").click()});
+initChart();syncFollow();render();setInterval(render,900);
 window.addEventListener("focus",()=>{map?.invalidateSize();render()});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){map?.invalidateSize();render()}});
 </script></body></html>
