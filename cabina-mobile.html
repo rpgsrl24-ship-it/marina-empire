@@ -100,6 +100,9 @@ body.gpsFullscreen{overflow:hidden}
 .largeGps.expanded .gpsHint{display:none}
 .largeGps.expanded .largeGpsTitle{margin-bottom:8px}
 @media(max-width:460px){.largeGps{margin:10px 5px 4px;padding:8px}.largeGpsTitle h2{font-size:16px}.largeGps .chart{height:clamp(340px,57vh,530px)!important}.largeGps .gpsControls{top:42px;right:5px}.largeGps .gpsControls button{width:32px;height:32px;font-size:22px}.largeGps.expanded{inset:1vh 1vw auto!important;width:98vw;height:96dvh;max-height:96dvh}.largeGps.expanded .chart{height:calc(96dvh - 82px)!important}.miniBoat{font-size:20px}.gpsHint{font-size:10px}}
+/* Mobile cockpit V14: compact chart, safe navigation clearance and legible controls. */
+@media(max-width:699px){body{padding-bottom:calc(100px + env(safe-area-inset-bottom))}.app{padding-bottom:calc(115px + env(safe-area-inset-bottom))}.largeGps .chart{height:clamp(245px,37dvh,370px)!important}.largeGps.expanded .chart{height:calc(96dvh - 90px)!important}.largeGps .gpsControls{top:46px;right:6px}.largeGps .gpsControls button{min-width:36px;min-height:36px}.bottom{bottom:calc(5px + env(safe-area-inset-bottom));padding:7px 5px}.gpsHint{padding-bottom:8px}.largeGpsTitle #chartDistance{color:#c8edff}}
+@media(max-width:390px){.largeGps .chart{height:clamp(235px,35dvh,320px)!important}.largeGps.expanded .chart{height:calc(96dvh - 90px)!important}}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <section class="mission"><h1 id="status">🛥️ CARICAMENTO PLANCIA</h1><div class="names" id="names">Preparazione GPS…</div><div class="stats"><div>DISTANZA RIMASTA<b id="remaining">— NM</b></div><div>ARRIVO DEMO<b id="eta">—</b></div><div>AVANZAMENTO<b id="pct">—</b></div></div><div class="track"><i id="track"></i></div></section>
@@ -148,7 +151,7 @@ function setVoyage(api,from,to,progress,inMotion){
  if(map){
   if(!boatMarker)boatMarker=L.marker(geo,{icon:L.divIcon({className:"",html:'<div style="font-size:27px;filter:drop-shadow(0 0 4px white)">🛥️</div>',iconSize:[32,32],iconAnchor:[16,16]})}).addTo(map);
   boatMarker.setLatLng(geo);
-  if(inMotion&&followEnabled)map.panTo(geo,{animate:false});
+  if(inMotion&&followEnabled){if(map.getZoom()<10)map.setView(geo,10,{animate:false});else map.panTo(geo,{animate:false});}
  }
  const prev=api.positionGeoAt?.(from,to,Math.max(0,progress-.003))||geo;
  const dy=(geo[0]-prev[0])*Math.PI/180,dx=(geo[1]-prev[1])*Math.cos(geo[0]*Math.PI/180)*Math.PI/180;
