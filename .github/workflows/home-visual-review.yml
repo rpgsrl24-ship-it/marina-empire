@@ -1,0 +1,31 @@
+name: Marina Empire visual audit of public home
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/home-visual-review.cjs'
+      - '.github/workflows/home-visual-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Review actual live public desktop and mobile home
+        run: node scripts/home-visual-review.cjs
+      - name: Save actual screenshots and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: marina-empire-home-live-review
+          path: test-results/home-visual-live/
+          if-no-files-found: warn
+          retention-days: 7
