@@ -137,8 +137,8 @@ body.gpsFullscreen{overflow:hidden}
 <div id="notice" class="notice" role="status">Le operazioni di rifornimento e manutenzione sono disponibili quando l'imbarcazione è in porto.</div>
 <section id="serviceConfirm" class="serviceConfirm" hidden aria-label="Conferma servizio di bordo"><strong id="serviceTitle">Servizio di bordo</strong><p id="serviceDescription"></p><div class="serviceButtons"><button id="serviceCancel" type="button">ANNULLA</button><button id="serviceApply" type="button">CONFERMA OPERAZIONE</button></div></section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261122-cabin20"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
-<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261122-engine9"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261122-cabin21"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261122-engine10"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -151,12 +151,19 @@ const voyageEvents={
  engine:{eyebrow:"SALA MACCHINE",title:"Temperatura motore alta",text:"Un allarme tecnico segnala temperatura sopra la norma. Devi decidere se proteggere il motore o mantenere la consegna.",a:{label:"RIDUCI I GIRI",sub:"+120 crediti · meno usura",code:"engineSlow"},b:{label:"PROSEGUI A POTENZA",sub:"+260 crediti · usura alta",code:"enginePush"}},
  vip:{eyebrow:"CHARTER VIP",title:"Richiesta del cliente",text:"Il cliente vuole scegliere tra una navigazione più confortevole o un arrivo più rapido.",a:{label:"PRIORITÀ COMFORT",sub:"+160 crediti · +22 prestigio",code:"vipComfort"},b:{label:"ARRIVO RAPIDO",sub:"+300 crediti · più usura",code:"vipSpeed"}},
  cargo:{eyebrow:"CARICO PRIORITARIO",title:"Carico da mettere in sicurezza",text:"Il mare sta facendo muovere il carico. Puoi rallentare e fissarlo oppure mantenere la tabella di marcia.",a:{label:"METTI IN SICUREZZA",sub:"+140 crediti · +14 prestigio",code:"cargoSecure"},b:{label:"MANTIENI LA CORSA",sub:"+280 crediti · più usura",code:"cargoRush"}},
- patrol:{eyebrow:"CONTROLLO IN MARE",title:"Richiesta di identificazione",text:"Una pattuglia ti contatta via VHF per un controllo operativo. Puoi fermarti e collaborare oppure inviare i dati e proseguire.",a:{label:"FERMATI E COLLABORA",sub:"+110 crediti · +20 prestigio",code:"patrolAssist"},b:{label:"INVIA DATI E PROSEGUI",sub:"+190 crediti · +6 prestigio",code:"patrolContinue"}}
+ patrol:{eyebrow:"CONTROLLO IN MARE",title:"Richiesta di identificazione",text:"Una pattuglia ti contatta via VHF per un controllo operativo. Puoi fermarti e collaborare oppure inviare i dati e proseguire.",a:{label:"FERMATI E COLLABORA",sub:"+110 crediti · +20 prestigio",code:"patrolAssist"},b:{label:"INVIA DATI E PROSEGUI",sub:"+190 crediti · +6 prestigio",code:"patrolContinue"}},
+ mayday:{eyebrow:"EVENTO RARO · MAYDAY",title:"Mayday in mare aperto",text:"Una chiamata di soccorso prioritaria arriva sul canale 16. Puoi deviare e intervenire direttamente oppure coordinare il soccorso da distanza.",a:{label:"INTERVIENI SUBITO",sub:"+700 crediti · +55 prestigio",code:"maydayRescue"},b:{label:"COORDINA IL SOCCORSO",sub:"+350 crediti · +35 prestigio",code:"maydayRelay"}},
+ seabob:{eyebrow:"EVENTO RARO · RECUPERO",title:"Seabob disperso",text:"Un superyacht segnala un Seabob perso in acqua. Puoi fermarti per recuperarlo o limitarti a segnalarne la posizione.",a:{label:"RECUPERA IL SEABOB",sub:"+600 crediti · +30 prestigio",code:"seabobRecover"},b:{label:"SEGNALA POSIZIONE",sub:"+280 crediti · +18 prestigio",code:"seabobMark"}},
+ superyacht:{eyebrow:"EVENTO RARO · SUPERYACHT",title:"Richiesta tender VIP",text:"Un superyacht vicino alla tua rotta cerca un tender per un trasferimento urgente di ospiti.",a:{label:"ACCETTA SERVIZIO VIP",sub:"+850 crediti · +45 prestigio",code:"superyachtTender"},b:{label:"RIFIUTA E PROSEGUI",sub:"+300 crediti · +12 prestigio",code:"superyachtDecline"}},
+ storm:{eyebrow:"EVENTO RARO · TEMPESTA",title:"Temporale severo sulla rotta",text:"Una cella temporalesca intensa attraversa la tua rotta. Puoi cercare ridosso oppure tentare di attraversarla.",a:{label:"CERCA RIDOSSO",sub:"+420 crediti · +40 prestigio",code:"stormShelter"},b:{label:"ATTRAVERSA LA TEMPESTA",sub:"+900 crediti · rischio alto",code:"stormCross"}}
 };
 function eventForTrip(t){
- const types=["rescue","weather","engine","vip","cargo","patrol"];
+ const normal=["rescue","weather","engine","vip","cargo","patrol"];
+ const rare=["mayday","seabob","superyacht","storm"];
  const seed=(Number(t?.voyageId)||1)+String(t?.id||"").split("").reduce((a,ch)=>a+ch.charCodeAt(0),0);
- return voyageEvents[types[Math.abs(seed)%types.length]];
+ const rareRoll=Math.abs(seed)%10===0;
+ const pool=rareRoll?rare:normal;
+ return voyageEvents[pool[Math.abs(seed)%pool.length]];
 }
 function hideVoyageEvent(){$("voyageEvent").classList.remove("show")}
 function showVoyageEvent(t){
