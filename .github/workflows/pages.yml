@@ -14,6 +14,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    outputs:
+      index_sha: ${{ steps.release.outputs.index_sha }}
     timeout-minutes: 20
     steps:
       - name: Checkout
@@ -58,6 +60,7 @@ jobs:
           console.log('PASS standalone Marketplace mobile release checks');
           NODE
       - name: Record the exact published revision
+        id: release
         run: |
           node <<'NODE'
           const fs = require('node:fs');
@@ -67,6 +70,7 @@ jobs:
             indexSha256: crypto.createHash('sha256').update(fs.readFileSync('index.html')).digest('hex')
           }, null, 2) + '\n');
           NODE
+          echo "index_sha=$(node -p "require('./release.json').indexSha256")" >> "$GITHUB_OUTPUT"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Prepare site without test dependencies or reports
@@ -107,6 +111,7 @@ jobs:
       - name: Verify published revision and homepage bytes
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_INDEX_SHA: ${{ needs.build.outputs.index_sha }}
         run: |
           for attempt in 1 2 3 4 5; do
             if curl --fail --location --silent --show-error --max-time 20 "${PAGE_URL%/}/release.json?revision=$GITHUB_SHA" -o /tmp/marina-empire-release.json &&
@@ -115,12 +120,13 @@ jobs:
                 const fs = require("node:fs");
                 const crypto = require("node:crypto");
                 const assert = require("node:assert/strict");
-                const expected = JSON.parse(fs.readFileSync("release.json", "utf8"));
                 const actual = JSON.parse(fs.readFileSync("/tmp/marina-empire-release.json", "utf8"));
                 const digest = crypto.createHash("sha256").update(fs.readFileSync("/tmp/marina-empire-public.html")).digest("hex");
+                const expected = process.env.EXPECTED_INDEX_SHA;
+                assert.ok(expected, "Missing build index hash output");
                 assert.equal(actual.commit, process.env.GITHUB_SHA, "Published commit differs from this deployment");
-                assert.equal(actual.indexSha256, expected.indexSha256, "Published manifest differs from this artifact");
-                assert.equal(digest, expected.indexSha256, "Published homepage is stale or different");
+                assert.equal(actual.indexSha256, expected, "Published manifest differs from this artifact");
+                assert.equal(digest, expected, "Published homepage is stale or different");
               '; then
               echo "Published Marina Empire revision and homepage match $GITHUB_SHA"
               exit 0
