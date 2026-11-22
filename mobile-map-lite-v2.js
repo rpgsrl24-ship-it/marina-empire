@@ -133,7 +133,15 @@ function applyVoyageDecision(code){
   cargoSecure:{label:"CARICO URGENTE",result:"Hai messo in sicurezza il carico e proseguito con cautela.",bonus:140,prestige:14,wear:0},
   cargoRush:{label:"CARICO URGENTE",result:"Hai mantenuto la tabella di marcia con il carico prioritario.",bonus:280,prestige:7,wear:4},
   patrolAssist:{label:"CONTROLLO IN MARE",result:"Hai collaborato con la pattuglia e completato il controllo.",bonus:110,prestige:20,wear:0},
-  patrolContinue:{label:"CONTROLLO IN MARE",result:"Hai comunicato i dati via VHF e proseguito la missione.",bonus:190,prestige:6,wear:1}
+  patrolContinue:{label:"CONTROLLO IN MARE",result:"Hai comunicato i dati via VHF e proseguito la missione.",bonus:190,prestige:6,wear:1},
+  maydayRescue:{label:"EVENTO RARO · MAYDAY",result:"Hai completato un soccorso complesso in mare aperto.",bonus:700,prestige:55,wear:4},
+  maydayRelay:{label:"EVENTO RARO · MAYDAY",result:"Hai coordinato un soccorso a distanza mantenendo la missione.",bonus:350,prestige:35,wear:0},
+  seabobRecover:{label:"EVENTO RARO · RECUPERO",result:"Hai recuperato un Seabob disperso e lo hai riconsegnato al proprietario.",bonus:600,prestige:30,wear:1},
+  seabobMark:{label:"EVENTO RARO · RECUPERO",result:"Hai segnalato la posizione del Seabob e proseguito la rotta.",bonus:280,prestige:18,wear:0},
+  superyachtTender:{label:"EVENTO RARO · SUPERYACHT",result:"Hai effettuato un servizio tender VIP per un superyacht.",bonus:850,prestige:45,wear:2},
+  superyachtDecline:{label:"EVENTO RARO · SUPERYACHT",result:"Hai rinunciato al servizio VIP per rispettare la missione principale.",bonus:300,prestige:12,wear:0},
+  stormShelter:{label:"EVENTO RARO · TEMPESTA",result:"Hai cercato ridosso e superato la tempesta senza danni importanti.",bonus:420,prestige:40,wear:-2},
+  stormCross:{label:"EVENTO RARO · TEMPESTA",result:"Hai attraversato la tempesta mantenendo la rotta.",bonus:900,prestige:25,wear:9}
  };
  const pick=choices[code];if(!pick)return{ok:false,message:"Scelta non valida"};
  let applied=false;
