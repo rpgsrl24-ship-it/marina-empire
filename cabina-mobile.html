@@ -126,11 +126,13 @@ body.gpsFullscreen{overflow:hidden}
 .serviceButtons #serviceApply{background:#136d8a;border-color:#69d0ef}
 .miniGps{cursor:zoom-in}
 .miniGps:focus-visible{outline:3px solid #ffdc83;outline-offset:2px}
+.voyageEvent{display:none;margin:10px;border:1px solid #d7b36c;border-radius:15px;background:linear-gradient(145deg,#142f46,#081a2b);padding:13px;box-shadow:0 8px 24px #0005}.voyageEvent.show{display:block}.voyageEvent .eyebrow{display:block;color:#f3c977;font-size:10px;font-weight:900;letter-spacing:.12em}.voyageEvent h3{margin:5px 0 6px;color:#fff;font-size:17px}.voyageEvent p{margin:0;color:#bdd7e5;font-size:11px;line-height:1.4}.voyageChoices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}.voyageChoices button{min-height:52px;border:1px solid #6e91a7;border-radius:11px;background:#11354f;color:#fff;font-weight:850;font-size:11px;padding:8px}.voyageChoices button strong{display:block;color:#f3d49b;font-size:10px;margin-top:3px}.arrival{position:relative;overflow:hidden}.arrival.show{padding:15px}.arrival b{font-size:15px}.arrival p{line-height:1.45}.arrival a{display:inline-block;margin-top:7px;padding:9px 11px;border-radius:9px;background:#d2ae6a;color:#10273a;font-weight:850}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
-<section class="mission"><h1 id="status">🛥️ CARICAMENTO PLANCIA</h1><div class="names" id="names">Preparazione GPS…</div><div class="stats"><div>DISTANZA RIMASTA<b id="remaining">— NM</b></div><div>ARRIVO DEMO<b id="eta">—</b></div><div>AVANZAMENTO<b id="pct">—</b></div></div><div class="track"><i id="track"></i></div></section>
+<section class="mission"><h1 id="status">🛥️ CARICAMENTO PLANCIA</h1><div class="names" id="names">Preparazione GPS…</div><div class="stats"><div>DISTANZA RIMASTA<b id="remaining">— NM</b></div><div>ARRIVO STIMATO<b id="eta">—</b></div><div>AVANZAMENTO<b id="pct">—</b></div></div><div class="track"><i id="track"></i></div></section>
 <div class="helm"><div class="photo" id="window"><img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Plancia di comando yacht con vista mare dal parabrezza e strumentazione di bordo"><span class="sea-status" id="seaLabel">🌊 VISTA MARE</span><div class="gpsSlot miniGps" role="button" tabindex="0" title="Apri carta nautica ingrandita" aria-label="Apri carta nautica ingrandita dal monitor di bordo"><div class="miniSea"><svg class="miniChart" viewBox="0 0 320 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H50C72 28 60 45 48 64C31 93 44 114 60 150H0Z" class="land"/><path d="M72 0C84 22 83 43 70 70C57 95 72 119 84 150" class="depth"/><path id="miniFullRoute" d="" fill="none" stroke="#71d9ff" stroke-width="3" stroke-dasharray="8 5" opacity=".8"/><path id="miniDoneRoute" d="" fill="none" stroke="#ffe6a6" stroke-width="4"/><circle id="miniStart" cx="45" cy="75" r="6" fill="#44dba9" stroke="white" stroke-width="2"/><circle id="miniEnd" cx="275" cy="75" r="6" fill="#ffc46a" stroke="white" stroke-width="2"/></svg><div class="miniWake" id="miniWake"></div><span class="miniBoat" id="miniBoat" aria-hidden="true">🛥️</span><span class="miniState" id="miniState">GPS · IN PORTO</span></div></div></div><div class="instrumentPanel"><div class="instrument"><div class="dial"><small>VELOCITÀ</small><b id="speed">—</b><small>nodi</small></div><div class="dial"><small>DIREZIONE</small><b id="heading">—</b><small>gradi</small></div><div class="dial"><small>STATO</small><b id="conditionGauge">—</b><small>barca</small></div></div></div></div>
 <section class="largeGps" id="largeGps" aria-label="Carta nautica grande"><div class="largeGpsTitle"><div><span class="eyebrow">🧭 CARTA NAUTICA IN TEMPO REALE</span><h2>Segui la tua imbarcazione</h2></div><span id="chartDistance">— NM</span></div><div class="chart"><div id="chartMap" style="height:100%;width:100%"></div><div class="fallback" id="fallback" hidden><div><strong>GPS nautico</strong><p id="fallbackMsg">Caricamento carta…</p></div></div><div class="gpshud"><span id="gpsLabel">● GPS LIVE</span><span id="gpsRoute">—</span></div><div class="gpsfoot"><b id="gpsBottom">Posizione sincronizzata con la missione</b></div><div class="gpsControls" aria-label="Controlli del GPS"><button type="button" id="zoomIn" aria-label="Ingrandisci GPS" title="Zoom avanti">+</button><button type="button" id="zoomOut" aria-label="Riduci GPS" title="Zoom indietro">−</button><button type="button" id="followBoat" aria-label="Segui imbarcazione" title="Segui barca">⌖</button><button type="button" id="fullGps" aria-label="Ingrandisci carta GPS a schermo intero" title="Espandi GPS">⛶</button></div></div><div class="gpsHint" id="gpsHint" role="status">Tocca <b>+</b> o <b>−</b> per zoomare la carta grande; <b>⌖</b> segue la barca. Tocca il monitor della plancia per ingrandire.</div></section>
+<section id="voyageEvent" class="voyageEvent" aria-live="polite"><span class="eyebrow" id="eventEyebrow">VHF LIVE</span><h3 id="eventTitle">Evento in navigazione</h3><p id="eventText"></p><div class="voyageChoices"><button id="eventChoiceA" type="button"></button><button id="eventChoiceB" type="button"></button></div></section>
 <section class="actions"><button id="refuel" type="button">⛽ PIENO<small id="refuelInfo">Solo in marina</small></button><button id="repair" type="button">🔧 MANUTENZIONE<small id="repairInfo">Solo in marina</small></button><a href="./map-mobile.html?v=20261119-map17">🗺️ VAI ALLA MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9">🎯 MISSIONI</a></section>
 <div id="notice" class="notice" role="status">Le operazioni di rifornimento e manutenzione sono disponibili quando l'imbarcazione è in porto.</div>
 <section id="serviceConfirm" class="serviceConfirm" hidden aria-label="Conferma servizio di bordo"><strong id="serviceTitle">Servizio di bordo</strong><p id="serviceDescription"></p><div class="serviceButtons"><button id="serviceCancel" type="button">ANNULLA</button><button id="serviceApply" type="button">CONFERMA OPERAZIONE</button></div></section>
@@ -142,6 +144,21 @@ body.gpsFullscreen{overflow:hidden}
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
 const marinaNames={rose:"Isola delle Rose",rimini:"Rimini",ancona:"Ancona",lignano:"Lignano",cervia:"Cervia",bari:"Bari",ravenna:"Marina di Ravenna",pescara:"Pescara",brindisi:"Brindisi",salerno:"Salerno",nettuno:"Nettuno",scarlino:"Scarlino",loano:"Loano",portocervo:"Porto Cervo",capodorlando:"Capo d'Orlando"};
 let map=null,routeLine=null,boatMarker=null,depMarker=null,arrMarker=null,activeVoyage="",lastPosition=null,centered=false,followEnabled=true,routeBounds=null;
+let activeEventVoyage=0;
+const voyageEvents={
+ rescue:{eyebrow:"VHF · CH 16",title:"Richiesta di assistenza",text:"Un'imbarcazione segnala un'avaria a poche miglia dalla tua rotta. Come vuoi gestire l'intervento?",a:{label:"DEVIA E SOCCORRI",sub:"+250 crediti · +25 prestigio",code:"rescue"},b:{label:"COORDINA VIA VHF",sub:"+100 crediti · +12 prestigio",code:"coastguard"}},
+ weather:{eyebrow:"ALLERTA METEO",title:"Mare in aumento",text:"Le condizioni stanno peggiorando. Puoi proteggere l'imbarcazione o mantenere l'andatura per puntare al bonus.",a:{label:"ROTTA SICURA",sub:"meno usura · +80 crediti",code:"safe"},b:{label:"MANTIENI VELOCITÀ",sub:"+180 crediti · più usura",code:"fast"}}
+};
+function eventForTrip(t){return (Number(t?.voyageId)||1)%2===0?voyageEvents.weather:voyageEvents.rescue}
+function hideVoyageEvent(){$("voyageEvent").classList.remove("show")}
+function showVoyageEvent(t){
+ if(!t||t.eventResolved||t.progress<.24||t.progress>.92){hideVoyageEvent();return}
+ const ev=eventForTrip(t);activeEventVoyage=Number(t.voyageId)||0;
+ $("eventEyebrow").textContent=ev.eyebrow;$("eventTitle").textContent=ev.title;$("eventText").textContent=ev.text;
+ $("eventChoiceA").innerHTML=ev.a.label+"<strong>"+ev.a.sub+"</strong>";$("eventChoiceA").dataset.choice=ev.a.code;
+ $("eventChoiceB").innerHTML=ev.b.label+"<strong>"+ev.b.sub+"</strong>";$("eventChoiceB").dataset.choice=ev.b.code;
+ $("voyageEvent").classList.add("show");
+}
 function note(message){$("notice").textContent=message}
 function initChart(){
  if(map||!window.L)return;
@@ -244,9 +261,11 @@ function render(){
   $("pct").textContent=pct+"%";$("track").style.width=pct+"%";
   $("speed").textContent=String(t.cruiseKnots);
   setVoyage(api,t.origin,t.dest,t.progress,true);
-  note("Navigazione demo in corso. La posizione è condivisa con la mappa. Pieno e manutenzione saranno disponibili all'arrivo.");
+  showVoyageEvent(t);
+  note(t.eventResolved&&t.eventResult?t.eventResult+" Continua verso "+t.destinationName+".":"Navigazione in corso. Segui GPS e VHF: durante la rotta possono comparire decisioni operative.");
   window.MarinaEmpirePlayerTracker?.startPlay?.();
  }else{
+  hideVoyageEvent();
   $("status").textContent="⚓ IMBARCAZIONE IN PORTO";
   $("speed").textContent="0";
   const dock=s.lastDockedBridge;
@@ -257,7 +276,8 @@ function render(){
   else {const pos=shot.chartPorts?.find(p=>p.id===s.port);$("heading").textContent="—";if(map&&pos)map.setView([48-pos.y*.13,6.2+pos.x*.132],11)}
   if(s.lastArrival){
    $("arrivalTitle").textContent="⚓ ARRIVO A "+(marinaNames[s.lastArrival.destination]||s.lastArrival.destination||"MARINA").toUpperCase();
-   $("arrivalReward").textContent="+"+fmt(s.lastArrival.reward)+" crediti · +"+fmt(s.lastArrival.prestige)+" prestigio";
+   const evBonus=Number(s.lastArrival.eventBonus)||0,evPrestige=Number(s.lastArrival.eventPrestige)||0;
+   $("arrivalReward").innerHTML="<strong>Missione completata</strong><br>+"+fmt(s.lastArrival.reward)+" crediti · +"+fmt(s.lastArrival.prestige)+" prestigio"+(s.lastArrival.eventResult?"<br><small>"+s.lastArrival.eventResult+(evBonus||evPrestige?" · bonus evento incluso":"")+"</small>":"");
    window.MarinaEmpirePlayerTracker?.completeVoyage?.(s.lastArrival.voyageId);
   }
   if(!$("notice").dataset.manual)note("Yacht in porto: puoi fare il pieno o la manutenzione utilizzando i pulsanti qui sotto.");
@@ -296,6 +316,14 @@ $("serviceApply").onclick=()=>{
  $("notice").scrollIntoView({behavior:"smooth",block:"nearest"});
 };
 $("refuel").onclick=()=>service("refuel");$("repair").onclick=()=>service("repair");
+document.querySelectorAll("#voyageEvent [data-choice],#eventChoiceA,#eventChoiceB").forEach(btn=>btn.onclick=()=>{
+ const code=btn.dataset.choice;if(!code)return;
+ const current=window.MarinaEmpireMapLite?.snapshot?.()?.trip;
+ if(!current||Number(current.voyageId||0)!==activeEventVoyage){hideVoyageEvent();return}
+ const result=window.MarinaEmpireMapLite?.applyVoyageDecision?.(code);
+ if(result?.ok){hideVoyageEvent();note(result.result+" Bonus registrato per l'arrivo.");render();}
+ else note(result?.message||"Decisione non registrata.");
+});
 function fitRoute(){if(!map)return;if(routeBounds)map.fitBounds(routeBounds,{animate:false,maxZoom:13});else if(lastPosition)map.setView(lastPosition,12,{animate:false});followEnabled=false;syncFollow()}
 function gpsMessage(message){$("gpsHint").textContent=message}
 function syncFollow(){$("followBoat").setAttribute("aria-pressed",String(followEnabled));$("followBoat").title=followEnabled?"Segui barca: attivo":"Segui barca";$("followBoat").textContent=followEnabled?"◎":"⌖"}
