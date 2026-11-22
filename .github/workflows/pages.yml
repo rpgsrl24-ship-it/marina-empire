@@ -10,12 +10,9 @@ permissions:
   id-token: write
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -84,15 +81,29 @@ jobs:
           });
           NODE
       - name: Upload site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
-          name: github-pages
           path: ${{ runner.temp }}/marina-empire-site
+
+  deploy:
+    needs: build
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          artifact_name: github-pages
+
+      - name: Checkout published revision metadata
+        uses: actions/checkout@v4
+
       - name: Verify published revision and homepage bytes
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
