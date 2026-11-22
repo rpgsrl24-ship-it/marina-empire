@@ -72,7 +72,7 @@ function tripView(s,b){
  const progress=Math.max(0,Math.min(1,1-remaining/(duration*1000)));
  const origin=String(t.origin||s.port),dest=String(t.dest||s.port),route=routePoints(origin,dest).map(([lat,lon])=>project(lat,lon));
  const distance=seaMiles(origin,dest),knots=Number(b?.knots)||18;
- return {id:String(t.id||""),name:String(t.mission?.name||"Missione attiva"),origin,originName:(ports.find(x=>x.id===origin)||ports[1]).name,dest,destinationName:(ports.find(x=>x.id===dest)||ports[1]).name,reward:Number(t.mission?.reward)||0,prestige:Number(t.mission?.prestige)||0,progress,distance,cruiseKnots:knots,etaMinutesReal:Math.max(1,Math.round((distance*(1-progress)/knots)*60)),remainingSec:Math.max(0,Math.ceil(remaining/1000)),route};
+ return {id:String(t.id||""),voyageId:Number(t.voyageId)||0,name:String(t.mission?.name||"Missione attiva"),origin,originName:(ports.find(x=>x.id===origin)||ports[1]).name,dest,destinationName:(ports.find(x=>x.id===dest)||ports[1]).name,reward:Number(t.mission?.reward)||0,prestige:Number(t.mission?.prestige)||0,progress,distance,cruiseKnots:knots,etaMinutesReal:Math.max(1,Math.round((distance*(1-progress)/knots)*60)),remainingSec:Math.max(0,Math.ceil(remaining/1000)),route,eventResolved:!!t.eventResolved,eventLabel:String(t.eventLabel||""),eventResult:String(t.eventResult||"")};
 }
 function snapshot(){const s=read()||{coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],voyages:0};const b=boats.find(x=>x.id===s.boat)||boats[0];return{state:s,tank:b.tank,boatName:b.name,ports:ports.map(p=>({id:p.id,name:p.name,x:illustrated[p.id]?.[0]??50,y:illustrated[p.id]?.[1]??50})),chartPorts:ports.map(p=>({id:p.id,name:p.name,...project(...harborGPS[p.id])})),trip:tripView(s,b)}}
 function preview(dest){const shot=snapshot(),s=shot.state,b=boats.find(x=>x.id===s.boat)||boats[0],p=ports.find(x=>x.id===dest);if(!p||dest===s.port)return{ok:false,reason:"Seleziona una marina diversa"};const pl=plan(s.port,dest,b.tank,b.burn);const eta=Math.max(1,Math.round((pl.distance/b.knots)*60));const cost=Math.max(250,Math.round(pl.distance*7*b.mult))+b.crew;const reward=Math.max(1200,Math.round(pl.distance*20*b.mult));let fuelNow=Math.max(0,Math.min(b.tank,Number(s.fuel)||0)),refuel=0,ready=!!pl.possible&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id));if(pl.possible){for(let i=0;i<pl.legs.length-1;i++){const req=Math.ceil(seaMiles(pl.legs[i],pl.legs[i+1])*b.burn);if(i>0){const liters=Math.max(0,req+pl.reserve-fuelNow);refuel+=liters*3;fuelNow+=liters}if(fuelNow<req+pl.reserve)ready=false;fuelNow-=Math.min(fuelNow,req)}}const total=cost+refuel;if(Number(s.coins)||0<total)ready=false;const route=routePoints(s.port,dest).map(([lat,lon])=>project(lat,lon));return{ok:pl.possible,reason:pl.reason||"",origin:s.port,originName:(ports.find(x=>x.id===s.port)||ports[1]).name,dest,destinationName:p.name,distance:pl.distance,fuel:pl.fuel,cruiseKnots:b.knots,etaMinutesReal:eta,route,mission:{id:"R_"+b.id+"_"+s.port+"_"+dest,name:"Trasferimento nautico verso "+p.name,reward,prestige:Math.max(15,Math.round(pl.distance*.4*b.mult)),ready,reason:ready?"":"Controlla carburante, crediti e stato yacht",total}}}
@@ -113,12 +113,31 @@ function startMission(id,expectedDest){
    g.coins=Math.max(0,Number(g.coins)||0)-Math.max(0,Number(mission.cost)||0);
    g.fuel=Math.max(0,Number(g.fuel)||0)-Math.max(0,Number(mission.fuel)||0);
    g.voyageSerial=Math.max(0,Number(g.voyageSerial)||0)+1;
-   g.trip={voyageId:g.voyageSerial,id:mission.id,origin:g.port,dest:mission.dest,legs:[g.port,mission.dest],legIndex:0,legSeconds:duration,sec:duration,fuelRate:b.burn,weather:"calm",weatherWear:3,weatherLabel:"CALMO",mission:{id:mission.id,name:mission.name,dest:mission.dest,boat:mission.boat,reward:mission.reward,cost:mission.cost,fuel:mission.fuel,prestige:mission.prestige,sec:duration},until:Date.now()+duration*1000};
+   g.trip={voyageId:g.voyageSerial,id:mission.id,origin:g.port,dest:mission.dest,legs:[g.port,mission.dest],legIndex:0,legSeconds:duration,sec:duration,fuelRate:b.burn,weather:"calm",weatherWear:3,weatherLabel:"CALMO",eventResolved:false,eventLabel:"",eventResult:"",eventBonus:0,eventPrestige:0,eventWear:0,mission:{id:mission.id,name:mission.name,dest:mission.dest,boat:mission.boat,reward:mission.reward,cost:mission.cost,fuel:mission.fuel,prestige:mission.prestige,sec:duration},until:Date.now()+duration*1000};
  });
  if(!ok)return{ok:false,message:"Salvataggio della partenza non riuscito"};
  const saved=read(),trip=saved?.trip;
  if(!trip||String(trip.id)!==String(mission.id)||String(trip.dest)!==String(mission.dest))return{ok:false,message:"Partenza non confermata"};
  return{ok:true,snapshot:snapshot()};
+}
+function applyVoyageDecision(code){
+ const choices={
+  rescue:{label:"SOS VHF",result:"Hai deviato per prestare assistenza.",bonus:250,prestige:25,wear:2},
+  coastguard:{label:"SOS VHF",result:"Hai coordinato il soccorso via VHF.",bonus:100,prestige:12,wear:0},
+  safe:{label:"METEO",result:"Hai ridotto la velocità e protetto l'imbarcazione.",bonus:80,prestige:8,wear:-2},
+  fast:{label:"METEO",result:"Hai mantenuto la velocità accettando maggiore usura.",bonus:180,prestige:5,wear:4}
+ };
+ const pick=choices[code];if(!pick)return{ok:false,message:"Scelta non valida"};
+ let applied=false;
+ const ok=mutate(g=>{
+   if(!g.trip||g.trip.eventResolved)return;
+   g.trip.eventResolved=true;g.trip.eventLabel=pick.label;g.trip.eventResult=pick.result;
+   g.trip.eventBonus=Math.max(0,Number(g.trip.eventBonus)||0)+pick.bonus;
+   g.trip.eventPrestige=Math.max(0,Number(g.trip.eventPrestige)||0)+pick.prestige;
+   g.trip.eventWear=(Number(g.trip.eventWear)||0)+pick.wear;
+   applied=true;
+ });
+ return ok&&applied?{ok:true,...pick}:{ok:false,message:"Evento già risolto o missione terminata"};
 }
 function pulse(){
  const s=read();if(!s?.trip)return {active:false,snapshot:snapshot()};
@@ -129,7 +148,7 @@ function pulse(){
  const fresh=read(),ft=fresh?.trip;if(ft&&Number(ft.until)<=Date.now()){
    mutate(g=>{
      const trip=g.trip;if(!trip)return;
-     const m=trip.mission||{},id=String(trip.id||m.id||""),reward=Math.max(0,Number(m.reward)||0),prestige=Math.max(0,Number(m.prestige)||0),dest=String(m.dest||trip.dest||g.port);
+     const m=trip.mission||{},id=String(trip.id||m.id||""),baseReward=Math.max(0,Number(m.reward)||0),basePrestige=Math.max(0,Number(m.prestige)||0),eventBonus=Math.max(0,Number(trip.eventBonus)||0),eventPrestige=Math.max(0,Number(trip.eventPrestige)||0),reward=baseReward+eventBonus,prestige=basePrestige+eventPrestige,dest=String(m.dest||trip.dest||g.port);
      g.completed=Array.isArray(g.completed)?g.completed:[];
      g.settledVoyages=Array.isArray(g.settledVoyages)?g.settledVoyages:[];
      const voyageId=Number(trip.voyageId)||0;
@@ -142,8 +161,8 @@ function pulse(){
        g.prestige=Math.max(0,Number(g.prestige)||0)+prestige;
        g.voyages=Math.max(0,Number(g.voyages)||0)+1;
        g.earnings=Math.max(0,Number(g.earnings)||0)+reward;
-       g.condition=Math.max(0,(Number(g.condition??100)||100)-Math.max(0,Number(trip.weatherWear)||3));
-       g.lastArrival={destination:dest,reward,baseReward:reward,crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),voyageId,mission:String(m.name||"Missione completata"),emergency:false};
+       g.condition=Math.max(0,Math.min(100,(Number(g.condition??100)||100)-Math.max(0,(Number(trip.weatherWear)||3)+(Number(trip.eventWear)||0))));
+       g.lastArrival={destination:dest,reward,baseReward,eventBonus,eventPrestige,eventLabel:String(trip.eventLabel||""),eventResult:String(trip.eventResult||""),crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),voyageId,mission:String(m.name||"Missione completata"),emergency:false};
      }
      g.lastDockedBridge={origin:String(trip.origin||g.port),destination:dest,at:Date.now()};
      g.trip=null;
@@ -151,5 +170,5 @@ function pulse(){
  }
  return {active:!!read()?.trip,snapshot:snapshot()};
 }
-window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
+window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,applyVoyageDecision,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
 })();
