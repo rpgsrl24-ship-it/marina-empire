@@ -123,9 +123,17 @@ function startMission(id,expectedDest){
 function applyVoyageDecision(code){
  const choices={
   rescue:{label:"SOS VHF",result:"Hai deviato per prestare assistenza.",bonus:250,prestige:25,wear:2},
-  coastguard:{label:"SOS VHF",result:"Hai coordinato il soccorso via VHF.",bonus:100,prestige:12,wear:0},
+  coastguard:{label:"SOS VHF",result:"Hai coordinato il soccorso con la Guardia Costiera.",bonus:100,prestige:12,wear:0},
   safe:{label:"METEO",result:"Hai ridotto la velocità e protetto l'imbarcazione.",bonus:80,prestige:8,wear:-2},
-  fast:{label:"METEO",result:"Hai mantenuto la velocità accettando maggiore usura.",bonus:180,prestige:5,wear:4}
+  fast:{label:"METEO",result:"Hai mantenuto la velocità accettando maggiore usura.",bonus:180,prestige:5,wear:4},
+  engineSlow:{label:"SALA MACCHINE",result:"Hai ridotto i giri e stabilizzato il motore.",bonus:120,prestige:10,wear:-1},
+  enginePush:{label:"SALA MACCHINE",result:"Hai proseguito a piena potenza: consegna salva, ma maggiore usura.",bonus:260,prestige:6,wear:6},
+  vipComfort:{label:"CHARTER VIP",result:"Hai privilegiato comfort e servizio del cliente.",bonus:160,prestige:22,wear:0},
+  vipSpeed:{label:"CHARTER VIP",result:"Hai accettato la richiesta di arrivo rapido del cliente.",bonus:300,prestige:8,wear:3},
+  cargoSecure:{label:"CARICO URGENTE",result:"Hai messo in sicurezza il carico e proseguito con cautela.",bonus:140,prestige:14,wear:0},
+  cargoRush:{label:"CARICO URGENTE",result:"Hai mantenuto la tabella di marcia con il carico prioritario.",bonus:280,prestige:7,wear:4},
+  patrolAssist:{label:"CONTROLLO IN MARE",result:"Hai collaborato con la pattuglia e completato il controllo.",bonus:110,prestige:20,wear:0},
+  patrolContinue:{label:"CONTROLLO IN MARE",result:"Hai comunicato i dati via VHF e proseguito la missione.",bonus:190,prestige:6,wear:1}
  };
  const pick=choices[code];if(!pick)return{ok:false,message:"Scelta non valida"};
  let applied=false;
