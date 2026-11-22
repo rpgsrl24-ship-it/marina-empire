@@ -137,7 +137,7 @@ body.gpsFullscreen{overflow:hidden}
 <div id="notice" class="notice" role="status">Le operazioni di rifornimento e manutenzione sono disponibili quando l'imbarcazione è in porto.</div>
 <section id="serviceConfirm" class="serviceConfirm" hidden aria-label="Conferma servizio di bordo"><strong id="serviceTitle">Servizio di bordo</strong><p id="serviceDescription"></p><div class="serviceButtons"><button id="serviceCancel" type="button">ANNULLA</button><button id="serviceApply" type="button">CONFERMA OPERAZIONE</button></div></section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261122-cabin21"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261122-cabin22"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261122-engine10"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
@@ -157,18 +157,19 @@ const voyageEvents={
  superyacht:{eyebrow:"EVENTO RARO · SUPERYACHT",title:"Richiesta tender VIP",text:"Un superyacht vicino alla tua rotta cerca un tender per un trasferimento urgente di ospiti.",a:{label:"ACCETTA SERVIZIO VIP",sub:"+850 crediti · +45 prestigio",code:"superyachtTender"},b:{label:"RIFIUTA E PROSEGUI",sub:"+300 crediti · +12 prestigio",code:"superyachtDecline"}},
  storm:{eyebrow:"EVENTO RARO · TEMPESTA",title:"Temporale severo sulla rotta",text:"Una cella temporalesca intensa attraversa la tua rotta. Puoi cercare ridosso oppure tentare di attraversarla.",a:{label:"CERCA RIDOSSO",sub:"+420 crediti · +40 prestigio",code:"stormShelter"},b:{label:"ATTRAVERSA LA TEMPESTA",sub:"+900 crediti · rischio alto",code:"stormCross"}}
 };
-function eventForTrip(t){
- const normal=["rescue","weather","engine","vip","cargo","patrol"];
+function eventForTrip(t,prestige){
+ const p=Math.max(0,Number(prestige)||0);
+ const base=p>=250?["rescue","weather","engine","vip","cargo","patrol"]:["rescue","weather","engine"];
  const rare=["mayday","seabob","superyacht","storm"];
  const seed=(Number(t?.voyageId)||1)+String(t?.id||"").split("").reduce((a,ch)=>a+ch.charCodeAt(0),0);
- const rareRoll=Math.abs(seed)%10===0;
- const pool=rareRoll?rare:normal;
+ const rareRoll=p>=1000&&Math.abs(seed)%10===0;
+ const pool=rareRoll?rare:base;
  return voyageEvents[pool[Math.abs(seed)%pool.length]];
 }
 function hideVoyageEvent(){$("voyageEvent").classList.remove("show")}
-function showVoyageEvent(t){
+function showVoyageEvent(t,prestige){
  if(!t||t.eventResolved||t.progress<.24||t.progress>.92){hideVoyageEvent();return}
- const ev=eventForTrip(t);activeEventVoyage=Number(t.voyageId)||0;
+ const ev=eventForTrip(t,prestige);activeEventVoyage=Number(t.voyageId)||0;
  $("eventEyebrow").textContent=ev.eyebrow;$("eventTitle").textContent=ev.title;$("eventText").textContent=ev.text;
  $("eventChoiceA").innerHTML=ev.a.label+"<strong>"+ev.a.sub+"</strong>";$("eventChoiceA").dataset.choice=ev.a.code;
  $("eventChoiceB").innerHTML=ev.b.label+"<strong>"+ev.b.sub+"</strong>";$("eventChoiceB").dataset.choice=ev.b.code;
@@ -276,7 +277,7 @@ function render(){
   $("pct").textContent=pct+"%";$("track").style.width=pct+"%";
   $("speed").textContent=String(t.cruiseKnots);
   setVoyage(api,t.origin,t.dest,t.progress,true);
-  showVoyageEvent(t);
+  showVoyageEvent(t,s.prestige);
   note(t.eventResolved&&t.eventResult?t.eventResult+" Continua verso "+t.destinationName+".":"Navigazione in corso. Segui GPS e VHF: durante la rotta possono comparire decisioni operative.");
   window.MarinaEmpirePlayerTracker?.startPlay?.();
  }else{
