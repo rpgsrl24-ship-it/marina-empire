@@ -73,12 +73,18 @@ const throttleModes={
 };
 function throttleFor(t){return throttleModes[String(t?.throttleMode||"cruise")]||throttleModes.cruise}
 function projectedTrip(t,now=Date.now()){
- const duration=Math.max(1,Number(t?.sec)||1),mode=throttleFor(t),saved=Math.max(0,Math.min(1,Number(t?.progressBase)||0));
- const last=Math.max(0,Number(t?.lastProgressAt)||Number(t?.startedAt)||now);
- const elapsed=Math.max(0,now-last);
- const progress=Math.max(0,Math.min(1,saved+elapsed/(duration*1000)*mode.speedMult));
- const remainingSec=Math.max(0,Math.ceil((1-progress)*duration/mode.speedMult));
- return{progress,remainingSec,mode};
+ const duration=Math.max(1,Number(t?.sec)||1),mode=throttleFor(t),saved=Math.max(0,Math.min(.97,Number(t?.progressBase)||0));
+ if(t?.dockingReady)return{progress:.97,remainingSec:0,mode,harbor:true,effectiveKnots:0,effectiveRpm:0,effectiveTemp:Math.max(68,mode.temp-8),effectiveLph:3};
+ const last=Math.max(0,Number(t?.lastProgressAt)||Number(t?.startedAt)||now),elapsed=Math.max(0,now-last);
+ const harbor=saved<.15||saved>=.85;
+ const phaseSpeed=harbor?Math.min(mode.speedMult,.34):mode.speedMult;
+ const progress=Math.max(0,Math.min(.97,saved+elapsed/(duration*1000)*phaseSpeed));
+ const remainingSec=Math.max(0,Math.ceil((.97-progress)*duration/Math.max(.01,phaseSpeed)));
+ const effectiveKnots=harbor?Math.min(6,mode.knots):mode.knots;
+ const effectiveRpm=harbor?Math.min(1100,mode.rpm):mode.rpm;
+ const effectiveTemp=harbor?Math.max(68,mode.temp-8):mode.temp;
+ const effectiveLph=harbor?Math.min(12,mode.lph):mode.lph;
+ return{progress,remainingSec,mode,harbor,effectiveKnots,effectiveRpm,effectiveTemp,effectiveLph};
 }
 function settleTrip(g,now=Date.now()){
  const t=g?.trip;if(!t)return;
@@ -95,7 +101,7 @@ function tripView(s,b){
  const t=s?.trip;if(!t)return null;
  const proj=projectedTrip(t),progress=proj.progress,origin=String(t.origin||s.port),dest=String(t.dest||s.port),route=routePoints(origin,dest).map(([lat,lon])=>project(lat,lon));
  const distance=seaMiles(origin,dest),knots=proj.mode.knots;
- return {id:String(t.id||""),voyageId:Number(t.voyageId)||0,name:String(t.mission?.name||"Missione attiva"),origin,originName:(ports.find(x=>x.id===origin)||ports[1]).name,dest,destinationName:(ports.find(x=>x.id===dest)||ports[1]).name,reward:Number(t.mission?.reward)||0,prestige:Number(t.mission?.prestige)||0,progress,distance,cruiseKnots:knots,etaMinutesReal:Math.max(1,Math.round((distance*(1-progress)/knots)*60)),remainingSec:proj.remainingSec,route,eventResolved:!!t.eventResolved,eventLabel:String(t.eventLabel||""),eventResult:String(t.eventResult||""),throttleMode:proj.mode.id,throttleLabel:proj.mode.label,rpm:proj.mode.rpm,temp:proj.mode.temp,lph:proj.mode.lph,fuelMult:proj.mode.fuelMult};
+ return {id:String(t.id||""),voyageId:Number(t.voyageId)||0,name:String(t.mission?.name||"Missione attiva"),origin,originName:(ports.find(x=>x.id===origin)||ports[1]).name,dest,destinationName:(ports.find(x=>x.id===dest)||ports[1]).name,reward:Number(t.mission?.reward)||0,prestige:Number(t.mission?.prestige)||0,progress,distance,cruiseKnots:proj.effectiveKnots??knots,etaMinutesReal:Math.max(1,Math.round((distance*(1-progress)/Math.max(1,proj.effectiveKnots||knots))*60)),remainingSec:proj.remainingSec,route,eventResolved:!!t.eventResolved,eventLabel:String(t.eventLabel||""),eventResult:String(t.eventResult||""),throttleMode:proj.mode.id,throttleLabel:proj.harbor?(t.dockingReady?"ORMEGGIO":"MANOVRA PORTO"):proj.mode.label,rpm:proj.effectiveRpm??proj.mode.rpm,temp:proj.effectiveTemp??proj.mode.temp,lph:proj.effectiveLph??proj.mode.lph,fuelMult:proj.mode.fuelMult,harbor:!!proj.harbor,dockingReady:!!t.dockingReady,dockingOffset:Number(t.dockingOffset)||0};
 }
 function snapshot(){const s=read()||{coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],voyages:0};const b=boats.find(x=>x.id===s.boat)||boats[0];return{state:s,tank:b.tank,boatName:b.name,ports:ports.map(p=>({id:p.id,name:p.name,x:illustrated[p.id]?.[0]??50,y:illustrated[p.id]?.[1]??50})),chartPorts:ports.map(p=>({id:p.id,name:p.name,...project(...harborGPS[p.id])})),trip:tripView(s,b)}}
 function preview(dest){const shot=snapshot(),s=shot.state,b=boats.find(x=>x.id===s.boat)||boats[0],p=ports.find(x=>x.id===dest);if(!p||dest===s.port)return{ok:false,reason:"Seleziona una marina diversa"};const pl=plan(s.port,dest,b.tank,b.burn);const eta=Math.max(1,Math.round((pl.distance/b.knots)*60));const cost=Math.max(250,Math.round(pl.distance*7*b.mult))+b.crew;const reward=Math.max(1200,Math.round(pl.distance*20*b.mult));let fuelNow=Math.max(0,Math.min(b.tank,Number(s.fuel)||0)),refuel=0,ready=!!pl.possible&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id));if(pl.possible){for(let i=0;i<pl.legs.length-1;i++){const req=Math.ceil(seaMiles(pl.legs[i],pl.legs[i+1])*b.burn);if(i>0){const liters=Math.max(0,req+pl.reserve-fuelNow);refuel+=liters*3;fuelNow+=liters}if(fuelNow<req+pl.reserve)ready=false;fuelNow-=Math.min(fuelNow,req)}}const total=cost+refuel;if(Number(s.coins)||0<total)ready=false;const route=routePoints(s.port,dest).map(([lat,lon])=>project(lat,lon));return{ok:pl.possible,reason:pl.reason||"",origin:s.port,originName:(ports.find(x=>x.id===s.port)||ports[1]).name,dest,destinationName:p.name,distance:pl.distance,fuel:pl.fuel,cruiseKnots:b.knots,etaMinutesReal:eta,route,mission:{id:"R_"+b.id+"_"+s.port+"_"+dest,name:"Trasferimento nautico verso "+p.name,reward,prestige:Math.max(15,Math.round(pl.distance*.4*b.mult)),ready,reason:ready?"":"Controlla carburante, crediti e stato yacht",total}}}
@@ -182,6 +188,9 @@ function applyVoyageDecision(code){
 function setThrottle(modeId){
  const mode=throttleModes[String(modeId||"")];if(!mode)return{ok:false,message:"Modalità manetta non valida"};
  const before=read();if(!before?.trip)return{ok:false,message:"Manetta disponibile solo durante la navigazione"};
+ if(before.trip.dockingReady)return{ok:false,message:"Motori al minimo: completa l'ormeggio"};
+ const beforeProj=projectedTrip(before.trip);
+ if((beforeProj.progress<.15||beforeProj.progress>=.85)&&mode.id==="fast")return{ok:false,message:"FAST non disponibile nelle acque portuali"};
  const current=throttleFor(before.trip),proj=projectedTrip(before.trip),baseFuel=Math.max(0,Number(before.trip.mission?.fuel)||0);
  const projectedFuel=baseFuel*Math.max(0,1-proj.progress)*mode.fuelMult/Math.max(.01,mode.speedMult);
  if((Number(before.fuel)||0)+.01<projectedFuel)return{ok:false,message:"Carburante insufficiente per mantenere "+mode.label};
@@ -198,34 +207,43 @@ function setThrottle(modeId){
  });
  return ok&&applied?{ok:true,mode:mode.id,label:mode.label,knots:mode.knots,rpm:mode.rpm,temp:mode.temp,lph:mode.lph,message:mode.label+" · "+mode.knots+" kn · "+mode.rpm+" RPM"}:{ok:false,message:"Cambio manetta non salvato"};
 }
+function finalizeTrip(g,dockingBonus=0,dockingPrestige=0,dockingGrade="STANDARD"){
+ const trip=g.trip;if(!trip)return false;
+ const m=trip.mission||{},id=String(trip.id||m.id||""),baseReward=Math.max(0,Number(m.reward)||0),basePrestige=Math.max(0,Number(m.prestige)||0),eventBonus=Math.max(0,Number(trip.eventBonus)||0),eventPrestige=Math.max(0,Number(trip.eventPrestige)||0),reward=baseReward+eventBonus+dockingBonus,prestige=basePrestige+eventPrestige+dockingPrestige,dest=String(m.dest||trip.dest||g.port);
+ g.completed=Array.isArray(g.completed)?g.completed:[];g.settledVoyages=Array.isArray(g.settledVoyages)?g.settledVoyages:[];
+ const voyageId=Number(trip.voyageId)||0,settled=voyageId>0&&g.settledVoyages.includes(voyageId);g.port=dest;
+ if(!settled){
+  if(id&&!g.completed.includes(id))g.completed.push(id);if(voyageId>0)g.settledVoyages.push(voyageId);
+  g.coins=Math.max(0,Number(g.coins)||0)+reward;g.prestige=Math.max(0,Number(g.prestige)||0)+prestige;g.voyages=Math.max(0,Number(g.voyages)||0)+1;g.earnings=Math.max(0,Number(g.earnings)||0)+reward;
+  g.condition=Math.max(0,Math.min(100,(Number(g.condition??100)||100)-Math.max(0,(Number(trip.weatherWear)||3)+(Number(trip.eventWear)||0)+(Number(trip.throttleWear)||0))));
+  g.lastArrival={destination:dest,reward,baseReward,eventBonus,eventPrestige,dockingBonus,dockingPrestige,dockingGrade,eventLabel:String(trip.eventLabel||""),eventResult:String(trip.eventResult||""),crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),voyageId,mission:String(m.name||"Missione completata"),emergency:false};
+ }
+ g.lastDockedBridge={origin:String(trip.origin||g.port),destination:dest,at:Date.now()};g.trip=null;return true;
+}
+function adjustDocking(delta){
+ const s=read();if(!s?.trip?.dockingReady)return{ok:false,message:"Ormeggio non ancora disponibile"};
+ let offset=0;const ok=mutate(g=>{if(!g.trip?.dockingReady)return;g.trip.dockingOffset=Math.max(-40,Math.min(40,(Number(g.trip.dockingOffset)||0)+Number(delta||0)));offset=g.trip.dockingOffset;});
+ return ok?{ok:true,offset,message:Math.abs(offset)<=6?"Allineamento corretto: puoi ormeggiare.":offset<0?"Correggi ancora verso dritta.":"Correggi ancora verso sinistra."}:{ok:false,message:"Correzione non salvata"};
+}
+function completeDocking(){
+ const s=read();if(!s?.trip?.dockingReady)return{ok:false,message:"Ormeggio non disponibile"};
+ const offset=Math.abs(Number(s.trip.dockingOffset)||0);if(offset>6)return{ok:false,message:"Barca non allineata al posto barca"};
+ const grade=offset<=2?"PERFETTO":"BUONO",bonus=offset<=2?250:120,prestige=offset<=2?20:10;
+ let done=false;const ok=mutate(g=>{if(!g.trip?.dockingReady)return;done=finalizeTrip(g,bonus,prestige,grade);});
+ return ok&&done?{ok:true,grade,bonus,prestige,message:"Ormeggio "+grade.toLowerCase()+" completato"}:{ok:false,message:"Ormeggio non completato"};
+}
 function pulse(){
  const s=read();if(!s?.trip)return {active:false,snapshot:snapshot()};
- mutate(g=>{if(g.trip)settleTrip(g,Date.now())});
+ mutate(g=>{if(g.trip&&!g.trip.dockingReady)settleTrip(g,Date.now())});
  const fresh=read(),ft=fresh?.trip,proj=ft?projectedTrip(ft):null;
- if(ft&&proj&&proj.progress>=1){
+ if(ft&&!ft.dockingReady&&proj&&proj.progress>=.97){
    mutate(g=>{
-     const trip=g.trip;if(!trip)return;
-     const m=trip.mission||{},id=String(trip.id||m.id||""),baseReward=Math.max(0,Number(m.reward)||0),basePrestige=Math.max(0,Number(m.prestige)||0),eventBonus=Math.max(0,Number(trip.eventBonus)||0),eventPrestige=Math.max(0,Number(trip.eventPrestige)||0),reward=baseReward+eventBonus,prestige=basePrestige+eventPrestige,dest=String(m.dest||trip.dest||g.port);
-     g.completed=Array.isArray(g.completed)?g.completed:[];
-     g.settledVoyages=Array.isArray(g.settledVoyages)?g.settledVoyages:[];
-     const voyageId=Number(trip.voyageId)||0;
-     const settled=voyageId>0&&g.settledVoyages.includes(voyageId);
-     g.port=dest;
-     if(!settled){
-       if(id&&!g.completed.includes(id))g.completed.push(id);
-       if(voyageId>0)g.settledVoyages.push(voyageId);
-       g.coins=Math.max(0,Number(g.coins)||0)+reward;
-       g.prestige=Math.max(0,Number(g.prestige)||0)+prestige;
-       g.voyages=Math.max(0,Number(g.voyages)||0)+1;
-       g.earnings=Math.max(0,Number(g.earnings)||0)+reward;
-       g.condition=Math.max(0,Math.min(100,(Number(g.condition??100)||100)-Math.max(0,(Number(trip.weatherWear)||3)+(Number(trip.eventWear)||0)+(Number(trip.throttleWear)||0))));
-       g.lastArrival={destination:dest,reward,baseReward,eventBonus,eventPrestige,eventLabel:String(trip.eventLabel||""),eventResult:String(trip.eventResult||""),crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),voyageId,mission:String(m.name||"Missione completata"),emergency:false};
-     }
-     g.lastDockedBridge={origin:String(trip.origin||g.port),destination:dest,at:Date.now()};
-     g.trip=null;
+     if(!g.trip)return;const now=Date.now();
+     g.trip.progressBase=.97;g.trip.lastProgressAt=now;g.trip.lastFuelAt=now;g.trip.until=now;g.trip.dockingReady=true;g.trip.throttleMode="eco";
+     if(!Number.isFinite(Number(g.trip.dockingOffset)))g.trip.dockingOffset=((Number(g.trip.voyageId)||1)*17%41)-20;
    });
  }
  return {active:!!read()?.trip,snapshot:snapshot()};
 }
-window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,setThrottle,applyVoyageDecision,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
+window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,setThrottle,adjustDocking,completeDocking,applyVoyageDecision,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
 })();
