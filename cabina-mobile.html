@@ -160,12 +160,20 @@ body.gpsFullscreen{overflow:hidden}
 .helmControl{position:absolute;z-index:18;left:2.5%;bottom:13%;width:17%;min-width:70px;padding:7px;border:1px solid #9c7b48;border-radius:13px;background:#061827df;backdrop-filter:blur(5px);box-shadow:0 8px 20px #0007}.helmHud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;color:#9fc3d4;font-size:6px;text-align:center}.helmHud b{color:#ffe0a1;font-size:11px}.helmWheelWrap{display:grid;grid-template-columns:24px 1fr 24px;align-items:center;gap:4px;margin-top:5px}.helmWheelWrap>button{border:1px solid #667f8f;background:#0d2b3e;color:#fff;border-radius:8px;min-height:32px;font-weight:900;padding:0}.helmWheel{aspect-ratio:1;border-radius:50%!important;min-height:54px!important;background:radial-gradient(circle,#173e54 0 31%,#071827 32% 45%,#a78046 46% 50%,#071827 51%)!important;transition:transform .2s ease;box-shadow:inset 0 0 0 4px #10283a,0 3px 10px #0008}.helmWheel span{font-size:17px;display:block}.approachGuide{margin-top:5px;padding:5px;border-radius:7px;background:#0b293bd9;text-align:center;border:1px solid #39596b}.approachGuide b,.approachGuide span{display:block}.approachGuide b{font-size:7px;color:#e8c77e}.approachGuide span{font-size:6px;color:#a9c9d9;margin-top:2px}.approachGuide.warn{border-color:#d6b25b;background:#3a3019dd}.approachGuide.good{border-color:#4fc98d;background:#113b31dd}
 .cockpitThrottle{left:21%!important;right:19%!important}
 @media(max-width:390px){.helmControl{left:1.5%;width:17.5%;padding:5px}.helmWheelWrap{grid-template-columns:20px 1fr 20px;gap:2px}.helmWheel{min-height:48px!important}.cockpitThrottle{left:20%!important;right:18%!important}}
+
+.seaMotion{position:absolute;z-index:3;left:5%;right:5%;top:18%;height:24%;pointer-events:none;overflow:hidden;opacity:.16;mix-blend-mode:screen;mask-image:linear-gradient(180deg,transparent 0,#000 22%,#000 84%,transparent 100%);-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 22%,#000 84%,transparent 100%)}
+.seaMotion:before,.seaMotion:after{content:"";position:absolute;inset:-20% -30%;background:repeating-linear-gradient(176deg,transparent 0 13px,#bcecff2b 14px 16px,transparent 17px 31px);transform:translateX(-5%);animation:seaSlide 7s linear infinite}
+.seaMotion:after{opacity:.55;animation-duration:11s;animation-direction:reverse;transform:translateX(8%) scaleY(.7)}
+.cockpitStage:not(.inMotion) .seaMotion{opacity:.05}.cockpitStage.docking .seaMotion{opacity:.10}
+@keyframes seaSlide{0%{transform:translate3d(-6%,0,0)}50%{transform:translate3d(2%,3px,0)}100%{transform:translate3d(10%,0,0)}}
+.courseDeviation{font-weight:900;color:#f1cc84}.courseDeviation.good{color:#6be0a7}.courseDeviation.warn{color:#ffd16e}
+@media(prefers-reduced-motion:reduce){.seaMotion:before,.seaMotion:after{animation:none!important}}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <div class="helm cockpitOne">
   <div class="photo cockpitStage" id="window">
     <img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Postazione di comando interattiva Marina Empire">
-    <div class="cockpitShade"></div>
+    <div class="cockpitShade"></div><div class="seaMotion" aria-hidden="true"></div>
 
     <section class="mission cockpitMission">
       <div class="missionMain"><h1 id="status">🛥️ CARICAMENTO PLANCIA</h1><div class="names" id="names">Preparazione GPS…</div><div class="stats"><div>DISTANZA<b id="remaining">— NM</b></div><div>ARRIVO<b id="eta">—</b></div><div>AVANZAMENTO<b id="pct">—</b></div></div><div class="track"><i id="track"></i></div></div>
@@ -222,7 +230,7 @@ body.gpsFullscreen{overflow:hidden}
 <section id="serviceConfirm" class="serviceConfirm" hidden aria-label="Conferma servizio di bordo"><strong id="serviceTitle">Servizio di bordo</strong><p id="serviceDescription"></p><div class="serviceButtons"><button id="serviceCancel" type="button">ANNULLA</button><button id="serviceApply" type="button">CONFERMA OPERAZIONE</button></div></section>
 <section id="dockingPanel" class="dockingPanel" aria-live="polite"><h3>⚓ ORMEGGIO</h3><p>Allinea la barca al posto barca, poi completa la manovra.</p><div class="dockScene"><div class="dockPier"></div><div class="dockTarget"></div><div class="dockBoat" id="dockBoat">🛥️</div><div class="dockGuide">Velocità limitata · manovra finale</div></div><div class="dockControls"><button id="dockLeft" type="button">◀ CORREGGI SINISTRA</button><button id="dockRight" type="button">CORREGGI DRITTA ▶</button><button id="dockNow" class="dockNow" type="button">ORMEGGIA</button></div><div class="dockAlign"><span>SINISTRA</span><div class="dockAlignTrack"><i id="dockAlignBar"></i><b id="dockAlignNeedle"></b></div><span>DRITTA</span></div><div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div></section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin29"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin30"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261123-engine15"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
@@ -297,10 +305,14 @@ function setVoyage(api,from,to,progress,inMotion){
  }
  const prev=api.positionGeoAt?.(from,to,Math.max(0,progress-.003))||geo;
  const dy=(geo[0]-prev[0])*Math.PI/180,dx=(geo[1]-prev[1])*Math.cos(geo[0]*Math.PI/180)*Math.PI/180;
- const heading=Math.round((Math.atan2(dx,dy)*180/Math.PI+360)%360);
+ const routeHeading=Math.round((Math.atan2(dx,dy)*180/Math.PI+360)%360);
+ const helm=Math.max(-30,Math.min(30,Number(api.snapshot?.()?.trip?.helmAngle)||0));
+ const helmEffect=Math.round(helm*.42);
+ const heading=(routeHeading+helmEffect+360)%360;
  $("heading").textContent=String(heading).padStart(3,"0")+"°";
+ $("simHdg").textContent=String(heading).padStart(3,"0")+"°";
  $("gpsRoute").textContent=(marinaNames[from]||from)+" → "+(marinaNames[to]||to);
- return true;
+ return {routeHeading,heading,helmEffect};
 }
 function render(){
  const api=window.MarinaEmpireMapLite;
@@ -338,7 +350,7 @@ function render(){
   $("miniBoat").style.left=(bx/320*100)+"%";$("miniBoat").style.top=(by/150*100)+"%";
   const later=api.positionGeoAt?.(miniFrom,miniTo,Math.min(1,fraction+.008))||miniPosition;
   const bearing=((Math.atan2((later[1]-miniPosition[1])*Math.cos(miniPosition[0]*Math.PI/180),later[0]-miniPosition[0])*180/Math.PI)+360)%360;
-  if(Number.isFinite(bearing))$("miniBoat").style.setProperty("--heading",bearing.toFixed(1)+"deg");
+  if(Number.isFinite(bearing)){const helmTurn=active?Math.max(-30,Math.min(30,Number(t?.helmAngle)||0))*.42:0;$("miniBoat").style.setProperty("--heading",(bearing+helmTurn).toFixed(1)+"deg");}
   $("miniWake").style.left=(bx/320*100)+"%";$("miniWake").style.top=((by+11)/150*100)+"%";
  }else{
   $("miniFullRoute").setAttribute("d","");$("miniDoneRoute").setAttribute("d","");
@@ -347,7 +359,7 @@ function render(){
  }
  $("miniState").textContent=active?"GPS LIVE · "+Math.round(progress*100)+"%":"⚓ IN PORTO";
  $("chartDistance").textContent=active?Math.max(0,Math.round(t.distance*(1-progress)))+" NM":"0 NM";
- $("window").classList.toggle("docked",!active);
+ $("window").classList.toggle("docked",!active);$("window").classList.toggle("inMotion",active&&!t?.dockingReady);$("window").classList.toggle("docking",!!t?.dockingReady);
  $("seaLabel").textContent=active?"🌊 IN NAVIGAZIONE":"⚓ ORMEGGIATA";
  const fullTank=Math.max(1,Number(window.MarinaEmpireMarinaLite?.snapshot?.()?.boat?.tank)||Number(shot.tank)||400);
  const fuelNeedsService=(Number(s.fuel)||0)<fullTank-.01,conditionNeedsService=Number(s.condition??100)<100;
@@ -370,7 +382,7 @@ function render(){
   const guide=$("approachGuide");guide.classList.remove("warn","good");
   if(t.dockingReady){$("approachTitle").textContent="ORMEGGIO";$("approachText").textContent=Math.abs(Number(t.dockingOffset)||0)<=6?"Allineamento corretto":"Usa timone e correzioni";guide.classList.add(Math.abs(Number(t.dockingOffset)||0)<=6?"good":"warn");}
   else if(t.progress>=.85){$("approachTitle").textContent="AVVICINAMENTO";$("approachText").textContent=t.cruiseKnots>6?"Riduci velocità":"Velocità corretta · mantieni assetto";guide.classList.add(t.cruiseKnots>6?"warn":"good");}
-  else{$("approachTitle").textContent="ROTTA STABILE";$("approachText").textContent=Math.abs(helm)<=5?"Timone centrato":"Correzione manuale attiva";}
+  else{$("approachTitle").textContent="ROTTA STABILE";$("approachText").innerHTML=Math.abs(helm)<=5?"Timone centrato · <span class=\"courseDeviation good\">rotta corretta</span>":"Correzione manuale · <span class=\"courseDeviation warn\">deviazione "+Math.abs(Math.round(helm*.42))+"°</span>";}
 
   if(t.dockingReady){
     $("status").textContent="⚓ MANOVRA DI ORMEGGIO";
@@ -478,6 +490,7 @@ document.querySelectorAll("[data-throttle]").forEach(b=>b.onclick=()=>applyThrot
  track.addEventListener("click",e=>{if(e.target===lever)return;applyThrottle(modeFromY(e.clientY));});
 })();
 function commandHelm(angle){
+ if(Number(angle)!==0&&followEnabled){followEnabled=false;$("autopilotBtn").classList.remove("on");syncFollow();}
  const r=window.MarinaEmpireMapLite?.setHelm?.(angle);
  if(r?.ok){note(r.message+(r.dockingOffset!==null&&r.dockingOffset!==undefined?" · allineamento aggiornato":""));render();}
  else note(r?.message||"Timone non disponibile.");
@@ -486,7 +499,7 @@ $("helmLeft").onclick=()=>{const a=Number(window.MarinaEmpireMapLite?.snapshot?.
 $("helmRight").onclick=()=>{const a=Number(window.MarinaEmpireMapLite?.snapshot?.()?.trip?.helmAngle)||0;commandHelm(Math.min(30,a+10));};
 $("helmWheel").onclick=()=>commandHelm(0);
 let cabinLightsOn=true;
-$("autopilotBtn").onclick=()=>{followEnabled=!followEnabled;$("autopilotBtn").classList.toggle("on",followEnabled);syncFollow();note(followEnabled?"Autopilota inserito: il GPS segue la rotta.":"Autopilota disinserito: carta in modalità manuale.");};
+$("autopilotBtn").onclick=()=>{followEnabled=!followEnabled;$("autopilotBtn").classList.toggle("on",followEnabled);if(followEnabled)window.MarinaEmpireMapLite?.setHelm?.(0);syncFollow();render();note(followEnabled?"Autopilota inserito: timone centrato e GPS sulla rotta.":"Autopilota disinserito: controllo manuale disponibile.");};
 $("routeBtn").onclick=()=>{if(!$("largeGps").classList.contains("expanded"))$("fullGps").click();};
 $("waypointBtn").onclick=()=>{fitRoute();note("Rotta e waypoint centrati sulla carta nautica.");};
 $("vhfBtn").onclick=()=>{const panel=$("vhfPanel"),ev=$("voyageEvent"),open=panel.hasAttribute("hidden");if(open){panel.removeAttribute("hidden");$("vhfPanelText").textContent=ev.classList.contains("show")?("CH 16 · "+$("eventTitle").textContent+" — "+$("eventText").textContent):"Canale 16 in ascolto. Nessun traffico prioritario.";}$("vhfBtn").classList.toggle("on",open);if(!open)panel.setAttribute("hidden","");};
