@@ -133,6 +133,7 @@ body.gpsFullscreen{overflow:hidden}
 .roundGauges{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px}.roundGauge{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;text-align:center;border:5px solid #17384e;background:radial-gradient(circle,#0d2d43 0 54%,#071724 55% 100%);box-shadow:inset 0 0 0 3px #244c62,0 4px 14px #0006}.roundGauge:nth-child(1){border-top-color:#3dd9e8}.roundGauge:nth-child(2){border-top-color:#48d777}.roundGauge:nth-child(3){border-top-color:#f36d45}.roundGauge:nth-child(4){border-top-color:#51d76d}.roundGauge small{font-size:7px;color:#a7c6d6}.roundGauge b{display:block;font-size:clamp(14px,3.8vw,21px);line-height:1.05}.roundGauge span{font-size:7px;color:#d8edf6}
 .twinThrottle{display:grid;grid-template-columns:1fr 1fr;gap:8px}.throttleColumn{position:relative;height:190px;border:1px solid #54778d;border-radius:18px;background:linear-gradient(180deg,#3a1820 0 18%,#6a4f12 18% 58%,#0d4e39 58% 100%);box-shadow:inset 0 0 18px #0008}.throttleColumn:before{content:attr(data-side);position:absolute;left:0;right:0;bottom:6px;text-align:center;color:#fff;font-size:8px;font-weight:900;letter-spacing:.06em}.throttleLever,.throttleLeverTwin{position:absolute;left:50%;top:50%;width:48px;height:68px;transform:translate(-50%,-50%);border:2px solid #d9b870;border-radius:15px;background:linear-gradient(180deg,#d8d8d8,#686868 35%,#151515 36% 100%);box-shadow:0 5px 14px #000b;touch-action:none}.throttleLever:after,.throttleLeverTwin:after{content:"";position:absolute;left:8px;right:8px;top:8px;height:14px;border-radius:8px;background:#202020}.throttleLeverTwin{pointer-events:none}.throttleTrack{height:auto!important;border:0!important;background:none!important;box-shadow:none!important}.throttleTrack:before{display:none!important}
 @media(max-width:430px){.mission{grid-template-columns:1fr}.vhfLive{justify-content:center}.roundGauges{gap:4px;margin:8px 5px}.roundGauge{border-width:4px}.roundGauge small,.roundGauge span{font-size:6px}.simDeck{grid-template-columns:64px 1fr 64px}.simRail button{font-size:8px;padding:4px}}
+.dockingPanel{display:none;margin:10px;border:2px solid #d6b46b;border-radius:16px;background:linear-gradient(145deg,#0d263a,#071724);padding:13px;box-shadow:0 9px 24px #0006}.dockingPanel.show{display:block}.dockingPanel h3{margin:0;color:#ffe0a1;font-size:17px}.dockingPanel p{margin:5px 0 9px;color:#b8d2df;font-size:11px}.dockScene{position:relative;height:118px;border:1px solid #3e6479;border-radius:12px;background:linear-gradient(180deg,#7fc2df 0 32%,#176d91 33% 100%);overflow:hidden}.dockPier{position:absolute;right:8%;top:18%;width:23%;height:72%;background:linear-gradient(90deg,#9b8a69,#d6c7a2);border-left:4px solid #5f5038;box-shadow:-5px 0 12px #0005}.dockBoat{position:absolute;left:38%;top:48%;transform:translate(-50%,-50%);font-size:38px;transition:left .25s ease}.dockTarget{position:absolute;right:22%;top:50%;width:22px;height:56px;border:2px dashed #ffe09a;border-radius:8px;transform:translateY(-50%)}.dockGuide{position:absolute;left:12px;bottom:9px;color:#eaffff;font-size:9px;font-weight:850;background:#06263dcc;padding:5px 7px;border-radius:7px}.dockControls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.dockControls button{min-height:48px;border:1px solid #66879a;border-radius:11px;background:#11334b;color:#fff;font-weight:900}.dockControls .dockNow{grid-column:1/-1;background:linear-gradient(180deg,#e4bd65,#a97518);color:#11283a;border-color:#f5d98e}.dockStatus{margin-top:8px;font-size:10px;color:#bcd8e6;text-align:center}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <section class="mission"><div class="missionMain"><h1 id="status">🛥️ CARICAMENTO PLANCIA</h1><div class="names" id="names">Preparazione GPS…</div><div class="stats"><div>DISTANZA RIMASTA<b id="remaining">— NM</b></div><div>ARRIVO STIMATO<b id="eta">—</b></div><div>AVANZAMENTO<b id="pct">—</b></div></div><div class="track"><i id="track"></i></div></div><div class="vhfLive"><i></i><span>VHF LIVE · CH 16</span><span class="vhfWave"></span></div></section>
@@ -146,9 +147,10 @@ body.gpsFullscreen{overflow:hidden}
 <section class="actions"><button id="refuel" type="button">⛽ PIENO<small id="refuelInfo">Solo in marina</small></button><button id="repair" type="button">🔧 MANUTENZIONE<small id="repairInfo">Solo in marina</small></button><a href="./map-mobile.html?v=20261119-map17">🗺️ VAI ALLA MAPPA</a><a href="./missions-mobile.html?v=20261111-missions9">🎯 MISSIONI</a></section>
 <div id="notice" class="notice" role="status">Le operazioni di rifornimento e manutenzione sono disponibili quando l'imbarcazione è in porto.</div>
 <section id="serviceConfirm" class="serviceConfirm" hidden aria-label="Conferma servizio di bordo"><strong id="serviceTitle">Servizio di bordo</strong><p id="serviceDescription"></p><div class="serviceButtons"><button id="serviceCancel" type="button">ANNULLA</button><button id="serviceApply" type="button">CONFERMA OPERAZIONE</button></div></section>
+<section id="dockingPanel" class="dockingPanel" aria-live="polite"><h3>⚓ ORMEGGIO</h3><p>Allinea la barca al posto barca, poi completa la manovra.</p><div class="dockScene"><div class="dockPier"></div><div class="dockTarget"></div><div class="dockBoat" id="dockBoat">🛥️</div><div class="dockGuide">Velocità limitata · manovra finale</div></div><div class="dockControls"><button id="dockLeft" type="button">◀ CORREGGI SINISTRA</button><button id="dockRight" type="button">CORREGGI DRITTA ▶</button><button id="dockNow" class="dockNow" type="button">ORMEGGIA</button></div><div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div></section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin25"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
-<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261123-engine11"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin26"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261123-engine12"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -280,6 +282,7 @@ function render(){
  $("refuelInfo").textContent=active?"All'arrivo":fuelNeedsService?"Disponibile ora":"Serbatoio pieno";
  $("repairInfo").textContent=active?"All'arrivo":conditionNeedsService?"Disponibile ora":"Stato già 100%";
  $("arrival").classList.toggle("show",!active&&!!s.lastArrival);
+ $("dockingPanel").classList.toggle("show",!!t?.dockingReady);
  if(t){
   const pct=Math.max(0,Math.min(100,Math.round(t.progress*100)));
   $("status").textContent="🛥️ MISSIONE IN CORSO · GPS ATTIVO";
@@ -287,7 +290,16 @@ function render(){
   $("remaining").textContent=Math.max(0,Math.round(t.distance*(1-t.progress)))+" NM";
   $("eta").textContent=Math.max(0,t.remainingSec)+" s";
   $("pct").textContent=pct+"%";$("track").style.width=pct+"%";
-  $("speed").textContent=String(t.cruiseKnots);$("simSog").textContent=t.cruiseKnots+" kn";$("gaugeSpeed").textContent=t.cruiseKnots;$("gaugeTemp").textContent=fmt(t.temp||0);$("gaugeRpm").textContent=fmt(t.rpm||0);
+  $("speed").textContent=String(t.cruiseKnots);
+  if(t.dockingReady){
+    $("status").textContent="⚓ MANOVRA DI ORMEGGIO";
+    $("phaseExit").classList.add("done");$("phaseNav").classList.add("done");$("phaseApproach").classList.add("active");
+    $("phaseExitText").textContent="Completata";$("phaseNavText").textContent="Completata";$("phaseApproachText").textContent="Ormeggio";
+    $("phaseFill").style.width="97%";
+    const off=Math.max(-40,Math.min(40,Number(t.dockingOffset)||0));
+    $("dockBoat").style.left=(50+off)+"%";
+    $("dockStatus").textContent=Math.abs(off)<=6?"Allineamento corretto · puoi ormeggiare":off<0?"Barca troppo a sinistra · correggi verso dritta":"Barca troppo a dritta · correggi verso sinistra";
+  }$("simSog").textContent=t.cruiseKnots+" kn";$("gaugeSpeed").textContent=t.cruiseKnots;$("gaugeTemp").textContent=fmt(t.temp||0);$("gaugeRpm").textContent=fmt(t.rpm||0);
   $("liveRpm").textContent=fmt(t.rpm||0);$("liveTemp").textContent=fmt(t.temp||0)+" °C";$("liveLph").textContent=fmt(t.lph||0)+" L/h";$("liveEta").textContent=Math.max(0,t.remainingSec)+" s";
   $("throttleModeLabel").textContent=(t.throttleLabel||"CROCIERA")+" · "+t.cruiseKnots+" kn";
   document.querySelectorAll("[data-throttle]").forEach(b=>b.classList.toggle("on",b.dataset.throttle===t.throttleMode));
@@ -298,7 +310,7 @@ function render(){
   if(t.progress<.15){$("phaseExit").classList.add("active");$("phaseExitText").textContent="In corso";$("phaseNavText").textContent="Attesa";$("phaseApproachText").textContent="Attesa";}
   else if(t.progress<.85){$("phaseExit").classList.add("done");$("phaseNav").classList.add("active");$("phaseExitText").textContent="Completata";$("phaseNavText").textContent=phasePct+"%";$("phaseApproachText").textContent="Tra "+Math.max(0,t.remainingSec)+" s";}
   else{$("phaseExit").classList.add("done");$("phaseNav").classList.add("done");$("phaseApproach").classList.add("active");$("phaseExitText").textContent="Completata";$("phaseNavText").textContent="Completata";$("phaseApproachText").textContent="In corso";}
-  showVoyageEvent(t,s.prestige);
+  if(!t.dockingReady)showVoyageEvent(t,s.prestige);else hideVoyageEvent();
   note(t.eventResolved&&t.eventResult?t.eventResult+" Continua verso "+t.destinationName+".":"Navigazione in corso. Segui GPS e VHF: durante la rotta possono comparire decisioni operative.");
   window.MarinaEmpirePlayerTracker?.startPlay?.();
  }else{
@@ -388,6 +400,17 @@ $("waypointBtn").onclick=()=>{fitRoute();note("Rotta e waypoint centrati sulla c
 $("vhfBtn").onclick=()=>{const ev=$("voyageEvent");if(ev.classList.contains("show"))ev.scrollIntoView({behavior:"smooth",block:"center"});else note("VHF CH 16 in ascolto. Nessuna chiamata prioritaria in questo momento.");};
 $("alarmBtn").onclick=()=>{const s=window.MarinaEmpireMapLite?.snapshot?.();const t=s?.trip;note(t&&Number(t.temp)>=90?"⚠ Temperatura motori elevata: valuta ECO o CROCIERA.":"Sistemi nella norma. Nessun allarme critico.");};
 $("lightsBtn").onclick=()=>{cabinLightsOn=!cabinLightsOn;document.body.classList.toggle("nightMode",!cabinLightsOn);$("lightsBtn").classList.toggle("on",!cabinLightsOn);note(cabinLightsOn?"Luci plancia attive.":"Modalità notturna attiva.");};
+function refreshDocking(result){
+ if(result?.message)note(result.message);
+ render();
+}
+$("dockLeft").onclick=()=>refreshDocking(window.MarinaEmpireMapLite?.adjustDocking?.(-5));
+$("dockRight").onclick=()=>refreshDocking(window.MarinaEmpireMapLite?.adjustDocking?.(5));
+$("dockNow").onclick=()=>{
+ const result=window.MarinaEmpireMapLite?.completeDocking?.();
+ if(result?.ok){note("Ormeggio "+result.grade.toLowerCase()+" · bonus +"+fmt(result.bonus)+" crediti e +"+fmt(result.prestige)+" prestigio.");render();}
+ else refreshDocking(result);
+};
 function fitRoute(){if(!map)return;if(routeBounds)map.fitBounds(routeBounds,{animate:false,maxZoom:13});else if(lastPosition)map.setView(lastPosition,12,{animate:false});followEnabled=false;syncFollow()}
 function gpsMessage(message){$("gpsHint").textContent=message}
 function syncFollow(){$("followBoat").setAttribute("aria-pressed",String(followEnabled));$("followBoat").title=followEnabled?"Segui barca: attivo":"Segui barca";$("followBoat").textContent=followEnabled?"◎":"⌖"}
