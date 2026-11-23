@@ -108,27 +108,27 @@ function preview(dest){const shot=snapshot(),s=shot.state,b=boats.find(x=>x.id==
 
 function missionCatalog(){
  const shot=snapshot(),s=shot.state,b=boats.find(x=>x.id===s.boat)||boats[0],originName=(ports.find(x=>x.id===s.port)||ports[1]).name;
- const list=[];
+ const list=[],reserve=Math.ceil(b.tank*.15);
  if(s.port==="rimini"&&b.id==="voyager"&&(Number(s.voyages)||0)===0&&!(Array.isArray(s.completed)&&s.completed.includes("INTRO_RIMINI_CERVIA"))){
-   const dist=seaMiles("rimini","cervia"),fuelCost=Math.ceil(dist*b.burn),ready=!s.trip&&(Number(s.condition??100)>=30)&&(Number(s.fuel)||0)>=fuelCost+Math.ceil(b.tank*.15);
-   list.push({id:"INTRO_RIMINI_CERVIA",name:"PRIMA MISSIONE · RPG Academy 8 · Rimini - Cervia",service:"Academy",dest:"cervia",destination:"Cervia",origin:originName,reward:500,prestige:50,cost:0,total:0,fuel:fuelCost,distance:dist,boat:"voyager",ready,reason:ready?"":"Controlla carburante e stato yacht"});
+   const dist=seaMiles("rimini","cervia"),fuelCost=Math.ceil(dist*b.burn),ready=!s.trip&&(Number(s.condition??100)>=30)&&(Number(s.fuel)||0)>=fuelCost+reserve;
+   list.push({id:"INTRO_RIMINI_CERVIA",name:"PRIMA MISSIONE · RPG Academy 8 · Rimini - Cervia",service:"Academy",dest:"cervia",destination:"Cervia",origin:originName,reward:500,prestige:50,cost:0,total:0,fuel:fuelCost,distance:dist,boat:"voyager",ready,reason:ready?"":s.trip?(s.trip.dockingReady?"Completa l'ormeggio della missione attiva":"Completa prima la missione attiva"):"Controlla carburante e stato yacht"});
  }
  const introActive=s.port==="rimini"&&b.id==="voyager"&&(Number(s.voyages)||0)===0&&!(Array.isArray(s.completed)&&s.completed.includes("INTRO_RIMINI_CERVIA"));
  for(const p of ports){
    if(p.id===s.port)continue;
    if(introActive&&p.id==="cervia")continue;
-   const pl=plan(s.port,p.id,b.tank,b.burn),direct=!!pl.possible&&Array.isArray(pl.legs)&&pl.legs.length===2;
-   const distance=Number(pl.distance)||seaMiles(s.port,p.id),fuelCost=Math.ceil(distance*b.burn),cost=Math.max(250,Math.round(distance*7*b.mult))+b.crew,reward=Math.max(1200,Math.round(distance*20*b.mult)),prestige=Math.max(15,Math.round(distance*.4*b.mult));
-   let ready=direct&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id))&&(Number(s.fuel)||0)>=fuelCost+Math.ceil(b.tank*.15)&&(Number(s.coins)||0)>=cost;
+   const distance=seaMiles(s.port,p.id),fuelCost=Math.ceil(distance*b.burn),cost=Math.max(250,Math.round(distance*7*b.mult))+b.crew,reward=Math.max(1200,Math.round(distance*20*b.mult)),prestige=Math.max(15,Math.round(distance*.4*b.mult));
+   const direct=distance>0&&(fuelCost+reserve)<=b.tank;
+   let ready=direct&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id))&&(Number(s.fuel)||0)>=fuelCost+reserve&&(Number(s.coins)||0)>=cost;
    let reason="";
-   if(!direct)reason="Rotta con sosta tecnica: non disponibile in modalità rapida";
-   else if(s.trip)reason="Viaggio già in corso";
+   if(!direct)reason="Serve una barca con maggiore autonomia";
+   else if(s.trip)reason=s.trip.dockingReady?"Completa l'ormeggio della missione attiva":"Completa prima la missione attiva";
    else if((Number(s.condition??100))<30)reason="Manutenzione necessaria";
-   else if((Number(s.fuel)||0)<fuelCost+Math.ceil(b.tank*.15))reason="Carburante insufficiente";
+   else if((Number(s.fuel)||0)<fuelCost+reserve)reason="Carburante insufficiente · fai rifornimento in Marina";
    else if((Number(s.coins)||0)<cost)reason="Crediti insufficienti";
    list.push({id:"R_"+b.id+"_"+s.port+"_"+p.id,name:"Trasferimento nautico verso "+p.name,service:"Missione",dest:p.id,destination:p.name,origin:originName,reward,prestige,cost,total:cost,fuel:fuelCost,distance,boat:b.id,ready,reason});
  }
- return list;
+ return list.sort((a,b)=>Number(b.ready)-Number(a.ready)||Number(a.distance)-Number(b.distance));
 }
 function startMission(id,expectedDest){
  const before=read();if(before?.trip)return{ok:false,message:"Viaggio già in corso"};
