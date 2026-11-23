@@ -66,13 +66,36 @@ function mutate(fn){
  const s=c.readGame(h);if(!s)return false;
  fn(s);return c.writeGame(h,s);
 }
+const throttleModes={
+ eco:{id:"eco",label:"ECO",knots:12,speedMult:2/3,fuelMult:.67,rpm:1450,temp:72,wear:-1,lph:28},
+ cruise:{id:"cruise",label:"CROCIERA",knots:18,speedMult:1,fuelMult:1,rpm:2150,temp:82,wear:0,lph:42},
+ fast:{id:"fast",label:"FAST",knots:24,speedMult:4/3,fuelMult:1.38,rpm:2900,temp:91,wear:3,lph:58}
+};
+function throttleFor(t){return throttleModes[String(t?.throttleMode||"cruise")]||throttleModes.cruise}
+function projectedTrip(t,now=Date.now()){
+ const duration=Math.max(1,Number(t?.sec)||1),mode=throttleFor(t),saved=Math.max(0,Math.min(1,Number(t?.progressBase)||0));
+ const last=Math.max(0,Number(t?.lastProgressAt)||Number(t?.startedAt)||now);
+ const elapsed=Math.max(0,now-last);
+ const progress=Math.max(0,Math.min(1,saved+elapsed/(duration*1000)*mode.speedMult));
+ const remainingSec=Math.max(0,Math.ceil((1-progress)*duration/mode.speedMult));
+ return{progress,remainingSec,mode};
+}
+function settleTrip(g,now=Date.now()){
+ const t=g?.trip;if(!t)return;
+ const proj=projectedTrip(t,now),lastFuel=Math.max(0,Number(t.lastFuelAt)||Number(t.lastProgressAt)||Number(t.startedAt)||now);
+ const fuelElapsed=Math.max(0,Math.min(now,lastFuel+proj.remainingSec*1000+600000)-lastFuel);
+ const baseFuel=Math.max(0,Number(t.mission?.fuel)||0),duration=Math.max(1,Number(t.sec)||1);
+ const fuelUse=baseFuel/duration*(fuelElapsed/1000)*proj.mode.fuelMult;
+ if(fuelUse>0)g.fuel=Math.max(0,(Number(g.fuel)||0)-fuelUse);
+ t.fuelUsed=Math.max(0,Number(t.fuelUsed)||0)+fuelUse;
+ t.progressBase=proj.progress;t.lastProgressAt=now;t.lastFuelAt=now;
+ t.until=now+proj.remainingSec*1000;
+}
 function tripView(s,b){
  const t=s?.trip;if(!t)return null;
- const duration=Math.max(1,Number(t.sec)||1),remaining=Math.max(0,(Number(t.until)||Date.now())-Date.now());
- const progress=Math.max(0,Math.min(1,1-remaining/(duration*1000)));
- const origin=String(t.origin||s.port),dest=String(t.dest||s.port),route=routePoints(origin,dest).map(([lat,lon])=>project(lat,lon));
- const distance=seaMiles(origin,dest),knots=Number(b?.knots)||18;
- return {id:String(t.id||""),voyageId:Number(t.voyageId)||0,name:String(t.mission?.name||"Missione attiva"),origin,originName:(ports.find(x=>x.id===origin)||ports[1]).name,dest,destinationName:(ports.find(x=>x.id===dest)||ports[1]).name,reward:Number(t.mission?.reward)||0,prestige:Number(t.mission?.prestige)||0,progress,distance,cruiseKnots:knots,etaMinutesReal:Math.max(1,Math.round((distance*(1-progress)/knots)*60)),remainingSec:Math.max(0,Math.ceil(remaining/1000)),route,eventResolved:!!t.eventResolved,eventLabel:String(t.eventLabel||""),eventResult:String(t.eventResult||"")};
+ const proj=projectedTrip(t),progress=proj.progress,origin=String(t.origin||s.port),dest=String(t.dest||s.port),route=routePoints(origin,dest).map(([lat,lon])=>project(lat,lon));
+ const distance=seaMiles(origin,dest),knots=proj.mode.knots;
+ return {id:String(t.id||""),voyageId:Number(t.voyageId)||0,name:String(t.mission?.name||"Missione attiva"),origin,originName:(ports.find(x=>x.id===origin)||ports[1]).name,dest,destinationName:(ports.find(x=>x.id===dest)||ports[1]).name,reward:Number(t.mission?.reward)||0,prestige:Number(t.mission?.prestige)||0,progress,distance,cruiseKnots:knots,etaMinutesReal:Math.max(1,Math.round((distance*(1-progress)/knots)*60)),remainingSec:proj.remainingSec,route,eventResolved:!!t.eventResolved,eventLabel:String(t.eventLabel||""),eventResult:String(t.eventResult||""),throttleMode:proj.mode.id,throttleLabel:proj.mode.label,rpm:proj.mode.rpm,temp:proj.mode.temp,lph:proj.mode.lph,fuelMult:proj.mode.fuelMult};
 }
 function snapshot(){const s=read()||{coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],voyages:0};const b=boats.find(x=>x.id===s.boat)||boats[0];return{state:s,tank:b.tank,boatName:b.name,ports:ports.map(p=>({id:p.id,name:p.name,x:illustrated[p.id]?.[0]??50,y:illustrated[p.id]?.[1]??50})),chartPorts:ports.map(p=>({id:p.id,name:p.name,...project(...harborGPS[p.id])})),trip:tripView(s,b)}}
 function preview(dest){const shot=snapshot(),s=shot.state,b=boats.find(x=>x.id===s.boat)||boats[0],p=ports.find(x=>x.id===dest);if(!p||dest===s.port)return{ok:false,reason:"Seleziona una marina diversa"};const pl=plan(s.port,dest,b.tank,b.burn);const eta=Math.max(1,Math.round((pl.distance/b.knots)*60));const cost=Math.max(250,Math.round(pl.distance*7*b.mult))+b.crew;const reward=Math.max(1200,Math.round(pl.distance*20*b.mult));let fuelNow=Math.max(0,Math.min(b.tank,Number(s.fuel)||0)),refuel=0,ready=!!pl.possible&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id));if(pl.possible){for(let i=0;i<pl.legs.length-1;i++){const req=Math.ceil(seaMiles(pl.legs[i],pl.legs[i+1])*b.burn);if(i>0){const liters=Math.max(0,req+pl.reserve-fuelNow);refuel+=liters*3;fuelNow+=liters}if(fuelNow<req+pl.reserve)ready=false;fuelNow-=Math.min(fuelNow,req)}}const total=cost+refuel;if(Number(s.coins)||0<total)ready=false;const route=routePoints(s.port,dest).map(([lat,lon])=>project(lat,lon));return{ok:pl.possible,reason:pl.reason||"",origin:s.port,originName:(ports.find(x=>x.id===s.port)||ports[1]).name,dest,destinationName:p.name,distance:pl.distance,fuel:pl.fuel,cruiseKnots:b.knots,etaMinutesReal:eta,route,mission:{id:"R_"+b.id+"_"+s.port+"_"+dest,name:"Trasferimento nautico verso "+p.name,reward,prestige:Math.max(15,Math.round(pl.distance*.4*b.mult)),ready,reason:ready?"":"Controlla carburante, crediti e stato yacht",total}}}
@@ -111,9 +134,10 @@ function startMission(id,expectedDest){
    const b=boats.find(x=>x.id===g.boat)||boats[0],duration=mission.id==="INTRO_RIMINI_CERVIA"?20:Math.max(20,Math.min(45,Math.round(mission.distance*.35)));
    g.setupComplete=true;g.homeMarina=g.homeMarina||g.port;g.investmentMarina=g.investmentMarina||g.port;
    g.coins=Math.max(0,Number(g.coins)||0)-Math.max(0,Number(mission.cost)||0);
-   g.fuel=Math.max(0,Number(g.fuel)||0)-Math.max(0,Number(mission.fuel)||0);
+   // Fuel is consumed progressively during navigation so throttle changes have a real effect.
    g.voyageSerial=Math.max(0,Number(g.voyageSerial)||0)+1;
-   g.trip={voyageId:g.voyageSerial,id:mission.id,origin:g.port,dest:mission.dest,legs:[g.port,mission.dest],legIndex:0,legSeconds:duration,sec:duration,fuelRate:b.burn,weather:"calm",weatherWear:3,weatherLabel:"CALMO",eventResolved:false,eventLabel:"",eventResult:"",eventBonus:0,eventPrestige:0,eventWear:0,mission:{id:mission.id,name:mission.name,dest:mission.dest,boat:mission.boat,reward:mission.reward,cost:mission.cost,fuel:mission.fuel,prestige:mission.prestige,sec:duration},until:Date.now()+duration*1000};
+   const now=Date.now();
+   g.trip={voyageId:g.voyageSerial,id:mission.id,origin:g.port,dest:mission.dest,legs:[g.port,mission.dest],legIndex:0,legSeconds:duration,sec:duration,fuelRate:b.burn,weather:"calm",weatherWear:3,weatherLabel:"CALMO",eventResolved:false,eventLabel:"",eventResult:"",eventBonus:0,eventPrestige:0,eventWear:0,throttleMode:"cruise",progressBase:0,startedAt:now,lastProgressAt:now,lastFuelAt:now,fuelUsed:0,throttleWear:0,mission:{id:mission.id,name:mission.name,dest:mission.dest,boat:mission.boat,reward:mission.reward,cost:mission.cost,fuel:mission.fuel,prestige:mission.prestige,sec:duration},until:now+duration*1000};
  });
  if(!ok)return{ok:false,message:"Salvataggio della partenza non riuscito"};
  const saved=read(),trip=saved?.trip;
@@ -155,13 +179,30 @@ function applyVoyageDecision(code){
  });
  return ok&&applied?{ok:true,...pick}:{ok:false,message:"Evento già risolto o missione terminata"};
 }
+function setThrottle(modeId){
+ const mode=throttleModes[String(modeId||"")];if(!mode)return{ok:false,message:"Modalità manetta non valida"};
+ const before=read();if(!before?.trip)return{ok:false,message:"Manetta disponibile solo durante la navigazione"};
+ const current=throttleFor(before.trip),proj=projectedTrip(before.trip),baseFuel=Math.max(0,Number(before.trip.mission?.fuel)||0);
+ const projectedFuel=baseFuel*Math.max(0,1-proj.progress)*mode.fuelMult/Math.max(.01,mode.speedMult);
+ if((Number(before.fuel)||0)+.01<projectedFuel)return{ok:false,message:"Carburante insufficiente per mantenere "+mode.label};
+ let applied=false;
+ const ok=mutate(g=>{
+   if(!g.trip)return;
+   const now=Date.now();settleTrip(g,now);
+   const old=throttleFor(g.trip),remaining=Math.max(0,1-(Number(g.trip.progressBase)||0));
+   g.trip.throttleWear=Math.max(0,Number(g.trip.throttleWear)||0)+Math.max(0,mode.wear-old.wear)*remaining;
+   g.trip.throttleMode=mode.id;
+   const eta=Math.ceil(remaining*Math.max(1,Number(g.trip.sec)||1)/mode.speedMult);
+   g.trip.until=now+eta*1000;
+   applied=true;
+ });
+ return ok&&applied?{ok:true,mode:mode.id,label:mode.label,knots:mode.knots,rpm:mode.rpm,temp:mode.temp,lph:mode.lph,message:mode.label+" · "+mode.knots+" kn · "+mode.rpm+" RPM"}:{ok:false,message:"Cambio manetta non salvato"};
+}
 function pulse(){
  const s=read();if(!s?.trip)return {active:false,snapshot:snapshot()};
- const t=s.trip;
- if(t.id==="INTRO_RIMINI_CERVIA"&&(!Number.isFinite(Number(t.sec))||Number(t.sec)>20||(Number(t.until)-Date.now())>20000)){
-   mutate(g=>{if(!g.trip)return;g.trip.sec=20;g.trip.legSeconds=20;g.trip.until=Date.now()+20000;});
- }
- const fresh=read(),ft=fresh?.trip;if(ft&&Number(ft.until)<=Date.now()){
+ mutate(g=>{if(g.trip)settleTrip(g,Date.now())});
+ const fresh=read(),ft=fresh?.trip,proj=ft?projectedTrip(ft):null;
+ if(ft&&proj&&proj.progress>=1){
    mutate(g=>{
      const trip=g.trip;if(!trip)return;
      const m=trip.mission||{},id=String(trip.id||m.id||""),baseReward=Math.max(0,Number(m.reward)||0),basePrestige=Math.max(0,Number(m.prestige)||0),eventBonus=Math.max(0,Number(trip.eventBonus)||0),eventPrestige=Math.max(0,Number(trip.eventPrestige)||0),reward=baseReward+eventBonus,prestige=basePrestige+eventPrestige,dest=String(m.dest||trip.dest||g.port);
@@ -177,7 +218,7 @@ function pulse(){
        g.prestige=Math.max(0,Number(g.prestige)||0)+prestige;
        g.voyages=Math.max(0,Number(g.voyages)||0)+1;
        g.earnings=Math.max(0,Number(g.earnings)||0)+reward;
-       g.condition=Math.max(0,Math.min(100,(Number(g.condition??100)||100)-Math.max(0,(Number(trip.weatherWear)||3)+(Number(trip.eventWear)||0))));
+       g.condition=Math.max(0,Math.min(100,(Number(g.condition??100)||100)-Math.max(0,(Number(trip.weatherWear)||3)+(Number(trip.eventWear)||0)+(Number(trip.throttleWear)||0))));
        g.lastArrival={destination:dest,reward,baseReward,eventBonus,eventPrestige,eventLabel:String(trip.eventLabel||""),eventResult:String(trip.eventResult||""),crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),voyageId,mission:String(m.name||"Missione completata"),emergency:false};
      }
      g.lastDockedBridge={origin:String(trip.origin||g.port),destination:dest,at:Date.now()};
@@ -186,5 +227,5 @@ function pulse(){
  }
  return {active:!!read()?.trip,snapshot:snapshot()};
 }
-window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,applyVoyageDecision,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
+window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,setThrottle,applyVoyageDecision,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
 })();
