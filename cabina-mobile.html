@@ -262,6 +262,41 @@ body.dockingMode .dockingReal{display:block!important;margin:8px 8px 92px!import
 body.dockingMode .dockingReal .berthScene{height:min(48dvh,430px)}
 body.dockingMode .head{position:sticky;top:0;z-index:80}
 body.dockingMode .bottom{z-index:90}
+
+/* V34 - match approved docking render */
+.dockingReal{padding:10px!important;border:0!important;background:#041225!important;border-radius:0!important}
+.dockModeTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;padding:10px 12px;border:1px solid #b98f4d;border-radius:18px;background:#06182c}
+.dockModeName{display:flex;align-items:center;gap:9px}.dockModeName span{font-size:23px}.dockModeName strong{font-family:Georgia,serif;font-size:20px;color:#fff}.dockModeName em{font-style:normal;color:#e4b960}
+.dockBoatChip{padding:8px 13px;border:1px solid #4f7d9f;border-radius:999px;background:#09233a;color:#e9f4fa;font-size:10px;font-weight:900}
+.dockFlow{display:grid;grid-template-columns:auto 1fr auto 1fr auto;align-items:center;gap:5px;padding:4px 8px 8px}
+.dockFlowStep{text-align:center;color:#8d99a8;min-width:74px}.dockFlowStep i{display:grid;place-items:center;width:27px;height:27px;border:3px solid #596879;border-radius:50%;margin:0 auto 4px;font-style:normal;font-size:10px}.dockFlowStep b{font-size:8px}.dockFlowStep.done{color:#dce8ef}.dockFlowStep.done i{border-color:#60dfac;background:#2f8c69;color:white}.dockFlowStep.active{color:#f1cb78}.dockFlowStep.active i{border-color:#e0b455;box-shadow:0 0 12px #e0b455aa;background:#1a6c91;color:#fff}.dockFlowLine{height:4px;border-radius:99px;background:#5b6471}.dockFlowLine.on{background:#61dca8}
+.dockInstruction{display:flex!important;align-items:center;gap:8px;padding:9px 11px!important;border:1px solid #4c829d!important;border-radius:12px!important;background:#0a2a42!important;color:#e9f4fa!important;font-size:10px!important}
+.dockInstruction span{font-size:20px}.dockInstruction b{font-weight:700}
+.berthScene{height:430px!important;border:2px solid #bb8d45!important;border-radius:18px!important;background:radial-gradient(circle at 50% 12%,#155f7b 0,#0c516d 43%,#08334e 100%)!important}
+.dockSceneLabel{position:absolute;z-index:10;top:8px;left:8px;padding:7px 11px;border:1px solid #d0a04b;border-radius:999px;background:#071c2ee8;color:#fff;font-weight:900;font-size:12px}.dockSceneLabel b{color:#f0c466}
+.dockAlignBox{position:absolute;z-index:10;top:8px;right:8px;width:31%!important;background:#06192be8!important;border-color:#b28b4b!important}
+.quayTop{height:48px!important;background:linear-gradient(#b89f77,#7e6848)!important}.quayTop span{font-size:18px!important}
+.finger{top:48px!important;height:67%!important;width:17%!important;background:linear-gradient(90deg,#65513a,#b6935f 48%,#6a543b)!important;border-left:2px solid #ceb27d;border-right:2px solid #4f3e2b}
+.fingerLeft{left:17%!important}.fingerRight{right:17%!important}
+.berthTarget{left:36%!important;right:36%!important;top:64px!important;height:62%!important;border-color:#5ae4a6!important;background:#4fe09c12!important}
+.adjacentYacht{position:absolute;z-index:2;top:105px;font-size:56px;filter:grayscale(.2) drop-shadow(0 6px 6px #00131d);opacity:.9}.adjLeft{left:3%;transform:rotate(8deg)}.adjRight{right:3%;transform:rotate(-8deg)}
+.dockPath{position:absolute;left:47%;top:37%;z-index:3;color:#e8f7ff;font-size:48px;transform:rotate(-68deg);opacity:.9;filter:drop-shadow(0 0 4px #fff)}
+.dockYacht{z-index:5;font-size:76px!important;filter:drop-shadow(0 8px 8px #00141f)!important}
+.distance{font-size:9px!important;border-color:#6a8797!important}.distance b{font-size:12px!important}.bowDistance{top:72px!important}.portDistance{left:19%!important;top:57%!important}.starDistance{right:19%!important;top:57%!important}.sternDistance{bottom:13px!important}
+.dockSpeed{left:10px!important;bottom:10px!important;border-color:#dfba72!important}.dockSpeed b{font-size:19px!important}
+.dockConsole{grid-template-columns:1fr 1.1fr 1fr!important;gap:8px!important;margin-top:9px!important}
+.dockEngine,.dockHelm{border:1px solid #c0944f!important;border-radius:14px!important;background:#06162a!important;padding:8px!important}
+.dockEngine strong,.dockHelm strong{font-size:10px!important}
+.dockEngine{display:grid;grid-template-columns:38% 62%;grid-template-rows:auto 1fr;column-gap:6px}.dockEngine>strong{grid-column:1/-1}.dockLeverVisual{position:relative;height:115px;border:1px solid #306277;border-radius:10px;background:linear-gradient(#1b3246,#07131f);overflow:hidden}.dockLeverVisual:before{content:"";position:absolute;left:50%;top:8px;bottom:8px;width:8px;transform:translateX(-50%);border-radius:99px;background:linear-gradient(#7c1212 0 30%,#714f16 30% 55%,#0b6b3c 55% 100%)}.leverHandle{position:absolute;left:50%;top:50%;width:24px;height:36px;transform:translate(-50%,-50%);border-radius:10px;background:linear-gradient(#f6f8f9,#adb9bf);box-shadow:0 2px 8px #0008}
+.dockEngineStates{display:flex;flex-direction:column;justify-content:space-between}.dockEngineStates button{min-height:31px!important;margin:0!important}.dockEngineStates button.on{background:#6a4b17!important;border-color:#f0c461!important;box-shadow:0 0 9px #e5b75d66}
+.helmArc{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;color:#d9e5eb;font-size:8px}.helmArc b{color:#fff;font-size:11px}
+.dockHelmWheel{height:72px!important;border:6px solid #9a6a33!important;font-size:28px!important;box-shadow:inset 0 0 0 3px #cc9f55,0 5px 10px #0008}
+.dockHelmRow{grid-template-columns:30px 1fr 30px!important}.dockHelmRow button{height:46px!important}
+.bowThruster{grid-template-columns:1.25fr 1fr 1fr 1fr!important;border:1px solid #c0924d!important;border-radius:14px!important;background:#06162a!important}.bowThruster button{min-height:40px!important}.bowThruster button.on{box-shadow:0 0 11px #e0b45d77}
+.dockingReal .dockNow{min-height:56px!important;margin-top:12px!important;border-radius:16px!important;font-size:16px!important;background:linear-gradient(#d8a844,#7e5718)!important;box-shadow:0 0 15px #e1af4f66}
+.dockStatus{text-align:center!important;margin-top:7px!important;color:#bcd5e1!important;font-size:9px!important}
+body.dockingMode .dockingReal{max-width:620px;margin-left:auto!important;margin-right:auto!important}
+@media(max-width:390px){.berthScene{height:395px!important}.dockModeName strong{font-size:17px}.dockBoatChip{font-size:8px;padding:7px 9px}.adjacentYacht{font-size:44px}.dockYacht{font-size:68px!important}.dockEngine{grid-template-columns:42% 58%}.dockLeverVisual{height:105px}.bowThruster{grid-template-columns:1fr 1fr 1fr!important}.bowThruster strong{grid-column:1/-1}}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <div class="helm cockpitOne">
@@ -323,32 +358,55 @@ body.dockingMode .bottom{z-index:90}
 <div id="notice" class="notice" role="status">Le operazioni di rifornimento e manutenzione sono disponibili quando l'imbarcazione è in porto.</div>
 <section id="serviceConfirm" class="serviceConfirm" hidden aria-label="Conferma servizio di bordo"><strong id="serviceTitle">Servizio di bordo</strong><p id="serviceDescription"></p><div class="serviceButtons"><button id="serviceCancel" type="button">ANNULLA</button><button id="serviceApply" type="button">CONFERMA OPERAZIONE</button></div></section>
 <section id="dockingPanel" class="dockingPanel dockingReal" aria-live="polite">
-  <div class="dockTop">
-    <div><span class="eyebrow">CABINA / ORMEGGIO</span><h3>⚓ POSTO BARCA <b id="berthNumber">12</b></h3></div>
-    <div class="dockAlignBox"><small>ALLINEAMENTO</small><b id="dockAlignPct">0%</b><div class="dockAlignMeter"><i id="dockAlignFill"></i></div></div>
+  <div class="dockModeTitle">
+    <div class="dockModeName"><span>🛥️</span><strong>CABINA / <em>ORMEGGIO</em></strong></div>
+    <div class="dockBoatChip">⚓ <span id="dockBoatName">M/Y</span></div>
   </div>
-  <p class="dockInstruction">Entra lentamente nel posto barca usando motori, timone ed elica di prua.</p>
+
+  <div class="dockFlow">
+    <div class="dockFlowStep done"><i>✓</i><b>AVVICINAMENTO</b></div>
+    <div class="dockFlowLine on"></div>
+    <div class="dockFlowStep active"><i>●</i><b>MANOVRA</b></div>
+    <div class="dockFlowLine"></div>
+    <div class="dockFlowStep"><i></i><b>ORMEGGIO</b></div>
+  </div>
+
+  <div class="dockInstruction"><span>ⓘ</span><b>Entra lentamente nel posto barca usando motori, timone ed elica di prua.</b></div>
+
   <div class="berthScene" id="berthScene">
-    <div class="quayTop"><span>POSTO 12</span></div>
+    <div class="dockSceneLabel">⚓ POSTO BARCA <b id="berthNumber">12</b></div>
+    <div class="dockAlignBox"><small>⌖ ALLINEAMENTO</small><b id="dockAlignPct">0%</b><div class="dockAlignMeter"><i id="dockAlignFill"></i></div></div>
+
+    <div class="quayTop"><span>12</span></div>
     <div class="finger fingerLeft"></div>
     <div class="finger fingerRight"></div>
+    <div class="adjacentYacht adjLeft">🛥️</div>
+    <div class="adjacentYacht adjRight">🛥️</div>
     <div class="berthTarget"></div>
+    <div class="dockPath">➜</div>
     <div class="dockYacht" id="dockYacht">🛥️</div>
-    <div class="distance bowDistance">PRUA <b id="distBow">—</b></div>
-    <div class="distance portDistance">SX <b id="distPort">—</b></div>
-    <div class="distance starDistance">DX <b id="distStar">—</b></div>
-    <div class="distance sternDistance">POPPA <b id="distStern">—</b></div>
+
+    <div class="distance bowDistance">Prua <b id="distBow">—</b></div>
+    <div class="distance portDistance">Sinistra <b id="distPort">—</b></div>
+    <div class="distance starDistance">Dritta <b id="distStar">—</b></div>
+    <div class="distance sternDistance">Poppa <b id="distStern">—</b></div>
     <div class="dockSpeed">VELOCITÀ <b id="dockSpeed">0.0 kn</b></div>
   </div>
+
   <div class="dockConsole">
-    <div class="dockEngine" data-side="port">
-      <strong>MOTORE SX</strong>
-      <button data-dock-engine="port:1">AVANTI</button>
-      <button data-dock-engine="port:0" class="on">FOLLE</button>
-      <button data-dock-engine="port:-1">INDIETRO</button>
+    <div class="dockEngine enginePort" data-side="port">
+      <strong>✣ MOTORE SX</strong>
+      <div class="dockLeverVisual"><span class="leverHandle" id="portLeverHandle"></span></div>
+      <div class="dockEngineStates">
+        <button data-dock-engine="port:1">AVANTI</button>
+        <button data-dock-engine="port:0" class="on">FOLLE</button>
+        <button data-dock-engine="port:-1">INDIETRO</button>
+      </div>
     </div>
+
     <div class="dockHelm">
-      <strong>TIMONE</strong>
+      <strong>☸ TIMONE</strong>
+      <div class="helmArc"><span>30°</span><b>0°</b><span>30°</span></div>
       <div class="dockHelmRow">
         <button id="dockHelmLeft" type="button">◀</button>
         <div class="dockHelmWheel" id="dockHelmWheel">⚓</div>
@@ -356,24 +414,30 @@ body.dockingMode .bottom{z-index:90}
       </div>
       <small id="dockHelmAngle">0°</small>
     </div>
-    <div class="dockEngine" data-side="starboard">
-      <strong>MOTORE DX</strong>
-      <button data-dock-engine="starboard:1">AVANTI</button>
-      <button data-dock-engine="starboard:0" class="on">FOLLE</button>
-      <button data-dock-engine="starboard:-1">INDIETRO</button>
+
+    <div class="dockEngine engineStar" data-side="starboard">
+      <strong>✣ MOTORE DX</strong>
+      <div class="dockLeverVisual"><span class="leverHandle" id="starLeverHandle"></span></div>
+      <div class="dockEngineStates">
+        <button data-dock-engine="starboard:1">AVANTI</button>
+        <button data-dock-engine="starboard:0" class="on">FOLLE</button>
+        <button data-dock-engine="starboard:-1">INDIETRO</button>
+      </div>
     </div>
   </div>
+
   <div class="bowThruster" id="bowThrusterBox">
     <strong>✣ ELICA DI PRUA</strong>
     <button data-bow="-1">◀ SINISTRA</button>
-    <button data-bow="0" class="on">STOP</button>
+    <button data-bow="0" class="on">■ STOP</button>
     <button data-bow="1">DRITTA ▶</button>
   </div>
+
   <button id="dockNow" class="dockNow" type="button">⚓ COMPLETA ORMEGGIO</button>
   <div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div>
 </section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin33"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin34"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261123-engine17"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
@@ -548,6 +612,10 @@ function render(){
     $("distStar").textContent=Math.max(.4,Math.round((3.0-off*.05)*10)/10)+" m";
     $("dockSpeed").textContent=(Math.abs(Number(t.enginePort)||0)+Math.abs(Number(t.engineStarboard)||0)>.1?"0.8":"0.0")+" kn";
     document.querySelectorAll("[data-dock-engine]").forEach(b=>{const [side,val]=b.dataset.dockEngine.split(":");const cur=side==="port"?Number(t.enginePort)||0:Number(t.engineStarboard)||0;b.classList.toggle("on",cur===Number(val));});
+    $("dockBoatName").textContent=shot.boatName||"M/Y";
+    const pEng=Number(t.enginePort)||0,sEng=Number(t.engineStarboard)||0;
+    $("portLeverHandle").style.top=(pEng>0?"18%":pEng<0?"82%":"50%");
+    $("starLeverHandle").style.top=(sEng>0?"18%":sEng<0?"82%":"50%");
     document.querySelectorAll("[data-bow]").forEach(b=>b.classList.toggle("on",(Number(t.bowThruster)||0)===Number(b.dataset.bow)));
     $("bowThrusterBox").classList.toggle("unavailable",!t.bowThrusterAvailable);
     $("bowThrusterBox").querySelector("strong").textContent=t.bowThrusterAvailable?"✣ ELICA DI PRUA":"✣ ELICA DI PRUA · NON DISPONIBILE";
