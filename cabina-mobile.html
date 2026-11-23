@@ -249,6 +249,19 @@ body.gpsFullscreen{overflow:hidden}
 .bowThruster{display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr;gap:6px;align-items:center;margin-top:9px;padding:8px;border:1px solid #8c6b3d;border-radius:11px;background:#07192b}.bowThruster strong{font-size:9px}.bowThruster button{min-height:37px;border:1px solid #4e7187;border-radius:8px;background:#10344c;color:white;font-size:8px;font-weight:900}.bowThruster button.on{background:#614719;border-color:#edc261;color:#ffe6ad}.bowThruster.unavailable{opacity:.38}.bowThruster.unavailable button{pointer-events:none}
 .dockingReal .dockNow{width:100%;margin-top:10px;min-height:48px;border:2px solid #e3ba61;border-radius:13px;background:linear-gradient(#d9ad52,#8b631b);color:#fff;font-size:14px;font-weight:950}.dockingReal .dockNow:disabled{opacity:.35}
 @media(max-width:390px){.berthScene{height:300px}.dockYacht{font-size:62px}.dockConsole{gap:5px}.dockEngine,.dockHelm{padding:6px}.bowThruster{grid-template-columns:1fr 1fr 1fr}.bowThruster strong{grid-column:1/-1;text-align:center}}
+
+/* V33 - docking takes over the cabin when final maneuver starts */
+body.dockingMode .cockpitOne,
+body.dockingMode .cockpitFullscreenGps,
+body.dockingMode #voyageEvent,
+body.dockingMode .actions,
+body.dockingMode #notice,
+body.dockingMode #serviceConfirm,
+body.dockingMode #arrival{display:none!important}
+body.dockingMode .dockingReal{display:block!important;margin:8px 8px 92px!important;min-height:calc(100dvh - 145px)}
+body.dockingMode .dockingReal .berthScene{height:min(48dvh,430px)}
+body.dockingMode .head{position:sticky;top:0;z-index:80}
+body.dockingMode .bottom{z-index:90}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <div class="helm cockpitOne">
@@ -360,8 +373,8 @@ body.gpsFullscreen{overflow:hidden}
   <div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div>
 </section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin32"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
-<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261123-engine16"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin33"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261123-engine17"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -497,7 +510,7 @@ function render(){
  $("refuelInfo").textContent=active?"All'arrivo":fuelNeedsService?"Disponibile ora":"Serbatoio pieno";
  $("repairInfo").textContent=active?"All'arrivo":conditionNeedsService?"Disponibile ora":"Stato già 100%";
  $("arrival").classList.toggle("show",!active&&!!s.lastArrival);
- $("dockingPanel").classList.toggle("show",!!t?.dockingReady);
+ $("dockingPanel").classList.toggle("show",!!t?.dockingReady);document.body.classList.toggle("dockingMode",!!t?.dockingReady);
  if(t){
   const pct=Math.max(0,Math.min(100,Math.round(t.progress*100)));
   $("status").textContent="🛥️ IN NAVIGAZIONE";
@@ -556,6 +569,7 @@ function render(){
   note(t.eventResolved&&t.eventResult?t.eventResult+" Continua verso "+t.destinationName+".":"Navigazione in corso. Segui GPS e VHF: durante la rotta possono comparire decisioni operative.");
   window.MarinaEmpirePlayerTracker?.startPlay?.();
  }else{
+  document.body.classList.remove("dockingMode");
   hideVoyageEvent();
   $("helmAngle").textContent="0°";$("helmWheel").style.transform="rotate(0deg)";$("approachTitle").textContent="IN PORTO";$("approachText").textContent="Timone centrato";$("approachGuide").classList.remove("warn","good");
   $("status").textContent="⚓ IMBARCAZIONE IN PORTO";
@@ -698,7 +712,7 @@ $("fullGps").onclick=()=>{
 document.querySelector(".miniGps").addEventListener("click",()=>{if(!$("largeGps").classList.contains("expanded"))$("fullGps").click()});
 document.querySelector(".miniGps").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();if(!$("largeGps").classList.contains("expanded"))$("fullGps").click()}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.querySelector(".largeGps").classList.contains("expanded"))$("fullGps").click()});
-initChart();syncFollow();render();setInterval(render,900);
+initChart();syncFollow();render();setInterval(render,650);
 window.addEventListener("focus",()=>{map?.invalidateSize();render()});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){map?.invalidateSize();render()}});
 </script></body></html>
