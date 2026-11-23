@@ -168,6 +168,73 @@ body.gpsFullscreen{overflow:hidden}
 @keyframes seaSlide{0%{transform:translate3d(-6%,0,0)}50%{transform:translate3d(2%,3px,0)}100%{transform:translate3d(10%,0,0)}}
 .courseDeviation{font-weight:900;color:#f1cc84}.courseDeviation.good{color:#6be0a7}.courseDeviation.warn{color:#ffd16e}
 @media(prefers-reduced-motion:reduce){.seaMotion:before,.seaMotion:after{animation:none!important}}
+
+/* V31 - simplified cockpit: preserve functions, remove visual overload */
+.simpleGuide{position:absolute;z-index:20;left:50%;top:17.2%;transform:translateX(-50%);padding:5px 10px;border:1px solid #b99355;border-radius:999px;background:#071927d9;color:#ffe2a6;font-size:8px;font-weight:900;letter-spacing:.08em;white-space:nowrap}
+.cockpitStage{height:min(78dvh,760px)!important;min-height:590px!important}
+.cockpitMission{left:4%!important;right:4%!important;top:2%!important;padding:7px 9px!important}
+.cockpitMission h1{display:none!important}
+.cockpitMission .names{font-size:15px!important;font-weight:900!important;text-align:center!important}
+.cockpitMission .stats{grid-template-columns:1fr 1fr!important;margin:5px 0 2px!important}
+.cockpitMission .stats>div:nth-child(3){display:none!important}
+.cockpitMission .stats div{font-size:7px!important}
+.cockpitMission .stats b{font-size:12px!important}
+.cockpitMission .vhfLive{display:none!important}
+.cockpitStage .sea-status{top:17%!important;left:3%!important;font-size:7px!important;padding:4px 7px!important}
+
+.cockpitGps{left:11%!important;top:22%!important;width:78%!important;height:27%!important;border:3px solid #cba766!important;box-shadow:0 0 0 2px #0d2434,0 7px 22px #000b!important}
+.miniState{font-size:9px!important;padding:3px 7px!important}
+
+.cockpitTriplet{display:none!important}
+.cockpitGauges{left:22%!important;right:22%!important;top:51%!important;grid-template-columns:1fr 1fr!important;gap:9px!important}
+.cockpitGauges .roundGauge:nth-child(3),.cockpitGauges .roundGauge:nth-child(4){display:none!important}
+.cockpitGauges .roundGauge{min-height:74px!important;border-width:4px!important}
+.cockpitGauges .roundGauge small{font-size:7px!important}
+.cockpitGauges .roundGauge b{font-size:18px!important}
+.cockpitGauges .roundGauge span{font-size:7px!important}
+
+.cockpitControls{top:51%!important;left:2.5%!important;right:2.5%!important;grid-template-columns:56px 1fr 56px!important}
+.cockpitControls .simCenter{display:none!important}
+.cockpitControls .simRail{display:block!important}
+.cockpitControls .leftRail button:not(#autopilotBtn){display:none!important}
+.cockpitControls .rightRail button:not(#vhfBtn){display:none!important}
+.cockpitControls .simRail button{width:56px!important;min-height:54px!important;font-size:8px!important;border-radius:12px!important}
+.cockpitControls .simRail button b{font-size:17px!important;margin-bottom:2px!important}
+
+.helmControl{left:3%!important;bottom:11.5%!important;width:34%!important;min-width:0!important;padding:8px!important}
+.helmHud{font-size:7px!important}.helmHud b{font-size:13px!important}
+.helmWheelWrap{grid-template-columns:34px 1fr 34px!important;gap:5px!important}
+.helmWheelWrap>button{min-height:42px!important;font-size:14px!important}
+.helmWheel{min-height:67px!important}
+.approachGuide{padding:6px!important}.approachGuide b{font-size:8px!important}.approachGuide span{font-size:7px!important;line-height:1.25!important}
+
+.cockpitThrottle{left:39%!important;right:3%!important;bottom:11.5%!important;padding:8px!important}
+.cockpitThrottle .throttleTitle{font-size:9px!important;margin-bottom:5px!important}
+.cockpitThrottle .throttleGrid{display:block!important}
+.cockpitThrottle .throttleTrack{height:94px!important}
+.cockpitThrottle .throttleColumn{height:94px!important}
+.cockpitThrottle .engineLive{display:none!important}
+.cockpitThrottle .modeButtons{grid-template-columns:repeat(3,1fr)!important;gap:5px!important;margin-top:6px!important}
+.cockpitThrottle .modeButtons button{min-height:39px!important;font-size:8px!important;border-radius:8px!important}
+.cockpitThrottle .throttleLever,.cockpitThrottle .throttleLeverTwin{height:42px!important;width:30px!important}
+
+.cockpitPhase{left:3%!important;right:3%!important;bottom:1.5%!important;padding:5px 7px!important}
+.cockpitPhase .phaseSteps{gap:3px!important}
+.cockpitPhase .phaseStep{padding:4px 2px!important}
+.cockpitPhase .phaseStep b{font-size:7px!important}
+.cockpitPhase .phaseStep span{font-size:6px!important}
+
+.vhfPanel{top:21%!important;right:4%!important;width:60%!important}
+@media(max-width:390px){
+ .cockpitStage{height:76dvh!important;min-height:570px!important}
+ .cockpitGps{top:21.5%!important;height:26%!important}
+ .cockpitGauges{top:49.5%!important;left:21%!important;right:21%!important}
+ .cockpitControls{top:50%!important}
+ .helmControl{bottom:11.5%!important;width:35%!important}
+ .cockpitThrottle{left:40%!important;bottom:11.5%!important}
+ .helmWheel{min-height:61px!important}
+ .cockpitThrottle .throttleTrack,.cockpitThrottle .throttleColumn{height:86px!important}
+}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <div class="helm cockpitOne">
@@ -180,7 +247,7 @@ body.gpsFullscreen{overflow:hidden}
       <div class="vhfLive"><i></i><span>VHF · CH 16</span><span class="vhfWave"></span></div>
     </section>
 
-    <span class="sea-status" id="seaLabel">🌊 VISTA MARE</span>
+    <span class="sea-status" id="seaLabel">🌊 VISTA MARE</span><div id="simpleGuide" class="simpleGuide">GPS · TIMONE · MANETTE</div>
 
     <div class="gpsSlot miniGps cockpitGps" role="button" tabindex="0" title="Apri carta nautica" aria-label="Apri carta nautica a schermo intero">
       <div class="miniSea"><svg class="miniChart" viewBox="0 0 320 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H50C72 28 60 45 48 64C31 93 44 114 60 150H0Z" class="land"/><path d="M72 0C84 22 83 43 70 70C57 95 72 119 84 150" class="depth"/><path id="miniFullRoute" d="" fill="none" stroke="#71d9ff" stroke-width="3" stroke-dasharray="8 5" opacity=".8"/><path id="miniDoneRoute" d="" fill="none" stroke="#ffe6a6" stroke-width="4"/><circle id="miniStart" cx="45" cy="75" r="6" fill="#44dba9" stroke="white" stroke-width="2"/><circle id="miniEnd" cx="275" cy="75" r="6" fill="#ffc46a" stroke="white" stroke-width="2"/></svg><div class="miniWake" id="miniWake"></div><span class="miniBoat" id="miniBoat" aria-hidden="true">🛥️</span><span class="miniState" id="miniState">GPS · IN PORTO</span></div>
@@ -212,7 +279,7 @@ body.gpsFullscreen{overflow:hidden}
     <button id="helmWheel" class="helmWheel" type="button" aria-label="Timone al centro"><span>⚓</span></button>
     <button id="helmRight" type="button" aria-label="Timone a dritta">▶</button>
   </div>
-  <div class="approachGuide" id="approachGuide"><b id="approachTitle">ROTTA STABILE</b><span id="approachText">Mantieni il timone centrato</span></div>
+  <div class="approachGuide" id="approachGuide"><b id="approachTitle">ROTTA</b><span id="approachText">Mantieni il timone centrato</span></div>
 </section>
 <section class="throttleWrap cockpitThrottle" aria-label="Manette motori">
       <div class="throttleTitle"><strong>MANETTE</strong><span id="throttleModeLabel">CROCIERA · 18 kn</span></div>
@@ -230,7 +297,7 @@ body.gpsFullscreen{overflow:hidden}
 <section id="serviceConfirm" class="serviceConfirm" hidden aria-label="Conferma servizio di bordo"><strong id="serviceTitle">Servizio di bordo</strong><p id="serviceDescription"></p><div class="serviceButtons"><button id="serviceCancel" type="button">ANNULLA</button><button id="serviceApply" type="button">CONFERMA OPERAZIONE</button></div></section>
 <section id="dockingPanel" class="dockingPanel" aria-live="polite"><h3>⚓ ORMEGGIO</h3><p>Allinea la barca al posto barca, poi completa la manovra.</p><div class="dockScene"><div class="dockPier"></div><div class="dockTarget"></div><div class="dockBoat" id="dockBoat">🛥️</div><div class="dockGuide">Velocità limitata · manovra finale</div></div><div class="dockControls"><button id="dockLeft" type="button">◀ CORREGGI SINISTRA</button><button id="dockRight" type="button">CORREGGI DRITTA ▶</button><button id="dockNow" class="dockNow" type="button">ORMEGGIA</button></div><div class="dockAlign"><span>SINISTRA</span><div class="dockAlignTrack"><i id="dockAlignBar"></i><b id="dockAlignNeedle"></b></div><span>DRITTA</span></div><div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div></section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin30"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin31"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261123-engine15"></script><script src="./mobile-marina-lite-v1.js?v=20261110-marinalite2"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
@@ -370,7 +437,7 @@ function render(){
  $("dockingPanel").classList.toggle("show",!!t?.dockingReady);
  if(t){
   const pct=Math.max(0,Math.min(100,Math.round(t.progress*100)));
-  $("status").textContent="🛥️ MISSIONE IN CORSO · GPS ATTIVO";
+  $("status").textContent="🛥️ IN NAVIGAZIONE";
   $("names").textContent=t.originName+" → "+t.destinationName;
   $("remaining").textContent=Math.max(0,Math.round(t.distance*(1-t.progress)))+" NM";
   $("eta").textContent=Math.max(0,t.remainingSec)+" s";
@@ -382,10 +449,10 @@ function render(){
   const guide=$("approachGuide");guide.classList.remove("warn","good");
   if(t.dockingReady){$("approachTitle").textContent="ORMEGGIO";$("approachText").textContent=Math.abs(Number(t.dockingOffset)||0)<=6?"Allineamento corretto":"Usa timone e correzioni";guide.classList.add(Math.abs(Number(t.dockingOffset)||0)<=6?"good":"warn");}
   else if(t.progress>=.85){$("approachTitle").textContent="AVVICINAMENTO";$("approachText").textContent=t.cruiseKnots>6?"Riduci velocità":"Velocità corretta · mantieni assetto";guide.classList.add(t.cruiseKnots>6?"warn":"good");}
-  else{$("approachTitle").textContent="ROTTA STABILE";$("approachText").innerHTML=Math.abs(helm)<=5?"Timone centrato · <span class=\"courseDeviation good\">rotta corretta</span>":"Correzione manuale · <span class=\"courseDeviation warn\">deviazione "+Math.abs(Math.round(helm*.42))+"°</span>";}
+  else{$("approachTitle").textContent="ROTTA";$("approachText").innerHTML=Math.abs(helm)<=5?"Timone centrato · <span class=\"courseDeviation good\">rotta corretta</span>":"Correzione manuale · <span class=\"courseDeviation warn\">deviazione "+Math.abs(Math.round(helm*.42))+"°</span>";}
 
   if(t.dockingReady){
-    $("status").textContent="⚓ MANOVRA DI ORMEGGIO";
+    $("status").textContent="⚓ ORMEGGIO";
     $("phaseExit").classList.add("done");$("phaseNav").classList.add("done");$("phaseApproach").classList.add("active");
     $("phaseExitText").textContent="Completata";$("phaseNavText").textContent="Completata";$("phaseApproachText").textContent="Ormeggio";
     $("phaseFill").style.width="97%";
