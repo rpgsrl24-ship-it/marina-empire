@@ -59,6 +59,7 @@ function positionAt(route,progress){
  return route[route.length-1];
 }
 function getHandle(){const c=window.MarinaLocalSaveContext;if(!c)return null;let h=c.capture();if(!h){c.select(null);h=c.capture()}return h}
+const DOCKING_STATE_VERSION=1;
 function defaultGame(){return{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],trip:null,reservations:[],voyages:0,setupComplete:true,voyageSerial:0}}
 function read(){
  const c=window.MarinaLocalSaveContext,h=getHandle();if(!c||!h)return null;
@@ -69,6 +70,11 @@ function read(){
    const selected=String(g.boat||"voyager");
    if(boats.some(x=>x.id===selected)&&!g.owned.includes(selected)){g.owned.push(selected);changed=true}
    if(!ports.some(p=>p.id===g.port)){g.port="rimini";changed=true}
+   if(g.trip&&Number(g.trip.dockingVersion||0)<DOCKING_STATE_VERSION){
+     const legacyArrived=!!g.trip.dockingReady||Number(g.trip.progressBase||0)>=.97||(Number(g.trip.until)||0)>0&&(Number(g.trip.until)||0)<=Date.now();
+     if(legacyArrived){finalizeTrip(g,0,0,"RECUPERO");g.lastMissionRecoveryAt=Date.now();changed=true}
+     else{g.trip.dockingVersion=DOCKING_STATE_VERSION;changed=true}
+   }
    if(changed)c.writeGame(h,g);
    return g;
  }
@@ -156,7 +162,7 @@ function startMission(id,expectedDest){
    // Fuel is consumed progressively during navigation so throttle changes have a real effect.
    g.voyageSerial=Math.max(0,Number(g.voyageSerial)||0)+1;
    const now=Date.now();
-   g.trip={voyageId:g.voyageSerial,id:mission.id,origin:g.port,dest:mission.dest,legs:[g.port,mission.dest],legIndex:0,legSeconds:duration,sec:duration,fuelRate:b.burn,weather:"calm",weatherWear:3,weatherLabel:"CALMO",eventResolved:false,eventLabel:"",eventResult:"",eventBonus:0,eventPrestige:0,eventWear:0,throttleMode:"cruise",helmAngle:0,progressBase:0,startedAt:now,lastProgressAt:now,lastFuelAt:now,fuelUsed:0,throttleWear:0,mission:{id:mission.id,name:mission.name,dest:mission.dest,boat:mission.boat,reward:mission.reward,cost:mission.cost,fuel:mission.fuel,prestige:mission.prestige,sec:duration},until:now+duration*1000};
+   g.trip={dockingVersion:DOCKING_STATE_VERSION,voyageId:g.voyageSerial,id:mission.id,origin:g.port,dest:mission.dest,legs:[g.port,mission.dest],legIndex:0,legSeconds:duration,sec:duration,fuelRate:b.burn,weather:"calm",weatherWear:3,weatherLabel:"CALMO",eventResolved:false,eventLabel:"",eventResult:"",eventBonus:0,eventPrestige:0,eventWear:0,throttleMode:"cruise",helmAngle:0,progressBase:0,startedAt:now,lastProgressAt:now,lastFuelAt:now,fuelUsed:0,throttleWear:0,mission:{id:mission.id,name:mission.name,dest:mission.dest,boat:mission.boat,reward:mission.reward,cost:mission.cost,fuel:mission.fuel,prestige:mission.prestige,sec:duration},until:now+duration*1000};
  });
  if(!ok)return{ok:false,message:"Salvataggio della partenza non riuscito"};
  const saved=read(),trip=saved?.trip;
