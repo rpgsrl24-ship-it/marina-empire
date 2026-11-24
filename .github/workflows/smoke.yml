@@ -55,6 +55,7 @@ jobs:
           node tests/credit-release-gate.test.cjs
           node tests/marina-services.test.cjs
           node tests/mission-selection.test.cjs
+          node tests/docking-rotation.test.cjs
           node tests/fleet-switching.test.cjs
           node tests/research-upgrade.test.cjs
           node tests/marketplace-credits.test.cjs

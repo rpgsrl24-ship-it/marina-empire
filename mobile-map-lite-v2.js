@@ -120,7 +120,7 @@ function tripView(s,b){
  const t=s?.trip;if(!t)return null;
  const proj=projectedTrip(t),progress=proj.progress,origin=String(t.origin||s.port),dest=String(t.dest||s.port),route=routePoints(origin,dest).map(([lat,lon])=>project(lat,lon));
  const distance=seaMiles(origin,dest),knots=proj.mode.knots;
- return {id:String(t.id||""),voyageId:Number(t.voyageId)||0,name:String(t.mission?.name||"Missione attiva"),origin,originName:(ports.find(x=>x.id===origin)||ports[1]).name,dest,destinationName:(ports.find(x=>x.id===dest)||ports[1]).name,reward:Number(t.mission?.reward)||0,prestige:Number(t.mission?.prestige)||0,progress,distance,cruiseKnots:proj.effectiveKnots??knots,etaMinutesReal:Math.max(1,Math.round((distance*(1-progress)/Math.max(1,proj.effectiveKnots||knots))*60)),remainingSec:proj.remainingSec,route,eventResolved:!!t.eventResolved,eventLabel:String(t.eventLabel||""),eventResult:String(t.eventResult||""),throttleMode:proj.mode.id,throttleLabel:proj.harbor?(t.dockingReady?"ORMEGGIO":"MANOVRA PORTO"):proj.mode.label,rpm:proj.effectiveRpm??proj.mode.rpm,temp:proj.effectiveTemp??proj.mode.temp,lph:proj.effectiveLph??proj.mode.lph,fuelMult:proj.mode.fuelMult,harbor:!!proj.harbor,dockingReady:!!t.dockingReady,dockingOffset:Number(t.dockingOffset)||0,dockingDepth:Math.max(0,Math.min(100,Number(t.dockingDepth)||0)),dockingHeading:Math.max(-45,Math.min(45,Number(t.dockingHeading)||0)),enginePort:Number(t.enginePort)||0,engineStarboard:Number(t.engineStarboard)||0,bowThruster:Number(t.bowThruster)||0,bowThrusterAvailable:["yacht14","yacht20","yacht30","luna"].includes(String(s.boat||"")),helmAngle:Math.max(-30,Math.min(30,Number(t.helmAngle)||0)),dockingAssist:!!t.dockingAssist,dockingSurge:Number(t.dockingSurge)||0,dockingSway:Number(t.dockingSway)||0,dockingYawRate:Number(t.dockingYawRate)||0,dockingWind:Number(t.dockingWind)||0,dockingWindSide:Number(t.dockingWindSide)||0,dockingCurrent:Number(t.dockingCurrent)||0,dockingCurrentSide:Number(t.dockingCurrentSide)||0,dockingContacts:Number(t.dockingContacts)||0};
+ return {id:String(t.id||""),voyageId:Number(t.voyageId)||0,name:String(t.mission?.name||"Missione attiva"),origin,originName:(ports.find(x=>x.id===origin)||ports[1]).name,dest,destinationName:(ports.find(x=>x.id===dest)||ports[1]).name,reward:Number(t.mission?.reward)||0,prestige:Number(t.mission?.prestige)||0,progress,distance,cruiseKnots:proj.effectiveKnots??knots,etaMinutesReal:Math.max(1,Math.round((distance*(1-progress)/Math.max(1,proj.effectiveKnots||knots))*60)),remainingSec:proj.remainingSec,route,eventResolved:!!t.eventResolved,eventLabel:String(t.eventLabel||""),eventResult:String(t.eventResult||""),throttleMode:proj.mode.id,throttleLabel:proj.harbor?(t.dockingReady?"ORMEGGIO":"MANOVRA PORTO"):proj.mode.label,rpm:proj.effectiveRpm??proj.mode.rpm,temp:proj.effectiveTemp??proj.mode.temp,lph:proj.effectiveLph??proj.mode.lph,fuelMult:proj.mode.fuelMult,harbor:!!proj.harbor,dockingReady:!!t.dockingReady,dockingOffset:Number(t.dockingOffset)||0,dockingDepth:Math.max(0,Math.min(100,Number(t.dockingDepth)||0)),dockingHeading:wrapDockAngle(t.dockingHeading),dockingOrientation:dockOrientation(t),dockingHeadingError:dockHeadingError(t),dockingTurning:hasDockTurn(t),dockingAssistUsed:!!(t.dockingAssistUsed||t.dockingAssist),dockingManualMoved:!!t.dockingManualMoved,enginePort:Number(t.enginePort)||0,engineStarboard:Number(t.engineStarboard)||0,bowThruster:Number(t.bowThruster)||0,bowThrusterAvailable:["yacht14","yacht20","yacht30","luna"].includes(String(s.boat||"")),helmAngle:Math.max(-30,Math.min(30,Number(t.helmAngle)||0)),dockingAssist:!!t.dockingAssist,dockingSurge:Number(t.dockingSurge)||0,dockingSway:Number(t.dockingSway)||0,dockingYawRate:Number(t.dockingYawRate)||0,dockingWind:Number(t.dockingWind)||0,dockingWindSide:Number(t.dockingWindSide)||0,dockingCurrent:Number(t.dockingCurrent)||0,dockingCurrentSide:Number(t.dockingCurrentSide)||0,dockingContacts:Number(t.dockingContacts)||0};
 }
 function snapshot(){const s=read()||{coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],voyages:0};const b=boats.find(x=>x.id===s.boat)||boats[0];return{state:s,tank:b.tank,boatName:b.name,ports:ports.map(p=>({id:p.id,name:p.name,x:illustrated[p.id]?.[0]??50,y:illustrated[p.id]?.[1]??50})),chartPorts:ports.map(p=>({id:p.id,name:p.name,...project(...harborGPS[p.id])})),trip:tripView(s,b)}}
 function preview(dest){const shot=snapshot(),s=shot.state,b=boats.find(x=>x.id===s.boat)||boats[0],p=ports.find(x=>x.id===dest);if(!p||dest===s.port)return{ok:false,reason:"Seleziona una marina diversa"};const pl=plan(s.port,dest,b.tank,b.burn);const eta=Math.max(1,Math.round((pl.distance/b.knots)*60));const cost=Math.max(250,Math.round(pl.distance*7*b.mult))+b.crew;const reward=Math.max(1200,Math.round(pl.distance*20*b.mult));let fuelNow=Math.max(0,Math.min(b.tank,Number(s.fuel)||0)),refuel=0,ready=!!pl.possible&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id));if(pl.possible){for(let i=0;i<pl.legs.length-1;i++){const req=Math.ceil(seaMiles(pl.legs[i],pl.legs[i+1])*b.burn);if(i>0){const liters=Math.max(0,req+pl.reserve-fuelNow);refuel+=liters*3;fuelNow+=liters}if(fuelNow<req+pl.reserve)ready=false;fuelNow-=Math.min(fuelNow,req)}}const total=cost+refuel;if(Number(s.coins)||0<total)ready=false;const route=routePoints(s.port,dest).map(([lat,lon])=>project(lat,lon));return{ok:pl.possible,reason:pl.reason||"",origin:s.port,originName:(ports.find(x=>x.id===s.port)||ports[1]).name,dest,destinationName:p.name,distance:pl.distance,fuel:pl.fuel,cruiseKnots:b.knots,etaMinutesReal:eta,route,mission:{id:"R_"+b.id+"_"+s.port+"_"+dest,name:"Trasferimento nautico verso "+p.name,reward,prestige:Math.max(15,Math.round(pl.distance*.4*b.mult)),ready,reason:ready?"":"Controlla carburante, crediti e stato yacht",total}}}
@@ -235,16 +235,40 @@ function finalizeTrip(g,dockingBonus=0,dockingPrestige=0,dockingGrade="STANDARD"
   if(id&&!g.completed.includes(id))g.completed.push(id);if(voyageId>0)g.settledVoyages.push(voyageId);
   g.coins=Math.max(0,Number(g.coins)||0)+reward;g.prestige=Math.max(0,Number(g.prestige)||0)+prestige;g.voyages=Math.max(0,Number(g.voyages)||0)+1;g.earnings=Math.max(0,Number(g.earnings)||0)+reward;
   g.condition=Math.max(0,Math.min(100,(Number(g.condition??100)||100)-Math.max(0,(Number(trip.weatherWear)||3)+(Number(trip.eventWear)||0)+(Number(trip.throttleWear)||0))));
-  g.lastArrival={destination:dest,reward,baseReward,eventBonus,eventPrestige,dockingBonus,dockingPrestige,dockingGrade,eventLabel:String(trip.eventLabel||""),eventResult:String(trip.eventResult||""),crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),voyageId,mission:String(m.name||"Missione completata"),emergency:false};
+  g.lastArrival={destination:dest,reward,baseReward,eventBonus,eventPrestige,dockingBonus,dockingPrestige,dockingGrade,dockingOrientation:dockOrientation(trip),dockingManualBonus:Number(trip.dockingManualBonus)||0,dockingManualPrestige:Number(trip.dockingManualPrestige)||0,eventLabel:String(trip.eventLabel||""),eventResult:String(trip.eventResult||""),crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige,weather:String(trip.weather||"calm"),at:Date.now(),voyageId,mission:String(m.name||"Missione completata"),emergency:false};
  }
  g.lastDockedBridge={origin:String(trip.origin||g.port),destination:dest,at:Date.now()};g.trip=null;return true;
 }
 function setHelm(angle){
  const s=read();if(!s?.trip)return{ok:false,message:"Timone disponibile solo durante una missione"};
  const a=Math.max(-30,Math.min(30,Math.round(Number(angle)||0)));
- const ok=mutate(g=>{if(g.trip){g.trip.helmAngle=a;if(g.trip.dockingReady)g.trip.dockingAssist=false;}});
+ const ok=mutate(g=>{if(g.trip){g.trip.helmAngle=a;if(g.trip.dockingReady)cancelDockAutomation(g.trip);}});
  const side=a===0?"CENTRO":a<0?"SINISTRA":"DRITTA";
  return ok?{ok:true,angle:a,dockingOffset:null,message:"Timone "+side+(a?" "+Math.abs(a)+"°":"")}:{ok:false,message:"Comando timone non salvato"};
+}
+const DOCK_MANUAL_BONUS=250,DOCK_MANUAL_PRESTIGE=20,DOCK_TURN_DEPTH=20;
+function wrapDockAngle(value){const a=Number(value)||0;return ((a+180)%360+360)%360-180}
+function dockOrientation(t){return t?.dockingOrientation==="stern"?"stern":"bow"}
+function dockTarget(t){return dockOrientation(t)==="stern"?180:0}
+function dockHeadingError(t){return Math.abs(wrapDockAngle((Number(t?.dockingHeading)||0)-dockTarget(t)))}
+function hasDockTurn(t){return t?.dockingTurnTarget!=null&&Number.isFinite(Number(t.dockingTurnTarget))}
+function stopDockMotion(t){t.enginePort=0;t.engineStarboard=0;t.bowThruster=0;t.helmAngle=0;t.dockingSurge=0;t.dockingSway=0;t.dockingYawRate=0}
+function cancelDockAutomation(t){if(t.dockingAssist)t.dockingAssistUsed=true;t.dockingAssist=false;t.dockingTurnTarget=null}
+function stepDockHeading(value,target,maxStep){const a=wrapDockAngle(value),d=wrapDockAngle(target-a);return wrapDockAngle(a+(Math.abs(d)<=maxStep?d:Math.sign(d)*maxStep))}
+function setDockOrientation(mode){
+ if(!["bow","stern"].includes(mode))return{ok:false,message:"Orientamento non valido"};
+ const t=read()?.trip;if(!t?.dockingReady)return{ok:false,message:"Ormeggio non disponibile"};
+ if((Number(t.dockingDepth)||0)>DOCK_TURN_DEPTH&&dockOrientation(t)!==mode)return{ok:false,message:"Esci dal posto barca prima di cambiare orientamento"};
+ const ok=mutate(g=>{if(g.trip?.dockingReady)g.trip.dockingOrientation=mode;});
+ return ok?{ok:true,mode,message:mode==="bow"?"Ormeggio di prua selezionato":"Ormeggio di poppa selezionato: ruota la barca e usa la retromarcia"}:{ok:false,message:"Orientamento non salvato"};
+}
+function rotateDock90(direction){
+ const t=read()?.trip;if(!t?.dockingReady)return{ok:false,message:"Ormeggio non disponibile"};
+ if((Number(t.dockingDepth)||0)>DOCK_TURN_DEPTH)return{ok:false,message:"Esci dal posto barca prima di ruotare"};
+ if(hasDockTurn(t))return{ok:false,message:"Rotazione in corso"};
+ const delta=Number(direction)<0?-90:90;
+ const ok=mutate(g=>{if(!g.trip?.dockingReady)return;const a=g.trip;cancelDockAutomation(a);stopDockMotion(a);a.dockingTurnTarget=wrapDockAngle((Number(a.dockingHeading)||0)+delta);});
+ return ok?{ok:true,message:"Rotazione di 90° in corso"}:{ok:false,message:"Rotazione non salvata"};
 }
 function dockingInertia(id){return({voyager:.82,open:.74,yacht:1,yacht14:1.1,yacht20:1.25,yacht30:1.42,luna:1.6})[String(id||"")]||1}
 function applyDockingMotion(g){
@@ -253,29 +277,44 @@ function applyDockingMotion(g){
  const avg=(p+s)/2,split=(p-s)/2,helm=Math.max(-30,Math.min(30,Number(t.helmAngle)||0)),inertia=dockingInertia(g.boat);
  const bow=["yacht14","yacht20","yacht30","luna"].includes(String(g.boat||""))?Math.max(-1,Math.min(1,Number(t.bowThruster)||0)):0;
  let surge=Number(t.dockingSurge)||0,sway=Number(t.dockingSway)||0,yaw=Number(t.dockingYawRate)||0;
- let depth=Math.max(0,Math.min(100,Number(t.dockingDepth)||0)),offset=Math.max(-40,Math.min(40,Number(t.dockingOffset)||0)),heading=Math.max(-45,Math.min(45,Number(t.dockingHeading)||0));
+ let depth=Math.max(0,Math.min(100,Number(t.dockingDepth)||0)),offset=Math.max(-40,Math.min(40,Number(t.dockingOffset)||0)),heading=wrapDockAngle(t.dockingHeading);
+ if(hasDockTurn(t)){
+   stopDockMotion(t);const target=Number(t.dockingTurnTarget);
+   t.dockingHeading=stepDockHeading(heading,target,18);
+   if(Math.abs(wrapDockAngle(target-t.dockingHeading))<.01)t.dockingTurnTarget=null;
+   return;
+ }
+ const previousDepth=depth,previousHeading=heading;
  const wind=Math.max(0,Math.min(20,Number(t.dockingWind)||0)),windSide=Number(t.dockingWindSide)||0,current=Math.max(0,Math.min(3,Number(t.dockingCurrent)||0)),currentSide=Number(t.dockingCurrentSide)||0;
  surge+=avg*1.5/inertia;
  yaw+=split*2.5/inertia;
  if(Math.abs(surge)>.08&&Math.abs(helm)>=4)yaw+=(helm/30)*Math.min(1.4,Math.abs(surge))*.85*Math.sign(surge);
  if(bow){sway+=bow*1.1/inertia;yaw+=bow*.42/inertia;}
  sway+=(windSide*wind*.014+currentSide*current*.11)/inertia;
- surge*=.83;sway*=.79;yaw*=.76;
- depth+=surge*3.2;
- heading+=yaw*1.8;
- offset+=sway*1.65+Math.sin(heading*Math.PI/180)*surge*.55;
+ surge=Math.max(-2.4,Math.min(2.4,surge*(Math.abs(avg)>.01?.83:.63)));sway*=.79;yaw*=.76;
+ heading=wrapDockAngle(heading+yaw*1.8);
+ const radians=heading*Math.PI/180,advance=surge*3.2*Math.cos(radians)-sway*1.12*Math.sin(radians);
+ depth+=advance;
+ offset+=surge*4.65*Math.sin(radians)+sway*1.65*Math.cos(radians);
  let contact=false;
- if(depth>96){depth=96;surge=-Math.abs(surge)*.28;contact=true}
+ const axisError=Math.min(Math.abs(heading),Math.abs(wrapDockAngle(heading-180)));
+ if(depth>26&&axisError>25){
+   depth=Math.min(depth,Math.max(26,previousDepth));
+   if(previousDepth>26){heading=previousHeading;yaw=0}
+   surge*=.25;contact=true;
+ }
+ if(depth>96){depth=96;surge=0;contact=true}
  if(depth>26&&Math.abs(offset)>17){offset=Math.sign(offset)*17;sway=-sway*.32;contact=true}
- if(depth<0){depth=0;surge=Math.max(0,surge)}
+ if(depth<0){depth=0;surge=0}
+ if(depth>previousDepth+.1&&Math.abs(avg)>.01)t.dockingManualMoved=true;
  if(contact){t.dockingContacts=Math.max(0,Number(t.dockingContacts)||0)+1;t.dockingContactAt=Date.now();}
- t.dockingDepth=Math.max(0,Math.min(100,depth));t.dockingOffset=Math.max(-40,Math.min(40,offset));t.dockingHeading=Math.max(-45,Math.min(45,heading));
+ t.dockingDepth=Math.max(0,Math.min(100,depth));t.dockingOffset=Math.max(-40,Math.min(40,offset));t.dockingHeading=wrapDockAngle(heading);
  t.dockingSurge=surge;t.dockingSway=sway;t.dockingYawRate=yaw;
 }
 function setDockEngine(side,state){
  const s=read();if(!s?.trip?.dockingReady)return{ok:false,message:"Motori di manovra disponibili solo in ormeggio"};
  const v=Math.max(-1,Math.min(1,Math.round(Number(state)||0)));let view=null;
- const ok=mutate(g=>{if(!g.trip?.dockingReady)return;g.trip.dockingAssist=false;if(side==="port")g.trip.enginePort=v;else g.trip.engineStarboard=v;view={port:Number(g.trip.enginePort)||0,starboard:Number(g.trip.engineStarboard)||0,offset:Number(g.trip.dockingOffset)||0,depth:Number(g.trip.dockingDepth)||0,heading:Number(g.trip.dockingHeading)||0};});
+ const ok=mutate(g=>{if(!g.trip?.dockingReady)return;cancelDockAutomation(g.trip);if(side==="port")g.trip.enginePort=v;else g.trip.engineStarboard=v;view={port:Number(g.trip.enginePort)||0,starboard:Number(g.trip.engineStarboard)||0,offset:Number(g.trip.dockingOffset)||0,depth:Number(g.trip.dockingDepth)||0,heading:Number(g.trip.dockingHeading)||0};});
  const label=v>0?"AVANTI":v<0?"INDIETRO":"FOLLE";
  return ok?{ok:true,...view,message:"Motore "+(side==="port"?"SX":"DX")+" "+label}:{ok:false,message:"Comando motore non salvato"};
 }
@@ -283,7 +322,7 @@ function setBowThruster(state){
  const s=read();if(!s?.trip?.dockingReady)return{ok:false,message:"Elica di prua disponibile solo in ormeggio"};
  if(!["yacht14","yacht20","yacht30","luna"].includes(String(s.boat||"")))return{ok:false,message:"Questa imbarcazione non dispone di elica di prua"};
  const v=Math.max(-1,Math.min(1,Math.round(Number(state)||0)));let view=null;
- const ok=mutate(g=>{if(!g.trip?.dockingReady)return;g.trip.dockingAssist=false;g.trip.bowThruster=v;view={offset:Number(g.trip.dockingOffset)||0,depth:Number(g.trip.dockingDepth)||0,heading:Number(g.trip.dockingHeading)||0};});
+ const ok=mutate(g=>{if(!g.trip?.dockingReady)return;cancelDockAutomation(g.trip);g.trip.bowThruster=v;view={offset:Number(g.trip.dockingOffset)||0,depth:Number(g.trip.dockingDepth)||0,heading:Number(g.trip.dockingHeading)||0};});
  return ok?{ok:true,...view,message:v===0?"Elica di prua STOP":v<0?"Elica di prua SINISTRA":"Elica di prua DRITTA"}:{ok:false,message:"Comando elica di prua non salvato"};
 }
 function setDockAssist(enable=true){
@@ -292,33 +331,40 @@ function setDockAssist(enable=true){
  const ok=mutate(g=>{
    if(!g.trip?.dockingReady)return;
    g.trip.dockingAssist=enable!==false;active=!!g.trip.dockingAssist;
-   if(active){g.trip.enginePort=0;g.trip.engineStarboard=0;g.trip.bowThruster=0;g.trip.helmAngle=0;}
+   if(active){g.trip.dockingAssistUsed=true;g.trip.dockingTurnTarget=null;stopDockMotion(g.trip); }
  });
  return ok?{ok:true,active,message:active?"Assistenza ormeggio attiva · la barca si allinea automaticamente":"Assistenza disattivata · controllo manuale"}:{ok:false,message:"Impossibile cambiare assistenza"};
 }
 function applyDockingAssistMotion(g){
  const t=g?.trip;if(!t?.dockingReady||!t.dockingAssist)return;
  const step=(value,target,maxStep)=>{const v=Number(value)||0,d=target-v;return Math.abs(d)<=maxStep?target:v+Math.sign(d)*maxStep};
- t.enginePort=0;t.engineStarboard=0;t.bowThruster=0;t.helmAngle=0;
+ t.dockingAssistUsed=true;stopDockMotion(t);
+ const target=dockTarget(t);
+ // Back away from the fingers before changing orientation, then approach.
+ if(dockHeadingError(t)>12&&(Number(t.dockingDepth)||0)>DOCK_TURN_DEPTH){
+   t.dockingDepth=step(t.dockingDepth,0,14);return;
+ }
  t.dockingOffset=Math.max(-40,Math.min(40,step(t.dockingOffset,0,7)));
- t.dockingHeading=Math.max(-45,Math.min(45,step(t.dockingHeading,0,6)));
- t.dockingDepth=Math.max(0,Math.min(100,step(t.dockingDepth,84,14)));
+ t.dockingHeading=stepDockHeading(t.dockingHeading,target,18);
+ if(dockHeadingError(t)<=8)t.dockingDepth=Math.max(0,Math.min(100,step(t.dockingDepth,84,14)));
 }
 function adjustDocking(delta){
  const s=read();if(!s?.trip?.dockingReady)return{ok:false,message:"Ormeggio non ancora disponibile"};
- let offset=0;const ok=mutate(g=>{if(!g.trip?.dockingReady)return;g.trip.dockingAssist=false;g.trip.dockingOffset=Math.max(-40,Math.min(40,(Number(g.trip.dockingOffset)||0)+Number(delta||0)));offset=g.trip.dockingOffset;});
+ let offset=0;const ok=mutate(g=>{if(!g.trip?.dockingReady)return;cancelDockAutomation(g.trip);g.trip.dockingOffset=Math.max(-40,Math.min(40,(Number(g.trip.dockingOffset)||0)+Number(delta||0)));offset=g.trip.dockingOffset;});
  return ok?{ok:true,offset,message:Math.abs(offset)<=6?"Allineamento corretto: puoi ormeggiare.":offset<0?"Correggi ancora verso dritta.":"Correggi ancora verso sinistra."}:{ok:false,message:"Correzione non salvata"};
 }
 function completeDocking(){
  const s=read();if(!s?.trip?.dockingReady)return{ok:false,message:"Ormeggio non disponibile"};
- const offset=Math.abs(Number(s.trip.dockingOffset)||0),depth=Math.max(0,Math.min(100,Number(s.trip.dockingDepth)||0)),heading=Math.abs(Number(s.trip.dockingHeading)||0);
+ const offset=Math.abs(Number(s.trip.dockingOffset)||0),depth=Math.max(0,Math.min(100,Number(s.trip.dockingDepth)||0)),heading=dockHeadingError(s.trip);
  if(Number(s.trip.enginePort)||Number(s.trip.engineStarboard)||Number(s.trip.bowThruster)||0)return{ok:false,message:"Metti motori ed elica di prua su FOLLE/STOP"};
+ if(hasDockTurn(s.trip)||Math.abs(Number(s.trip.dockingSurge)||0)>.55||Math.abs(Number(s.trip.dockingYawRate)||0)>.55)return{ok:false,message:"Attendi che la barca sia ferma"};
  if(depth<70)return{ok:false,message:"Entra ancora un poco nel posto barca"};
  if(offset>10)return{ok:false,message:"Centra ancora la barca nel posto"};
  if(heading>12)return{ok:false,message:"Raddrizza ancora la barca"};
- const perfect=offset<=2&&heading<=3&&depth>=88,grade=perfect?"PERFETTO":"BUONO",bonus=perfect?300:140,prestige=perfect?25:12;
- let done=false;const ok=mutate(g=>{if(!g.trip?.dockingReady)return;done=finalizeTrip(g,bonus,prestige,grade);});
- return ok&&done?{ok:true,grade,bonus,prestige,message:"Ormeggio "+grade.toLowerCase()+" completato"}:{ok:false,message:"Ormeggio non completato"};
+ const perfect=offset<=2&&heading<=3&&depth>=88,grade=perfect?"PERFETTO":"BUONO",clean=!!s.trip.dockingManualMoved&&!s.trip.dockingAssist&&!s.trip.dockingAssistUsed&&!(Number(s.trip.dockingContacts)||0);
+ const manualBonus=clean?DOCK_MANUAL_BONUS:0,manualPrestige=clean?DOCK_MANUAL_PRESTIGE:0,bonus=(perfect?300:140)+manualBonus,prestige=(perfect?25:12)+manualPrestige,orientation=dockOrientation(s.trip);
+ let done=false;const ok=mutate(g=>{if(!g.trip?.dockingReady)return;g.trip.dockingManualBonus=manualBonus;g.trip.dockingManualPrestige=manualPrestige;done=finalizeTrip(g,bonus,prestige,grade);});
+ return ok&&done?{ok:true,grade,bonus,prestige,orientation,manualBonus,manualPrestige,message:"Ormeggio "+grade.toLowerCase()+" completato"}:{ok:false,message:"Ormeggio non completato"};
 }
 function pulse(){
  const s=read();if(!s?.trip)return {active:false,snapshot:snapshot()};
@@ -339,10 +385,10 @@ function pulse(){
      if(!Number.isFinite(Number(g.trip.dockingOffset)))g.trip.dockingOffset=((Number(g.trip.voyageId)||1)*17%25)-12;
      if(!Number.isFinite(Number(g.trip.dockingDepth)))g.trip.dockingDepth=0;
      if(!Number.isFinite(Number(g.trip.dockingHeading)))g.trip.dockingHeading=((Number(g.trip.voyageId)||1)*9%13)-6;
-     g.trip.enginePort=0;g.trip.engineStarboard=0;g.trip.bowThruster=0;g.trip.dockingAssist=false;g.trip.dockingSurge=0;g.trip.dockingSway=0;g.trip.dockingYawRate=0;g.trip.dockingContacts=0;g.trip.dockingWind=(Number(g.trip.voyageId)||1)<=1?0:3+((Number(g.trip.voyageId)||1)%5);g.trip.dockingWindSide=((Number(g.trip.voyageId)||1)%2)?1:-1;g.trip.dockingCurrent=(Number(g.trip.voyageId)||1)<=1?0:(((Number(g.trip.voyageId)||1)*3)%4)*.2;g.trip.dockingCurrentSide=((Number(g.trip.voyageId)||1)%3===0)?-1:1;g.trip.dockingLastAt=ts;
+     g.trip.enginePort=0;g.trip.engineStarboard=0;g.trip.bowThruster=0;g.trip.dockingAssist=false;g.trip.dockingAssistUsed=false;g.trip.dockingManualMoved=false;g.trip.dockingOrientation="bow";g.trip.dockingTurnTarget=null;g.trip.dockingSurge=0;g.trip.dockingSway=0;g.trip.dockingYawRate=0;g.trip.dockingContacts=0;g.trip.dockingWind=(Number(g.trip.voyageId)||1)<=1?0:3+((Number(g.trip.voyageId)||1)%5);g.trip.dockingWindSide=((Number(g.trip.voyageId)||1)%2)?1:-1;g.trip.dockingCurrent=(Number(g.trip.voyageId)||1)<=1?0:(((Number(g.trip.voyageId)||1)*3)%4)*.2;g.trip.dockingCurrentSide=((Number(g.trip.voyageId)||1)%3===0)?-1:1;g.trip.dockingLastAt=ts;
    });
  }
  return {active:!!read()?.trip,snapshot:snapshot()};
 }
-window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,setThrottle,setHelm,setDockEngine,setBowThruster,setDockAssist,adjustDocking,completeDocking,applyVoyageDecision,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
+window.MarinaEmpireMapLite={snapshot,preview,read,pulse,missionCatalog,startMission,setThrottle,setHelm,setDockEngine,setBowThruster,setDockAssist,setDockOrientation,rotateDock90,adjustDocking,completeDocking,applyVoyageDecision,positionAt,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
 })();

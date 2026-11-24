@@ -58,7 +58,7 @@ async function pageAudit(page,label){
 
 async function assertDesktopDockFits(page,label){
   const metrics=await page.evaluate(()=>{
-    const selectors=['.head','.dockModeTitle','.dockFlow','#berthScene','.dockInstruction','.dockQuick','.dockConsole','#dockAssist','#dockHelmLeft','#dockHelmRight','#dockNow','#dockStatus','nav.bottom','[data-dock-engine="port:1"]','[data-dock-engine="port:-1"]','[data-dock-engine="starboard:1"]','[data-dock-engine="starboard:-1"]','#bowThrusterBox'];
+    const selectors=['.head','.dockModeTitle','.dockFlow','#berthScene','.dockInstruction','.dockQuick','.dockConsole','#dockAssist','#dockBowMode','#dockSternMode','#dockRotateLeft','#dockRotateRight','#dockHelmLeft','#dockHelmRight','#dockNow','#dockStatus','nav.bottom','[data-dock-engine="port:1"]','[data-dock-engine="port:-1"]','[data-dock-engine="starboard:1"]','[data-dock-engine="starboard:-1"]','#bowThrusterBox'];
     const bounds=selectors.flatMap(sel=>{
       const el=document.querySelector(sel);if(!el)return [{sel,missing:true}];
       const r=el.getBoundingClientRect();if(getComputedStyle(el).display==='none'||!r.width||!r.height)return [];
@@ -194,6 +194,15 @@ async function runScenario(browser,name,viewport,mobile){
       }
       await page.setViewportSize(viewport);
     }
+    const startHeading=await page.evaluate(()=>window.MarinaEmpireMapLite.snapshot().trip.dockingHeading);
+    await page.locator('#dockRotateRight').click();
+    await page.waitForFunction(h=>{const t=window.MarinaEmpireMapLite.snapshot().trip;return !t.dockingTurning&&Math.abs(((t.dockingHeading-h-90+180)%360+360)%360-180)<.1},startHeading,{timeout:12000});
+    await page.locator('#dockRotateLeft').click();
+    await page.waitForFunction(h=>{const t=window.MarinaEmpireMapLite.snapshot().trip;return !t.dockingTurning&&Math.abs(((t.dockingHeading-h+180)%360+360)%360-180)<.1},startHeading,{timeout:12000});
+    await page.locator('#dockSternMode').click();
+    assert.equal(await page.locator('#dockSternMode').getAttribute('aria-pressed'),'true');
+    await page.locator('#dockBowMode').click();
+    assert.equal(await page.locator('#dockBowMode').getAttribute('aria-pressed'),'true');
     const lever=page.locator('[data-lever-side="port"]');
     if(await lever.isVisible()){
       await lever.click({position:{x:10,y:10}});
