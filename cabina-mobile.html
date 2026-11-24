@@ -409,6 +409,10 @@ body.dockingMode .portDistance{left:24%!important;top:49%!important}
 body.dockingMode .starDistance{right:24%!important;top:49%!important}
 body.dockingMode .sternDistance{bottom:8px!important}
 body.dockingMode .dockSpeed{z-index:12!important}
+body.dockingMode .dockEnv{position:absolute;z-index:12;right:10px;bottom:10px;display:flex;gap:5px}
+body.dockingMode .dockEnv span{padding:5px 7px;border:1px solid #678ba0;border-radius:8px;background:#06192ee9;color:#dbeef7;font-size:8px;font-weight:900}
+body.dockingMode .dockEnv b{color:#8debc0}
+
 body.dockingMode .dockSceneLabel{z-index:13!important}
 body.dockingMode .dockAlignBox{z-index:13!important}
 
@@ -546,7 +550,7 @@ body.dockingMode .dockAssist.on{border-color:#8af0bd;background:linear-gradient(
     <div class="distance portDistance">Sinistra <b id="distPort">—</b></div>
     <div class="distance starDistance">Dritta <b id="distStar">—</b></div>
     <div class="distance sternDistance">Poppa <b id="distStern">—</b></div>
-    <div class="dockSpeed">VELOCITÀ <b id="dockSpeed">0.0 kn</b></div>
+    <div class="dockSpeed">VELOCITÀ <b id="dockSpeed">0.0 kn</b></div><div class="dockEnv"><span>💨 <b id="dockWind">0 kn</b></span><span>🌊 <b id="dockCurrent">0.0 kn</b></span></div>
   </div>
 
   <div class="dockConsole">
@@ -594,7 +598,7 @@ body.dockingMode .dockAssist.on{border-color:#8af0bd;background:linear-gradient(
 </section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261124-missions12">Scegli una nuova missione →</a></section>
 </main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin35"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261124-missions12"><b>🎯</b>MISSIONI</a></nav>
-<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261124-engine21"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261124-engine22"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -766,7 +770,7 @@ function render(){
     $("distStern").textContent=Math.max(0,Math.round((24.8-depth*.16)*10)/10)+" m";
     $("distPort").textContent=Math.max(.4,Math.round((3.1+off*.035)*10)/10)+" m";
     $("distStar").textContent=Math.max(.4,Math.round((3.3-off*.035)*10)/10)+" m";
-    $("dockSpeed").textContent=(Math.abs(Number(t.enginePort)||0)+Math.abs(Number(t.engineStarboard)||0)>.1?"0.8":"0.0")+" kn";
+    const dockMotion=Math.min(2.4,Math.abs(Number(t.dockingSurge)||0)*.55+Math.abs(Number(t.dockingSway)||0)*.35);$("dockSpeed").textContent=dockMotion.toFixed(1)+" kn";$("dockWind").textContent=Math.round(Number(t.dockingWind)||0)+" kn";$("dockCurrent").textContent=(Number(t.dockingCurrent)||0).toFixed(1)+" kn";
     document.querySelectorAll("[data-dock-engine]").forEach(b=>{const [side,val]=b.dataset.dockEngine.split(":");const cur=side==="port"?Number(t.enginePort)||0:Number(t.engineStarboard)||0;b.classList.toggle("on",cur===Number(val));});
     $("dockBoatName").textContent=shot.boatName||"M/Y";
     const pEng=Number(t.enginePort)||0,sEng=Number(t.engineStarboard)||0;
