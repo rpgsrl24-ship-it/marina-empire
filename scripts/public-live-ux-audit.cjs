@@ -122,6 +122,8 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(missions.horizontalOverflow,false,name+': missions has horizontal overflow');
     assert.equal(missions.clipped.length,0,name+': missions has clipped actions '+JSON.stringify(missions.clipped));
 
+    assert.equal(await page.locator('#careerGuide').isVisible(),true,name+': first-trip guide visible');
+    assert.equal(await page.locator('[data-kind="all"]').isVisible(),true,name+': mission filters visible');
     const first=page.locator('[data-start]:enabled').first();
     const firstCard=first.locator('xpath=ancestor::article[1]');
     const firstText=(await firstCard.innerText()).trim();
@@ -223,6 +225,13 @@ async function runScenario(browser,name,viewport,mobile){
     assert.match(await page.locator('#arrivalReward').innerText(),/Allenamento completato/);
     assert.equal(await page.evaluate(()=>localStorage.getItem('marina_empire_beta_test_session')),realBefore,name+': practice must leave real save unchanged');
     assert.equal(await page.locator('#dockPreviewEntry').isVisible(),true,name+': practice restart must be visible');
+    await page.goto(LIVE+'missions-mobile.html?tipo=special',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('[data-kind="special"][aria-pressed="true"]').waitFor({state:'visible',timeout:15000});
+    await page.locator('.contractObjective').first().waitFor({state:'visible',timeout:15000});
+    assert.ok(await page.locator('[data-start^="C_rescue_"]:enabled').count(),name+': rescue contract unlocked after Academy');
+    assert.ok(await page.locator('[data-start^="C_charter_"]:disabled').count(),name+': VIP contract requires prestige');
+    await page.locator('[data-kind="transfer"]').click();
+    assert.equal(await page.locator('.contractObjective').count(),0,name+': transfer filter separates special contracts');
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,

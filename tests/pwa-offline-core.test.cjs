@@ -8,7 +8,7 @@ const manifestAlias=JSON.parse(fs.readFileSync('manifest.json','utf8'));
 
 for(const path of [
  './mobile-home.html?v=20261111-home6',
- './missions-mobile.html?v=20261124-missions12',
+ './missions-mobile.html?v=20261125-missions13',
  './map-mobile.html?v=20261124-map20',
  './marina-mobile.html?v=20261123-marina5',
  './fleet-mobile.html?v=20261109-fleet1',

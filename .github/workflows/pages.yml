@@ -33,6 +33,7 @@ jobs:
           node tests/marina-services.test.cjs
           node tests/mission-selection.test.cjs
           node tests/docking-rotation.test.cjs
+          node tests/mission-contract-types.test.cjs
           node tests/fleet-switching.test.cjs
           node tests/research-upgrade.test.cjs
           node tests/marketplace-credits.test.cjs
