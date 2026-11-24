@@ -63,8 +63,10 @@ async function seedUnifiedGame(context){
       boat:'voyager',owned:['voyager'],completed:[],trip:null,reservations:[],voyages:0,
       setupComplete:true,voyageSerial:0
     };
-    localStorage.setItem('marina_empire_local_context_v1',JSON.stringify({version:1,accountId:null,revision:'live-audit-v2'}));
-    localStorage.setItem('marina_empire_beta_test_session',JSON.stringify(game));
+    if(!localStorage.getItem('marina_empire_beta_test_session')){
+      localStorage.setItem('marina_empire_local_context_v1',JSON.stringify({version:1,accountId:null,revision:'live-audit-v2'}));
+      localStorage.setItem('marina_empire_beta_test_session',JSON.stringify(game));
+    }
   });
 }
 
@@ -106,9 +108,11 @@ async function runScenario(browser,name,viewport,mobile){
     const firstText=(await firstCard.innerText()).trim();
     assert.match(firstText,/Rimini/i,name+': first mission must originate in Rimini');
     await first.click();
-    await page.waitForFunction(()=>location.pathname.endsWith('/map-mobile.html'),{timeout:20000});
+    await page.waitForURL(/cabina-mobile\.html/,{timeout:30000});
+    await page.locator('#dockPreviewEntry').waitFor({state:'attached',timeout:15000});
+    await page.goto(LIVE+'map-mobile.html',{waitUntil:'domcontentloaded',timeout:30000});
     await page.locator('#routeStatus').waitFor({state:'visible',timeout:15000});
-    await page.waitForFunction(()=>document.querySelector('#routeStatus')?.textContent?.includes('→'),{timeout:15000});
+    await page.waitForFunction(()=>document.querySelector('#routeStatus')?.textContent?.includes('→'),null,{timeout:15000});
     await page.screenshot({path:path.join(OUT,name+'-map-active.png'),fullPage:false,animations:'disabled'});
     const map=await pageAudit(page,name+' map active');
     assert.equal(map.horizontalOverflow,false,name+': map has horizontal overflow');
@@ -124,9 +128,18 @@ async function runScenario(browser,name,viewport,mobile){
     assert.ok(active.route.includes('Cervia')&&active.destination.includes('Cervia'),name+': accepted mission route/destination must stay synchronized to Cervia');
     assert.match(active.mission,/RPG Academy 8/i,name+': map must show the accepted mission');
 
-    const trip=active.save.trip;
-    const naturalWait=Math.max(20000,Math.min(120000,Number(trip.until)-Date.now()+15000));
-    await page.waitForFunction(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'null')?.trip===null,{timeout:naturalWait});
+    await page.locator('#cabinJump a').click();
+    await page.waitForURL(/cabina-mobile\.html/,{timeout:20000});
+    await page.locator('#dockingPanel').waitFor({state:'visible',timeout:180000});
+    await page.screenshot({path:path.join(OUT,name+'-docking.png'),fullPage:true,animations:'disabled'});
+    const docking=await pageAudit(page,name+' docking');
+    assert.equal(docking.horizontalOverflow,false,name+': docking has horizontal overflow');
+    assert.equal(docking.clipped.length,0,name+': docking has clipped actions '+JSON.stringify(docking.clipped));
+    assert.equal(await page.locator('.dockArtwork').isVisible(),true,name+': new docking artwork must be visible');
+    await page.locator('#dockAssist').click();
+    await page.waitForFunction(()=>!document.getElementById('dockNow')?.disabled,null,{timeout:20000});
+    await page.locator('#dockNow').click();
+    await page.waitForFunction(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'null')?.trip===null,null,{timeout:15000});
     await page.waitForTimeout(800);
     await page.screenshot({path:path.join(OUT,name+'-arrival.png'),fullPage:false,animations:'disabled'});
     const arrivalSave=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'null'));
@@ -134,11 +147,34 @@ async function runScenario(browser,name,viewport,mobile){
     assert.ok(Number(arrivalSave?.prestige)>0,name+': arrival must credit prestige');
     assert.ok(Array.isArray(arrivalSave?.completed)&&arrivalSave.completed.length>0,name+': arrival must mark mission completed');
 
+    const realBefore=await page.evaluate(()=>localStorage.getItem('marina_empire_beta_test_session'));
+    await page.goto(LIVE+'cabina-mobile.html?anteprima=ormeggio',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('#dockPreviewBanner').waitFor({state:'visible',timeout:15000});
+    await page.locator('#dockingPanel .dockArtwork').waitFor({state:'visible',timeout:15000});
+    assert.equal(await page.locator('.cockpitOne').isVisible(),false,name+': practice must not show sailing cockpit');
+    assert.equal(await page.locator('#bowThrusterBox').isVisible(),true,name+': practice yacht has bow thruster');
+    await page.screenshot({path:path.join(OUT,name+'-practice.png'),fullPage:true,animations:'disabled'});
+    const practice=await pageAudit(page,name+' practice');
+    assert.equal(practice.horizontalOverflow,false,name+': practice has horizontal overflow');
+    assert.equal(practice.clipped.length,0,name+': practice has clipped actions '+JSON.stringify(practice.clipped));
+    const initial=await page.locator('#dockYacht').getAttribute('transform');
+    await page.locator('[data-dock-engine="port:1"]').click();
+    await page.locator('[data-dock-engine="starboard:1"]').click();
+    await page.waitForFunction(initial=>document.getElementById('dockYacht')?.getAttribute('transform')!==initial,initial,{timeout:8000});
+    await page.locator('[data-dock-engine="port:0"]').click();
+    await page.locator('[data-dock-engine="starboard:0"]').click();
+    await page.locator('#dockAssist').click();
+    await page.waitForFunction(()=>!document.getElementById('dockNow')?.disabled,null,{timeout:20000});
+    await page.locator('#dockNow').click();
+    await page.locator('#arrival').waitFor({state:'visible',timeout:15000});
+    assert.match(await page.locator('#arrivalReward').innerText(),/Allenamento completato/);
+    assert.equal(await page.evaluate(()=>localStorage.getItem('marina_empire_beta_test_session')),realBefore,name+': practice must leave real save unchanged');
+    assert.equal(await page.locator('#dockPreviewEntry').isVisible(),true,name+': practice restart must be visible');
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,
       arrival:{port:arrivalSave.port,coins:arrivalSave.coins,prestige:arrivalSave.prestige,voyages:arrivalSave.voyages},
-      home,missions,map,runtimeErrors:errors,badResponses
+      home,missions,map,docking,practice,runtimeErrors:errors,badResponses
     }));
     assert.deepEqual(errors,[],name+': runtime errors '+JSON.stringify(errors));
     assert.deepEqual(badResponses,[],name+': missing/bad live assets '+JSON.stringify(badResponses));

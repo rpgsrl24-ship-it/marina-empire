@@ -6,6 +6,7 @@ on:
       - 'index.html'
       - 'mobile-home.html'
       - 'map-mobile.html'
+      - 'cabina-mobile.html'
       - 'missions-mobile.html'
       - 'marina-mobile.html'
       - 'mobile-map-lite-v2.js'

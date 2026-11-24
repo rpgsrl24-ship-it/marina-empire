@@ -520,10 +520,13 @@ body.dockingMode .dockStatus{font-size:clamp(10px,2.7vw,13px)!important;margin-t
 body.dockingMode .dockPreviewEntry:not([data-demo]){display:none!important}
 @media(max-width:360px){body.dockingMode .dockEngine{grid-template-columns:1fr!important}body.dockingMode .dockLeverVisual{display:none!important}body.dockingMode .dockEngineStates button{min-height:36px!important}body.dockingMode .dockHelmWheel{height:58px!important}}
 @media(min-width:600px){body.dockingMode .dockLeverVisual{height:155px!important}body.dockingMode .dockEngineStates button{min-height:49px!important}body.dockingMode .dockHelmWheel{height:100px!important}}
+body.practiceMode:not(.dockingMode) .cockpitOne,body.practiceMode:not(.dockingMode) .actions,body.practiceMode:not(.dockingMode) #notice,body.practiceMode:not(.dockingMode) #serviceConfirm,body.practiceMode:not(.dockingMode) #voyageEvent{display:none!important}
+body.practiceMode .arrival a{display:none!important}
+body.dockingMode .dockArtwork #dockYacht{transition:transform .5s ease-out}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
-<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita</div>
-<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261124-cabin37&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
+<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita · v38</div>
+<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261124-cabin38&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
 <div class="helm cockpitOne">
   <div class="photo cockpitStage" id="window">
     <img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Postazione di comando interattiva Marina Empire">
@@ -704,13 +707,13 @@ body.dockingMode .dockPreviewEntry:not([data-demo]){display:none!important}
   <div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div>
 </section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261124-missions12">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin37"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261124-missions12"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin38"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261124-missions12"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script>
 window.MarinaDockPreview=new URLSearchParams(location.search).get("anteprima")==="ormeggio";
 if(window.MarinaDockPreview){
   const now=Date.now(),copy=x=>JSON.parse(JSON.stringify(x)),handle={accountId:null,saveKey:"preview-only"};
   let demo={name:"Allenamento",coins:10000,prestige:0,fuel:770,condition:100,port:"rimini",boat:"yacht20",owned:["yacht20"],completed:[],reservations:[],voyages:0,voyageSerial:1,setupComplete:true,trip:{id:"DEMO_DOCKING",voyageId:1,dockingVersion:1,origin:"rimini",dest:"cervia",legs:["rimini","cervia"],legIndex:0,legSeconds:20,sec:20,until:now,progressBase:.97,startedAt:now,lastProgressAt:now,lastFuelAt:now,dockingReady:true,dockingDepth:0,dockingOffset:-8,dockingHeading:12,dockingSurge:0,dockingSway:0,dockingYawRate:0,dockingWind:0,dockingCurrent:0,enginePort:0,engineStarboard:0,bowThruster:0,helmAngle:0,dockingLastAt:now,weather:"calm",weatherWear:0,throttleMode:"eco",mission:{id:"DEMO_DOCKING",name:"Allenamento ormeggio",dest:"cervia",boat:"yacht20",reward:0,prestige:0,cost:0,fuel:0}}};
-  window.MarinaLocalSaveContext=Object.freeze({capture:()=>handle,select:()=>true,isCurrent:h=>h===handle,readGame:h=>h===handle?copy(demo):null,writeGame:(h,g)=>{if(h!==handle)return false;demo=copy(g);return true}});
+  window.MarinaLocalSaveContext=Object.freeze({capture:()=>handle,select:()=>true,isCurrent:h=>h===handle,readGame:h=>h===handle?copy(demo):null,writeGame:(h,g)=>{if(h!==handle)return false;demo=copy(g);return true},layoutKey:()=>null,readLayout:()=>null,writeLayout:()=>false,resetLayout:()=>false,hasExternalChange:()=>false});
 }
 </script><script src="./mobile-map-lite-v2.js?v=20261124-engine23"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script>if(!window.MarinaDockPreview){const tracker=document.createElement("script");tracker.src="./player-tracker-v2.js?v=20261119-tracker3";document.head.appendChild(tracker);}</script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -807,7 +810,8 @@ function render(){
  $("gaugeFuel").textContent=Math.round((Number(s.fuel)||0)/Math.max(1,Number(shot.tank)||1)*100)+"%";
  $("simHdg").textContent=$("heading").textContent||"—";
  const active=!!t;
- $("dockPreviewBanner").hidden=!window.MarinaDockPreview;
+ $("dockingPanel").classList.toggle("show",!!t?.dockingReady);document.body.classList.toggle("dockingMode",!!t?.dockingReady);
+ $("dockPreviewBanner").hidden=!window.MarinaDockPreview;document.body.classList.toggle("practiceMode",!!window.MarinaDockPreview);
  $("dockPreviewEntry").hidden=active;
  if(window.MarinaDockPreview){$("dockPreviewEntry").textContent="↻ RIPROVA ORMEGGIO";$("dockPreviewEntry").dataset.demo="1";}
  const progress=active?Math.max(0,Math.min(1,Number(t.progress)||0)):(s.lastArrival?1:0);
@@ -845,13 +849,12 @@ function render(){
  $("chartDistance").textContent=active?Math.max(0,Math.round(t.distance*(1-progress)))+" NM":"0 NM";
  $("window").classList.toggle("docked",!active);$("window").classList.toggle("inMotion",active&&!t?.dockingReady);$("window").classList.toggle("docking",!!t?.dockingReady);
  $("seaLabel").textContent=active?"🌊 IN NAVIGAZIONE":"⚓ ORMEGGIATA";
- const fullTank=Math.max(1,Number(window.MarinaEmpireMarinaLite?.snapshot?.()?.boat?.tank)||Number(shot.tank)||400);
+ const fullTank=Math.max(1,Number(shot.tank)||400);
  const fuelNeedsService=(Number(s.fuel)||0)<fullTank-.01,conditionNeedsService=Number(s.condition??100)<100;
  $("refuel").disabled=active||!fuelNeedsService;$("repair").disabled=active||!conditionNeedsService;
  $("refuelInfo").textContent=active?"All'arrivo":fuelNeedsService?"Disponibile ora":"Serbatoio pieno";
  $("repairInfo").textContent=active?"All'arrivo":conditionNeedsService?"Disponibile ora":"Stato già 100%";
  $("arrival").classList.toggle("show",!active&&!!s.lastArrival);
- $("dockingPanel").classList.toggle("show",!!t?.dockingReady);document.body.classList.toggle("dockingMode",!!t?.dockingReady);
  if(t){
   const pct=Math.max(0,Math.min(100,Math.round(t.progress*100)));
   $("status").textContent="🛥️ IN NAVIGAZIONE";
