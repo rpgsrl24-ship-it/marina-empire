@@ -644,10 +644,44 @@ body.dockingMode .dockPreviewBanner{margin:5px 8px;padding:5px 7px;font-size:11p
  body.dockingMode .bowThruster button{min-height:40px!important}
  body.dockingMode .dockNow{min-height:45px!important}
 }
+
+/* V41: reserve space for the actual header, mode title and navigation.
+   Keep every essential docking action in the desktop viewport. */
+@media(min-width:1000px) and (orientation:landscape){
+ body.dockingMode{--dock-frame-reserve:195px}
+ body.dockingMode.practiceMode{--dock-frame-reserve:225px}
+ body.dockingMode .dockingReal{grid-template-rows:auto repeat(5,min-content) minmax(15px,1fr);align-content:start}
+ body.dockingMode .berthScene{align-self:start}
+ body.dockingMode .dockPreviewBanner{line-height:1.2!important;padding:3px 7px!important;margin:3px 10px!important}
+ body.dockingMode .dockModeTitle{min-height:40px}
+ body.dockingMode .dockFlow{padding:3px 6px!important}
+}
+@media(min-width:1000px) and (orientation:landscape) and (max-height:700px){
+ body.dockingMode{--dock-frame-reserve:185px}
+ body.dockingMode.practiceMode{--dock-frame-reserve:215px}
+ body.dockingMode .head{padding:3px 10px!important;gap:10px}
+ body.dockingMode .hud div{padding:3px 5px!important}
+ body.dockingMode .hud b{font-size:16px!important}
+ body.dockingMode .dockModeTitle{min-height:36px}
+ body.dockingMode .dockFlowStep i{width:18px;height:18px}
+ body.dockingMode .dockFlowStep b{font-size:10px}
+ body.dockingMode .dockInstruction{padding:4px 7px!important}
+ body.dockingMode .dockInstruction span{font-size:16px!important}
+ body.dockingMode .dockQuick{gap:4px}
+ body.dockingMode .dockConditions span{padding:3px 3px!important}
+ body.dockingMode .dockAssist{min-height:40px!important}
+ body.dockingMode .dockEngine strong,body.dockingMode .dockHelm strong{font-size:12px!important;margin-bottom:3px!important}
+ body.dockingMode .dockLeverVisual{height:124px!important}
+ body.dockingMode .dockHelmWheel{height:62px!important}
+ body.dockingMode .dockHelm small{margin-top:2px!important}
+ body.dockingMode .dockNow{min-height:44px!important}
+ body.dockingMode .bottom{margin:3px auto!important;padding:2px!important}
+ body.dockingMode .bottom a{padding:2px!important}
+}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
-<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita · v40</div>
-<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261124-cabin40&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
+<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita · v41</div>
+<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261124-cabin41&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
 <div class="helm cockpitOne">
   <div class="photo cockpitStage" id="window">
     <img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Postazione di comando interattiva Marina Empire">
@@ -828,7 +862,7 @@ body.dockingMode .dockPreviewBanner{margin:5px 8px;padding:5px 7px;font-size:11p
   <div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div>
 </section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261124-missions12">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin40"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261124-missions12"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin41"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261124-missions12"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script>
 window.MarinaDockPreview=new URLSearchParams(location.search).get("anteprima")==="ormeggio";
 if(window.MarinaDockPreview){
