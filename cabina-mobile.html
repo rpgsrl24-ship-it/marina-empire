@@ -461,8 +461,69 @@ body.dockingMode .dockConditions b{display:block;margin-top:2px;color:#fff;font-
  .helmControl{width:22%!important;min-width:78px!important}
  .cockpitThrottle{left:25%!important;right:12%!important}
 }
+
+/* V37: original live docking scene, same composition as the approved design. */
+body.dockingMode .dockingReal{padding:5px 8px 24px!important;margin:5px auto 12px!important;min-height:0!important;max-width:660px!important}
+body.dockingMode .dockModeTitle{border:1.5px solid #e1b65e!important;border-radius:16px!important;padding:9px!important}
+body.dockingMode .dockModeName strong{font-size:clamp(14px,4vw,22px)!important;white-space:nowrap}
+body.dockingMode .dockModeName span{font-size:20px}
+body.dockingMode .dockBoatChip{font-size:clamp(9px,2.5vw,13px)!important;padding:6px 8px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:43%}
+body.dockingMode .dockFlow{background:#061a2e;border:1px solid #24465d;border-radius:13px;padding:7px 5px!important}
+body.dockingMode .dockFlowStep b{font-size:clamp(8px,2.4vw,12px)}
+body.dockingMode .dockInstruction{font-size:clamp(10px,2.7vw,14px)!important;padding:7px 9px!important}
+body.dockingMode .dockQuick{display:grid;grid-template-columns:1fr 1.15fr;gap:7px;margin:6px 0 8px;align-items:stretch}
+body.dockingMode .dockConditions{margin:0!important;gap:4px!important}
+body.dockingMode .dockConditions span{padding:4px 2px!important;font-size:8px!important}
+body.dockingMode .dockConditions b{font-size:12px!important;margin-top:2px}
+body.dockingMode .dockAssist{min-height:43px!important;margin:0!important;padding:5px!important;font-size:clamp(9px,2.6vw,13px)!important}
+body.dockingMode .berthScene{height:auto!important;min-height:0!important;aspect-ratio:600/480;border:2px solid #e6b859!important;border-radius:15px!important;background:#073e55!important;overflow:hidden}
+body.dockingMode .berthScene:after{display:none!important}
+body.dockingMode .dockArtwork{display:block;width:100%;height:100%;position:absolute;inset:0}
+body.dockingMode .dockSceneLabel{font-size:clamp(10px,3.1vw,17px)!important;left:5px;top:5px;padding:6px 8px}
+body.dockingMode .dockAlignBox{width:31%!important;top:5px;right:5px;padding:5px 7px}
+body.dockingMode .dockAlignBox small{font-size:clamp(7px,1.9vw,11px)}
+body.dockingMode .dockAlignBox b{font-size:clamp(14px,4vw,21px)}
+body.dockingMode .dockAlignMeter{height:5px}
+body.dockingMode .distance{padding:3px 6px;font-size:clamp(8px,2.2vw,11px)!important;text-align:center;border-radius:8px;line-height:1.2}
+body.dockingMode .distance b{display:block;font-size:clamp(11px,3vw,16px)!important;color:#62efb0}
+body.dockingMode .bowDistance{top:15%!important;left:50%!important}
+body.dockingMode .portDistance{left:21%!important;top:49%!important;transform:translateX(-50%)}
+body.dockingMode .starDistance{right:21%!important;top:49%!important;transform:translateX(50%)}
+body.dockingMode .sternDistance{bottom:3px!important}
+body.dockingMode .dockSpeed{bottom:5px!important;left:5px!important;padding:4px 7px;font-size:8px}
+body.dockingMode .dockSpeed b{font-size:clamp(14px,4vw,22px)!important}
+body.dockingMode .dockConsole{grid-template-columns:minmax(0,1fr) minmax(0,.94fr) minmax(0,1fr)!important;gap:5px!important;margin-top:7px!important}
+body.dockingMode .dockEngine,body.dockingMode .dockHelm{min-height:0!important;padding:6px 4px!important;border:1.5px solid #dbb15d!important;border-radius:12px!important;background:linear-gradient(145deg,#0c263b,#031323)!important}
+body.dockingMode .dockEngine{grid-template-columns:34% minmax(0,1fr)!important;gap:3px!important}
+body.dockingMode .dockEngine strong,body.dockingMode .dockHelm strong{font-size:clamp(9px,2.7vw,14px)!important;margin-bottom:5px;white-space:nowrap}
+body.dockingMode .dockLeverVisual{height:120px!important;min-width:0!important;background:linear-gradient(90deg,#06111b,#193749,#071723)!important;border-color:#50b1bd!important}
+body.dockingMode .dockLeverVisual:before{width:7px!important;background:linear-gradient(90deg,#07131c,#b8d2d9 48%,#2e4857 55%,#020b11)!important}
+body.dockingMode .leverHandle{width:85%!important;height:20px!important;border-radius:5px!important;background:linear-gradient(180deg,#f5ffff,#bacbd1 38%,#637987 62%,#d7e0e2)!important;border:1px solid #e3ca91}
+body.dockingMode .dockEngineStates button{font-size:clamp(8px,2.05vw,12px)!important;min-height:39px!important;padding:2px!important;white-space:nowrap;margin:0!important}
+body.dockingMode .dockEngineStates button.on,body.dockingMode .bowThruster button.on{background:linear-gradient(#b98424,#634314)!important;border-color:#ffe19c!important;box-shadow:0 0 8px #ebbc55a6!important;color:#fff9e9!important}
+body.dockingMode .dockHelmRow{grid-template-columns:1fr 1fr!important;gap:3px!important}
+body.dockingMode .dockHelmWheel{grid-column:1/-1;grid-row:1;width:100%;height:67px!important;min-height:0!important;border:0!important;background:transparent!important;box-shadow:none!important;padding:0!important;display:grid;place-items:center}
+body.dockingMode .dockHelmWheel svg{width:100%;height:100%;max-width:78px;filter:drop-shadow(0 3px 4px #0008)}
+body.dockingMode .dockHelmRow>button:not(.dockHelmWheel){height:35px!important;min-height:35px!important;padding:0!important}
+body.dockingMode .helmArc{font-size:8px;margin:0}
+body.dockingMode .dockHelm small{margin-top:3px!important;font-size:10px}
+body.dockingMode .bowThruster{grid-template-columns:1.1fr repeat(3,minmax(0,1fr))!important;gap:4px!important;padding:6px!important;border-color:#dbb15d!important}
+body.dockingMode .bowThruster strong{grid-column:auto!important;font-size:clamp(8px,2.3vw,13px)!important;text-align:center}
+body.dockingMode .bowThruster button{font-size:clamp(8px,2.2vw,13px)!important;min-height:42px!important;padding:3px!important}
+body.dockingMode .bowThruster[hidden]{display:none!important}
+body.dockingMode .dockNow{background:linear-gradient(180deg,#e6b859,#9f701e 50%,#644310)!important;border:2px solid #ffe8b2!important;box-shadow:0 0 14px #e4aa4e80!important;min-height:52px!important;font-size:clamp(13px,3.8vw,21px)!important;border-radius:16px!important;letter-spacing:0!important}
+body.dockingMode .dockNow:disabled{opacity:.7;box-shadow:none!important}
+body.dockingMode .dockStatus{font-size:clamp(10px,2.7vw,13px)!important;margin-top:7px!important}
+.dockPreviewEntry{display:block;margin:8px 10px;padding:12px;text-align:center;border:1px solid #d7b15e;background:#102d42;color:#ffe0a0;border-radius:12px;font-weight:850}
+.dockPreviewEntry[hidden],.dockPreviewBanner[hidden]{display:none!important}
+.dockPreviewBanner{margin:8px 10px;padding:9px;border:1px solid #c6a35f;border-radius:10px;background:#122c42;color:#ffe1a0;font-size:12px;text-align:center}
+body.dockingMode .dockPreviewEntry:not([data-demo]){display:none!important}
+@media(max-width:360px){body.dockingMode .dockEngine{grid-template-columns:1fr!important}body.dockingMode .dockLeverVisual{display:none!important}body.dockingMode .dockEngineStates button{min-height:36px!important}body.dockingMode .dockHelmWheel{height:58px!important}}
+@media(min-width:600px){body.dockingMode .dockLeverVisual{height:155px!important}body.dockingMode .dockEngineStates button{min-height:49px!important}body.dockingMode .dockHelmWheel{height:100px!important}}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
+<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita</div>
+<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261124-cabin37&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
 <div class="helm cockpitOne">
   <div class="photo cockpitStage" id="window">
     <img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Postazione di comando interattiva Marina Empire">
@@ -535,26 +596,68 @@ body.dockingMode .dockConditions b{display:block;margin-top:2px;color:#fff;font-
     <div class="dockFlowStep"><i></i><b>ORMEGGIO</b></div>
   </div>
 
-  <div class="dockInstruction"><span>ⓘ</span><b>Puoi ormeggiare manualmente oppure usare l’assistenza. Quando la barca è dentro il posto, premi COMPLETA ORMEGGIO.</b></div><div class="dockConditions"><span>💨 VENTO <b id="dockWindTop">0 kn</b></span><span>🌊 CORRENTE <b id="dockCurrentTop">0.0 kn</b></span></div><button id="dockAssist" class="dockAssist" type="button">✨ ASSISTENZA ORMEGGIO</button>
+  <div class="dockInstruction"><span>ⓘ</span><b>Puoi ormeggiare manualmente oppure usare l’assistenza. Quando la barca è dentro il posto, premi COMPLETA ORMEGGIO.</b></div><div class="dockQuick"><div class="dockConditions"><span>VENTO <b id="dockWindTop">0 kn</b></span><span>CORRENTE <b id="dockCurrentTop">0.0 kn</b></span></div><button id="dockAssist" class="dockAssist" type="button">✨ ASSISTENZA ORMEGGIO</button></div>
 
   <div class="berthScene" id="berthScene">
     <div class="dockSceneLabel">⚓ POSTO BARCA <b id="berthNumber">12</b></div>
     <div class="dockAlignBox"><small>⌖ ALLINEAMENTO</small><b id="dockAlignPct">0%</b><div class="dockAlignMeter"><i id="dockAlignFill"></i></div></div>
 
-    <div class="quayTop"><span>12</span></div>
-    <div class="finger fingerLeft"></div>
-    <div class="finger fingerRight"></div>
-    <div class="adjacentYacht adjLeft" aria-hidden="true"></div>
-    <div class="adjacentYacht adjRight" aria-hidden="true"></div>
-    <div class="berthTarget"></div>
-    <div class="dockPath">➜</div>
-    <div class="dockYacht" id="dockYacht" aria-label="Yacht in manovra"></div>
+    <svg class="dockArtwork" viewBox="0 0 600 480" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Porto visto dall'alto, con due pontili, barche ormeggiate e posto barca centrale">
+<defs>
+ <linearGradient id="dockSea" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#124c61"/><stop offset=".48" stop-color="#07455b"/><stop offset="1" stop-color="#03263e"/></linearGradient>
+ <filter id="dockSeaGrain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".032 .13" numOctaves="3" seed="8"/><feColorMatrix type="matrix" values="0 0 0 .25 .02  0 0 0 .55 .07  0 0 0 .7 .10  0 0 0 .40 0"/><feBlend in="SourceGraphic" mode="soft-light"/></filter>
+ <pattern id="dockRipples" width="120" height="64" patternUnits="userSpaceOnUse"><g stroke="#6eb4c6" fill="none" stroke-width=".9" opacity=".3"><path d="M-12 6 Q8 14 29 6 T69 7 T109 6 T149 7 M-16 23 Q0 18 14 22 T50 23 T85 24 T122 23 M-10 44 Q9 51 27 45 T68 44 T111 44 M6 59 Q26 52 45 59 T82 58 T120 59"/><path d="M15 12q10-5 20 0m37 21q15 7 27 0m-74 3q15-7 24-1m19 19q12-6 22 0" opacity=".7"/></g></pattern>
+ <linearGradient id="dockTeak" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#56432b"/><stop offset=".15" stop-color="#c49763"/><stop offset=".5" stop-color="#a77e51"/><stop offset=".85" stop-color="#deb07a"/><stop offset="1" stop-color="#715334"/></linearGradient>
+ <pattern id="dockPlanks" width="10" height="8" patternUnits="userSpaceOnUse"><rect width="10" height="8" fill="#be9868"/><path d="M0 7.5H10" stroke="#795b3b" stroke-width=".7"/><path d="M1 2H8M3 4H9" stroke="#edc99a" stroke-opacity=".35" stroke-width=".5"/></pattern>
+ <pattern id="dockStone" width="35" height="23" patternUnits="userSpaceOnUse"><rect width="35" height="23" fill="#9e9a8c"/><path d="M0 0H35V23H0Z M17 0V23" stroke="#777466" stroke-width=".6" fill="none"/></pattern>
+ <linearGradient id="dockHullPaint" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#a6b5ba"/><stop offset=".14" stop-color="#fcffff"/><stop offset=".48" stop-color="#eef3f3"/><stop offset=".86" stop-color="#fff"/><stop offset="1" stop-color="#829ba5"/></linearGradient>
+ <linearGradient id="dockGlass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4c6975"/><stop offset=".44" stop-color="#122b3b"/><stop offset="1" stop-color="#091825"/></linearGradient>
+ <linearGradient id="dockSteel"><stop stop-color="#b8c6ca"/><stop offset=".28" stop-color="#fff"/><stop offset=".56" stop-color="#6c808c"/><stop offset="1" stop-color="#c4d1d3"/></linearGradient>
+ <radialGradient id="dockLampGlow"><stop stop-color="#ffdb89" stop-opacity=".46"/><stop offset="1" stop-color="#ffc46b" stop-opacity="0"/></radialGradient>
+ <filter id="dockShadow" x="-50%" y="-30%" width="200%" height="160%"><feDropShadow dx="2" dy="5" stdDeviation="3" flood-color="#00101b" flood-opacity=".78"/></filter>
+ <marker id="dockArrow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth"><path d="M0 0L7 3.5L0 7L2 3.5Z" fill="#f0ffff"/></marker>
+ <g id="dockHull">
+  <path d="M0-74C-15-65-29-43-30-21L-29 49Q-29 64-17 68H17Q29 64 29 49L30-21C29-43 15-65 0-74Z" fill="url(#dockHullPaint)" stroke="#e6ecea" stroke-width="1.4" filter="url(#dockShadow)"/>
+  <path d="M0-67C-12-58-25-38-25-20L-24 46Q-24 57-17 61H17Q24 57 24 46L25-20C25-38 12-58 0-67Z" fill="url(#dockPlanks)" stroke="#ad8c64" stroke-width=".8"/>
+  <path d="M-20-44Q0-63 20-44L23-18L-23-18Z" fill="#f7f7f4" stroke="#c9d0cb" stroke-width=".8"/>
+  <path d="M-15-42Q0-50 15-42L19-29H-19Z" fill="#d4dfe0" stroke="#a8b8bc" stroke-width=".7"/>
+  <path d="M-22-18Q0-32 22-18L21 25Q0 33-21 25Z" fill="#f0f3f1" stroke="#99aeb5" stroke-width="1.2"/>
+  <path d="M-19-15Q0-24 19-15L16-5Q0-9-16-5Z" fill="url(#dockGlass)" stroke="#779aa6" stroke-width=".8"/>
+  <path d="M-18 0L-9-2L-9 18L-19 15ZM18 0L9-2L9 18L19 15Z" fill="url(#dockGlass)"/>
+  <rect x="-7" y="1" width="14" height="16" rx="2" fill="#a9bec7" stroke="#e9efee" stroke-width="1"/>
+  <path d="M-17 23Q0 18 17 23L19 31H-19Z" fill="url(#dockGlass)" stroke="#a7b6b8" stroke-width=".7"/>
+  <rect x="-18" y="36" width="36" height="10" rx="2.4" fill="#e8e7de" stroke="#a7a295"/>
+  <rect x="-14" y="48" width="28" height="7" rx="1.5" fill="#b5a18b"/>
+  <path d="M-23 56Q0 61 23 56L22 63H-22Z" fill="#f6f9f7"/>
+  <path d="M0-68C-18-54-28-32-28-12V48M0-68C18-54 28-32 28-12V48" fill="none" stroke="#f7ffff" stroke-width="1.4"/>
+  <path d="M-24-18v59M24-18v59" stroke="#586e75" stroke-width=".6" fill="none"/>
+  <path d="M-4-59H4M-2-64V-55" stroke="#5a6b70" stroke-width="1.3" fill="none"/>
+  <circle cx="-21" cy="-15" r="1.8" fill="#d74346"/><circle cx="21" cy="-15" r="1.8" fill="#42b979"/>
+ </g>
+ <g id="dockFinger"><rect x="0" y="0" width="36" height="211" rx="2" fill="url(#dockTeak)" stroke="#e3ba80" stroke-width="2" filter="url(#dockShadow)"/><rect x="4" y="4" width="28" height="201" fill="url(#dockPlanks)"/><path d="M3 4V207M33 4V207" stroke="#edd4a6" stroke-width="1.2" opacity=".7"/><g fill="#eef2ec" stroke="#a7b5b3" stroke-width=".5"><rect x="-5" y="16" width="7" height="19" rx="3"/><rect x="34" y="16" width="7" height="19" rx="3"/><rect x="-5" y="83" width="7" height="19" rx="3"/><rect x="34" y="83" width="7" height="19" rx="3"/><rect x="-5" y="169" width="7" height="19" rx="3"/><rect x="34" y="169" width="7" height="19" rx="3"/></g><path d="M12 11H24M18 7V15M12 198H24M18 194V202" stroke="#e6eded" stroke-width="3" stroke-linecap="round"/></g>
+</defs>
+<rect width="600" height="480" fill="url(#dockSea)"/><rect width="600" height="480" fill="url(#dockSea)" filter="url(#dockSeaGrain)" opacity=".68"/><rect width="600" height="480" fill="url(#dockRipples)" opacity=".85"/>
+<ellipse cx="212" cy="76" rx="78" ry="94" fill="url(#dockLampGlow)"/><ellipse cx="388" cy="76" rx="78" ry="94" fill="url(#dockLampGlow)"/>
+<rect x="0" y="0" width="600" height="52" fill="url(#dockStone)" stroke="#c8bc9b" stroke-width="2" filter="url(#dockShadow)"/>
+<rect y="39" width="600" height="13" fill="url(#dockTeak)" stroke="#6d5138" stroke-width="1"/>
+<use href="#dockFinger" transform="translate(207 51)"/><use href="#dockFinger" transform="translate(357 51)"/>
+<path d="M250 60H350V276H250Z" fill="#39e69c" fill-opacity=".09" stroke="#60f9ae" stroke-width="2.4" stroke-dasharray="8 5"/>
+<g filter="url(#dockShadow)"><rect x="282" y="25" width="36" height="21" rx="2" fill="#f4ecdc" stroke="#6d6253"/><text x="300" y="41" text-anchor="middle" font-size="16" font-weight="800" fill="#1a2528">12</text></g>
+<g fill="#fff1c5" stroke="#9d7b42" stroke-width="1"><path d="M207 30V45M393 30V45" stroke="#362d23" stroke-width="4"/><circle cx="207" cy="29" r="6"/><circle cx="393" cy="29" r="6"/></g>
+<use href="#dockHull" transform="translate(104 140) rotate(180) scale(.87)"/><use href="#dockHull" transform="translate(496 140) rotate(180) scale(.87)"/>
+<g stroke="#ead5a0" stroke-width="1.2" opacity=".85"><path d="M90 78L80 49M120 78L135 49M480 78L465 49M512 78L525 49"/></g>
+<path id="dockGuideLine" d="M300 321Q300 260 300 122" stroke="#f3ffff" stroke-width="2.3" fill="none" stroke-dasharray="7 6" opacity=".85" marker-end="url(#dockArrow)"/>
+<g id="dockYacht" transform="translate(300 386)" aria-label="Yacht in manovra">
+ <g id="dockWake" opacity="0" stroke="#c2f0ef" fill="none" stroke-linecap="round"><path d="M-19 64Q-24 82-40 103M19 64Q24 82 40 103" stroke-width="4" opacity=".5"/><path d="M-13 65Q-10 83-17 106M13 65Q10 83 17 106M0 70V108" stroke-width="2" opacity=".55"/></g>
+ <use href="#dockHull"/>
+</g>
+</svg>
 
     <div class="distance bowDistance">Prua <b id="distBow">—</b></div>
     <div class="distance portDistance">Sinistra <b id="distPort">—</b></div>
     <div class="distance starDistance">Dritta <b id="distStar">—</b></div>
     <div class="distance sternDistance">Poppa <b id="distStern">—</b></div>
-    <div class="dockSpeed">VELOCITÀ <b id="dockSpeed">0.0 kn</b></div><div class="dockEnv"><span>💨 <b id="dockWind">0 kn</b></span><span>🌊 <b id="dockCurrent">0.0 kn</b></span></div>
+    <div class="dockSpeed">VELOCITÀ <b id="dockSpeed">0.0 kn</b></div>
   </div>
 
   <div class="dockConsole">
@@ -573,7 +676,7 @@ body.dockingMode .dockConditions b{display:block;margin-top:2px;color:#fff;font-
       <div class="helmArc"><span>30°</span><b>0°</b><span>30°</span></div>
       <div class="dockHelmRow">
         <button id="dockHelmLeft" type="button">◀</button>
-        <div class="dockHelmWheel" id="dockHelmWheel">⚓</div>
+        <button class="dockHelmWheel" id="dockHelmWheel" type="button" aria-label="Centra timone"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="wheelGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffdf9a"/><stop offset=".35" stop-color="#b47a36"/><stop offset=".58" stop-color="#efc67e"/><stop offset="1" stop-color="#795027"/></linearGradient></defs><circle cx="50" cy="50" r="31" fill="none" stroke="#382317" stroke-width="12"/><circle cx="50" cy="50" r="31" fill="none" stroke="url(#wheelGold)" stroke-width="8"/><g stroke="url(#wheelGold)" stroke-linecap="round" stroke-width="5"><path d="M50 7V93M7 50H93M20 20L80 80M20 80L80 20"/></g><circle cx="50" cy="50" r="12" fill="url(#wheelGold)" stroke="#f1d9a8" stroke-width="1.5"/><circle cx="50" cy="50" r="5" fill="#dce3e5" stroke="#766c56"/></svg></button>
         <button id="dockHelmRight" type="button">▶</button>
       </div>
       <small id="dockHelmAngle">0°</small>
@@ -601,8 +704,15 @@ body.dockingMode .dockConditions b{display:block;margin-top:2px;color:#fff;font-
   <div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div>
 </section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261124-missions12">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin36"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261124-missions12"><b>🎯</b>MISSIONI</a></nav>
-<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261124-engine23"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin37"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261124-missions12"><b>🎯</b>MISSIONI</a></nav>
+<script src="./local-save-context.js"></script><script>
+window.MarinaDockPreview=new URLSearchParams(location.search).get("anteprima")==="ormeggio";
+if(window.MarinaDockPreview){
+  const now=Date.now(),copy=x=>JSON.parse(JSON.stringify(x)),handle={accountId:null,saveKey:"preview-only"};
+  let demo={name:"Allenamento",coins:10000,prestige:0,fuel:770,condition:100,port:"rimini",boat:"yacht20",owned:["yacht20"],completed:[],reservations:[],voyages:0,voyageSerial:1,setupComplete:true,trip:{id:"DEMO_DOCKING",voyageId:1,dockingVersion:1,origin:"rimini",dest:"cervia",legs:["rimini","cervia"],legIndex:0,legSeconds:20,sec:20,until:now,progressBase:.97,startedAt:now,lastProgressAt:now,lastFuelAt:now,dockingReady:true,dockingDepth:0,dockingOffset:-8,dockingHeading:12,dockingSurge:0,dockingSway:0,dockingYawRate:0,dockingWind:0,dockingCurrent:0,enginePort:0,engineStarboard:0,bowThruster:0,helmAngle:0,dockingLastAt:now,weather:"calm",weatherWear:0,throttleMode:"eco",mission:{id:"DEMO_DOCKING",name:"Allenamento ormeggio",dest:"cervia",boat:"yacht20",reward:0,prestige:0,cost:0,fuel:0}}};
+  window.MarinaLocalSaveContext=Object.freeze({capture:()=>handle,select:()=>true,isCurrent:h=>h===handle,readGame:h=>h===handle?copy(demo):null,writeGame:(h,g)=>{if(h!==handle)return false;demo=copy(g);return true}});
+}
+</script><script src="./mobile-map-lite-v2.js?v=20261124-engine23"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script>if(!window.MarinaDockPreview){const tracker=document.createElement("script");tracker.src="./player-tracker-v2.js?v=20261119-tracker3";document.head.appendChild(tracker);}</script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -697,6 +807,9 @@ function render(){
  $("gaugeFuel").textContent=Math.round((Number(s.fuel)||0)/Math.max(1,Number(shot.tank)||1)*100)+"%";
  $("simHdg").textContent=$("heading").textContent||"—";
  const active=!!t;
+ $("dockPreviewBanner").hidden=!window.MarinaDockPreview;
+ $("dockPreviewEntry").hidden=active;
+ if(window.MarinaDockPreview){$("dockPreviewEntry").textContent="↻ RIPROVA ORMEGGIO";$("dockPreviewEntry").dataset.demo="1";}
  const progress=active?Math.max(0,Math.min(1,Number(t.progress)||0)):(s.lastArrival?1:0);
  const miniFrom=t?.origin||s.lastDockedBridge?.origin,miniTo=t?.dest||s.lastDockedBridge?.destination;
  const miniRoute=miniFrom&&miniTo?(api.routeGeoFor?.(miniFrom,miniTo)||[]):[];
@@ -763,9 +876,12 @@ function render(){
     const off=Math.max(-40,Math.min(40,Number(t.dockingOffset)||0));
     const depth=Math.max(0,Math.min(100,Number(t.dockingDepth)||0));
     const dockHeading=Math.max(-45,Math.min(45,Number(t.dockingHeading)||0));
-    $("dockYacht").style.left=(50+off*.42)+"%";
-    $("dockYacht").style.top=(90-depth*.50)+"%";
-    $("dockYacht").style.transform="translate(-50%,-50%) rotate("+dockHeading+"deg)";
+    const boatX=300+off*2.4,boatY=386-depth*2.65;
+    $("dockYacht").setAttribute("transform","translate("+boatX+" "+boatY+") rotate("+dockHeading+")");
+    const guideY=Math.max(105,boatY-75);
+    $("dockGuideLine").setAttribute("d","M"+boatX+" "+guideY+" Q"+boatX+" "+Math.max(110,guideY-48)+" 300 102");
+    $("dockGuideLine").setAttribute("opacity",depth>=70?".25":".85");
+    $("dockWake").setAttribute("opacity",String(Math.min(.85,Math.abs(Number(t.dockingSurge)||0)*.18+(t.dockingAssist&&depth<84?.38:0))));
     $("dockHelmAngle").textContent=(helm>0?"+":"")+helm+"°";
     $("dockHelmWheel").style.transform="rotate("+(helm*3)+"deg)";
     const align=Math.max(0,Math.round(100-(Math.abs(off)*1.7+Math.abs(dockHeading)*1.5+Math.max(0,78-depth)*1.1)));
@@ -774,7 +890,7 @@ function render(){
     $("distStern").textContent=Math.max(0,Math.round((24.8-depth*.16)*10)/10)+" m";
     $("distPort").textContent=Math.max(.4,Math.round((3.1+off*.035)*10)/10)+" m";
     $("distStar").textContent=Math.max(.4,Math.round((3.3-off*.035)*10)/10)+" m";
-    const dockMotion=Math.min(2.4,Math.abs(Number(t.dockingSurge)||0)*.55+Math.abs(Number(t.dockingSway)||0)*.35);$("dockSpeed").textContent=dockMotion.toFixed(1)+" kn";const windText=Math.round(Number(t.dockingWind)||0)+" kn",currentText=(Number(t.dockingCurrent)||0).toFixed(1)+" kn";$("dockWind").textContent=windText;$("dockCurrent").textContent=currentText;$("dockWindTop").textContent=windText;$("dockCurrentTop").textContent=currentText;
+    const dockMotion=Math.min(2.4,Math.abs(Number(t.dockingSurge)||0)*.55+Math.abs(Number(t.dockingSway)||0)*.35);$("dockSpeed").textContent=dockMotion.toFixed(1)+" kn";const windText=Math.round(Number(t.dockingWind)||0)+" kn",currentText=(Number(t.dockingCurrent)||0).toFixed(1)+" kn"; $("dockWindTop").textContent=windText;$("dockCurrentTop").textContent=currentText;
     document.querySelectorAll("[data-dock-engine]").forEach(b=>{const [side,val]=b.dataset.dockEngine.split(":");const cur=side==="port"?Number(t.enginePort)||0:Number(t.engineStarboard)||0;b.classList.toggle("on",cur===Number(val));});
     $("dockBoatName").textContent=shot.boatName||"M/Y";
     const pEng=Number(t.enginePort)||0,sEng=Number(t.engineStarboard)||0;
@@ -815,7 +931,7 @@ function render(){
   if(s.lastArrival){
    $("arrivalTitle").textContent="⚓ ARRIVO A "+(marinaNames[s.lastArrival.destination]||s.lastArrival.destination||"MARINA").toUpperCase();
    const evBonus=Number(s.lastArrival.eventBonus)||0,evPrestige=Number(s.lastArrival.eventPrestige)||0;
-   $("arrivalReward").innerHTML="<strong>Missione completata</strong><br>+"+fmt(s.lastArrival.reward)+" crediti · +"+fmt(s.lastArrival.prestige)+" prestigio"+(s.lastArrival.eventResult?"<br><small>"+s.lastArrival.eventResult+(evBonus||evPrestige?" · bonus evento incluso":"")+"</small>":"");
+   $("arrivalReward").innerHTML=window.MarinaDockPreview?"<strong>Allenamento completato</strong><br>Nessun credito o progresso della partita reale modificato.":"<strong>Missione completata</strong><br>+"+fmt(s.lastArrival.reward)+" crediti · +"+fmt(s.lastArrival.prestige)+" prestigio"+(s.lastArrival.eventResult?"<br><small>"+s.lastArrival.eventResult+(evBonus||evPrestige?" · bonus evento incluso":"")+"</small>":"");
    window.MarinaEmpirePlayerTracker?.completeVoyage?.(s.lastArrival.voyageId);
   }
   if(!$("notice").dataset.manual)note("Yacht in porto: puoi fare il pieno o la manutenzione utilizzando i pulsanti qui sotto.");
@@ -910,6 +1026,7 @@ $("dockAssist").onclick=()=>{const active=!!window.MarinaEmpireMapLite?.snapshot
 document.querySelectorAll("[data-bow]").forEach(b=>b.onclick=()=>{const r=window.MarinaEmpireMapLite?.setBowThruster?.(Number(b.dataset.bow));if(r?.message)note(r.message);render();});
 $("dockHelmLeft").onclick=()=>{const a=Number(window.MarinaEmpireMapLite?.snapshot?.()?.trip?.helmAngle)||0;commandHelm(Math.max(-30,a-10));};
 $("dockHelmRight").onclick=()=>{const a=Number(window.MarinaEmpireMapLite?.snapshot?.()?.trip?.helmAngle)||0;commandHelm(Math.min(30,a+10));};
+$("dockHelmWheel").onclick=()=>commandHelm(0);
 $("dockNow").onclick=()=>{
  const result=window.MarinaEmpireMapLite?.completeDocking?.();
  if(result?.ok){note("Ormeggio "+result.grade.toLowerCase()+" · bonus +"+fmt(result.bonus)+" crediti e +"+fmt(result.prestige)+" prestigio.");render();}

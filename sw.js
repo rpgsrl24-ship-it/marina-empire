@@ -1,11 +1,11 @@
-const CACHE="marina-empire-v20261124-cabin36";
+const CACHE="marina-empire-v20261124-cabin37";
 const CORE=[
  "./",
  "./index.html",
  "./mobile-home.html?v=20261111-home6",
  "./missions-mobile.html?v=20261124-missions12",
  "./map-mobile.html?v=20261124-map20",
- "./cabina-mobile.html?v=20261124-cabin36",
+ "./cabina-mobile.html?v=20261124-cabin37",
  "./marina-mobile.html?v=20261123-marina5",
  "./fleet-mobile.html?v=20261109-fleet1",
  "./profile-mobile.html?v=20261110-profile1",
