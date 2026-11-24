@@ -1,10 +1,10 @@
-const CACHE="marina-empire-v20261123-modern3";
+const CACHE="marina-empire-v20261124-missions4";
 const CORE=[
  "./",
  "./index.html",
  "./mobile-home.html?v=20261111-home6",
- "./missions-mobile.html?v=20261123-missions10",
- "./map-mobile.html?v=20261123-map19",
+ "./missions-mobile.html?v=20261124-missions12",
+ "./map-mobile.html?v=20261124-map20",
  "./marina-mobile.html?v=20261123-marina5",
  "./fleet-mobile.html?v=20261109-fleet1",
  "./profile-mobile.html?v=20261110-profile1",
