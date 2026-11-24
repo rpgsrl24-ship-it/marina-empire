@@ -60,7 +60,20 @@ function positionAt(route,progress){
 }
 function getHandle(){const c=window.MarinaLocalSaveContext;if(!c)return null;let h=c.capture();if(!h){c.select(null);h=c.capture()}return h}
 function defaultGame(){return{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],trip:null,reservations:[],voyages:0,setupComplete:true,voyageSerial:0}}
-function read(){const c=window.MarinaLocalSaveContext,h=getHandle();if(!c||!h)return null;let g=c.readGame(h);if(g)return g;const fresh=defaultGame();if(c.writeGame(h,fresh))g=c.readGame(h);return g||fresh}
+function read(){
+ const c=window.MarinaLocalSaveContext,h=getHandle();if(!c||!h)return null;
+ let g=c.readGame(h);
+ if(g){
+   let changed=false;
+   if(!Array.isArray(g.owned)){g.owned=[];changed=true}
+   const selected=String(g.boat||"voyager");
+   if(boats.some(x=>x.id===selected)&&!g.owned.includes(selected)){g.owned.push(selected);changed=true}
+   if(!ports.some(p=>p.id===g.port)){g.port="rimini";changed=true}
+   if(changed)c.writeGame(h,g);
+   return g;
+ }
+ const fresh=defaultGame();if(c.writeGame(h,fresh))g=c.readGame(h);return g||fresh
+}
 function mutate(fn){
  const c=window.MarinaLocalSaveContext,h=getHandle();if(!c||!h)return false;
  const s=c.readGame(h);if(!s)return false;
