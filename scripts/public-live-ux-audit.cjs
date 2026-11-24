@@ -136,6 +136,11 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(docking.horizontalOverflow,false,name+': docking has horizontal overflow');
     assert.equal(docking.clipped.length,0,name+': docking has clipped actions '+JSON.stringify(docking.clipped));
     assert.equal(await page.locator('.dockArtwork').isVisible(),true,name+': new docking artwork must be visible');
+    assert.equal(await page.locator('nav.bottom').evaluate(el=>getComputedStyle(el).position),'relative',name+': navigation must not cover docking controls');
+    assert.ok(await page.locator('[data-dock-engine="port:0"]').evaluate(el=>el.getBoundingClientRect().height>=40),name+': motor control must have a usable touch target');
+    const navTop=await page.locator('nav.bottom').evaluate(el=>el.getBoundingClientRect().top+scrollY);
+    const dockBottom=await page.locator('#dockNow').evaluate(el=>el.getBoundingClientRect().bottom+scrollY);
+    assert.ok(navTop>=dockBottom,name+': navigation must be below docking controls');
     await page.locator('#dockAssist').click();
     await page.waitForFunction(()=>!document.getElementById('dockNow')?.disabled,null,{timeout:20000});
     await page.locator('#dockNow').click();
@@ -157,6 +162,14 @@ async function runScenario(browser,name,viewport,mobile){
     const practice=await pageAudit(page,name+' practice');
     assert.equal(practice.horizontalOverflow,false,name+': practice has horizontal overflow');
     assert.equal(practice.clipped.length,0,name+': practice has clipped actions '+JSON.stringify(practice.clipped));
+    assert.equal(await page.locator('nav.bottom').evaluate(el=>getComputedStyle(el).position),'relative',name+': practice navigation must not cover docking controls');
+    const lever=page.locator('[data-lever-side="port"]');
+    if(await lever.isVisible()){
+      await lever.click({position:{x:10,y:10}});
+      assert.equal(await lever.getAttribute('aria-valuenow'),'1',name+': physical lever must command forward');
+      await lever.press('Home');
+      assert.equal(await lever.getAttribute('aria-valuenow'),'0',name+': physical lever must return to neutral');
+    }
     const initial=await page.locator('#dockYacht').getAttribute('transform');
     await page.locator('[data-dock-engine="port:1"]').click();
     await page.locator('[data-dock-engine="starboard:1"]').click();
