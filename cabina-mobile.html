@@ -434,6 +434,25 @@ body.dockingMode .dockAssist.on{border-color:#8af0bd;background:linear-gradient(
  body.dockingMode .starDistance{right:20%!important}
  body.dockingMode .dockEngine,.dockingMode .dockHelm{min-height:165px!important}
 }
+
+/* V36 - cleaner bridge: prioritize chart, helm and throttles */
+.cockpitGps{left:15%!important;top:24%!important;width:70%!important;height:24%!important}
+.cockpitTriplet{left:15%!important;right:15%!important;top:49.5%!important}
+.cockpitGauges{display:none!important}
+.cockpitControls{top:53%!important;grid-template-columns:1fr!important;left:auto!important;right:2.5%!important;width:62px!important}
+.cockpitControls .leftRail,.cockpitControls .simCenter{display:none!important}
+.cockpitControls .rightRail{display:block!important}
+.cockpitControls .rightRail button:not(#vhfBtn){display:none!important}
+.cockpitControls .rightRail #vhfBtn{display:block!important;width:100%!important;min-height:46px!important;font-size:8px!important}
+.helmControl{bottom:14%!important;width:20%!important;min-width:82px!important}
+.cockpitThrottle{left:25%!important;right:15%!important;bottom:12%!important}
+.cockpitThrottle .throttleGrid{grid-template-columns:38% 62%!important}
+@media(max-width:390px){
+ .cockpitGps{left:12%!important;width:76%!important;height:23%!important}
+ .cockpitTriplet{left:12%!important;right:12%!important;top:49%!important}
+ .helmControl{width:22%!important;min-width:78px!important}
+ .cockpitThrottle{left:25%!important;right:12%!important}
+}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <div class="helm cockpitOne">
