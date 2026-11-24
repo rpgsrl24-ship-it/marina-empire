@@ -571,10 +571,83 @@ body.dockingMode .dockStatus{margin-top:5px!important}
 body.dockingMode .dockPreviewBanner{margin:5px 8px;padding:5px 7px;font-size:11px;line-height:1.2}
 @media(max-width:360px){body.dockingMode .dockEngine{grid-template-columns:1fr!important}body.dockingMode .dockLeverVisual{display:none!important}body.dockingMode .dockEngineStates button{min-height:40px!important}body.dockingMode .dockHelmWheel{height:65px!important}}
 @media(min-width:600px){body.dockingMode .dockLeverVisual{height:154px!important}body.dockingMode .dockEngineStates button{min-height:49px!important}body.dockingMode .dockHelmWheel{height:91px!important}}
+
+/* V40: PC docking uses the available width, with the entire maneuver on screen.
+   Portrait phones keep the original vertical layout. No zoom or hidden overflow. */
+@media (min-width:1000px) and (orientation:landscape){
+ body.dockingMode{--dock-frame-reserve:155px;padding:0!important}
+ body.dockingMode.practiceMode{--dock-frame-reserve:182px}
+ body.dockingMode .app{width:100%;max-width:1500px!important;min-height:0!important;padding:0!important}
+ body.dockingMode .head{display:grid!important;grid-template-columns:minmax(275px,.85fr) minmax(0,1.4fr);align-items:center;gap:18px;padding:7px 12px!important}
+ body.dockingMode .brand{gap:10px}
+ body.dockingMode .brand strong{font-size:clamp(19px,2vw,28px)!important}
+ body.dockingMode .brand a{width:34px!important;height:34px!important;flex:none}
+ body.dockingMode .hud{margin:0!important;gap:6px}
+ body.dockingMode .hud div{padding:4px 6px!important}
+ body.dockingMode .hud small{font-size:10px!important}
+ body.dockingMode .hud b{font-size:17px!important;line-height:1.2}
+ body.dockingMode .dockPreviewBanner{margin:4px 10px!important;padding:4px 7px!important}
+ body.dockingMode .dockingReal{
+   display:grid!important;
+   grid-template-columns:minmax(0,1.3fr) minmax(390px,1fr);
+   grid-template-areas:"title flow" "scene instruction" "scene quick" "scene console" "scene bow" "scene complete" "scene status";
+   grid-template-rows:auto auto auto auto auto auto auto;
+   align-content:start;align-items:start;
+   gap:6px 12px!important;
+   width:100%;max-width:none!important;min-height:0!important;
+   margin:4px auto!important;padding:4px 12px!important;
+ }
+ body.dockingMode .dockModeTitle{grid-area:title;margin:0!important;align-self:stretch;padding:6px 10px!important;min-height:40px}
+ body.dockingMode .dockModeName strong{font-size:21px!important}
+ body.dockingMode .dockBoatChip{font-size:12px!important}
+ body.dockingMode .dockFlow{grid-area:flow;margin:0!important;align-self:stretch;padding:3px 8px!important}
+ body.dockingMode .dockFlowStep i{width:23px;height:23px;margin-bottom:1px}
+ body.dockingMode .dockFlowStep b{font-size:11px;line-height:1.1}
+ body.dockingMode .berthScene{grid-area:scene;align-self:center;justify-self:center;width:min(100%,calc(125dvh - 1.25 * var(--dock-frame-reserve)));height:auto!important;max-height:none!important;min-height:0!important;aspect-ratio:600/480!important;margin:0!important}
+ body.dockingMode .dockInstruction{grid-area:instruction;margin:0!important;font-size:13px!important;padding:7px 9px!important}
+ body.dockingMode .dockQuick{grid-area:quick;margin:0!important;gap:6px}
+ body.dockingMode .dockAssist{min-height:44px!important;font-size:12px!important}
+ body.dockingMode .dockConditions span{font-size:10px!important;padding:5px 4px!important}
+ body.dockingMode .dockConditions b{font-size:14px!important}
+ body.dockingMode .dockConsole{grid-area:console;margin:0!important;gap:6px!important;grid-template-columns:minmax(0,1fr) minmax(0,.9fr) minmax(0,1fr)!important}
+ body.dockingMode .dockEngine,body.dockingMode .dockHelm{padding:6px 5px!important;min-height:0!important}
+ body.dockingMode .dockEngine strong,body.dockingMode .dockHelm strong{font-size:13px!important;margin-bottom:5px!important}
+ body.dockingMode .dockEngine{grid-template-columns:33% minmax(0,1fr)!important}
+ body.dockingMode .dockLeverVisual{height:138px!important}
+ body.dockingMode .dockEngineStates button{font-size:11px!important;min-height:44px!important}
+ body.dockingMode .dockHelmWheel{height:75px!important}
+ body.dockingMode .dockHelmRow>button:not(.dockHelmWheel){height:42px!important;min-height:42px!important}
+ body.dockingMode .bowThruster{grid-area:bow;margin:0!important;padding:5px!important}
+ body.dockingMode .bowThruster strong{font-size:11px!important}
+ body.dockingMode .bowThruster button{font-size:11px!important;min-height:42px!important}
+ body.dockingMode .dockNow{grid-area:complete;margin:0!important;min-height:49px!important;font-size:18px!important}
+ body.dockingMode .dockStatus{grid-area:status;margin:0!important;font-size:12px!important;line-height:1.25;min-height:15px}
+ body.dockingMode .bottom{max-width:1500px!important;width:calc(100% - 24px)!important;margin:4px auto!important;padding:3px!important}
+ body.dockingMode .bottom a{padding:3px 2px!important;font-size:10px!important}
+ body.dockingMode .bottom a b{font-size:16px!important;margin-bottom:0}
+}
+@media (min-width:1000px) and (orientation:landscape) and (max-height:700px){
+ body.dockingMode{--dock-frame-reserve:145px}
+ body.dockingMode.practiceMode{--dock-frame-reserve:169px}
+ body.dockingMode .head{padding:4px 10px!important}
+ body.dockingMode .dockModeTitle{min-height:37px;padding:5px 8px!important}
+ body.dockingMode .dockModeName strong{font-size:18px!important}
+ body.dockingMode .dockFlowStep i{width:20px;height:20px}
+ body.dockingMode .dockingReal{gap:4px 10px!important;padding:3px 10px!important}
+ body.dockingMode .dockInstruction{font-size:12px!important;padding:5px 7px!important}
+ body.dockingMode .dockEngine,body.dockingMode .dockHelm{padding:4px!important}
+ body.dockingMode .dockLeverVisual{height:126px!important}
+ body.dockingMode .dockEngineStates button{min-height:40px!important}
+ body.dockingMode .dockHelmWheel{height:66px!important}
+ body.dockingMode .dockHelmRow>button:not(.dockHelmWheel){height:40px!important;min-height:40px!important}
+ body.dockingMode .bowThruster{padding:4px!important}
+ body.dockingMode .bowThruster button{min-height:40px!important}
+ body.dockingMode .dockNow{min-height:45px!important}
+}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
-<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita · v39</div>
-<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261124-cabin39&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
+<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita · v40</div>
+<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261124-cabin40&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
 <div class="helm cockpitOne">
   <div class="photo cockpitStage" id="window">
     <img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Postazione di comando interattiva Marina Empire">
@@ -755,7 +828,7 @@ body.dockingMode .dockPreviewBanner{margin:5px 8px;padding:5px 7px;font-size:11p
   <div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div>
 </section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261124-missions12">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin39"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261124-missions12"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin40"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261124-missions12"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script>
 window.MarinaDockPreview=new URLSearchParams(location.search).get("anteprima")==="ormeggio";
 if(window.MarinaDockPreview){

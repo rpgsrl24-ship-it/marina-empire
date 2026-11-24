@@ -56,6 +56,25 @@ async function pageAudit(page,label){
   },label);
 }
 
+async function assertDesktopDockFits(page,label){
+  const metrics=await page.evaluate(()=>{
+    const selectors=['.head','.dockModeTitle','.dockFlow','#berthScene','.dockInstruction','.dockQuick','.dockConsole','#dockAssist','#dockHelmLeft','#dockHelmRight','#dockNow','#dockStatus','nav.bottom','[data-dock-engine="port:1"]','[data-dock-engine="port:-1"]','[data-dock-engine="starboard:1"]','[data-dock-engine="starboard:-1"]','#bowThrusterBox'];
+    const bounds=selectors.flatMap(sel=>{
+      const el=document.querySelector(sel);if(!el)return [{sel,missing:true}];
+      const r=el.getBoundingClientRect();if(getComputedStyle(el).display==='none'||!r.width||!r.height)return [];
+      return [{sel,left:r.left,top:r.top,right:r.right,bottom:r.bottom}];
+    });
+    const scene=document.querySelector('#berthScene').getBoundingClientRect(),controls=document.querySelector('.dockConsole').getBoundingClientRect();
+    return {width:innerWidth,height:innerHeight,scrollHeight:document.documentElement.scrollHeight,scrollWidth:document.documentElement.scrollWidth,bounds,sideBySide:controls.left>=scene.right-2};
+  });
+  assert.ok(metrics.sideBySide,label+': desktop scene and controls must be side by side');
+  assert.ok(metrics.scrollHeight<=metrics.height+2,label+': desktop must fit vertically '+JSON.stringify(metrics));
+  assert.ok(metrics.scrollWidth<=metrics.width+2,label+': desktop must fit horizontally '+JSON.stringify(metrics));
+  const out=metrics.bounds.filter(r=>r.missing||r.top<-2||r.left<-2||r.bottom>metrics.height+2||r.right>metrics.width+2);
+  assert.deepEqual(out,[],label+': essential controls outside desktop viewport');
+  console.log('DESKTOP_DOCK_FIT '+JSON.stringify({label,width:metrics.width,height:metrics.height,scrollHeight:metrics.scrollHeight,scrollWidth:metrics.scrollWidth}));
+}
+
 async function seedUnifiedGame(context){
   await context.addInitScript(()=>{
     const game={
@@ -133,6 +152,7 @@ async function runScenario(browser,name,viewport,mobile){
     await page.locator('#dockingPanel').waitFor({state:'visible',timeout:180000});
     await page.screenshot({path:path.join(OUT,name+'-docking.png'),fullPage:true,animations:'disabled'});
     const docking=await pageAudit(page,name+' docking');
+    if(!mobile&&viewport.width>=1000)await assertDesktopDockFits(page,name+' real docking');
     assert.equal(docking.horizontalOverflow,false,name+': docking has horizontal overflow');
     assert.equal(docking.clipped.length,0,name+': docking has clipped actions '+JSON.stringify(docking.clipped));
     assert.equal(await page.locator('.dockArtwork').isVisible(),true,name+': new docking artwork must be visible');
@@ -160,9 +180,20 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(await page.locator('#bowThrusterBox').isVisible(),true,name+': practice yacht has bow thruster');
     await page.screenshot({path:path.join(OUT,name+'-practice.png'),fullPage:true,animations:'disabled'});
     const practice=await pageAudit(page,name+' practice');
+    if(!mobile&&viewport.width>=1000)await assertDesktopDockFits(page,name+' practice');
     assert.equal(practice.horizontalOverflow,false,name+': practice has horizontal overflow');
     assert.equal(practice.clipped.length,0,name+': practice has clipped actions '+JSON.stringify(practice.clipped));
     assert.equal(await page.locator('nav.bottom').evaluate(el=>getComputedStyle(el).position),'relative',name+': practice navigation must not cover docking controls');
+    if(!mobile){
+      for(const size of [{width:1366,height:768},{width:1280,height:600},{width:1024,height:600}]){
+        await page.setViewportSize(size);
+        await page.evaluate(()=>window.scrollTo(0,0));
+        await page.waitForTimeout(200);
+        await assertDesktopDockFits(page,name+' practice '+size.width+'x'+size.height);
+        await page.screenshot({path:path.join(OUT,'desktop-practice-'+size.width+'x'+size.height+'.png'),fullPage:false,animations:'disabled'});
+      }
+      await page.setViewportSize(viewport);
+    }
     const lever=page.locator('[data-lever-side="port"]');
     if(await lever.isVisible()){
       await lever.click({position:{x:10,y:10}});
