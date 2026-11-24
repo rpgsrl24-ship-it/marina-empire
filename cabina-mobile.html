@@ -420,6 +420,9 @@ body.dockingMode .dockEngineStates button{font-size:9px!important}
 body.dockingMode .dockHelmWheel{height:82px!important;font-size:31px!important}
 body.dockingMode .bowThruster{margin-top:9px!important}
 body.dockingMode .dockNow{margin-top:13px!important;min-height:58px!important;font-family:Georgia,serif;letter-spacing:.02em}
+body.dockingMode .dockAssist{display:block;width:100%;min-height:52px;margin:9px 0 4px;border:1px solid #5fd5ff;border-radius:14px;background:linear-gradient(180deg,#1687b6,#0b5f86);color:#fff;font-size:12px;font-weight:950;letter-spacing:.03em}
+body.dockingMode .dockAssist.on{border-color:#8af0bd;background:linear-gradient(180deg,#1d9c70,#116447);box-shadow:0 0 0 2px #5ce6aa33}
+
 @media(max-width:390px){
  body.dockingMode .berthScene{height:420px!important;min-height:380px!important}
  body.dockingMode .dockYacht{width:52px!important;height:124px!important}
@@ -505,7 +508,7 @@ body.dockingMode .dockNow{margin-top:13px!important;min-height:58px!important;fo
     <div class="dockFlowStep"><i></i><b>ORMEGGIO</b></div>
   </div>
 
-  <div class="dockInstruction"><span>ⓘ</span><b>Entra lentamente nel posto barca usando motori, timone ed elica di prua.</b></div>
+  <div class="dockInstruction"><span>ⓘ</span><b>Puoi ormeggiare manualmente oppure usare l’assistenza. Quando la barca è dentro il posto, premi COMPLETA ORMEGGIO.</b></div><button id="dockAssist" class="dockAssist" type="button">✨ ASSISTENZA ORMEGGIO</button>
 
   <div class="berthScene" id="berthScene">
     <div class="dockSceneLabel">⚓ POSTO BARCA <b id="berthNumber">12</b></div>
@@ -572,7 +575,7 @@ body.dockingMode .dockNow{margin-top:13px!important;min-height:58px!important;fo
 </section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261124-missions12">Scegli una nuova missione →</a></section>
 </main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin35"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261124-missions12"><b>🎯</b>MISSIONI</a></nav>
-<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261124-engine20"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261124-engine21"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -750,12 +753,12 @@ function render(){
     const pEng=Number(t.enginePort)||0,sEng=Number(t.engineStarboard)||0;
     $("portLeverHandle").style.top=(pEng>0?"18%":pEng<0?"82%":"50%");
     $("starLeverHandle").style.top=(sEng>0?"18%":sEng<0?"82%":"50%");
-    document.querySelectorAll("[data-bow]").forEach(b=>b.classList.toggle("on",(Number(t.bowThruster)||0)===Number(b.dataset.bow)));
+    document.querySelectorAll("[data-bow]").forEach(b=>b.classList.toggle("on",(Number(t.bowThruster)||0)===Number(b.dataset.bow)));$("dockAssist").classList.toggle("on",!!t.dockingAssist);$("dockAssist").textContent=t.dockingAssist?"✨ ASSISTENZA ATTIVA":"✨ ASSISTENZA ORMEGGIO";
     $("bowThrusterBox").classList.toggle("unavailable",!t.bowThrusterAvailable);
     $("bowThrusterBox").querySelector("strong").textContent=t.bowThrusterAvailable?"✣ ELICA DI PRUA":"✣ ELICA DI PRUA · NON DISPONIBILE";
-    const ready=depth>=78&&Math.abs(off)<=6&&Math.abs(dockHeading)<=7&&(Number(t.enginePort)||0)===0&&(Number(t.engineStarboard)||0)===0&&(Number(t.bowThruster)||0)===0;
+    const ready=depth>=70&&Math.abs(off)<=10&&Math.abs(dockHeading)<=12&&(Number(t.enginePort)||0)===0&&(Number(t.engineStarboard)||0)===0&&(Number(t.bowThruster)||0)===0;
     $("dockNow").disabled=!ready;
-    $("dockStatus").textContent=ready?"✅ Posizione corretta · completa l'ormeggio":depth<78?"Entra ancora nel posto barca":Math.abs(off)>6?"Centra la barca tra i finger":Math.abs(dockHeading)>7?"Raddrizza la barca":"Metti motori in FOLLE ed elica su STOP";
+    $("dockStatus").textContent=ready?"✅ Posizione corretta · completa l'ormeggio":t.dockingAssist?"✨ Assistenza attiva · sto allineando la barca":depth<70?"Entra ancora un poco nel posto barca":Math.abs(off)>10?"Centra ancora la barca":Math.abs(dockHeading)>12?"Raddrizza ancora la barca":"Metti motori in FOLLE ed elica su STOP";
   }$("simSog").textContent=t.cruiseKnots+" kn";$("gaugeSpeed").textContent=t.cruiseKnots;$("gaugeTemp").textContent=fmt(t.temp||0);$("gaugeRpm").textContent=fmt(t.rpm||0);
   $("liveRpm").textContent=fmt(t.rpm||0);$("liveTemp").textContent=fmt(t.temp||0)+" °C";$("liveLph").textContent=fmt(t.lph||0)+" L/h";$("liveEta").textContent=Math.max(0,t.remainingSec)+" s";
   $("throttleModeLabel").textContent=(t.throttleLabel||"CROCIERA")+" · "+t.cruiseKnots+" kn";
@@ -876,6 +879,7 @@ function refreshDocking(result){
  render();
 }
 document.querySelectorAll("[data-dock-engine]").forEach(b=>b.onclick=()=>{const [side,val]=b.dataset.dockEngine.split(":");const r=window.MarinaEmpireMapLite?.setDockEngine?.(side,Number(val));if(r?.message)note(r.message);render();});
+$("dockAssist").onclick=()=>{const active=!!window.MarinaEmpireMapLite?.snapshot?.()?.trip?.dockingAssist;const r=window.MarinaEmpireMapLite?.setDockAssist?.(!active);if(r?.message)note(r.message);render();};
 document.querySelectorAll("[data-bow]").forEach(b=>b.onclick=()=>{const r=window.MarinaEmpireMapLite?.setBowThruster?.(Number(b.dataset.bow));if(r?.message)note(r.message);render();});
 $("dockHelmLeft").onclick=()=>{const a=Number(window.MarinaEmpireMapLite?.snapshot?.()?.trip?.helmAngle)||0;commandHelm(Math.max(-30,a-10));};
 $("dockHelmRight").onclick=()=>{const a=Number(window.MarinaEmpireMapLite?.snapshot?.()?.trip?.helmAngle)||0;commandHelm(Math.min(30,a+10));};
