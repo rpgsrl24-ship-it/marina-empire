@@ -291,8 +291,8 @@ function pulse(){
      if(!g.trip)return;const ts=Date.now();
      g.trip.progressBase=.97;g.trip.lastProgressAt=ts;g.trip.lastFuelAt=ts;g.trip.until=ts;g.trip.dockingReady=true;g.trip.throttleMode="eco";
      if(!Number.isFinite(Number(g.trip.dockingOffset)))g.trip.dockingOffset=((Number(g.trip.voyageId)||1)*17%25)-12;
-     if(!Number.isFinite(Number(g.trip.dockingDepth)))g.trip.dockingDepth=18;
-     if(!Number.isFinite(Number(g.trip.dockingHeading)))g.trip.dockingHeading=((Number(g.trip.voyageId)||1)*11%19)-9;
+     if(!Number.isFinite(Number(g.trip.dockingDepth)))g.trip.dockingDepth=0;
+     if(!Number.isFinite(Number(g.trip.dockingHeading)))g.trip.dockingHeading=((Number(g.trip.voyageId)||1)*9%13)-6;
      g.trip.enginePort=0;g.trip.engineStarboard=0;g.trip.bowThruster=0;g.trip.dockingLastAt=ts;
    });
  }
