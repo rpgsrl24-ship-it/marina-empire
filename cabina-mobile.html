@@ -297,6 +297,140 @@ body.dockingMode .bottom{z-index:90}
 .dockStatus{text-align:center!important;margin-top:7px!important;color:#bcd5e1!important;font-size:9px!important}
 body.dockingMode .dockingReal{max-width:620px;margin-left:auto!important;margin-right:auto!important}
 @media(max-width:390px){.berthScene{height:395px!important}.dockModeName strong{font-size:17px}.dockBoatChip{font-size:8px;padding:7px 9px}.adjacentYacht{font-size:44px}.dockYacht{font-size:68px!important}.dockEngine{grid-template-columns:42% 58%}.dockLeverVisual{height:105px}.bowThruster{grid-template-columns:1fr 1fr 1fr!important}.bowThruster strong{grid-column:1/-1}}
+
+/* V35 - approved top-down docking console */
+body.dockingMode{background:#031426}
+body.dockingMode .head{background:linear-gradient(180deg,#031426,#061a30)!important;border-bottom:1px solid #223f58!important}
+body.dockingMode .head .brand strong{font-family:Georgia,serif;letter-spacing:.09em}
+body.dockingMode .bottom{background:#031225f2!important;border-color:#34546c!important}
+body.dockingMode .dockingReal{padding:10px 10px 100px!important;background:linear-gradient(180deg,#031426 0%,#041a2e 55%,#031426 100%)!important}
+body.dockingMode .dockModeTitle{margin-top:2px!important}
+body.dockingMode .dockFlow{margin-bottom:2px!important}
+body.dockingMode .dockInstruction{margin:4px 0 9px!important}
+
+body.dockingMode .berthScene{
+  height:min(51dvh,470px)!important;
+  min-height:390px!important;
+  background:
+    radial-gradient(circle at 50% 16%,#176f8c 0%,#0b506c 34%,#083b59 62%,#062c47 100%)!important;
+  border:2px solid #d5a54c!important;
+  box-shadow:inset 0 0 36px #00111e,0 0 0 1px #5a431c!important;
+}
+body.dockingMode .berthScene:after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.24;
+  background:
+    repeating-radial-gradient(ellipse at 30% 55%,transparent 0 12px,#b7f1ff13 13px 14px,transparent 15px 27px),
+    repeating-radial-gradient(ellipse at 70% 42%,transparent 0 16px,#d1f5ff10 17px 18px,transparent 19px 31px);
+  animation:dockWater 8s linear infinite;
+}
+@keyframes dockWater{0%{transform:translateY(0)}50%{transform:translateY(4px)}100%{transform:translateY(0)}}
+
+body.dockingMode .quayTop{
+  height:54px!important;
+  background:linear-gradient(180deg,#ba9e72 0%,#8c734d 52%,#6d5638 100%)!important;
+  border-bottom:4px solid #4d3c28!important;
+  box-shadow:0 6px 14px #00131f88!important;
+}
+body.dockingMode .quayTop:before,
+body.dockingMode .quayTop:after{
+  content:"";position:absolute;top:8px;width:10px;height:10px;border-radius:50%;
+  background:#ffe79b;box-shadow:0 0 12px 5px #f6c45a88;
+}
+body.dockingMode .quayTop:before{left:42%}
+body.dockingMode .quayTop:after{right:42%}
+body.dockingMode .quayTop span{font-size:19px!important;padding:2px 9px!important;background:#d5c8aa!important;border:1px solid #5e4b34!important}
+
+body.dockingMode .finger{
+  top:54px!important;height:55%!important;width:15.5%!important;
+  background:
+    repeating-linear-gradient(0deg,#9e7b4e 0 9px,#b18b59 10px 18px,#8f6c44 19px 20px)!important;
+  border:1px solid #d2ae77!important;
+  box-shadow:0 0 8px #00131faa!important;
+}
+body.dockingMode .finger:after{
+  content:"";position:absolute;top:14px;bottom:14px;width:10px;border-radius:99px;
+  background:repeating-linear-gradient(180deg,#f4f4f0 0 16px,transparent 17px 39px);
+  opacity:.95
+}
+body.dockingMode .fingerLeft{left:22%!important}
+body.dockingMode .fingerRight{right:22%!important}
+body.dockingMode .fingerLeft:after{right:-7px}
+body.dockingMode .fingerRight:after{left:-7px}
+
+body.dockingMode .berthTarget{
+  left:39.5%!important;right:39.5%!important;top:73px!important;height:52%!important;
+  border:3px dashed #45e6a4!important;border-radius:6px!important;background:#39da9615!important;
+  box-shadow:0 0 12px #2dd9982f inset!important
+}
+body.dockingMode .dockPath{
+  left:47.2%!important;top:35%!important;font-size:46px!important;
+  transform:rotate(-67deg)!important;opacity:.9!important;color:#f4fbff!important
+}
+
+body.dockingMode .dockYacht{
+  position:absolute!important;z-index:8!important;
+  width:58px!important;height:136px!important;
+  margin:0!important;padding:0!important;
+  border-radius:52% 52% 24% 24% / 25% 25% 18% 18%!important;
+  background:
+    linear-gradient(180deg,#f9faf9 0 17%,#dfe8e9 18% 25%,#f5f6f4 26% 56%,#c59b6f 57% 74%,#805b3c 75% 84%,#e8eeec 85% 100%)!important;
+  border:2px solid #d9e0df!important;
+  box-shadow:0 6px 14px #00111dcc,0 0 0 1px #8b6b49 inset!important;
+  transform-origin:50% 56%!important;
+  transition:left .22s linear,top .22s linear,transform .22s linear!important;
+}
+body.dockingMode .dockYacht:before{
+  content:"";position:absolute;left:13px;right:13px;top:24px;height:52px;border-radius:44% 44% 28% 28%;
+  background:linear-gradient(180deg,#223a46,#526c73 30%,#eef3f1 32%,#dbe3e0 100%);
+  border:1px solid #9caeac;box-shadow:0 2px 5px #00131f66
+}
+body.dockingMode .dockYacht:after{
+  content:"";position:absolute;left:20px;right:20px;top:84px;height:28px;border-radius:6px;
+  background:repeating-linear-gradient(90deg,#9a704b 0 3px,#b88960 4px 7px);
+  border:1px solid #745139
+}
+
+body.dockingMode .adjacentYacht{
+  width:51px!important;height:121px!important;top:88px!important;
+  border-radius:52% 52% 24% 24% / 25% 25% 18% 18%!important;
+  background:linear-gradient(180deg,#f8faf9 0 20%,#dfe8e9 21% 29%,#f3f4f2 30% 58%,#b98b60 59% 73%,#826044 74% 82%,#e7eeeb 83% 100%)!important;
+  border:2px solid #d3dfdd!important;box-shadow:0 5px 10px #00131faa!important;opacity:.94!important
+}
+body.dockingMode .adjacentYacht:before{
+  content:"";position:absolute;left:11px;right:11px;top:22px;height:43px;border-radius:42% 42% 28% 28%;
+  background:linear-gradient(#314954,#dce5e3 36%);border:1px solid #9fb0af
+}
+body.dockingMode .adjLeft{left:6%!important;transform:rotate(6deg)!important}
+body.dockingMode .adjRight{right:6%!important;transform:rotate(-6deg)!important}
+
+body.dockingMode .distance{z-index:12!important;background:#06192ee9!important;border:1px solid #678ba0!important;box-shadow:0 3px 10px #00111f99!important}
+body.dockingMode .bowDistance{top:83px!important}
+body.dockingMode .portDistance{left:24%!important;top:49%!important}
+body.dockingMode .starDistance{right:24%!important;top:49%!important}
+body.dockingMode .sternDistance{bottom:8px!important}
+body.dockingMode .dockSpeed{z-index:12!important}
+body.dockingMode .dockSceneLabel{z-index:13!important}
+body.dockingMode .dockAlignBox{z-index:13!important}
+
+body.dockingMode .dockConsole{gap:8px!important}
+body.dockingMode .dockEngine,
+body.dockingMode .dockHelm{min-height:177px!important}
+body.dockingMode .dockLeverVisual{height:122px!important}
+body.dockingMode .dockEngineStates button{font-size:9px!important}
+body.dockingMode .dockHelmWheel{height:82px!important;font-size:31px!important}
+body.dockingMode .bowThruster{margin-top:9px!important}
+body.dockingMode .dockNow{margin-top:13px!important;min-height:58px!important;font-family:Georgia,serif;letter-spacing:.02em}
+@media(max-width:390px){
+ body.dockingMode .berthScene{height:420px!important;min-height:380px!important}
+ body.dockingMode .dockYacht{width:52px!important;height:124px!important}
+ body.dockingMode .adjacentYacht{width:44px!important;height:106px!important}
+ body.dockingMode .fingerLeft{left:21%!important}
+ body.dockingMode .fingerRight{right:21%!important}
+ body.dockingMode .berthTarget{left:38.5%!important;right:38.5%!important}
+ body.dockingMode .portDistance{left:20%!important}
+ body.dockingMode .starDistance{right:20%!important}
+ body.dockingMode .dockEngine,.dockingMode .dockHelm{min-height:165px!important}
+}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <div class="helm cockpitOne">
@@ -380,11 +514,11 @@ body.dockingMode .dockingReal{max-width:620px;margin-left:auto!important;margin-
     <div class="quayTop"><span>12</span></div>
     <div class="finger fingerLeft"></div>
     <div class="finger fingerRight"></div>
-    <div class="adjacentYacht adjLeft">🛥️</div>
-    <div class="adjacentYacht adjRight">🛥️</div>
+    <div class="adjacentYacht adjLeft" aria-hidden="true"></div>
+    <div class="adjacentYacht adjRight" aria-hidden="true"></div>
     <div class="berthTarget"></div>
     <div class="dockPath">➜</div>
-    <div class="dockYacht" id="dockYacht">🛥️</div>
+    <div class="dockYacht" id="dockYacht" aria-label="Yacht in manovra"></div>
 
     <div class="distance bowDistance">Prua <b id="distBow">—</b></div>
     <div class="distance portDistance">Sinistra <b id="distPort">—</b></div>
@@ -437,8 +571,8 @@ body.dockingMode .dockingReal{max-width:620px;margin-left:auto!important;margin-
   <div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div>
 </section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261111-missions9">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261123-cabin34"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
-<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261123-engine17"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261124-cabin35"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a></nav>
+<script src="./local-save-context.js"></script><script src="./mobile-map-lite-v2.js?v=20261124-engine18"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script src="./player-tracker-v2.js?v=20261119-tracker3"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -599,17 +733,17 @@ function render(){
     const off=Math.max(-40,Math.min(40,Number(t.dockingOffset)||0));
     const depth=Math.max(0,Math.min(100,Number(t.dockingDepth)||0));
     const dockHeading=Math.max(-45,Math.min(45,Number(t.dockingHeading)||0));
-    $("dockYacht").style.left=(50+off*.55)+"%";
-    $("dockYacht").style.top=(86-depth*.52)+"%";
+    $("dockYacht").style.left=(50+off*.42)+"%";
+    $("dockYacht").style.top=(90-depth*.50)+"%";
     $("dockYacht").style.transform="translate(-50%,-50%) rotate("+dockHeading+"deg)";
     $("dockHelmAngle").textContent=(helm>0?"+":"")+helm+"°";
     $("dockHelmWheel").style.transform="rotate("+(helm*3)+"deg)";
     const align=Math.max(0,Math.round(100-(Math.abs(off)*1.7+Math.abs(dockHeading)*1.5+Math.max(0,78-depth)*1.1)));
     $("dockAlignPct").textContent=align+"%";$("dockAlignFill").style.width=align+"%";
-    $("distBow").textContent=Math.max(0,Math.round((100-depth)*.18*10)/10)+" m";
-    $("distStern").textContent=Math.max(0,Math.round(depth*.07*10)/10)+" m";
-    $("distPort").textContent=Math.max(.4,Math.round((3.0+off*.05)*10)/10)+" m";
-    $("distStar").textContent=Math.max(.4,Math.round((3.0-off*.05)*10)/10)+" m";
+    $("distBow").textContent=Math.max(0,Math.round((14.6-depth*.12)*10)/10)+" m";
+    $("distStern").textContent=Math.max(0,Math.round((24.8-depth*.16)*10)/10)+" m";
+    $("distPort").textContent=Math.max(.4,Math.round((3.1+off*.035)*10)/10)+" m";
+    $("distStar").textContent=Math.max(.4,Math.round((3.3-off*.035)*10)/10)+" m";
     $("dockSpeed").textContent=(Math.abs(Number(t.enginePort)||0)+Math.abs(Number(t.engineStarboard)||0)>.1?"0.8":"0.0")+" kn";
     document.querySelectorAll("[data-dock-engine]").forEach(b=>{const [side,val]=b.dataset.dockEngine.split(":");const cur=side==="port"?Number(t.enginePort)||0:Number(t.engineStarboard)||0;b.classList.toggle("on",cur===Number(val));});
     $("dockBoatName").textContent=shot.boatName||"M/Y";
