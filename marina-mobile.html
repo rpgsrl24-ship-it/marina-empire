@@ -35,7 +35,7 @@ button.service:target{outline:3px solid #ffd65c;outline-offset:3px;box-shadow:0 
 <section id="structuresPanel" class="panel"><h3>🏢 Strutture</h3><p id="structureText"></p><button class="btn" id="goMarket">APRI MARKETPLACE</button></section>
 <section id="upgradePanel" class="panel"><h3>⬆ Upgrade</h3><p id="upgradeText"></p><button class="btn gold" id="goOffice">GESTIONE AVANZATA</button></section>
 </main><div id="toast" class="toast hide"></div>
-<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261124-missions11"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a class="on" href="./marina-mobile.html?v=20261125-marina7"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261110-market13"><b>🛒</b>MARKET</a></nav>
+<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261124-missions11"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a class="on" href="./marina-mobile.html?v=20261125-marina8"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261110-market13"><b>🛒</b>MARKET</a></nav>
 <script src="./local-save-context.js"></script><script src="./marina-photos-v1.js?v=20261109-photos1"></script><script src="./mobile-marina-lite-v1.js?v=20261125-marinalite4"></script>
 <script>
 (()=>{
@@ -140,8 +140,15 @@ repair.onclick=()=>{const r=window.MarinaEmpireMarinaLite.repair();toastMsg(r.me
 
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));const map={overview:"overview",pontoons:"pontoonsPanel",services:"servicesPanel",structures:"structuresPanel",upgrade:"upgradePanel"};document.getElementById(map[b.dataset.tab])?.classList.add("on")});
 goMap.onclick=()=>location.assign("./map-mobile.html?v=20261111-map16");goMarket.onclick=()=>location.assign("./marketplace-mobile.html?v=20261110-market13");goOffice.onclick=()=>location.assign("./direction-mobile.html?v=20261110-direction1");
-// Ogni ingresso nella pagina Marina parte dalla posizione reale dello yacht.\n// Evita che una selezione rimasta in sessionStorage (es. Rimini) sopravviva a un arrivo in un altro porto.\ntry{\n const currentGame=window.MarinaEmpireMarinaLite?.read?.();\n const currentPort=String(currentGame?.port||"rimini");\n sessionStorage.setItem("marina_empire_selected_marina",currentPort);
- sessionStorage.setItem("marina_empire_selected_marina_at",String(Date.now()));\n}catch(_){}\nrender();
+// Ogni ingresso nella pagina Marina parte dalla posizione reale dello yacht.
+// Evita che una selezione rimasta in sessionStorage (es. Rimini) sopravviva a un arrivo in un altro porto.
+try{
+ const currentGame=window.MarinaEmpireMarinaLite?.read?.();
+ const currentPort=String(currentGame?.port||"rimini");
+ sessionStorage.setItem("marina_empire_selected_marina",currentPort);
+ sessionStorage.setItem("marina_empire_selected_marina_at",String(Date.now()));
+}catch(_){}
+render();
 
 (function(){
  const id=(location.hash||"").slice(1);

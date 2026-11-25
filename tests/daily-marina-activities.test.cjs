@@ -49,3 +49,6 @@ assert(html.includes('jobList=document.getElementById("jobList")'));
 assert(html.includes('jobsPanel.dataset.loaded="true"'));
 assert(html.includes('renderJobs(api,s,g);'));
 assert(html.includes('sessionStorage.setItem("marina_empire_selected_marina_at",String(Date.now()))'));
+
+// Catch malformed inline scripts before deployment (including literal escaped newlines).
+for(const m of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)){if(m[1].trim())new vm.Script(m[1]);}

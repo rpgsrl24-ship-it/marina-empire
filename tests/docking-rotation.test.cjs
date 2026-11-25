@@ -40,3 +40,30 @@ s=scenario();assert(s.api.setDockAssist(true).ok);s.step(1);assert(s.api.setDock
 s=scenario();let g=s.get();g.trip.dockingDepth=75;g.trip.dockingHeading=90;g.trip.dockingManualMoved=true;s.set(g);assert.equal(s.api.completeDocking().ok,false);assert.equal(s.api.rotateDock90(1).ok,false);assert.equal(s.api.setDockOrientation('stern').ok,false);
 s=scenario();g=s.get();g.trip.dockingDepth=84;g.trip.dockingContacts=1;g.trip.dockingManualMoved=true;s.set(g);result=s.api.completeDocking();assert(result.ok);assert.equal(result.manualBonus,0);
 console.log('PASS: quarter turns, bow/stern propulsion, safe completion, manual bonus and no double payout');
+
+for(const boat of ['voyager','open','yacht','yacht14','yacht20','yacht30','luna']){
+ const u=scenario(),g=u.get();g.boat=boat;g.owned=[boat];u.set(g);
+ assert.equal(u.trip().bowThrusterAvailable,true,boat);
+ assert.ok(u.api.setBowThruster(1).ok,boat);u.step(4);
+ assert.ok(u.trip().dockingOffset>0,boat+' thruster moves starboard');
+ assert.ok(Math.abs(u.trip().dockingYawRate)<=3.5);
+ assert.ok(u.api.setBowThruster(0).ok);u.step(15);
+ assert.ok(Math.abs(u.trip().dockingSway)<.1,boat+' stops smoothly');
+ const v=scenario(),x=v.get();x.boat=boat;x.owned=[boat];v.set(x);
+ assert(v.api.setBowThruster(-1).ok);v.step(4);
+ assert.ok(v.trip().dockingOffset<0,boat+' thruster moves port');
+}
+const gps=scenario().api;
+for(const [from,to] of [['rimini','cervia'],['cervia','rimini'],['lignano','brindisi'],['loano','bari']]){
+ let prior=0;
+ for(const p of [0,.01,.1,.25,.5,.75,.97,1]){
+  const r=gps.gpsTrackFor(from,to,p);
+  assert(r&&Number.isFinite(r.bearing));assert(r.bearing>=0&&r.bearing<360);
+  assert.deepEqual(r.position,gps.positionGeoAt(from,to,p));
+  assert.deepEqual(r.travelled[r.travelled.length-1],r.position);
+  assert.deepEqual(r.remaining[0],r.position);
+  assert(r.distance>=prior);prior=r.distance;
+ }
+}
+const q=scenario();assert(q.api.setDockEngine('port',1).ok);assert(q.api.setDockEngine('starboard',-1).ok);q.step(20);assert(Math.abs(q.trip().dockingYawRate)<=3.5);
+console.log('PASS: all seven bow thrusters, bounded motion, and distance-correct GPS tracks');

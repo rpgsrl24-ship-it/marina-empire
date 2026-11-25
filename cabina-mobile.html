@@ -807,10 +807,17 @@ body.navigationMode .actions{display:none!important}body.navigationMode #notice{
  .cockpitStage #voyageEvent.show{display:block}.cockpitStage #voyageEvent .voyageChoices{margin-top:6px}
  .cockpitStage .cockpitPhase .phaseStep b,.cockpitStage .cockpitPhase .phaseStep span{font-size:9px!important}
 }
+
+/* V46: coherent route chart and bounded rotation; docking appearance preserved. */
+.cockpitStage .miniBoat,.cockpitStage .miniWake{transition:left .6s linear,top .6s linear,transform .55s ease-out!important}
+.navMapYacht svg{display:block;width:100%;height:100%;filter:drop-shadow(0 2px 3px #062c48aa);transform-origin:50% 50%;transition:transform .5s ease-out}
+.navRouteLegend{position:absolute;z-index:5;top:5px;left:8px;max-width:calc(100% - 62px);font-size:10px;color:#ecfbff;background:#05273dd9;border-radius:5px;padding:4px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:699px){.navRouteLegend{font-size:9px;max-width:calc(100% - 55px)}}
+@media(prefers-reduced-motion:reduce){.cockpitStage .miniBoat,.cockpitStage .miniWake,.navMapYacht svg,body.dockingMode .dockArtwork #dockYacht{transition:none!important}}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
-<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita · v45</div>
-<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261125-cabin45&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
+<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita · v46</div>
+<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261125-cabin46&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
 <div class="helm cockpitOne">
   <div class="photo cockpitStage" id="window">
     <img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Postazione di comando interattiva Marina Empire">
@@ -824,7 +831,7 @@ body.navigationMode .actions{display:none!important}body.navigationMode #notice{
     <div class="navCaption"><span class="sea-status" id="seaLabel">🌊 VISTA MARE</span><div id="simpleGuide" class="simpleGuide">GPS · TIMONE · MANETTE</div><span class="navChartHint">Tocca il GPS per ingrandire</span></div><div class="navChartRow">
 
     <div class="gpsSlot miniGps cockpitGps" role="button" tabindex="0" title="Apri carta nautica" aria-label="Apri carta nautica a schermo intero">
-      <div class="miniSea"><svg class="miniChart" viewBox="0 0 320 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H50C72 28 60 45 48 64C31 93 44 114 60 150H0Z" class="land"/><path d="M72 0C84 22 83 43 70 70C57 95 72 119 84 150" class="depth"/><path id="miniFullRoute" d="" fill="none" stroke="#71d9ff" stroke-width="3" stroke-dasharray="8 5" opacity=".8"/><path id="miniDoneRoute" d="" fill="none" stroke="#ffe6a6" stroke-width="4"/><circle id="miniStart" cx="45" cy="75" r="6" fill="#44dba9" stroke="white" stroke-width="2"/><circle id="miniEnd" cx="275" cy="75" r="6" fill="#ffc46a" stroke="white" stroke-width="2"/></svg><div class="miniWake" id="miniWake"></div><span class="miniBoat" id="miniBoat" aria-hidden="true"><svg viewBox="0 0 36 66" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="navHull"><stop stop-color="#b1c8d1"/><stop offset=".35" stop-color="#fff"/><stop offset=".8" stop-color="#e0edf1"/><stop offset="1" stop-color="#94b2bf"/></linearGradient></defs><path d="M18 1C29 10 34 24 34 38L31 59Q18 65 5 59L2 38C2 24 7 10 18 1Z" fill="url(#navHull)" stroke="#fff" stroke-width="1.5"/><path d="M18 6Q25 13 28 25H8Q11 13 18 6Z" fill="#bf925e"/><path d="M8 29Q18 20 28 29L28 37Q18 33 8 37Z" fill="#183c52"/><rect x="9" y="38" width="18" height="12" rx="3" fill="#f2f3ee"/><path d="M8 53H28V58H8Z" fill="#ba9464"/><circle cx="5" cy="34" r="2" fill="#ff6f68"/><circle cx="31" cy="34" r="2" fill="#56f0bb"/></svg></span><span class="miniState" id="miniState">GPS · IN PORTO</span><span class="chartNorth" aria-hidden="true">N<br>▲</span><span class="chartExpand" aria-hidden="true">⛶</span></div>
+      <div class="miniSea"><svg class="miniChart" viewBox="0 0 320 150" preserveAspectRatio="none" aria-hidden="true"><path id="miniRemainingRoute" d="" fill="none" stroke="#b5e5ff" stroke-width="2.2" stroke-dasharray="5 4" opacity=".95"/><path id="miniFullRoute" d="" fill="none" stroke="#448cae" stroke-width="1.4" opacity=".3"/><path id="miniDoneRoute" d="" fill="none" stroke="#63e2b5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle id="miniStart" cx="45" cy="75" r="6" fill="#44dba9" stroke="white" stroke-width="2"/><circle id="miniEnd" cx="275" cy="75" r="6" fill="#ffc46a" stroke="white" stroke-width="2"/></svg><div class="miniWake" id="miniWake"></div><span class="miniBoat" id="miniBoat" aria-hidden="true"><svg viewBox="0 0 36 66" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="navHull"><stop stop-color="#b1c8d1"/><stop offset=".35" stop-color="#fff"/><stop offset=".8" stop-color="#e0edf1"/><stop offset="1" stop-color="#94b2bf"/></linearGradient></defs><path d="M18 1C29 10 34 24 34 38L31 59Q18 65 5 59L2 38C2 24 7 10 18 1Z" fill="url(#navHull)" stroke="#fff" stroke-width="1.5"/><path d="M18 6Q25 13 28 25H8Q11 13 18 6Z" fill="#bf925e"/><path d="M8 29Q18 20 28 29L28 37Q18 33 8 37Z" fill="#183c52"/><rect x="9" y="38" width="18" height="12" rx="3" fill="#f2f3ee"/><path d="M8 53H28V58H8Z" fill="#ba9464"/><circle cx="5" cy="34" r="2" fill="#ff6f68"/><circle cx="31" cy="34" r="2" fill="#56f0bb"/></svg></span><span class="navRouteLegend" id="navRouteLegend">ROTTA SCHEMATICA · carta completa con un tocco</span><span class="miniState" id="miniState">GPS · IN PORTO</span><span class="chartNorth" aria-hidden="true">N<br>▲</span><span class="chartExpand" aria-hidden="true">⛶</span></div>
     </div>
 
     <div class="cockpitTriplet">
@@ -992,7 +999,7 @@ body.navigationMode .actions{display:none!important}body.navigationMode #notice{
   <div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div>
 </section>
 <section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261125-missions13">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261125-cabin45"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261125-missions13"><b>🎯</b>MISSIONI</a></nav>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261125-cabin46"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261125-missions13"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script>
 window.MarinaDockPreview=new URLSearchParams(location.search).get("anteprima")==="ormeggio";
 if(window.MarinaDockPreview){
@@ -1000,13 +1007,13 @@ if(window.MarinaDockPreview){
   let demo={name:"Allenamento",coins:10000,prestige:0,fuel:770,condition:100,port:"rimini",boat:"yacht20",owned:["yacht20"],completed:[],reservations:[],voyages:0,voyageSerial:1,setupComplete:true,trip:{id:"DEMO_DOCKING",voyageId:1,dockingVersion:1,origin:"rimini",dest:"cervia",legs:["rimini","cervia"],legIndex:0,legSeconds:20,sec:20,until:now,progressBase:.97,startedAt:now,lastProgressAt:now,lastFuelAt:now,dockingReady:true,dockingDepth:0,dockingOffset:-8,dockingHeading:12,dockingSurge:0,dockingSway:0,dockingYawRate:0,dockingWind:0,dockingCurrent:0,enginePort:0,engineStarboard:0,bowThruster:0,helmAngle:0,dockingLastAt:now,dockingStartedAt:now,weather:"calm",weatherWear:0,throttleMode:"eco",mission:{id:"DEMO_DOCKING",name:"Allenamento ormeggio",dest:"cervia",boat:"yacht20",reward:0,prestige:0,cost:0,fuel:0}}};
   window.MarinaLocalSaveContext=Object.freeze({capture:()=>handle,select:()=>true,isCurrent:h=>h===handle,readGame:h=>h===handle?copy(demo):null,writeGame:(h,g)=>{if(h!==handle)return false;demo=copy(g);return true},layoutKey:()=>null,readLayout:()=>null,writeLayout:()=>false,resetLayout:()=>false,hasExternalChange:()=>false});
 }
-</script><script src="./mobile-map-lite-v2.js?v=20261125-engine26"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script>if(!window.MarinaDockPreview){const tracker=document.createElement("script");tracker.src="./player-tracker-v2.js?v=20261119-tracker3";document.head.appendChild(tracker);}</script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</script><script src="./mobile-map-lite-v2.js?v=20261125-engine27"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script>if(!window.MarinaDockPreview){const tracker=document.createElement("script");tracker.src="./player-tracker-v2.js?v=20261119-tracker3";document.head.appendChild(tracker);}</script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
 function dockClock(ms){const sec=Math.max(0,Math.floor((Number(ms)||0)/1000));return String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")}
 const marinaNames={rose:"Isola delle Rose",rimini:"Rimini",ancona:"Ancona",lignano:"Lignano",cervia:"Cervia",bari:"Bari",ravenna:"Marina di Ravenna",pescara:"Pescara",brindisi:"Brindisi",salerno:"Salerno",nettuno:"Nettuno",scarlino:"Scarlino",loano:"Loano",portocervo:"Porto Cervo",capodorlando:"Capo d'Orlando"};
-let map=null,routeLine=null,boatMarker=null,depMarker=null,arrMarker=null,activeVoyage="",lastPosition=null,centered=false,followEnabled=true,routeBounds=null;
+let map=null,routeLine=null,sailedLine=null,boatMarker=null,depMarker=null,arrMarker=null,activeVoyage="",lastPosition=null,centered=false,followEnabled=true,routeBounds=null;
 let activeEventVoyage=0;
 const voyageEvents={
  rescue:{eyebrow:"VHF · CH 16",title:"Richiesta di assistenza",text:"Un'imbarcazione segnala un'avaria a poche miglia dalla tua rotta. Come vuoi gestire l'intervento?",a:{label:"DEVIA E SOCCORRI",sub:"+250 crediti · +25 prestigio",code:"rescue"},b:{label:"COORDINA GUARDIA COSTIERA",sub:"+100 crediti · +12 prestigio",code:"coastguard"}},
@@ -1050,6 +1057,12 @@ function initChart(){
  setTimeout(()=>map?.invalidateSize(),250);
 }
 function point(geo){return Array.isArray(geo)&&geo.length===2&&geo.every(Number.isFinite)?geo:null}
+// Unwrap visual headings so crossing 0/360 or +/-180 never spins a full circle.
+function continuousHeading(previous,next){
+ const p=Number(previous),n=Number(next)||0;
+ return Number.isFinite(p)?p+((n-p+180)%360+360)%360-180:n;
+}
+let miniCourseKey="",miniAngle=NaN,dockCourseKey="",dockAngle=NaN,fullMapAngle=NaN;
 function setVoyage(api,from,to,progress,inMotion){
  const key=from+"|"+to;
  const gps=api.routeGeoFor?.(from,to)||[];
@@ -1058,8 +1071,8 @@ function setVoyage(api,from,to,progress,inMotion){
  if(key!==activeVoyage){
   activeVoyage=key;centered=false;
   if(map){
-   routeLine?.remove();depMarker?.remove();arrMarker?.remove();boatMarker?.remove();
-   routeLine=L.polyline(pts,{color:"#087fc8",weight:5,opacity:.9}).addTo(map);
+   routeLine?.remove();sailedLine?.remove();depMarker?.remove();arrMarker?.remove();boatMarker?.remove();boatMarker=null;fullMapAngle=NaN;
+   routeLine=L.polyline(pts,{color:"#1585be",weight:4,opacity:.95,dashArray:"8 7"}).addTo(map);sailedLine=L.polyline([],{color:"#20b78c",weight:5,opacity:.95}).addTo(map);
    depMarker=L.circleMarker(pts[0],{radius:6,color:"#fff",weight:2,fillColor:"#19a4d7",fillOpacity:1}).addTo(map).bindTooltip(marinaNames[from]||from,{permanent:true,direction:"top",offset:[0,-4],className:"port-tooltip"});
    arrMarker=L.circleMarker(pts[pts.length-1],{radius:6,color:"#fff",weight:2,fillColor:"#f7aa2b",fillOpacity:1}).addTo(map).bindTooltip(marinaNames[to]||to,{permanent:true,direction:"bottom",offset:[0,5],className:"port-tooltip"});
    routeBounds=L.latLngBounds(pts).pad(.58);
@@ -1067,19 +1080,20 @@ function setVoyage(api,from,to,progress,inMotion){
    centered=true;
   }
  }
- const geo=api.positionGeoAt?.(from,to,progress)||pts[0];
+ const track=api.gpsTrackFor?.(from,to,progress),geo=track?.position||api.positionGeoAt?.(from,to,progress)||pts[0];
  lastPosition=geo;
- if(map){
-  if(!boatMarker)boatMarker=L.marker(geo,{icon:L.divIcon({className:"",html:'<div style="font-size:27px;filter:drop-shadow(0 0 4px white)">🛥️</div>',iconSize:[32,32],iconAnchor:[16,16]})}).addTo(map);
-  boatMarker.setLatLng(geo);
-  if(inMotion&&followEnabled){if(map.getZoom()<10)map.setView(geo,10,{animate:false});else map.panTo(geo,{animate:false});}
- }
- const prev=api.positionGeoAt?.(from,to,Math.max(0,progress-.003))||geo;
- const dy=(geo[0]-prev[0])*Math.PI/180,dx=(geo[1]-prev[1])*Math.cos(geo[0]*Math.PI/180)*Math.PI/180;
- const routeHeading=Math.round((Math.atan2(dx,dy)*180/Math.PI+360)%360);
+ const routeHeading=Math.round(track?.bearing||0);
  const helm=Math.max(-30,Math.min(30,Number(api.snapshot?.()?.trip?.helmAngle)||0));
- const helmEffect=Math.round(helm*.42);
- const heading=(routeHeading+helmEffect+360)%360;
+ const helmEffect=inMotion?Math.round(helm*.3):0,heading=(routeHeading+helmEffect+360)%360;
+ if(map){
+  if(!boatMarker)boatMarker=L.marker(geo,{icon:L.divIcon({className:"navMapYacht",html:'<svg viewBox="0 0 36 66" aria-hidden="true"><path d="M18 1C29 10 34 24 34 38L31 59Q18 65 5 59L2 38C2 24 7 10 18 1Z" fill="#fff" stroke="#184b66" stroke-width="2"/><path d="M7 29Q18 20 29 29V37H7Z" fill="#124765"/><rect x="9" y="40" width="18" height="15" rx="3" fill="#c8a578"/></svg>',iconSize:[23,42],iconAnchor:[11.5,21]})}).addTo(map);
+  boatMarker.setLatLng(geo);
+  if(track){routeLine?.setLatLngs(track.remaining);sailedLine?.setLatLngs(track.travelled);}
+  const icon=boatMarker.getElement()?.querySelector("svg");
+  fullMapAngle=continuousHeading(fullMapAngle,heading);
+  if(icon)icon.style.transform="rotate("+fullMapAngle+"deg)";
+  if(inMotion&&followEnabled&&$("largeGps").classList.contains("expanded")){if(map.getZoom()<10)map.setView(geo,10,{animate:false});else map.panTo(geo,{animate:false});}
+ }
  $("heading").textContent=String(heading).padStart(3,"0")+"°";
  $("simHdg").textContent=String(heading).padStart(3,"0")+"°";
  $("gpsRoute").textContent=(marinaNames[from]||from)+" → "+(marinaNames[to]||to);
@@ -1103,34 +1117,30 @@ function render(){
  if(window.MarinaDockPreview){$("dockPreviewEntry").textContent="↻ RIPROVA ORMEGGIO";$("dockPreviewEntry").dataset.demo="1";}
  const progress=active?Math.max(0,Math.min(1,Number(t.progress)||0)):(s.lastArrival?1:0);
  const miniFrom=t?.origin||s.lastDockedBridge?.origin,miniTo=t?.dest||s.lastDockedBridge?.destination;
- const miniRoute=miniFrom&&miniTo?(api.routeGeoFor?.(miniFrom,miniTo)||[]):[];
- if(miniRoute.length>=2){
-  const lats=miniRoute.map(p=>p[0]),lons=miniRoute.map(p=>p[1]);
+ const miniTrack=miniFrom&&miniTo?api.gpsTrackFor?.(miniFrom,miniTo,progress):null;
+ if(miniTrack){
+  const key=String(t?.voyageId||"idle")+"|"+miniFrom+"|"+miniTo;
+  if(key!==miniCourseKey){miniCourseKey=key;miniAngle=NaN;}
+  const rect=document.querySelector(".miniSea").getBoundingClientRect(),w=320,h=rect.width>0&&rect.height>0?Math.max(50,Math.min(500,w*rect.height/rect.width)):150;
+  document.querySelector(".miniChart").setAttribute("viewBox","0 0 "+w+" "+h);
+  const lats=miniTrack.points.map(p=>p[0]),lons=miniTrack.points.map(p=>p[1]);
   const minLat=Math.min(...lats),maxLat=Math.max(...lats),minLon=Math.min(...lons),maxLon=Math.max(...lons);
-  const latScale=Math.max(.02,maxLat-minLat),lonScale=Math.max(.02,maxLon-minLon);
-  const sx=250/lonScale,sy=102/latScale;
-  const scale=Math.min(sx,sy);
-  const cx=(minLon+maxLon)/2,cy=(minLat+maxLat)/2;
-  const points=miniRoute.map(([lat,lon])=>({x:160+(lon-cx)*scale,y:73-(lat-cy)*scale}));
-  const d=points.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join(" ");
-  $("miniFullRoute").setAttribute("d",d);
-  const fraction=Math.max(0,Math.min(1,progress));
-  const miniPosition=api.positionGeoAt?.(miniFrom,miniTo,fraction)||miniRoute[0];
-  const bx=160+(miniPosition[1]-cx)*scale,by=73-(miniPosition[0]-cy)*scale;
-  const completed=points.slice(0,Math.max(1,Math.floor(fraction*(points.length-1))+1));
-  completed.push({x:bx,y:by});
-  $("miniDoneRoute").setAttribute("d",completed.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join(" "));
-  $("miniStart").setAttribute("cx",points[0].x);$("miniStart").setAttribute("cy",points[0].y);
-  $("miniEnd").setAttribute("cx",points[points.length-1].x);$("miniEnd").setAttribute("cy",points[points.length-1].y);
-  $("miniBoat").style.left=(bx/320*100)+"%";$("miniBoat").style.top=(by/150*100)+"%";
-  const later=api.positionGeoAt?.(miniFrom,miniTo,Math.min(1,fraction+.008))||miniPosition;
-  const bearing=((Math.atan2((later[1]-miniPosition[1])*Math.cos(miniPosition[0]*Math.PI/180),later[0]-miniPosition[0])*180/Math.PI)+360)%360;
-  if(Number.isFinite(bearing)){const helmTurn=active?Math.max(-30,Math.min(30,Number(t?.helmAngle)||0))*.42:0;$("miniBoat").style.setProperty("--heading",(bearing+helmTurn).toFixed(1)+"deg");}
-  $("miniWake").style.left=(bx/320*100)+"%";$("miniWake").style.top=(by/150*100)+"%";$("miniWake").style.setProperty("--heading",$("miniBoat").style.getPropertyValue("--heading"));
+  const cx=(minLon+maxLon)/2,cy=(minLat+maxLat)/2,cos=Math.max(.1,Math.cos(cy*Math.PI/180)),scale=Math.min((w-50)/Math.max(.001,(maxLon-minLon)*cos),(h-34)/Math.max(.001,maxLat-minLat));
+  const xy=([lat,lon])=>({x:w/2+(lon-cx)*cos*scale,y:h/2-(lat-cy)*scale});
+  const path=pts=>pts.map((p,i)=>{const q=xy(p);return(i?"L":"M")+q.x.toFixed(2)+" "+q.y.toFixed(2)}).join(" ");
+  $("miniFullRoute").setAttribute("d",path(miniTrack.points));$("miniDoneRoute").setAttribute("d",path(miniTrack.travelled));$("miniRemainingRoute").setAttribute("d",path(miniTrack.remaining));
+  const first=xy(miniTrack.points[0]),last=xy(miniTrack.points[miniTrack.points.length-1]),pos=xy(miniTrack.position);
+  $("miniStart").setAttribute("cx",first.x);$("miniStart").setAttribute("cy",first.y);
+  $("miniEnd").setAttribute("cx",last.x);$("miniEnd").setAttribute("cy",last.y);
+  const helmTurn=active?Math.max(-30,Math.min(30,Number(t?.helmAngle)||0))*.3:0;
+  miniAngle=continuousHeading(miniAngle,miniTrack.bearing+helmTurn);
+  for(const id of ["miniBoat","miniWake"]){const el=$(id);el.style.left=(pos.x/w*100)+"%";el.style.top=(pos.y/h*100)+"%";el.style.setProperty("--heading",miniAngle.toFixed(2)+"deg");}
+  $("navRouteLegend").textContent=(marinaNames[miniFrom]||miniFrom)+" → "+(marinaNames[miniTo]||miniTo)+" · carta completa ⛶";
  }else{
-  $("miniFullRoute").setAttribute("d","");$("miniDoneRoute").setAttribute("d","");
+  ["miniFullRoute","miniDoneRoute","miniRemainingRoute"].forEach(id=>$(id).setAttribute("d",""));
   $("miniStart").setAttribute("cx",-20);$("miniEnd").setAttribute("cx",-20);
-  $("miniBoat").style.left="50%";$("miniBoat").style.top="48%";
+  $("miniBoat").style.left="50%";$("miniBoat").style.top="48%";$("miniBoat").style.setProperty("--heading","0deg");
+  $("navRouteLegend").textContent="ROTTA SCHEMATICA · carta completa ⛶";miniCourseKey="";miniAngle=NaN;
  }
  $("miniState").textContent=active?"GPS LIVE · "+Math.round(progress*100)+"%":"⚓ IN PORTO";
  $("chartDistance").textContent=active?Math.max(0,Math.round(t.distance*(1-progress)))+" NM":"0 NM";
@@ -1171,7 +1181,10 @@ function render(){
     $("dockBowMode").disabled=depth>20&&stern;$("dockSternMode").disabled=depth>20&&!stern;
     $("dockRotateLeft").disabled=!canTurn;$("dockRotateRight").disabled=!canTurn;
     const boatX=300+off*1.8,boatY=386-depth*2.65;
-    $("dockYacht").setAttribute("transform","translate("+boatX+" "+boatY+") rotate("+dockHeading+") scale(1.2)");
+    const key=String(t.voyageId)+"|"+t.id;
+    if(key!==dockCourseKey){dockCourseKey=key;dockAngle=NaN;}
+    dockAngle=continuousHeading(dockAngle,dockHeading);
+    $("dockYacht").setAttribute("transform","translate("+boatX+" "+boatY+") rotate("+dockAngle+") scale(1.2)");
     const guideY=Math.max(105,boatY-89);
     $("dockGuideLine").setAttribute("d","M"+boatX+" "+guideY+" Q"+boatX+" "+Math.max(110,guideY-48)+" 300 102");
     $("dockGuideLine").setAttribute("opacity",depth>=70?".25":".85");
@@ -1193,8 +1206,8 @@ function render(){
     document.querySelectorAll("[data-lever-side]").forEach(el=>{const v=el.dataset.leverSide==="port"?pEng:sEng;el.setAttribute("aria-valuenow",String(v));el.setAttribute("aria-valuetext",v>0?"Avanti":v<0?"Indietro":"Folle");});
     document.querySelectorAll("[data-bow]").forEach(b=>b.classList.toggle("on",(Number(t.bowThruster)||0)===Number(b.dataset.bow)));$("dockAssist").classList.toggle("on",!!t.dockingAssist);$("dockAssist").textContent=t.dockingAssist?"✨ ASSISTENZA ATTIVA":"✨ ASSISTENZA ORMEGGIO";
     $("bowThrusterBox").classList.toggle("unavailable",!t.bowThrusterAvailable);$("bowThrusterBox").hidden=!t.bowThrusterAvailable;
-    $("bowThrusterBox").querySelector("strong").textContent="✣ ELICA DI PRUA";
-    const stopped=!turning&&Math.abs(Number(t.dockingSurge)||0)<=.55&&Math.abs(Number(t.dockingYawRate)||0)<=.55;
+    $("bowThrusterBox").querySelector("strong").textContent="✣ ELICA DI PRUA";$("bowThrusterBox").title="Potenza relativa: "+t.bowThrusterPower+"%";
+    const stopped=!turning&&Math.abs(Number(t.dockingSurge)||0)<=.55&&Math.abs(Number(t.dockingYawRate)||0)<=.55&&Math.abs(Number(t.dockingSway)||0)<=.45;
     const ready=depth>=70&&Math.abs(off)<=10&&headingError<=12&&stopped&&(Number(t.enginePort)||0)===0&&(Number(t.engineStarboard)||0)===0&&(Number(t.bowThruster)||0)===0;
     $("dockNow").disabled=!ready;$("dockNow").textContent=ready?"⚓ COMPLETA ORMEGGIO":t.dockingAssist?"✨ ASSISTENZA IN CORSO":turning?"ROTAZIONE IN CORSO":"⚓ PORTA LA BARCA NEL POSTO";
     const clean=!t.dockingAssistUsed&&!t.dockingContacts;
@@ -1205,7 +1218,7 @@ function render(){
   $("throttleModeLabel").textContent=(t.throttleLabel||"CROCIERA")+" · "+t.cruiseKnots+" kn";
   document.querySelectorAll("[data-throttle]").forEach(b=>b.classList.toggle("on",b.dataset.throttle===t.throttleMode));
   const pos=t.throttleMode==="fast"?14:t.throttleMode==="eco"?78:49;$("throttleLever").style.top=pos+"%";$("throttleLeverTwin").style.top=pos+"%";
-  setVoyage(api,t.origin,t.dest,t.progress,true);$("simHdg").textContent=$("heading").textContent;
+  setVoyage(api,t.origin,t.dest,t.progress,!t.dockingReady);$("simHdg").textContent=$("heading").textContent;
   const phasePct=Math.max(0,Math.min(100,Math.round(t.progress*100)));$("phaseFill").style.width=phasePct+"%";
   ["phaseExit","phaseNav","phaseApproach"].forEach(id=>$(id).classList.remove("done","active"));
   if(t.progress<.15){$("phaseExit").classList.add("active");$("phaseExitText").textContent="In corso";$("phaseNavText").textContent="Attesa";$("phaseApproachText").textContent="Attesa";}

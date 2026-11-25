@@ -135,6 +135,8 @@ async function runScenario(browser,name,viewport,mobile){
     await page.locator('#dockPreviewEntry').waitFor({state:'attached',timeout:15000});
     await page.locator('body.navigationMode .navDeck').waitFor({state:'visible',timeout:15000});
     assert.equal(await page.locator('#miniBoat svg').isVisible(),true,name+': live yacht');
+    assert.ok(await page.locator('#miniRemainingRoute').getAttribute('d'),name+': GPS shows remaining track');
+    assert.ok(await page.locator('#miniDoneRoute').getAttribute('d'),name+': GPS shows sailed track');
     assert.equal(await page.locator('#helmWheel svg').isVisible(),true,name+': steering wheel');
     const bridge=await pageAudit(page,name+' navigation bridge');
     assert.equal(bridge.horizontalOverflow,false,name+': navigation horizontal overflow');
@@ -181,6 +183,7 @@ async function runScenario(browser,name,viewport,mobile){
     const navTop=await page.locator('nav.bottom').evaluate(el=>el.getBoundingClientRect().top+scrollY);
     const dockBottom=await page.locator('#dockNow').evaluate(el=>el.getBoundingClientRect().bottom+scrollY);
     assert.ok(navTop>=dockBottom,name+': navigation must be below docking controls');
+    assert.equal(await page.locator('#bowThrusterBox').isVisible(),true,name+': Academy 8 bow thruster');
     await page.locator('#dockAssist').click();
     await page.waitForFunction(()=>!document.getElementById('dockNow')?.disabled,null,{timeout:20000});
     await page.locator('#dockNow').click();
@@ -259,7 +262,7 @@ async function runScenario(browser,name,viewport,mobile){
     const cup=await pageAudit(page,name+' cup');
     assert.equal(cup.horizontalOverflow,false,name+': cup has horizontal overflow');
     assert.equal(cup.clipped.length,0,name+': cup has clipped controls');
-    await page.goto(LIVE+'marina-mobile.html?v=20261125-marina7#jobs',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.goto(LIVE+'marina-mobile.html?v=20261125-marina8#jobs',{waitUntil:'domcontentloaded',timeout:30000});
     await page.locator('#jobsPanel[data-loaded="true"]').waitFor({state:'visible',timeout:15000}).catch(async e=>{throw new Error(name+': Marina Live did not render; '+JSON.stringify({errors,save:await page.evaluate(()=>{const g=JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'{}');return {port:g.port,voyages:g.voyages,trip:!!g.trip,engine:!!window.MarinaEmpireMarinaLite}})}))});
     assert.equal(await page.locator('.jobCard').count(),3,name+': expected three local job cards');
     assert.ok(await page.locator('[data-job-open="dock"]').count(),name+': dock job blocked: '+await page.locator('#jobText').innerText());
