@@ -12,7 +12,10 @@
 .panel{display:none;margin:0 8px 10px;padding:12px;border:1px solid #b5d8e7;border-radius:18px;background:#fff}#jobsPanel{display:block;border-color:#79cce9;background:linear-gradient(180deg,#f7fdff,#eaf8fd)}.panel.on{display:block}.panel h3{margin:0 0 8px}.panel .row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #e6eef2;font-size:9px}.panel .row:last-child{border-bottom:0}.btn{width:100%;min-height:46px;border:1px solid #b6d5e4;border-radius:14px;background:linear-gradient(180deg,#159df3,#0869da);color:white;font-weight:950}.btn.gold{background:linear-gradient(180deg,#f6cf57,#d99a16);color:#17334c;border-color:#efbd3e}.btn:disabled{opacity:.45}.toast{position:fixed;z-index:50;left:50%;bottom:86px;transform:translateX(-50%);max-width:88%;padding:10px 14px;border-radius:999px;background:#082e4be8;color:white;font-size:9px;font-weight:800;box-shadow:0 8px 25px #001f3366}.hide{display:none!important}
 .bottom{position:fixed;z-index:30;left:6px;right:6px;bottom:6px;max-width:608px;margin:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:5px;border:1px solid #58c1eb;border-radius:18px;background:#f8fcfef5;box-shadow:0 8px 26px #00395855;backdrop-filter:blur(12px)}.bottom a{min-width:0;min-height:58px;border-radius:12px;color:#0a456f;font-size:5.5px;font-weight:950;text-decoration:none;text-align:center;padding:6px 1px}.bottom a b{display:block;margin-bottom:3px;font-size:19px}.bottom a.on{background:linear-gradient(180deg,#159df3,#0869da);color:#fff}
 @media(max-width:390px){.panorama img{height:230px}.grid{grid-template-columns:1fr}.bottom a{font-size:5px}}
-button.service:target{outline:3px solid #ffd65c;outline-offset:3px;box-shadow:0 0 22px #ffd65c88}</style></head><body><main class="app">
+button.service:target{outline:3px solid #ffd65c;outline-offset:3px;box-shadow:0 0 22px #ffd65c88}
+.jobsHead{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}.jobsHead h3{font-size:15px;line-height:1.25}.jobsHead>b{flex:none;color:#075785;background:#dff2fb;border:1px solid #a0cfe5;border-radius:9px;padding:5px 7px;font-size:12px}
+#jobText{font-size:12px;line-height:1.4;margin:6px 0 10px;color:#315b72}.jobList{display:grid;gap:8px}.jobCard{background:#fff;border:1px solid #b7d7e6;border-radius:12px;padding:10px;color:#113c59}.jobCard h4{font-size:14px;margin:0 0 5px}.jobCard .jobReward{color:#146b48;font-size:11px;font-weight:800}.jobCard p{font-size:12px;line-height:1.4;margin:7px 0}.jobCard .jobChoices{display:grid;gap:5px}.jobCard .jobChoice{background:#f1f8fc;border:1px solid #9bcadd;border-radius:9px;color:#0b4266;text-align:left;min-height:44px;font:700 12px system-ui;padding:8px 9px}.jobCard .jobOpen{width:100%;min-height:40px;margin-top:8px;font-size:11px}.jobCard .jobDone{font-size:11px;font-weight:850;color:#18714b}.jobFoot{margin:10px 0 0;color:#4e7186;font-size:10px;line-height:1.4}.jobCard .jobFeedback{color:#8c4d19;font-weight:750}
+</style></head><body><main class="app">
 <header class="head"><div class="top"><a class="round" href="./mobile-home.html?v=20261111-home6">☰</a><div class="brand"><b>⚓ MARINA EMPIRE</b><small>IL GESTIONALE NAUTICO ONLINE</small></div><div class="round">👨‍✈️</div></div><div class="hud"><div><span>🪙 CREDITI</span><b id="coins">—</b></div><div><span>⭐ PRESTIGIO</span><b id="prestige">—</b></div><div><span>⛽ CARBURANTE</span><b id="fuel">—</b></div></div><div class="hero"><i>⚓</i><div><h1 id="marinaPageTitle">Base – La tua Marina</h1><p>Gestisci il tuo porto, i pontili e i servizi.</p></div></div></header>
 <nav class="tabs"><button class="on" data-tab="overview">🏠 Panoramica</button><button data-tab="pontoons">🛥 Pontili</button><button data-tab="services">🛠 Servizi</button><button data-tab="structures">🏢 Strutture</button><button data-tab="upgrade">⬆ Upgrade</button></nav>
 <section class="selector"><label>MARINA SELEZIONATA</label><select id="marinaSelect"><option value="rimini">Rimini</option><option value="cervia">Cervia</option><option value="ancona">Ancona</option><option value="lignano">Lignano</option><option value="ravenna">Marina di Ravenna</option><option value="pescara">Marina di Pescara</option><option value="bari">Bari</option><option value="brindisi">Marina di Brindisi</option><option value="salerno">Marina d’Arechi — Salerno</option><option value="nettuno">Marina di Nettuno</option><option value="scarlino">Marina di Scarlino</option><option value="loano">Marina di Loano</option><option value="portocervo">Marina di Porto Cervo</option><option value="capodorlando">Marina di Capo d’Orlando</option><option value="rose">Isola delle Rose</option></select></section>
@@ -25,18 +28,19 @@ button.service:target{outline:3px solid #ffd65c;outline-offset:3px;box-shadow:0 
 <a class="service" href="./marketplace-mobile.html?v=20261110-market13"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><b>🛒 Market</b></a>
 </section>
 <section class="income"><div><small>ENTRATE MARINA STIMATE / GIORNO</small><strong id="netIncome">—</strong></div><div>📈</div></section>
-<section id="jobsPanel" class="panel on"><h3>📻 Marina Live · Incarico locale</h3><p id="jobText">Caricamento incarico…</p><div class="row"><span>Ricompensa</span><b id="jobReward">—</b></div><button class="btn gold" id="jobAction" type="button">APRI INCARICO</button></section>
+<section id="jobsPanel" class="panel on"><div class="jobsHead"><h3>📻 Marina Live · Incarichi giornalieri</h3><b id="jobsCount">0 / 3</b></div><p id="jobText" role="status">Caricamento incarichi…</p><div id="jobList" class="jobList"></div><p class="jobFoot">Massimo 3 incarichi al giorno in tutte le marine. Nuovi incarichi a mezzanotte locale.</p></section>
 <section id="overview" class="panel on"><h3>Panoramica</h3><div class="row"><span>Entrate base</span><b id="baseIncome">—</b></div><div class="row"><span>Entrate ormeggi</span><b id="berthIncome">—</b></div><div class="row"><span>Personale</span><b id="staffCost">—</b></div><div class="row"><span>Manutenzione</span><b id="maintCost">—</b></div><div class="row"><span>Utenze</span><b id="utilCost">—</b></div></section>
 <section id="pontoonsPanel" class="panel"><h3>🛥 Pontili</h3><p id="pontoonText"></p></section>
 <section id="servicesPanel" class="panel"><h3>🛠 Servizi</h3><p>Rifornimento, manutenzione e servizi operativi sono disponibili quando il tuo yacht si trova nella marina selezionata.</p><button class="btn" id="goMap">APRI MAPPA</button></section>
 <section id="structuresPanel" class="panel"><h3>🏢 Strutture</h3><p id="structureText"></p><button class="btn" id="goMarket">APRI MARKETPLACE</button></section>
 <section id="upgradePanel" class="panel"><h3>⬆ Upgrade</h3><p id="upgradeText"></p><button class="btn gold" id="goOffice">GESTIONE AVANZATA</button></section>
 </main><div id="toast" class="toast hide"></div>
-<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261124-missions11"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a class="on" href="./marina-mobile.html?v=20261123-marina5"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261110-market13"><b>🛒</b>MARKET</a></nav>
-<script src="./local-save-context.js"></script><script src="./marina-photos-v1.js?v=20261109-photos1"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script>
+<nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261111-map16"><b>🗺️</b>MAPPA</a><a href="./missions-mobile.html?v=20261124-missions11"><b>🎯</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a class="on" href="./marina-mobile.html?v=20261125-marina6"><b>⚓</b>MARINA</a><a href="./marketplace-mobile.html?v=20261110-market13"><b>🛒</b>MARKET</a></nav>
+<script src="./local-save-context.js"></script><script src="./marina-photos-v1.js?v=20261109-photos1"></script><script src="./mobile-marina-lite-v1.js?v=20261125-marinalite4"></script>
 <script>
 const fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
 function toastMsg(t){toast.textContent=t;toast.classList.remove("hide");clearTimeout(window.__tt);window.__tt=setTimeout(()=>toast.classList.add("hide"),2300)}
+let openJob=null,jobFeedback="";
 function render(){
  const api=window.MarinaEmpireMarinaLite;if(!api)return;
  const s=api.snapshot(),g=s.game;
@@ -57,16 +61,32 @@ function render(){
  pontoonText.textContent="Pontili attivi: "+s.built+" · capacità "+s.capacity+" ormeggi · "+s.available+" disponibili.";
  structureText.textContent=s.owned?"La marina è di tua proprietà. Le strutture cresceranno con sviluppo, servizi e attività.":"Questa marina non è ancora di tua proprietà. Puoi usarne i servizi quando sei presente, ma gli investimenti richiedono l'acquisizione.";
  upgradeText.textContent=s.owned?"Sviluppo attuale livello "+s.level+". La gestione avanzata consente investimenti e potenziamenti.":"Acquista la marina dalla gestione avanzata per sbloccare upgrade e rendite.";
- const js=api.jobStatus?.()||{available:false,message:"Incarichi non disponibili",reward:0,prestige:0};
- jobText.textContent=js.message||"Incarico Marina Live";
- jobReward.textContent=(js.reward||0)+" crediti · "+(js.prestige||0)+" prestigio";
- jobAction.disabled=!js.available;
- jobAction.textContent=js.available?"ACCETTA E COMPLETA":"NON DISPONIBILE";
+ const js=api.jobStatus?.()||{available:false,message:"Incarichi non disponibili",count:0,limit:3,jobs:[]};
+ document.getElementById("jobsCount").textContent=js.count+" / "+js.limit;
+ jobText.textContent=js.message||"Incarichi Marina Live";
+ jobList.replaceChildren();
+ (js.jobs||[]).forEach(j=>{
+   const card=document.createElement("article");card.className="jobCard";
+   const title=document.createElement("h4");title.textContent=j.title;
+   const reward=document.createElement("div");reward.className="jobReward";reward.textContent="+"+fmt(j.reward)+" crediti · +"+fmt(j.prestige)+" prestigio";
+   card.append(title,reward);
+   if(j.completed){const done=document.createElement("p");done.className="jobDone";done.textContent="✓ INCARICO COMPLETATO";card.append(done)}
+   else if(j.available){
+     const btn=document.createElement("button");btn.type="button";btn.className="btn gold jobOpen";btn.textContent=openJob===j.id?"CHIUDI INCARICO":"APRI INCARICO";btn.dataset.jobOpen=j.key;btn.setAttribute("aria-expanded",String(openJob===j.id));btn.onclick=()=>{openJob=openJob===j.id?null:j.id;jobFeedback="";render()};card.append(btn);
+     if(openJob===j.id){
+       const question=document.createElement("p");question.textContent=j.request;const choices=document.createElement("div");choices.className="jobChoices";
+       j.options.forEach((text,i)=>{const b=document.createElement("button");b.type="button";b.className="jobChoice";b.dataset.jobChoice=String(i);b.textContent=text;b.onclick=()=>{const r=api.completeJob(j.id,i);jobFeedback=r.message;if(r.ok){openJob=null;toastMsg(r.message)}render()};choices.append(b)});
+       card.append(question,choices);
+       if(jobFeedback){const p=document.createElement("p");p.className="jobFeedback";p.setAttribute("role","status");p.textContent=jobFeedback;card.append(p)}
+     }
+   }else{const p=document.createElement("p");p.textContent="Non disponibile";card.append(p)}
+   jobList.append(card);
+ });
 }
-marinaSelect.onchange=()=>{if(window.MarinaEmpireMarinaLite.setSelected(marinaSelect.value)){render();toastMsg("Marina selezionata")}};
+marinaSelect.onchange=()=>{if(window.MarinaEmpireMarinaLite.setSelected(marinaSelect.value)){openJob=null;jobFeedback="";render();toastMsg("Marina selezionata")}};
 refuel.onclick=()=>{const r=window.MarinaEmpireMarinaLite.refuel();toastMsg(r.message);render()};
 repair.onclick=()=>{const r=window.MarinaEmpireMarinaLite.repair();toastMsg(r.message);render()};
-jobAction.onclick=()=>{const r=window.MarinaEmpireMarinaLite.completeJob();toastMsg(r.message);render()};
+
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));const map={overview:"overview",pontoons:"pontoonsPanel",services:"servicesPanel",structures:"structuresPanel",upgrade:"upgradePanel"};document.getElementById(map[b.dataset.tab])?.classList.add("on")});
 goMap.onclick=()=>location.assign("./map-mobile.html?v=20261111-map16");goMarket.onclick=()=>location.assign("./marketplace-mobile.html?v=20261110-market13");goOffice.onclick=()=>location.assign("./direction-mobile.html?v=20261110-direction1");
 // Ogni ingresso nella pagina Marina parte dalla posizione reale dello yacht.\n// Evita che una selezione rimasta in sessionStorage (es. Rimini) sopravviva a un arrivo in un altro porto.\ntry{\n const currentGame=window.MarinaEmpireMarinaLite?.read?.();\n const currentPort=String(currentGame?.port||"rimini");\n sessionStorage.setItem("marina_empire_selected_marina",currentPort);\n}catch(_){}\nrender();
@@ -76,7 +96,7 @@ goMap.onclick=()=>location.assign("./map-mobile.html?v=20261111-map16");goMarket
  if(id==="jobs"){
    document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));
    jobsPanel.classList.add("on");
-   setTimeout(()=>{jobsPanel.scrollIntoView({behavior:"smooth",block:"start"});jobAction.focus({preventScroll:true});},80);
+   setTimeout(()=>{jobsPanel.scrollIntoView({behavior:"smooth",block:"start"});jobsPanel.querySelector(".jobOpen")?.focus({preventScroll:true});},80);
    return;
  }
  if(id!=="refuel"&&id!=="repair")return;

@@ -54,25 +54,88 @@ function repair(){
  const saved=read();if(!saved||Number(saved.coins)!==nextCoins||Number(saved.condition)!==100||saved.trip)return{ok:false,message:"Manutenzione non confermata"};
  return{ok:true,cost,beforeCoins,afterCoins:nextCoins,recovered:prep.recovered,message:(prep.recovered?prep.message+" · ":"")+"Manutenzione completata · -"+cost.toLocaleString("it-IT")+" crediti"};
 }
-function jobStatus(){
- const game=read();if(!game)return{ok:false,available:false,message:"Salvataggio non disponibile"};
- const id=selectedId(game),here=game.port===id,used=Math.max(0,Number(game.guestTrialJobsUsed)||0),voyages=Math.max(0,Number(game.voyages)||0);
- if(game.trip)return{ok:true,available:false,message:game.trip.dockingReady?"Completa l\'ormeggio dalla Cabina.":(Number(game.fuel)||0)<=0?"Carburante esaurito: usa Rifornimento per il recupero d\'emergenza.":"Completa prima la navigazione in corso.",reward:250,prestige:10};
- if(!here)return{ok:true,available:false,message:"Raggiungi "+portName(id)+" per accettare un incarico locale.",reward:250,prestige:10};
- if(voyages<1)return{ok:true,available:false,message:"Completa prima la missione iniziale Rimini → Cervia.",reward:250,prestige:10};
- if(used>=1)return{ok:true,available:false,message:"Incarico gratuito già completato. Altri incarichi saranno disponibili con la progressione.",reward:250,prestige:10,completed:true};
- return{ok:true,available:true,message:"Assistenza ormeggio e controllo pontile · "+portName(id),reward:250,prestige:10};
+// Daily Marina Live activities. The calendar is local to the device.
+const dayKey=ms=>{const d=new Date(ms);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const previousDay=ms=>{const d=new Date(ms);d.setDate(d.getDate()-1);return dayKey(d.getTime())};
+const validDay=v=>typeof v==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(v)?v:"";
+const asRecord=v=>v&&typeof v==="object"&&!Array.isArray(v)?v:{};
+const num=v=>Math.max(0,Math.floor(Number(v)||0));
+const JOB_LIMIT=3;
+const jobTemplates=[
+ {key:"dock",title:"Assistenza ormeggio",request:"Un comandante chiede assistenza all'arrivo. Come prepari il posto barca?",options:["Preparo cime e parabordi e confermo il posto libero","Faccio entrare lo yacht senza controlli","Invito lo yacht a entrare a piena velocità"],correct:0,reward:250,prestige:10},
+ {key:"pontoon",title:"Controllo pontili",request:"Durante il giro trovi una cima allentata. Cosa fai?",options:["Ignoro la segnalazione","Metto in sicurezza la cima e segnalo l'anomalia","Rimuovo tutte le cime del pontile"],correct:1,reward:220,prestige:10},
+ {key:"service",title:"Assistenza servizi di bordo",request:"Un ospite chiede acqua e corrente alla banchina. Qual è la priorità?",options:["Collego senza verifiche","Apro tutti i servizi insieme","Verifico disponibilità e collegamenti prima del servizio"],correct:2,reward:260,prestige:12},
+ {key:"welcome",title:"Accoglienza charter",request:"Arrivano ospiti per un charter. Quale accoglienza organizzi?",options:["Confermo prenotazione, accessi e informazioni di sicurezza","Li lascio cercare lo yacht da soli","Salto la verifica della prenotazione"],correct:0,reward:280,prestige:14},
+ {key:"sup",title:"Preparazione water toys",request:"Un cliente vuole usare un SUP. Quale controllo fai prima della consegna?",options:["Consegno senza verificare","Controllo gonfiaggio, dotazioni e condizioni del mare","Gonfio oltre la pressione indicata"],correct:1,reward:230,prestige:11},
+ {key:"weather",title:"Assistenza meteo",request:"È previsto vento forte. Quale servizio organizzi per gli armatori?",options:["Ignoro l'avviso","Rimuovo i parabordi","Avviso i clienti e verifico ormeggi e protezioni"],correct:2,reward:300,prestige:15}
+];
+function dailyState(game,now=Date.now()){
+ const day=dayKey(now),r=asRecord(game?.retention),old=asRecord(r.daily),d=asRecord(r.dailyV2);
+ const modern=Object.hasOwn(r,"dailyV2");
+ const loginDay=modern?validDay(d.loginDay):validDay(old.day),missionDay=modern?validDay(d.missionDay):old.missionClaimed?validDay(old.day):"";
+ const lastSeen=validDay(d.lastSeen),clockMismatch=[loginDay,missionDay,lastSeen,validDay(game?.marinaDailyJobs?.day)].some(x=>x>day);
+ const streak=Math.min(7,num(modern?d.streak:old.streak)),priorStreak=loginDay===previousDay(now)?streak:0;
+ const arrived=entry=>{const at=Number(entry?.at);return Number.isFinite(at)&&at>0&&at<=now&&dayKey(at)===day&&!entry.emergency&&String(entry.id||"")!=="DEMO_DOCKING"};
+ const todayMission=(Array.isArray(game?.missionHistory)&&game.missionHistory.some(arrived))||arrived(game?.lastArrival);
+ return {day,loginDay,missionDay,clockMismatch,streak:loginDay===day?streak:priorStreak,loginClaimed:loginDay===day,missionClaimed:missionDay===day,missionDone:!!todayMission,loginReward:Math.min(600,300+priorStreak*50),missionReward:500,missionPrestige:10};
 }
-function completeJob(){
- const status=jobStatus();if(!status.available)return{ok:false,message:status.message};
- const game=read();if(!game)return{ok:false,message:"Salvataggio non disponibile"};
- game.coins=Math.max(0,Number(game.coins)||0)+250;
- game.prestige=Math.max(0,Number(game.prestige)||0)+10;
- game.guestTrialJobsUsed=Math.max(0,Number(game.guestTrialJobsUsed)||0)+1;
- game.npcJobsCompleted=Math.max(0,Number(game.npcJobsCompleted)||0)+1;
- game.lastNpcJob={id:"MOBILE_MARINA_TRIAL_"+String(game.port||"rimini"),type:"Assistenza ormeggio",reward:250,cost:0,prestige:10,reputation:5,sector:"marina",port:String(game.port||"rimini"),at:Date.now()};
- if(!write(game))return{ok:false,message:"Salvataggio incarico non confermato"};
- return{ok:true,message:"Incarico completato · +250 crediti · +10 prestigio",reward:250,prestige:10};
+function claimDaily(kind,now=Date.now()){
+ if(!["login","mission"].includes(kind))return{ok:false,message:"Premio non valido"};
+ const x=context(),game=x?.c.readGame(x.h);if(!game)return{ok:false,message:"Salvataggio non disponibile"};
+ const s=dailyState(game,now);
+ if(s.clockMismatch)return{ok:false,message:"Controlla la data del dispositivo"};
+ if(kind==="login"&&s.loginClaimed||kind==="mission"&&s.missionClaimed)return{ok:false,message:"Premio già riscosso"};
+ if(kind==="mission"&&!s.missionDone)return{ok:false,message:"Completa una missione oggi"};
+ const reward=kind==="login"?s.loginReward:s.missionReward,prestige=kind==="mission"?s.missionPrestige:0;
+ game.retention=asRecord(game.retention);
+ const next={loginDay:s.loginDay,missionDay:s.missionDay,streak:s.streak,lastSeen:s.day};
+ if(kind==="login"){next.loginDay=s.day;next.streak=Math.min(7,s.streak+1)}else next.missionDay=s.day;
+ game.retention.dailyV2=next;
+ game.retention.daily={...asRecord(game.retention.daily),day:next.loginDay,streak:next.streak,missionClaimed:next.loginDay===s.day&&next.missionDay===s.day,baseVoyages:num(game.voyages)};
+ game.coins=Math.max(0,Number(game.coins)||0)+reward;game.prestige=Math.max(0,Number(game.prestige)||0)+prestige;
+ if(!x.c.writeGame(x.h,game))return{ok:false,message:"Salvataggio non confermato. Riprova."};
+ return{ok:true,reward,prestige,message:"Premio riscosso · +"+reward+" crediti"+(prestige?" · +"+prestige+" prestigio":"")};
 }
-window.MarinaEmpireMarinaLite={ports,snapshot,setSelected,refuel,repair,read,jobStatus,completeJob};
+function dailyJobCatalog(game,now=Date.now(),id=game?.port||"rimini"){
+ const day=dayKey(now),old=asRecord(game?.marinaDailyJobs),clockMismatch=validDay(old.day)>day||dailyState(game,now).clockMismatch;
+ const same=old.day===day,done=same&&Array.isArray(old.done)?old.done.filter(x=>typeof x==="string"):[],count=same?Math.min(JOB_LIMIT,Math.max(done.length,num(old.count))):0;
+ const legacy=game?.lastNpcJob,legacyToday=!old.day&&num(game?.guestTrialJobsUsed)>0&&Number(legacy?.at)>0&&dayKey(Number(legacy.at))===day;
+ const used=Math.max(count,legacyToday?1:0);
+ const tutorial=same?!!old.tutorial:num(game?.guestTrialJobsUsed)===0||legacyToday;
+ let reason="";
+ if(clockMismatch)reason="Controlla la data del dispositivo.";
+ else if(game?.trip)reason=game.trip.dockingReady?"Completa l'ormeggio dalla Cabina.":"Completa prima la navigazione in corso.";
+ else if(game?.port!==id)reason="Raggiungi "+portName(id)+" per svolgere gli incarichi locali.";
+ else if(num(game?.voyages)<1)reason="Completa prima la missione iniziale Rimini → Cervia.";
+ else if(used>=JOB_LIMIT)reason="Tutti gli incarichi di oggi sono completati. Torna domani!";
+ const seed=Array.from(day+"|"+id).reduce((a,ch)=>(a*31+ch.charCodeAt(0))>>>0,0);
+ const first=tutorial?0:seed%jobTemplates.length;
+ const jobs=[0,1,2].map((_,i)=>{
+   const t=jobTemplates[(first+i)%jobTemplates.length],jobId=day+"|"+id+"|"+t.key;
+   const completed=done.includes(jobId)||(legacyToday&&t.key==="dock"&&legacy?.port===id);
+   return {id:jobId,key:t.key,title:t.title,request:t.request,options:t.options.slice(),reward:t.reward,prestige:t.prestige,completed,available:!reason&&!completed};
+ });
+ return {day,port:id,limit:JOB_LIMIT,count:used,tutorial,jobs,available:jobs.some(j=>j.available),message:reason||"Scegli un incarico di "+portName(id)+". Risolvi la richiesta per ottenere il premio.",clockMismatch};
+}
+function jobStatus(now=Date.now()){
+ const game=read();if(!game)return{ok:false,available:false,count:0,limit:JOB_LIMIT,jobs:[],message:"Salvataggio non disponibile"};
+ return {ok:true,...dailyJobCatalog(game,now,selectedId(game))};
+}
+function completeJob(id,choice,now=Date.now()){
+ const x=context(),game=x?.c.readGame(x.h);if(!game)return{ok:false,message:"Salvataggio non disponibile"};
+ const status=dailyJobCatalog(game,now,selectedId(game)),job=status.jobs.find(j=>j.id===id);
+ if(!job?.available)return{ok:false,message:status.message||"Incarico non disponibile"};
+ const template=jobTemplates.find(t=>t.key===job.key);
+ if(!Number.isInteger(choice)||choice!==template.correct)return{ok:false,message:"Scelta non corretta. Rileggi la richiesta e riprova."};
+ const old=asRecord(game.marinaDailyJobs),done=old.day===status.day&&Array.isArray(old.done)?old.done.slice():[];
+ for(const j of status.jobs)if(j.completed&&!done.includes(j.id))done.push(j.id);
+ done.push(id);game.marinaDailyJobs={day:status.day,count:status.count+1,tutorial:status.tutorial,done};
+ game.coins=Math.max(0,Number(game.coins)||0)+job.reward;game.prestige=Math.max(0,Number(game.prestige)||0)+job.prestige;
+ game.guestTrialJobsUsed=Math.max(1,num(game.guestTrialJobsUsed));game.npcJobsCompleted=num(game.npcJobsCompleted)+1;
+ game.marinaOperations=asRecord(game.marinaOperations);const ops=asRecord(game.marinaOperations[status.port]);game.marinaOperations[status.port]={...ops,completed:num(ops.completed)+1};
+ game.lastNpcJob={id,type:job.title,reward:job.reward,cost:0,prestige:job.prestige,reputation:5,sector:"marina",port:status.port,at:now};
+ if(!x.c.writeGame(x.h,game))return{ok:false,message:"Salvataggio incarico non confermato. Riprova."};
+ return{ok:true,message:"Incarico completato · +"+job.reward+" crediti · +"+job.prestige+" prestigio",reward:job.reward,prestige:job.prestige};
+}
+window.MarinaEmpireMarinaLite={ports,snapshot,setSelected,refuel,repair,read,jobStatus,dailyJobCatalog,completeJob,dailyState,claimDaily};
 })();

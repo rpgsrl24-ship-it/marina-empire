@@ -244,6 +244,24 @@ async function runScenario(browser,name,viewport,mobile){
     const cup=await pageAudit(page,name+' cup');
     assert.equal(cup.horizontalOverflow,false,name+': cup has horizontal overflow');
     assert.equal(cup.clipped.length,0,name+': cup has clipped controls');
+    await page.goto(LIVE+'marina-mobile.html?v=20261125-marina6#jobs',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('#jobsCount').waitFor({state:'visible',timeout:15000});
+    assert.match(await page.locator('#jobsCount').innerText(),/0 \/ 3/);
+    await page.locator('[data-job-open="dock"]').click();
+    await page.locator('[data-job-choice="1"]').click();
+    assert.match(await page.locator('.jobFeedback').innerText(),/non corretta/);
+    await page.locator('[data-job-choice="0"]').click();
+    assert.match(await page.locator('#jobsCount').innerText(),/1 \/ 3/);
+    const jobsAudit=await pageAudit(page,name+' marina jobs');
+    assert.equal(jobsAudit.horizontalOverflow,false,name+': jobs layout overflow');
+    await page.goto(LIVE+'mobile-home.html?v=20261111-home6',{waitUntil:'domcontentloaded',timeout:30000});
+    assert.match(await page.locator('#dailyMissionBtn').innerText(),/RISCATTA PREMIO/);
+    const beforeDaily=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins);
+    await page.locator('#dailyMissionBtn').click();
+    await page.waitForFunction(()=>document.getElementById('dailyMissionBtn')?.textContent==='PREMIO RISCOSSO',null,{timeout:15000});
+    const afterDaily=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins);
+    assert.equal(afterDaily,beforeDaily+500);
+    assert.equal(await page.locator('#dailyMissionBtn').isDisabled(),true);
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,

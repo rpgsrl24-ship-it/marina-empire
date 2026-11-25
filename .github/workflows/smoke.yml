@@ -58,6 +58,7 @@ jobs:
           node tests/docking-rotation.test.cjs
           node tests/mission-contract-types.test.cjs
           node tests/weekly-docking-challenge.test.cjs
+          node tests/daily-marina-activities.test.cjs
           node tests/fleet-switching.test.cjs
           node tests/research-upgrade.test.cjs
           node tests/marketplace-credits.test.cjs
