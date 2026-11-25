@@ -42,3 +42,10 @@ assert.equal(api.claimDaily('mission',now).ok,false,'legacy claim preserved');
 assert.equal(api.claimDaily('login',now).ok,false);
 game.retention={};game.lastArrival={at:now-1000,emergency:true};assert.equal(api.claimDaily('mission',now).ok,false);
 console.log('PASS: daily marina jobs, correct choices, stable list, daily port cap, reset, rewards and legacy claims');
+
+// The standalone UI must explicitly bind controls instead of depending on named window properties.
+const html=fs.readFileSync("marina-mobile.html","utf8");
+assert(html.includes('jobList=document.getElementById("jobList")'));
+assert(html.includes('jobsPanel.dataset.loaded="true"'));
+assert(html.includes('renderJobs(api,s,g);'));
+assert(html.includes('sessionStorage.setItem("marina_empire_selected_marina_at",String(Date.now()))'));

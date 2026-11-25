@@ -244,8 +244,10 @@ async function runScenario(browser,name,viewport,mobile){
     const cup=await pageAudit(page,name+' cup');
     assert.equal(cup.horizontalOverflow,false,name+': cup has horizontal overflow');
     assert.equal(cup.clipped.length,0,name+': cup has clipped controls');
-    await page.goto(LIVE+'marina-mobile.html?v=20261125-marina6#jobs',{waitUntil:'domcontentloaded',timeout:30000});
-    await page.locator('#jobsCount').waitFor({state:'visible',timeout:15000});
+    await page.goto(LIVE+'marina-mobile.html?v=20261125-marina7#jobs',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('#jobsPanel[data-loaded="true"]').waitFor({state:'visible',timeout:15000}).catch(async e=>{throw new Error(name+': Marina Live did not render; '+JSON.stringify({errors,save:await page.evaluate(()=>{const g=JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'{}');return {port:g.port,voyages:g.voyages,trip:!!g.trip,engine:!!window.MarinaEmpireMarinaLite}})}))});
+    assert.equal(await page.locator('.jobCard').count(),3,name+': expected three local job cards');
+    assert.ok(await page.locator('[data-job-open="dock"]').count(),name+': dock job blocked: '+await page.locator('#jobText').innerText());
     assert.match(await page.locator('#jobsCount').innerText(),/0 \/ 3/);
     await page.locator('[data-job-open="dock"]').click();
     await page.locator('[data-job-choice="1"]').click();
