@@ -109,6 +109,8 @@ async function runScenario(browser,name,viewport,mobile){
     await page.waitForLoadState('load',{timeout:30000});
     await page.screenshot({path:path.join(OUT,name+'-home.png'),fullPage:false,animations:'disabled'});
     const home=await pageAudit(page,name+' home');
+    assert.equal(await page.locator('#weeklyDock').isVisible(),true,name+': weekly challenge card');
+    assert.match(await page.locator('#weeklyDockCount').innerText(),/0 \/ 3/);
     assert.equal(home.horizontalOverflow,false,name+': home has horizontal overflow');
     assert.equal(home.clipped.length,0,name+': home has clipped actions '+JSON.stringify(home.clipped));
 
@@ -158,6 +160,7 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(docking.horizontalOverflow,false,name+': docking has horizontal overflow');
     assert.equal(docking.clipped.length,0,name+': docking has clipped actions '+JSON.stringify(docking.clipped));
     assert.equal(await page.locator('.dockArtwork').isVisible(),true,name+': new docking artwork must be visible');
+    assert.equal(await page.locator('#dockElapsed').isVisible(),true,name+': docking timer visible');
     assert.equal(await page.locator('nav.bottom').evaluate(el=>getComputedStyle(el).position),'relative',name+': navigation must not cover docking controls');
     assert.ok(await page.locator('[data-dock-engine="port:0"]').evaluate(el=>el.getBoundingClientRect().height>=40),name+': motor control must have a usable touch target');
     const navTop=await page.locator('nav.bottom').evaluate(el=>el.getBoundingClientRect().top+scrollY);
@@ -173,6 +176,7 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(arrivalSave?.port,'cervia',name+': arrival must move player to Cervia');
     assert.ok(Number(arrivalSave?.prestige)>0,name+': arrival must credit prestige');
     assert.ok(Array.isArray(arrivalSave?.completed)&&arrivalSave.completed.length>0,name+': arrival must mark mission completed');
+    assert.equal(Number(arrivalSave?.lastArrival?.weeklyDockReward)||0,0,name+': assisted docking cannot receive weekly reward');
 
     const realBefore=await page.evaluate(()=>localStorage.getItem('marina_empire_beta_test_session'));
     await page.goto(LIVE+'cabina-mobile.html?anteprima=ormeggio',{waitUntil:'domcontentloaded',timeout:30000});
