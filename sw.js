@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261125-cabin44";
+const CACHE="marina-empire-v20261125-cup1";
 const CORE=[
  "./",
  "./index.html",
@@ -14,6 +14,7 @@ const CORE=[
  "./manifest.webmanifest",
  "./app-icon.svg",
  "./local-save-context.js",
+ "./docking-ranking.html?v=20261125-cup1",
  "./mobile-map-lite-v2.js?v=20261125-engine26",
  "./cloud-sync-modern.js?v=20261111-cloud1",
  "./pwa-install.js?v=20261111-pwa1"

@@ -236,6 +236,14 @@ async function runScenario(browser,name,viewport,mobile){
     assert.ok(await page.locator('[data-start^="C_charter_"]:disabled').count(),name+': VIP contract requires prestige');
     await page.locator('[data-kind="transfer"]').click();
     assert.equal(await page.locator('.contractObjective').count(),0,name+': transfer filter separates special contracts');
+    await page.goto(LIVE+'docking-ranking.html?v=20261125-cup1',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('#count').waitFor({state:'visible',timeout:15000});
+    assert.match(await page.locator('#count').innerText(),/0\/3/);
+    assert.equal(await page.locator('#submit').isDisabled(),true,name+': guests cannot publish scores');
+    assert.equal(await page.locator('#remove').isDisabled(),true,name+': guests cannot remove scores');
+    const cup=await pageAudit(page,name+' cup');
+    assert.equal(cup.horizontalOverflow,false,name+': cup has horizontal overflow');
+    assert.equal(cup.clipped.length,0,name+': cup has clipped controls');
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,
