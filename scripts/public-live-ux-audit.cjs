@@ -118,7 +118,7 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(home.horizontalOverflow,false,name+': home has horizontal overflow');
     assert.equal(home.clipped.length,0,name+': home has clipped actions '+JSON.stringify(home.clipped));
 
-    const missionLink=page.locator('a[href*="missions-mobile.html"]').first();
+    const missionLink=page.locator('nav.bottom a[href*="missions-mobile.html"]').first();
     await missionLink.waitFor({state:'visible',timeout:15000});
     await missionLink.click();
     await page.waitForURL(/missions-mobile\.html/,{timeout:15000});
@@ -360,6 +360,17 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins),preWater-120+activity.reward);
     assert.equal(await page.locator('[data-water-job="sup"]').innerText(),'COMPLETATO OGGI');
     assert.equal((await pageAudit(page,name+' water toys')).horizontalOverflow,false);
+    await page.goto(LIVE+'academy-mobile.html',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('[data-claim="navigation"]:enabled').waitFor({state:'visible',timeout:15000});
+    assert.equal(await page.locator('#qualificationCount').innerText(),'1 / 4',name+': assisted intro only qualifies navigation');
+    const preAcademy=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins);
+    await page.locator('[data-claim="navigation"]').click();
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins),preAcademy+250);
+    assert.equal(await page.locator('[data-claim="navigation"]').isDisabled(),true);
+    await page.reload({waitUntil:'domcontentloaded'});
+    assert.equal(await page.locator('[data-claim="navigation"]').innerText(),'PREMIO RISCOSSO');
+    assert.equal((await pageAudit(page,name+' Academy')).horizontalOverflow,false);
+    await page.screenshot({path:path.join(OUT,name+'-academy.png'),fullPage:true,animations:'disabled'});
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,

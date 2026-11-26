@@ -66,6 +66,7 @@ jobs:
           node tests/research-upgrade.test.cjs
           node tests/research-benefits.test.cjs
           node tests/world-dynamic-events.test.cjs
+          node tests/academy-qualifications.test.cjs
           node tests/marketplace-credits.test.cjs
           node tests/direction-balance.test.cjs
           node tests/account-pwa-modern.test.cjs

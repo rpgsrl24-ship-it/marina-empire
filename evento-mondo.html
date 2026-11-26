@@ -25,7 +25,7 @@
 <script src="./local-save-context.js"></script><script>
 (()=>{"use strict";const $=id=>document.getElementById(id),world=window.MarinaWorldLive,ctx=window.MarinaLocalSaveContext;
 function render(){const e=world.current(),h=ctx.capture(),g=h&&ctx.readGame(h);
- $("icon").textContent=e.icon;$("title").textContent=e.title;$("detail").textContent=e.detail;$("bonus").textContent=e.bonus;$("port").textContent=(g?.port||"Marina attuale").replace(/[-_]/g," ");$("advice").textContent="Controlla i requisiti degli incarichi. Il bonus si aggiunge alla ricompensa base.";$("action").textContent=e.action;$("action").href=e.href;
+ $("icon").textContent=e.icon;$("title").textContent=e.title;$("detail").textContent=e.detail;$("bonus").textContent=e.bonus;$("port").textContent=(g?.port||"Marina attuale").replace(/[-_]/g," ");$("advice").textContent="Controlla i requisiti degli incarichi. Il bonus si aggiunge alla ricompensa base.";const beginner=!g||!(Number(g.voyages)>0)&&!g.completed?.includes("INTRO_RIMINI_CERVIA");$("action").textContent=beginner?"INIZIA DALLA RPG ACADEMY":e.action;$("action").href=beginner?"./mobile-home.html?v=20261111-home6":e.href;
  const min=Math.max(0,Math.ceil((e.endsAt-Date.now())/60000));$("timer").textContent="Nuovo evento tra "+Math.floor(min/60)+" h "+min%60+" min";
 }
 render();setInterval(render,30000);

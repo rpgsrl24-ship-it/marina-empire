@@ -219,3 +219,59 @@ if(typeof window!=="undefined")window.MarinaWorldLive=(()=>{
  }
  return Object.freeze({current,bonus,waterCatalog,startWater,claimWater});
 })();
+
+/* RPG Academy: optional in-game qualifications; never a real nautical licence.
+   Evidence is derived from completed voyages, not clicks or practice sessions. */
+if(typeof window!=="undefined")window.MarinaAcademy=(()=>{
+ const missions="./missions-mobile.html?v=20261125-missions13",cabin="./cabina-mobile.html?v=20261126-cabin48";
+ const tests=[
+  {id:"navigation",icon:"🧭",title:"Navigazione costiera",description:"Completa un viaggio con arrivo e ormeggio. Il primo viaggio RPG Academy vale come prova.",reward:250,prestige:10,href:missions,action:"VAI ALLE MISSIONI"},
+  {id:"bow",icon:"⚓",title:"Ormeggio di prua",description:"Completa un ormeggio reale di prua, BUONO o PERFETTO, senza assistenza e senza urti.",reward:350,prestige:15,href:missions,action:"PARTI PER LA PROVA"},
+  {id:"stern",icon:"⚓",title:"Ormeggio di poppa",description:"Completa un ormeggio reale di poppa, BUONO o PERFETTO, senza assistenza e senza urti.",reward:350,prestige:15,href:missions,action:"PARTI PER LA PROVA"},
+  {id:"rescue",icon:"🛟",title:"Soccorso VHF",description:"Completa una missione di soccorso risolvendo correttamente l'obiettivo VHF e ormeggiando a destinazione.",reward:500,prestige:20,href:missions+"&tipo=special",action:"CERCA SOCCORSO"}
+ ];
+ const record=x=>x&&typeof x==="object"&&!Array.isArray(x)?x:{};
+ function validArrival(a){
+  return !!a&&!a.emergency&&a.id!=="DEMO_DOCKING"&&a.mission!=="Allenamento ormeggio"&&Number.isFinite(Number(a.at))&&Number(a.at)>0&&Number(a.voyageId)>0;
+ }
+ function proofs(a){
+  if(!validArrival(a))return [];
+  const ids=["navigation"];
+  const manual=Number(a.dockingManualBonus)>0&&["BUONO","PERFETTO"].includes(a.dockingGrade);
+  if(manual&&["bow","stern"].includes(a.dockingOrientation))ids.push(a.dockingOrientation);
+  if((a.kind||a.missionKind)==="rescue"&&a.objectiveDone===true)ids.push("rescue");
+  return ids;
+ }
+ function evidence(g){
+  const saved=record(g?.academyEvidence),result={};
+  for(const t of tests){const p=saved[t.id];if(p&&Number.isFinite(Number(p.at))&&Number(p.at)>0)result[t.id]={at:Number(p.at),voyageId:Math.max(0,Number(p.voyageId)||0)};}
+  const history=Array.isArray(g?.missionHistory)?g.missionHistory:[];
+  for(const a of [...history,g?.lastArrival])for(const id of proofs(a))if(!result[id])result[id]={at:Number(a.at),voyageId:Number(a.voyageId)};
+  // The old save has a stable completion token for the Academy tutorial.
+  if(!result.navigation&&Array.isArray(g?.completed)&&g.completed.includes("INTRO_RIMINI_CERVIA"))result.navigation={at:null,voyageId:0,legacy:true};
+  return result;
+ }
+ function recordArrival(g,a){
+  if(window.MarinaDockPreview||!validArrival(a))return [];
+  const previous=evidence(g),next={...previous},newIds=[];
+  for(const id of proofs(a)){if(!previous[id])newIds.push(id);next[id]=previous[id]||{at:Number(a.at),voyageId:Number(a.voyageId)}}
+  // Record permanent evidence independently of the 30-voyage history.
+  g.academyEvidence=next;return newIds;
+ }
+ function snapshot(g){
+  const p=evidence(g),claimed=record(g?.academyClaims),items=tests.map(t=>({...t,passed:!!p[t.id],claimed:!!claimed[t.id],proof:p[t.id]||null,href:g?.trip?cabin:t.href,action:g?.trip?"CONTINUA LA MISSIONE":t.action}));
+  const passed=items.filter(t=>t.passed).length;
+  return {tests:items,passed,total:items.length,certified:passed===items.length,rank:passed===4?"Comandante qualificato":passed===0?"Cadetto":passed>=3?"Comandante operativo":"Comandante in formazione",next:items.find(t=>!t.passed)||null};
+ }
+ function claim(g,id,now=Date.now()){
+  if(g?.trip)return{ok:false,message:"Completa prima la missione e l'ormeggio"};
+  const t=snapshot(g).tests.find(x=>x.id===id);
+  if(!t||!t.passed||t.claimed)return{ok:false,message:"Premio non disponibile o già riscosso"};
+  if(!Number.isSafeInteger(g.coins+t.reward))return{ok:false,message:"Saldo non valido"};
+  g.academyClaims={...record(g.academyClaims),[id]:{at:now}};
+  const p=evidence(g);if(p[id]?.at)g.academyEvidence={...record(g.academyEvidence),[id]:p[id]};
+  g.coins+=t.reward;g.prestige=Math.max(0,Number(g.prestige)||0)+t.prestige;
+  return{ok:true,reward:t.reward,prestige:t.prestige,message:"Premio riscosso · +"+t.reward+" crediti · +"+t.prestige+" prestigio"};
+ }
+ return Object.freeze({snapshot,recordArrival,claim});
+})();
