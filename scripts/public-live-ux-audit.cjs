@@ -308,7 +308,7 @@ async function runScenario(browser,name,viewport,mobile){
       assert.equal(await page.locator('#level').innerText(),'Liv. 2');
       assert.equal(await page.locator('#collectMarina').isDisabled(),true);
       await page.evaluate(()=>{const k='marina_empire_beta_test_session',g=JSON.parse(localStorage.getItem(k)),r=g.marinas.cervia;r.lastReward-=86400001;r.berthLastReward=r.lastReward;r.incomeCursor=r.lastReward;r.incomeBank=0;localStorage.setItem(k,JSON.stringify(g));});
-      await page.goto(LIVE+'direction-mobile.html?v=20261126-direction2',{waitUntil:'domcontentloaded',timeout:30000});
+      await page.goto(LIVE+'direction-mobile.html?v=20261126-direction3',{waitUntil:'domcontentloaded',timeout:30000});
       await page.locator('#portfolioCollect:enabled').waitFor({state:'visible',timeout:15000});
       const pre=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins);
       await page.locator('#portfolioCollect').click();
@@ -317,6 +317,22 @@ async function runScenario(browser,name,viewport,mobile){
       assert.equal(await page.locator('#revenueChart .barcol').count(),7);
       assert.equal((await pageAudit(page,name+' direction')).horizontalOverflow,false);
     }
+    await page.evaluate(()=>{const k='marina_empire_beta_test_session',g=JSON.parse(localStorage.getItem(k));g.voyages=Math.max(4,g.voyages);g.coins=Math.max(10000,g.coins);localStorage.setItem(k,JSON.stringify(g))});
+    await page.goto(LIVE+'crew-mobile.html',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('#crewTrain:enabled').waitFor({state:'visible',timeout:15000});
+    if(name!=='desktop')page.on('dialog',d=>d.accept());
+    const beforeCrew=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins);
+    await page.locator('#crewTrain').click();
+    assert.equal(await page.locator('#crewTraining').innerText(),'1/5');
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins),beforeCrew-800);
+    await page.locator('[data-recruit="marco-riva"]').click();
+    assert.equal(await page.locator('#payroll').innerText(),'210');
+    assert.equal(await page.locator('[data-recruit="marco-riva"]').isDisabled(),true);
+    await page.reload({waitUntil:'domcontentloaded'});
+    assert.equal(await page.locator('#crewTraining').innerText(),'1/5');
+    assert.equal(await page.locator('#payroll').innerText(),'210');
+    assert.equal((await pageAudit(page,name+' crew')).horizontalOverflow,false);
+    await page.screenshot({path:path.join(OUT,name+'-crew.png'),fullPage:true,animations:'disabled'});
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,

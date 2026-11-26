@@ -32,6 +32,7 @@ jobs:
           node tests/local-assets.test.cjs
           node tests/marina-services.test.cjs
           node tests/marina-property-economy.test.cjs
+          node tests/crew-management.test.cjs
           node tests/mission-selection.test.cjs
           node tests/docking-rotation.test.cjs
           node tests/mission-contract-types.test.cjs

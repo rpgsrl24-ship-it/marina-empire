@@ -28,7 +28,7 @@ assert(pwa.includes('navigator.serviceWorker.register("./sw.js")'),'PWA helper m
 assert(pwa.includes('beforeinstallprompt'),'PWA helper must capture install prompt');
 assert(pwa.includes('appinstalled'),'PWA helper must react to successful installation');
 
-assert(sw.includes('marina-empire-v20261126-economy1'),'Service worker must use the modern cache version');
+assert(sw.includes('marina-empire-v20261126-crew1'),'Service worker must use the modern cache version');
 assert(sw.includes('./mobile-home.html?v=20261111-home6'),'Offline core must include modern Home');
 assert(sw.includes('./account-mobile.html'),'Offline core must include Account');
 assert(!sw.includes('cache.put(req.mode==="navigate"?"./index.html"'),'Navigation cache must not collapse every page into index.html');

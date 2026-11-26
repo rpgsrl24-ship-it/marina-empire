@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261126-economy1";
+const CACHE="marina-empire-v20261126-crew1";
 const CORE=[
  "./",
  "./index.html",
@@ -13,7 +13,8 @@ const CORE=[
  "./fleet-mobile.html?v=20261109-fleet1",
  "./profile-mobile.html?v=20261110-profile1",
  "./account-mobile.html",
- "./direction-mobile.html?v=20261126-direction2",
+ "./crew-mobile.html",
+ "./direction-mobile.html?v=20261126-direction3",
  "./activities-mobile.html?v=20261110-activities1",
  "./marketplace-mobile.html?v=20261110-market13",
  "./manifest.webmanifest",
@@ -21,7 +22,7 @@ const CORE=[
  "./local-save-context.js",
  "./player-tracker-v2.js?v=20261126-tracker5",
  "./docking-ranking.html?v=20261125-cup1",
- "./mobile-map-lite-v2.js?v=20261125-engine27",
+ "./mobile-map-lite-v2.js?v=20261126-engine28",
  "./cloud-sync-modern.js?v=20261111-cloud1",
  "./pwa-install.js?v=20261111-pwa1"
 ];

@@ -10,6 +10,114 @@ const boats=[
 {id:"yacht20",name:"RPG Elite 20",tank:1100,burn:1.05,knots:20,mult:2.3,crew:850},
 {id:"yacht30",name:"RPG Majesty 30",tank:1700,burn:1.12,knots:17,mult:2.55,crew:1250},
 {id:"luna",name:"RPG Imperial 60",tank:900,burn:1.18,knots:14,mult:2.7,crew:1500}];
+// Modern crew: keeps the existing per-voyage salary model and old roster fields.
+const CREW_ROLES={
+ voyager:["Comandante"],open:["Comandante","Marinaio"],yacht:["Comandante","Marinaio","Hostess"],yacht14:["Comandante","Marinaio","Hostess"],
+ yacht20:["Comandante","Marinaio","Chef","Hostess"],yacht30:["Comandante","Primo Ufficiale","Engineer","Chef","Hostess","Deckhand"],
+ luna:["Comandante","Primo Ufficiale","Engineer","Chef","Chief Steward/ess","Deckhand","Deckhand"]
+};
+const CREW_CANDIDATES=[
+ {id:"marco-riva",name:"Marco Riva",role:"Comandante",skill:72,salary:210},
+ {id:"elena-conti",name:"Elena Conti",role:"Primo Ufficiale",skill:68,salary:185},
+ {id:"luca-ferri",name:"Luca Ferri",role:"Engineer",skill:74,salary:195},
+ {id:"sofia-moretti",name:"Sofia Moretti",role:"Hostess",skill:70,salary:165},
+ {id:"ana-silva",name:"Ana Silva",role:"Chief Steward/ess",skill:78,salary:215},
+ {id:"matteo-gallo",name:"Matteo Gallo",role:"Deckhand",skill:66,salary:145},
+ {id:"giulia-romano",name:"Giulia Romano",role:"Chef",skill:73,salary:190},
+ {id:"davide-serra",name:"Davide Serra",role:"Marinaio",skill:64,salary:135}
+];
+const CREW_FOCUS={balanced:"Bilanciato",navigation:"Navigazione",technical:"Tecnica",hospitality:"Ospiti"};
+const CREW_RESERVE=2000;
+const crewRecord=v=>v&&typeof v==="object"&&!Array.isArray(v)?v:{};
+const crewInt=(v,fallback=0,min=0,max=100000)=>v!=null&&Number.isFinite(Number(v))?Math.max(min,Math.min(max,Math.floor(Number(v)))):fallback;
+function crewOwned(g){return boats.filter(b=>Array.isArray(g?.owned)&&g.owned.includes(b.id))}
+function crewUnlocked(g){return crewInt(g?.voyages)>=4||crewOwned(g).length>=2}
+function crewProgress(g,id){const p=crewRecord(g?.crewProgress?.[id]);return{xp:crewInt(p.xp),morale:crewInt(p.morale,85,35,100),training:crewInt(p.training,0,0,5),focus:Object.hasOwn(CREW_FOCUS,p.focus)?p.focus:"balanced"}}
+function crewRoster(g,b){
+ const roles=CREW_ROLES[b.id],saved=Array.isArray(g?.crewRoster?.[b.id])?g.crewRoster[b.id]:[],seen=new Set();
+ const share=Math.floor(b.crew/roles.length),remainder=b.crew-share*roles.length;
+ return roles.map((role,slot)=>{
+  const base=share+(slot===0?remainder:0),r=crewRecord(saved[slot]);
+  const candidate=CREW_CANDIDATES.find(x=>x.id===r.id&&x.role===role&&!seen.has(x.id));
+  if(candidate)seen.add(candidate.id);
+  const xp=crewInt(r.xp),skill=candidate?Math.min(95,candidate.skill+Math.floor(xp/5)):50;
+  return{slot,id:candidate?candidate.id:"default-"+b.id+"-"+slot,name:candidate?candidate.name:role,role,skill,salary:candidate?Math.max(base,candidate.salary):base,xp:candidate||r.id==="default-"+b.id+"-"+slot?xp:0,morale:crewInt(r.morale,85,35,100),default:!candidate};
+ });
+}
+function crewInfo(g,id){
+ const b=crewOwned(g).find(x=>x.id===id);if(!b)return null;
+ const members=crewRoster(g,b),p=crewProgress(g,id),unlocked=crewUnlocked(g),level=p.xp>=30?5:p.xp>=18?4:p.xp>=10?3:p.xp>=4?2:1;
+ const inUse=new Set(crewOwned(g).flatMap(x=>crewRoster(g,x).filter(m=>!m.default).map(m=>m.id)));
+ const candidates=CREW_CANDIDATES.filter(c=>CREW_ROLES[id].includes(c.role)).map(c=>{
+  const target=members.find(m=>m.role===c.role&&m.default);
+  return{...c,fee:900+c.skill*12,slot:target?.slot??-1,salary:target?Math.max(c.salary,target.salary):c.salary,available:!!target&&!inUse.has(c.id),reason:inUse.has(c.id)?"Già ingaggiato nella flotta":!target?"Libera prima un posto del ruolo":"",};
+ });
+ return{boat:b.id,name:b.name,...p,level,members,candidates,unlocked,active:!!g.trip,payroll:members.reduce((n,m)=>n+m.salary,0)};
+}
+function crewBenefits(g,b,kind){
+ const c=crewInfo(g,b.id);
+ // The Academy voyage remains entirely free. Never change the baseline salary of untouched crews.
+ if(kind==="academy")return{salary:0,bonusRate:0,wearMult:1,version:1};
+ if(!c)return{salary:b.crew,bonusRate:0,wearMult:1,version:1};
+ const skill=c.members.reduce((n,m)=>n+Math.max(0,m.skill-50),0)/c.members.length;
+ const focus=c.focus==="navigation"&&["transfer","rescue","cargo","recovery"].includes(kind)?.025:c.focus==="hospitality"&&kind==="charter"?.03:0;
+ const morale=Math.max(.35,c.morale/100);
+ const bonusRate=c.unlocked?Math.min(.18,Math.max(0,(Math.min(.06,c.xp*.002)+c.training*.012+Math.min(.05,skill*.0018)+focus)*morale)):0;
+ return{salary:c.payroll,bonusRate,wearMult:c.unlocked&&c.focus==="technical"?.9:1,version:1};
+}
+function crewSnapshot(id){
+ const g=read();if(!g)return null;
+ const selected=crewInfo(g,id||g.boat)||crewInfo(g,g.boat)||crewInfo(g,crewOwned(g)[0]?.id);
+ if(!selected)return null;
+ const b=boats.find(x=>x.id===selected.boat);
+ return{...selected,coins:g.coins,voyages:crewInt(g.voyages),owned:crewOwned(g).map(x=>({id:x.id,name:x.name})),benefits:Object.fromEntries(["transfer","rescue","cargo","charter","recovery"].map(k=>[k,crewBenefits(g,b,k)]))};
+}
+function saveCrewProgress(g,id,p,members){
+ g.crewProgress=crewRecord(g.crewProgress);g.crewProgress[id]=p;
+ g.crewRoster=crewRecord(g.crewRoster);g.crewRoster[id]=members;
+}
+function crewAction(id,action,value){
+ const ctx=window.MarinaLocalSaveContext,h=getHandle(),g=h&&ctx?.readGame(h);
+ if(!g)return{ok:false,message:"Salvataggio non disponibile"};
+ const c=crewInfo(g,id);if(!c)return{ok:false,message:"Imbarcazione non posseduta"};
+ if(!c.unlocked)return{ok:false,message:"Completa 4 viaggi o acquista una seconda imbarcazione"};
+ if(g.trip)return{ok:false,message:"Gestisci l'equipaggio dopo l'ormeggio"};
+ const members=c.members,p={xp:c.xp,morale:c.morale,training:c.training,focus:c.focus};
+ let cost=0,message="";
+ if(action==="recruit"){
+  const cand=c.candidates.find(x=>x.id===value);
+  if(!cand?.available||cand.slot<0)return{ok:false,message:cand?.reason||"Candidato non disponibile"};
+  cost=cand.fee;const slot=cand.slot;
+  members[slot]={slot,id:cand.id,name:cand.name,role:cand.role,skill:cand.skill,salary:cand.salary,xp:0,morale:88,default:false};
+  message=cand.name+" ingaggiato";
+ }else if(action==="dismiss"){
+  const slot=Number(value),m=members[slot];
+  if(!Number.isInteger(slot)||!m||m.default)return{ok:false,message:"Nessun professionista da sostituire"};
+  const b=boats.find(x=>x.id===id);
+  const original=crewRoster({},b)[slot];members[slot]=original;message="Equipaggio standard ripristinato";
+ }else if(action==="train"){
+  if(p.training>=5)return{ok:false,message:"Addestramento già al massimo"};
+  cost=800;p.training++;p.morale=Math.min(100,p.morale+5);message="Addestramento completato";
+ }else if(action==="rest"){
+  if(p.morale>=100&&members.every(m=>m.morale>=100))return{ok:false,message:"Equipaggio già riposato"};
+  cost=250;p.morale=Math.min(100,p.morale+18);members.forEach(m=>m.morale=Math.min(100,m.morale+15));message="Equipaggio riposato";
+ }else if(action==="focus"){
+  if(!Object.hasOwn(CREW_FOCUS,value))return{ok:false,message:"Assetto non valido"};
+  p.focus=value;message="Assetto: "+CREW_FOCUS[value];
+ }else return{ok:false,message:"Operazione non valida"};
+ if(!Number.isSafeInteger(g.coins)||cost&&g.coins-cost<CREW_RESERVE)return{ok:false,message:"Mantieni almeno 2.000 crediti di riserva"};
+ g.coins-=cost;saveCrewProgress(g,id,p,members);
+ if(cost)g.economyHistory=(Array.isArray(g.economyHistory)?g.economyHistory:[]).concat([{kind:"crew_"+action,id,amount:-cost,at:Date.now()}]).slice(-300);
+ if(!ctx.writeGame(h,g))return{ok:false,message:"Salvataggio non confermato"};
+ return{ok:true,cost,message:message+(cost?" · -"+cost.toLocaleString("it-IT")+" crediti":"")};
+}
+function crewComplete(g,id){
+ const c=crewInfo(g,id);if(!c)return;
+ const p={xp:c.xp+1,morale:Math.max(35,c.morale-(c.focus==="technical"?3:c.focus==="hospitality"?5:4)),training:c.training,focus:c.focus};
+ const members=c.members.map(m=>({...m,xp:m.xp+1,morale:Math.max(35,m.morale-3)}));
+ saveCrewProgress(g,id,p,members);
+}
+
 const harborGPS={rose:[43.7,14.5],rimini:[44.071,12.579],ancona:[43.615,13.514],lignano:[45.680,13.148],cervia:[44.259,12.368],bari:[41.133,16.864],ravenna:[44.493,12.282],pescara:[42.46,14.23],brindisi:[40.65,17.97],salerno:[40.63,14.84],nettuno:[41.46,12.66],scarlino:[42.89,10.78],loano:[44.12,8.26],portocervo:[41.13,9.53],capodorlando:[38.15,14.74]};
 const illustrated={rose:[69,32.47],rimini:[55.4,29.41],ancona:[60.3,34.47],lignano:[56.7,22.35],cervia:[54.8,25.41],bari:[86.7,57.88],ravenna:[46.1,26.94],pescara:[60.8,42.59],brindisi:[89.2,56.59],salerno:[65.5,56.71],nettuno:[48.9,50.35],scarlino:[34.7,39.29],loano:[15.6,29.88],portocervo:[25.2,52.82],capodorlando:[64.7,75.76]};
 const coastal={lignano:[45.56,13.35],ravenna:[44.47,12.49],cervia:[44.24,12.57],rimini:[44.06,12.78],ancona:[43.61,13.77],rose:[43.7,14.5],pescara:[42.46,14.48],bari:[41.15,17.18],brindisi:[40.68,18.17],loano:[44.07,8.14],scarlino:[42.82,10.65],nettuno:[41.42,12.55],salerno:[40.52,14.78],portocervo:[41.19,9.75],capodorlando:[38.19,14.59]};
@@ -140,7 +248,7 @@ function tripView(s,b){
  return {id:String(t.id||""),voyageId:Number(t.voyageId)||0,name:String(t.mission?.name||"Missione attiva"),origin,originName:(ports.find(x=>x.id===origin)||ports[1]).name,dest,destinationName:(ports.find(x=>x.id===dest)||ports[1]).name,reward:Number(t.mission?.reward)||0,prestige:Number(t.mission?.prestige)||0,progress,distance,cruiseKnots:proj.effectiveKnots??knots,etaMinutesReal:Math.max(1,Math.round((distance*(1-progress)/Math.max(1,proj.effectiveKnots||knots))*60)),remainingSec:proj.remainingSec,route,missionKind:String(t.mission?.kind||"transfer"),objective:specFor(t.mission?.kind)?.objective||"",objectiveBonus:specFor(t.mission?.kind)?.bonus||0,objectivePrestige:specFor(t.mission?.kind)?.prestige||0,objectiveDone:!!specFor(t.mission?.kind)?.success.includes(t.eventChoice),eventKey:eventKeyForTrip(t,s.prestige),eventResolved:!!t.eventResolved,eventLabel:String(t.eventLabel||""),eventResult:String(t.eventResult||""),throttleMode:proj.mode.id,throttleLabel:proj.harbor?(t.dockingReady?"ORMEGGIO":"MANOVRA PORTO"):proj.mode.label,rpm:proj.effectiveRpm??proj.mode.rpm,temp:proj.effectiveTemp??proj.mode.temp,lph:proj.effectiveLph??proj.mode.lph,fuelMult:proj.mode.fuelMult,harbor:!!proj.harbor,dockingReady:!!t.dockingReady,dockingElapsedMs:t.dockingReady?dockingElapsed(t):0,dockingOffset:Number(t.dockingOffset)||0,dockingDepth:Math.max(0,Math.min(100,Number(t.dockingDepth)||0)),dockingHeading:wrapDockAngle(t.dockingHeading),dockingOrientation:dockOrientation(t),dockingHeadingError:dockHeadingError(t),dockingTurning:hasDockTurn(t),dockingAssistUsed:!!(t.dockingAssistUsed||t.dockingAssist),dockingManualMoved:!!t.dockingManualMoved,enginePort:Number(t.enginePort)||0,engineStarboard:Number(t.engineStarboard)||0,bowThruster:Number(t.bowThruster)||0,bowThrusterAvailable:true,bowThrusterPower:Math.round(bowPower(s.boat)*100),helmAngle:Math.max(-30,Math.min(30,Number(t.helmAngle)||0)),dockingAssist:!!t.dockingAssist,dockingSurge:Number(t.dockingSurge)||0,dockingSway:Number(t.dockingSway)||0,dockingYawRate:Number(t.dockingYawRate)||0,dockingWind:Number(t.dockingWind)||0,dockingWindSide:Number(t.dockingWindSide)||0,dockingCurrent:Number(t.dockingCurrent)||0,dockingCurrentSide:Number(t.dockingCurrentSide)||0,dockingContacts:Number(t.dockingContacts)||0};
 }
 function snapshot(){const s=read()||{coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",owned:["voyager"],completed:[],voyages:0};const b=boats.find(x=>x.id===s.boat)||boats[0];return{state:s,tank:b.tank,boatName:b.name,ports:ports.map(p=>({id:p.id,name:p.name,x:illustrated[p.id]?.[0]??50,y:illustrated[p.id]?.[1]??50})),chartPorts:ports.map(p=>({id:p.id,name:p.name,...project(...harborGPS[p.id])})),trip:tripView(s,b)}}
-function preview(dest){const shot=snapshot(),s=shot.state,b=boats.find(x=>x.id===s.boat)||boats[0],p=ports.find(x=>x.id===dest);if(!p||dest===s.port)return{ok:false,reason:"Seleziona una marina diversa"};const pl=plan(s.port,dest,b.tank,b.burn);const eta=Math.max(1,Math.round((pl.distance/b.knots)*60));const cost=Math.max(250,Math.round(pl.distance*7*b.mult))+b.crew;const reward=Math.max(1200,Math.round(pl.distance*20*b.mult));let fuelNow=Math.max(0,Math.min(b.tank,Number(s.fuel)||0)),refuel=0,ready=!!pl.possible&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id));if(pl.possible){for(let i=0;i<pl.legs.length-1;i++){const req=Math.ceil(seaMiles(pl.legs[i],pl.legs[i+1])*b.burn);if(i>0){const liters=Math.max(0,req+pl.reserve-fuelNow);refuel+=liters*3;fuelNow+=liters}if(fuelNow<req+pl.reserve)ready=false;fuelNow-=Math.min(fuelNow,req)}}const total=cost+refuel;if(Number(s.coins)||0<total)ready=false;const route=routePoints(s.port,dest).map(([lat,lon])=>project(lat,lon));return{ok:pl.possible,reason:pl.reason||"",origin:s.port,originName:(ports.find(x=>x.id===s.port)||ports[1]).name,dest,destinationName:p.name,distance:pl.distance,fuel:pl.fuel,cruiseKnots:b.knots,etaMinutesReal:eta,route,mission:{id:"R_"+b.id+"_"+s.port+"_"+dest,name:"Trasferimento nautico verso "+p.name,reward,prestige:Math.max(15,Math.round(pl.distance*.4*b.mult)),ready,reason:ready?"":"Controlla carburante, crediti e stato yacht",total}}}
+function preview(dest){const shot=snapshot(),s=shot.state,b=boats.find(x=>x.id===s.boat)||boats[0],p=ports.find(x=>x.id===dest);if(!p||dest===s.port)return{ok:false,reason:"Seleziona una marina diversa"};const pl=plan(s.port,dest,b.tank,b.burn);const eta=Math.max(1,Math.round((pl.distance/b.knots)*60));const cost=Math.max(250,Math.round(pl.distance*7*b.mult))+crewBenefits(s,b,'transfer').salary;const reward=Math.max(1200,Math.round(pl.distance*20*b.mult));let fuelNow=Math.max(0,Math.min(b.tank,Number(s.fuel)||0)),refuel=0,ready=!!pl.possible&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id));if(pl.possible){for(let i=0;i<pl.legs.length-1;i++){const req=Math.ceil(seaMiles(pl.legs[i],pl.legs[i+1])*b.burn);if(i>0){const liters=Math.max(0,req+pl.reserve-fuelNow);refuel+=liters*3;fuelNow+=liters}if(fuelNow<req+pl.reserve)ready=false;fuelNow-=Math.min(fuelNow,req)}}const total=cost+refuel;if((Number(s.coins)||0)<total)ready=false;const route=routePoints(s.port,dest).map(([lat,lon])=>project(lat,lon));return{ok:pl.possible,reason:pl.reason||"",origin:s.port,originName:(ports.find(x=>x.id===s.port)||ports[1]).name,dest,destinationName:p.name,distance:pl.distance,fuel:pl.fuel,cruiseKnots:b.knots,etaMinutesReal:eta,route,mission:{id:"R_"+b.id+"_"+s.port+"_"+dest,name:"Trasferimento nautico verso "+p.name,reward,prestige:Math.max(15,Math.round(pl.distance*.4*b.mult)),ready,reason:ready?"":"Controlla carburante, crediti e stato yacht",total}}}
 
 // Distinct playable contracts, with stable transfer IDs for existing saves.
 const contractSpecs=Object.freeze({
@@ -160,7 +268,7 @@ function eventKeyForTrip(t,prestige){
 }
 function missionCatalog(){
  const shot=snapshot(),s=shot.state,b=boats.find(x=>x.id===s.boat)||boats[0],originName=(ports.find(x=>x.id===s.port)||ports[1]).name;
- const list=[],reserve=Math.ceil(b.tank*.15);
+ const list=[],reserve=Math.ceil(b.tank*.15),baseCrew=crewBenefits(s,b,'transfer');
  if(s.port==="rimini"&&b.id==="voyager"&&(Number(s.voyages)||0)===0&&!(Array.isArray(s.completed)&&s.completed.includes("INTRO_RIMINI_CERVIA"))){
    const dist=seaMiles("rimini","cervia"),fuelCost=Math.ceil(dist*b.burn),ready=!s.trip&&(Number(s.condition??100)>=30)&&(Number(s.fuel)||0)>=fuelCost+reserve;
    list.push({id:"INTRO_RIMINI_CERVIA",name:"PRIMA MISSIONE · RPG Academy 8 · Rimini - Cervia",service:"Academy",kind:"academy",dest:"cervia",destination:"Cervia",origin:originName,reward:500,prestige:50,cost:0,total:0,fuel:fuelCost,distance:dist,boat:"voyager",ready,reason:ready?"":s.trip?(s.trip.dockingReady?"Completa l'ormeggio della missione attiva":"Completa prima la missione attiva"):"Controlla carburante e stato yacht"});
@@ -169,7 +277,7 @@ function missionCatalog(){
  for(const p of ports){
    if(p.id===s.port)continue;
    if(introActive&&p.id==="cervia")continue;
-   const distance=seaMiles(s.port,p.id),fuelCost=Math.ceil(distance*b.burn),cost=Math.max(250,Math.round(distance*7*b.mult))+b.crew,reward=Math.max(1200,Math.round(distance*20*b.mult)),prestige=Math.max(15,Math.round(distance*.4*b.mult));
+   const distance=seaMiles(s.port,p.id),fuelCost=Math.ceil(distance*b.burn),cost=Math.max(250,Math.round(distance*7*b.mult))+baseCrew.salary,reward=Math.max(1200,Math.round(distance*20*b.mult)),prestige=Math.max(15,Math.round(distance*.4*b.mult));
    const direct=distance>0&&(fuelCost+reserve)<=b.tank;
    let ready=direct&&!s.trip&&(Number(s.condition??100)>=30)&&(Array.isArray(s.owned)&&s.owned.includes(b.id))&&(Number(s.fuel)||0)>=fuelCost+reserve&&(Number(s.coins)||0)>=cost;
    let reason="";
@@ -178,14 +286,14 @@ function missionCatalog(){
    else if((Number(s.condition??100))<30)reason="Manutenzione necessaria";
    else if((Number(s.fuel)||0)<fuelCost+reserve)reason="Carburante insufficiente · fai rifornimento in Marina";
    else if((Number(s.coins)||0)<cost)reason="Crediti insufficienti";
-   list.push({id:"R_"+b.id+"_"+s.port+"_"+p.id,name:"Trasferimento nautico verso "+p.name,service:"Missione",kind:"transfer",dest:p.id,destination:p.name,origin:originName,reward,prestige,cost,total:cost,fuel:fuelCost,distance,boat:b.id,ready,reason});
+   list.push({id:"R_"+b.id+"_"+s.port+"_"+p.id,name:"Trasferimento nautico verso "+p.name,service:"Missione",kind:"transfer",dest:p.id,destination:p.name,origin:originName,reward,prestige,cost,total:cost,crewSalary:baseCrew.salary,crewBonus:Math.floor(reward*baseCrew.bonusRate),fuel:fuelCost,distance,boat:b.id,ready,reason});
  }
  if(!introActive){
   const routes=list.filter(m=>m.kind==="transfer").sort((a,b)=>Number(b.ready)-Number(a.ready)||a.distance-b.distance);
   const reachable=routes.filter(m=>m.fuel+reserve<=b.tank),candidates=reachable.length?reachable:routes;
   if(candidates.length)Object.entries(contractSpecs).forEach(([kind,spec],i)=>{
-   const route=candidates[i%candidates.length],unlocked=(Number(s.prestige)||0)>=spec.unlock;
-   list.push({...route,id:"C_"+kind+"_"+b.id+"_"+s.port+"_"+route.dest,kind,service:spec.label,name:spec.label+" verso "+route.destination,objective:spec.objective,objectiveBonus:spec.bonus,objectivePrestige:spec.prestige,requiredPrestige:spec.unlock,ready:unlocked&&route.ready,reason:!unlocked?"Richiede "+spec.unlock.toLocaleString("it-IT")+" prestigio":route.reason});
+   const route=candidates[i%candidates.length],unlocked=(Number(s.prestige)||0)>=spec.unlock,crew=crewBenefits(s,b,kind);
+   list.push({...route,crewBonus:Math.floor(route.reward*crew.bonusRate),id:"C_"+kind+"_"+b.id+"_"+s.port+"_"+route.dest,kind,service:spec.label,name:spec.label+" verso "+route.destination,objective:spec.objective,objectiveBonus:spec.bonus,objectivePrestige:spec.prestige,requiredPrestige:spec.unlock,ready:unlocked&&route.ready,reason:!unlocked?"Richiede "+spec.unlock.toLocaleString("it-IT")+" prestigio":route.reason});
   });
  }
  return list.sort((a,b)=>Number(b.kind==="academy")-Number(a.kind==="academy")||Number(b.ready)-Number(a.ready)||Number(!!specFor(b.kind))-Number(!!specFor(a.kind))||Number(a.distance)-Number(b.distance));
@@ -199,11 +307,12 @@ function startMission(id,expectedDest){
    if(g.trip)throw new Error("Viaggio già in corso");
    const b=boats.find(x=>x.id===g.boat)||boats[0],duration=mission.id==="INTRO_RIMINI_CERVIA"?20:Math.max(20,Math.min(45,Math.round(mission.distance*.35)));
    g.setupComplete=true;g.homeMarina=g.homeMarina||g.port;g.investmentMarina=g.investmentMarina||g.port;
+   const crew=crewBenefits(g,b,mission.kind||'transfer');
    g.coins=Math.max(0,Number(g.coins)||0)-Math.max(0,Number(mission.cost)||0);
    // Fuel is consumed progressively during navigation so throttle changes have a real effect.
    g.voyageSerial=Math.max(0,Number(g.voyageSerial)||0)+1;
    const now=Date.now();
-   g.trip={dockingVersion:DOCKING_STATE_VERSION,voyageId:g.voyageSerial,id:mission.id,origin:g.port,dest:mission.dest,legs:[g.port,mission.dest],legIndex:0,legSeconds:duration,sec:duration,fuelRate:b.burn,weather:"calm",weatherWear:3,weatherLabel:"CALMO",eventResolved:false,eventLabel:"",eventResult:"",eventBonus:0,eventPrestige:0,eventWear:0,throttleMode:"cruise",helmAngle:0,progressBase:0,startedAt:now,lastProgressAt:now,lastFuelAt:now,fuelUsed:0,throttleWear:0,mission:{id:mission.id,name:mission.name,dest:mission.dest,boat:mission.boat,kind:mission.kind||"transfer",reward:mission.reward,cost:mission.cost,fuel:mission.fuel,prestige:mission.prestige,sec:duration},until:now+duration*1000};
+   g.trip={dockingVersion:DOCKING_STATE_VERSION,voyageId:g.voyageSerial,id:mission.id,origin:g.port,dest:mission.dest,legs:[g.port,mission.dest],legIndex:0,legSeconds:duration,sec:duration,fuelRate:b.burn,weather:"calm",weatherWear:3,weatherLabel:"CALMO",eventResolved:false,eventLabel:"",eventResult:"",eventBonus:0,eventPrestige:0,eventWear:0,throttleMode:"cruise",helmAngle:0,progressBase:0,startedAt:now,lastProgressAt:now,lastFuelAt:now,fuelUsed:0,throttleWear:0,mission:{id:mission.id,name:mission.name,dest:mission.dest,boat:mission.boat,kind:mission.kind||"transfer",reward:mission.reward,cost:mission.cost,fuel:mission.fuel,prestige:mission.prestige,sec:duration,crewVersion:1,crewSalary:crew.salary,crewBonus:Math.floor(mission.reward*crew.bonusRate),crewWearMult:crew.wearMult},until:now+duration*1000};
    g.trip.eventKey=eventKeyForTrip(g.trip,g.prestige);
  });
  if(!ok)return{ok:false,message:"Salvataggio della partenza non riuscito"};
@@ -298,11 +407,12 @@ function finalizeTrip(g,dockingBonus=0,dockingPrestige=0,dockingGrade="STANDARD"
  const voyageId=Number(trip.voyageId)||0,settled=voyageId>0&&g.settledVoyages.includes(voyageId);g.port=dest;
  if(!settled){
   if(id&&!g.completed.includes(id))g.completed.push(id);if(voyageId>0)g.settledVoyages.push(voyageId);
-  const completedAt=Date.now(),weekly=recordWeeklyDock(g,trip,dockingGrade,completedAt),totalReward=reward+weekly.reward,totalPrestige=prestige+weekly.prestige;
+  const completedAt=Date.now(),weekly=recordWeeklyDock(g,trip,dockingGrade,completedAt),crewBonus=m.crewVersion===1?Math.max(0,Math.min(Math.floor(baseReward*.18),Number(m.crewBonus)||0)):0,totalReward=reward+weekly.reward+crewBonus,totalPrestige=prestige+weekly.prestige;
   g.coins=Math.max(0,Number(g.coins)||0)+totalReward;g.prestige=Math.max(0,Number(g.prestige)||0)+totalPrestige;g.voyages=Math.max(0,Number(g.voyages)||0)+1;g.earnings=Math.max(0,Number(g.earnings)||0)+totalReward;
-  g.condition=Math.max(0,Math.min(100,(Number(g.condition??100)||100)-Math.max(0,(Number(trip.weatherWear)||3)+(Number(trip.eventWear)||0)+(Number(trip.throttleWear)||0))));
-  g.lastArrival={destination:dest,reward:totalReward,baseReward,eventBonus,eventPrestige,weeklyDockReward:weekly.reward,weeklyDockPrestige:weekly.prestige,weeklyDockCount:weekly.count,weeklyDockEligible:weekly.eligible,dockingElapsedMs:weekly.elapsed,dockingNewBest:weekly.newBest,missionKind:m.kind||"transfer",objectiveDone,objectiveBonus,objectivePrestige,objective:contract?.objective||"",dockingBonus,dockingPrestige,dockingGrade,dockingOrientation:dockOrientation(trip),dockingManualBonus:Number(trip.dockingManualBonus)||0,dockingManualPrestige:Number(trip.dockingManualPrestige)||0,eventLabel:String(trip.eventLabel||""),eventResult:String(trip.eventResult||""),crewBonus:0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige:totalPrestige,weather:String(trip.weather||"calm"),at:completedAt,voyageId,mission:String(m.name||"Missione completata"),emergency:false};
-  g.missionHistory=(Array.isArray(g.missionHistory)?g.missionHistory:[]).concat([{id,voyageId,origin:String(trip.origin||""),destination:dest,name:g.lastArrival.mission,kind:g.lastArrival.missionKind,reward:totalReward,prestige:totalPrestige,objectiveDone,objectiveBonus,dockingGrade,dockingElapsedMs:weekly.elapsed,weeklyDockReward:weekly.reward,at:g.lastArrival.at}]).slice(-30);
+  g.condition=Math.max(0,Math.min(100,(Number(g.condition??100)||100)-Math.max(0,(Number(trip.weatherWear)||3)+(Number(trip.eventWear)||0)+(Number(trip.throttleWear)||0))*(m.crewVersion===1&&m.crewWearMult===.9?.9:1)));
+  if(m.crewVersion===1)crewComplete(g,String(m.boat||g.boat));
+  g.lastArrival={destination:dest,reward:totalReward,baseReward,eventBonus,eventPrestige,weeklyDockReward:weekly.reward,weeklyDockPrestige:weekly.prestige,weeklyDockCount:weekly.count,weeklyDockEligible:weekly.eligible,dockingElapsedMs:weekly.elapsed,dockingNewBest:weekly.newBest,missionKind:m.kind||"transfer",objectiveDone,objectiveBonus,objectivePrestige,objective:contract?.objective||"",dockingBonus,dockingPrestige,dockingGrade,dockingOrientation:dockOrientation(trip),dockingManualBonus:Number(trip.dockingManualBonus)||0,dockingManualPrestige:Number(trip.dockingManualPrestige)||0,eventLabel:String(trip.eventLabel||""),eventResult:String(trip.eventResult||""),crewBonus,crewSalary:m.crewVersion===1?Math.max(0,Number(m.crewSalary)||0):0,charterBonus:0,charterRating:0,charterClient:"",charterTier:"",charterCareerTier:"",charterReturningClient:false,charterReputation:0,charterIncident:"",charterIncidentMatched:false,charterSpecialRequest:"",charterSpecialAccepted:false,charterSpecialMatched:false,charterClientLoyalty:"",prestige:totalPrestige,weather:String(trip.weather||"calm"),at:completedAt,voyageId,mission:String(m.name||"Missione completata"),emergency:false};
+  g.missionHistory=(Array.isArray(g.missionHistory)?g.missionHistory:[]).concat([{id,voyageId,origin:String(trip.origin||""),destination:dest,name:g.lastArrival.mission,kind:g.lastArrival.missionKind,reward:totalReward,crewBonus,crewSalary:g.lastArrival.crewSalary,cost:Math.max(0,Number(m.cost)||0),prestige:totalPrestige,objectiveDone,objectiveBonus,dockingGrade,dockingElapsedMs:weekly.elapsed,weeklyDockReward:weekly.reward,at:g.lastArrival.at}]).slice(-30);
  }
  g.lastDockedBridge={origin:String(trip.origin||g.port),destination:dest,at:Date.now()};g.trip=null;return true;
 }
@@ -465,5 +575,5 @@ function pulse(){
  }
  return {active:!!read()?.trip,snapshot:snapshot()};
 }
-window.MarinaEmpireMapLite={snapshot,preview,read,pulse,weeklyDockStatus,missionCatalog,startMission,setThrottle,setHelm,setDockEngine,setBowThruster,setDockAssist,setDockOrientation,rotateDock90,adjustDocking,completeDocking,applyVoyageDecision,positionAt,gpsTrackFor,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
+window.MarinaEmpireMapLite={snapshot,preview,read,pulse,crewSnapshot,crewAction,weeklyDockStatus,missionCatalog,startMission,setThrottle,setHelm,setDockEngine,setBowThruster,setDockAssist,setDockOrientation,rotateDock90,adjustDocking,completeDocking,applyVoyageDecision,positionAt,gpsTrackFor,routeFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>project(lat,lon)),routeGeoFor:(from,to)=>routePoints(from,to).map(([lat,lon])=>[lat,lon]),positionGeoAt:(from,to,progress)=>geoAt(from,to,progress)};
 })();
