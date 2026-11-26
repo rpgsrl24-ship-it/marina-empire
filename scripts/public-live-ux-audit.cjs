@@ -107,6 +107,10 @@ async function runScenario(browser,name,viewport,mobile){
     await page.goto(LIVE,{waitUntil:'domcontentloaded',timeout:30000});
     await page.waitForURL(/mobile-home\.html/,{timeout:15000});
     await page.waitForLoadState('load',{timeout:30000});
+    await page.locator('#academyStart').waitFor({state:'visible',timeout:15000});
+    assert.equal(await page.locator('#academyStart').isEnabled(),true,name+': immediate Academy start');
+    await page.locator('#meAnalyticsChoice [data-choice="no"]').click();
+    assert.equal(await page.evaluate(()=>localStorage.getItem('marina_empire_visitor_id_v2')),null,name+': analytics refusal creates no persistent ID');
     await page.screenshot({path:path.join(OUT,name+'-home.png'),fullPage:false,animations:'disabled'});
     const home=await pageAudit(page,name+' home');
     assert.equal(await page.locator('#weeklyDock').isVisible(),true,name+': weekly challenge card');
@@ -130,7 +134,11 @@ async function runScenario(browser,name,viewport,mobile){
     const firstCard=first.locator('xpath=ancestor::article[1]');
     const firstText=(await firstCard.innerText()).trim();
     assert.match(firstText,/Rimini/i,name+': first mission must originate in Rimini');
-    await first.click();
+    // Check both the mission catalog and the new one-click Academy flow.
+    if(name==='mobile-portrait'){
+      await page.goto(LIVE+'mobile-home.html?v=20261111-home6',{waitUntil:'domcontentloaded',timeout:30000});
+      await page.locator('#academyStart').click();
+    }else await first.click();
     await page.waitForURL(/cabina-mobile\.html/,{timeout:30000});
     await page.locator('#dockPreviewEntry').waitFor({state:'attached',timeout:15000});
     await page.locator('body.navigationMode .navDeck').waitFor({state:'visible',timeout:15000});
@@ -195,6 +203,9 @@ async function runScenario(browser,name,viewport,mobile){
     assert.ok(Number(arrivalSave?.prestige)>0,name+': arrival must credit prestige');
     assert.ok(Array.isArray(arrivalSave?.completed)&&arrivalSave.completed.length>0,name+': arrival must mark mission completed');
     assert.equal(Number(arrivalSave?.lastArrival?.weeklyDockReward)||0,0,name+': assisted docking cannot receive weekly reward');
+    assert.equal(await page.locator('#arrivalNext').isVisible(),true,name+': first-arrival next steps');
+    assert.equal(await page.locator('#arrivalAccount').isVisible(),true,name+': optional guest account link');
+    assert.equal(await page.evaluate(()=>localStorage.getItem('marina_empire_visitor_id_v2')),null,name+': gameplay works without analytics');
 
     const realBefore=await page.evaluate(()=>localStorage.getItem('marina_empire_beta_test_session'));
     await page.goto(LIVE+'cabina-mobile.html?anteprima=ormeggio',{waitUntil:'domcontentloaded',timeout:30000});
@@ -245,6 +256,7 @@ async function runScenario(browser,name,viewport,mobile){
     await page.locator('#dockNow').click();
     await page.locator('#arrival').waitFor({state:'visible',timeout:15000});
     assert.match(await page.locator('#arrivalReward').innerText(),/Allenamento completato/);
+    assert.equal(await page.locator('#arrivalNext').isVisible(),false,name+': practice not a real Academy completion');
     assert.equal(await page.evaluate(()=>localStorage.getItem('marina_empire_beta_test_session')),realBefore,name+': practice must leave real save unchanged');
     assert.equal(await page.locator('#dockPreviewEntry').isVisible(),true,name+': practice restart must be visible');
     await page.goto(LIVE+'missions-mobile.html?tipo=special',{waitUntil:'domcontentloaded',timeout:30000});

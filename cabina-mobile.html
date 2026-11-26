@@ -814,10 +814,16 @@ body.navigationMode .actions{display:none!important}body.navigationMode #notice{
 .navRouteLegend{position:absolute;z-index:5;top:5px;left:8px;max-width:calc(100% - 62px);font-size:10px;color:#ecfbff;background:#05273dd9;border-radius:5px;padding:4px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:699px){.navRouteLegend{font-size:9px;max-width:calc(100% - 55px)}}
 @media(prefers-reduced-motion:reduce){.cockpitStage .miniBoat,.cockpitStage .miniWake,.navMapYacht svg,body.dockingMode .dockArtwork #dockYacht{transition:none!important}}
+/* First-arrival next steps: no extra panels during sailing or docking. */
+#arrivalNext{margin:8px 0;padding:9px;border:1px solid #c6a467;border-radius:10px;background:#0c2c3f;color:#eef8ff}
+#arrivalNext strong{color:#ffdf9b;font-size:14px}#arrivalNext p{font-size:12px;margin:5px 0}
+#arrivalNext a,#arrivalAccount a{min-height:42px;display:inline-flex;align-items:center}
+#arrivalNext[hidden],#arrivalAccount[hidden]{display:none!important}
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
-<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita · v46</div>
-<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261126-cabin47&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
+<div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita · v48</div>
+<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261126-cabin48&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
+<section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><div id="arrivalNext" hidden><strong>Prima missione completata!</strong><p>Hai imparato a navigare e ormeggiare. Inizia gli incarichi in marina oppure riparti per guadagnare altri crediti.</p><a href="./marina-mobile.html?v=20261125-marina8#jobs">INCARICHI MARINA LIVE →</a></div><p id="arrivalAccount" hidden><a href="./account-mobile.html?from=academy">Salva i tuoi progressi: crea un account gratuito →</a></p><a href="./missions-mobile.html?v=20261125-missions13">Scegli una nuova missione →</a></section>
 <div class="helm cockpitOne">
   <div class="photo cockpitStage" id="window">
     <img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Postazione di comando interattiva Marina Empire">
@@ -998,8 +1004,8 @@ body.navigationMode .actions{display:none!important}body.navigationMode #notice{
   <button id="dockNow" class="dockNow" type="button">⚓ COMPLETA ORMEGGIO</button>
   <div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div>
 </section>
-<section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><p id="arrivalAccount" hidden><a href="./account-mobile.html?from=academy">Salva i tuoi progressi: crea un account gratuito →</a></p><a href="./missions-mobile.html?v=20261125-missions13">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261126-cabin47"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261125-missions13"><b>🎯</b>MISSIONI</a></nav>
+
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261126-cabin48"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261125-missions13"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script>
 window.MarinaDockPreview=new URLSearchParams(location.search).get("anteprima")==="ormeggio";
 if(window.MarinaDockPreview){
@@ -1007,7 +1013,7 @@ if(window.MarinaDockPreview){
   let demo={name:"Allenamento",coins:10000,prestige:0,fuel:770,condition:100,port:"rimini",boat:"yacht20",owned:["yacht20"],completed:[],reservations:[],voyages:0,voyageSerial:1,setupComplete:true,trip:{id:"DEMO_DOCKING",voyageId:1,dockingVersion:1,origin:"rimini",dest:"cervia",legs:["rimini","cervia"],legIndex:0,legSeconds:20,sec:20,until:now,progressBase:.97,startedAt:now,lastProgressAt:now,lastFuelAt:now,dockingReady:true,dockingDepth:0,dockingOffset:-8,dockingHeading:12,dockingSurge:0,dockingSway:0,dockingYawRate:0,dockingWind:0,dockingCurrent:0,enginePort:0,engineStarboard:0,bowThruster:0,helmAngle:0,dockingLastAt:now,dockingStartedAt:now,weather:"calm",weatherWear:0,throttleMode:"eco",mission:{id:"DEMO_DOCKING",name:"Allenamento ormeggio",dest:"cervia",boat:"yacht20",reward:0,prestige:0,cost:0,fuel:0}}};
   window.MarinaLocalSaveContext=Object.freeze({capture:()=>handle,select:()=>true,isCurrent:h=>h===handle,readGame:h=>h===handle?copy(demo):null,writeGame:(h,g)=>{if(h!==handle)return false;demo=copy(g);return true},layoutKey:()=>null,readLayout:()=>null,writeLayout:()=>false,resetLayout:()=>false,hasExternalChange:()=>false});
 }
-</script><script src="./mobile-map-lite-v2.js?v=20261125-engine27"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script>if(!window.MarinaDockPreview){const tracker=document.createElement("script");tracker.src="./player-tracker-v2.js?v=20261126-tracker4";document.head.appendChild(tracker);}</script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</script><script src="./mobile-map-lite-v2.js?v=20261125-engine27"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script>if(!window.MarinaDockPreview){const tracker=document.createElement("script");tracker.src="./player-tracker-v2.js?v=20261126-tracker5";document.head.appendChild(tracker);}</script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -1110,7 +1116,8 @@ function render(){
  $("conditionGauge").textContent=Math.round(Number(s.condition??100))+"%";
  $("gaugeFuel").textContent=Math.round((Number(s.fuel)||0)/Math.max(1,Number(shot.tank)||1)*100)+"%";
  $("simHdg").textContent=$("heading").textContent||"—";
- const active=!!t;
+ const active=!!t,academyTrip=!!t&&t.id==="INTRO_RIMINI_CERVIA"&&!window.MarinaDockPreview;
+ $("simpleGuide").textContent=academyTrip?"ACADEMY · SEGUI IL GPS":"GPS · TIMONE · MANETTE";
  $("dockingPanel").classList.toggle("show",!!t?.dockingReady);document.body.classList.toggle("dockingMode",!!t?.dockingReady);document.body.classList.toggle("navigationMode",!!t&&!t.dockingReady);
  $("dockPreviewBanner").hidden=!window.MarinaDockPreview;document.body.classList.toggle("practiceMode",!!window.MarinaDockPreview);
  $("dockPreviewEntry").hidden=active;
@@ -1204,7 +1211,8 @@ function render(){
     $("portLeverHandle").style.top=(pEng>0?"18%":pEng<0?"82%":"50%");
     $("starLeverHandle").style.top=(sEng>0?"18%":sEng<0?"82%":"50%");
     document.querySelectorAll("[data-lever-side]").forEach(el=>{const v=el.dataset.leverSide==="port"?pEng:sEng;el.setAttribute("aria-valuenow",String(v));el.setAttribute("aria-valuetext",v>0?"Avanti":v<0?"Indietro":"Folle");});
-    document.querySelectorAll("[data-bow]").forEach(b=>b.classList.toggle("on",(Number(t.bowThruster)||0)===Number(b.dataset.bow)));$("dockAssist").classList.toggle("on",!!t.dockingAssist);$("dockAssist").textContent=t.dockingAssist?"✨ ASSISTENZA ATTIVA":"✨ ASSISTENZA ORMEGGIO";
+    document.querySelectorAll("[data-bow]").forEach(b=>b.classList.toggle("on",(Number(t.bowThruster)||0)===Number(b.dataset.bow)));$("dockAssist").classList.toggle("on",!!t.dockingAssist);$("dockAssist").textContent=t.dockingAssist?"✨ ASSISTENZA ATTIVA":academyTrip?"✨ GUIDAMI ALL'ORMEGGIO":"✨ ASSISTENZA ORMEGGIO";
+ $("dockAssist").title=academyTrip?"Per la prima missione puoi farti guidare al posto barca, poi premere Completa ormeggio.":"Attiva o disattiva l'assistenza alla manovra";
     $("bowThrusterBox").classList.toggle("unavailable",!t.bowThrusterAvailable);$("bowThrusterBox").hidden=!t.bowThrusterAvailable;
     $("bowThrusterBox").querySelector("strong").textContent="✣ ELICA DI PRUA";$("bowThrusterBox").title="Potenza relativa: "+t.bowThrusterPower+"%";
     const stopped=!turning&&Math.abs(Number(t.dockingSurge)||0)<=.55&&Math.abs(Number(t.dockingYawRate)||0)<=.55&&Math.abs(Number(t.dockingSway)||0)<=.45;
@@ -1252,6 +1260,7 @@ function render(){
    $("arrivalReward").innerHTML=(window.MarinaDockPreview?"<strong>Allenamento completato</strong><br>Nessun credito o progresso della partita reale modificato.":"<strong>Missione completata</strong><br>+"+fmt(s.lastArrival.reward)+" crediti · +"+fmt(s.lastArrival.prestige)+" prestigio"+(s.lastArrival.eventResult?"<br><small>"+s.lastArrival.eventResult+(evBonus||evPrestige?" · bonus evento incluso":"")+"</small>":""))+orientationText+timeText+bonusText+objectiveText+weeklyText;
    window.MarinaEmpirePlayerTracker?.completeVoyage?.(s.lastArrival.voyageId);
    $("arrivalAccount").hidden=!!window.MarinaDockPreview||!!window.MarinaLocalSaveContext?.capture?.()?.accountId;
+   $("arrivalNext").hidden=!!window.MarinaDockPreview||s.lastArrival.emergency||!((Number(s.voyages)||0)===1&&s.completed?.includes("INTRO_RIMINI_CERVIA"));
   }
   if(!$("notice").dataset.manual)note("Yacht in porto: puoi fare il pieno o la manutenzione utilizzando i pulsanti qui sotto.");
  }
@@ -1362,7 +1371,7 @@ $("dockRotateLeft").onclick=()=>refreshDocking(window.MarinaEmpireMapLite?.rotat
 $("dockRotateRight").onclick=()=>refreshDocking(window.MarinaEmpireMapLite?.rotateDock90?.(1));
 $("dockNow").onclick=()=>{
  const result=window.MarinaEmpireMapLite?.completeDocking?.();
- if(result?.ok){note("Ormeggio "+result.grade.toLowerCase()+" · bonus +"+fmt(result.bonus)+" crediti e +"+fmt(result.prestige)+" prestigio.");render();}
+ if(result?.ok){note("Ormeggio "+result.grade.toLowerCase()+" · bonus +"+fmt(result.bonus)+" crediti e +"+fmt(result.prestige)+" prestigio.");render();if(!window.MarinaDockPreview&&$("arrival").classList.contains("show"))$("arrival").scrollIntoView({block:"start",behavior:"auto"});}
  else refreshDocking(result);
 };
 function fitRoute(){if(!map)return;if(routeBounds)map.fitBounds(routeBounds,{animate:false,maxZoom:13});else if(lastPosition)map.setView(lastPosition,12,{animate:false});followEnabled=false;syncFollow()}

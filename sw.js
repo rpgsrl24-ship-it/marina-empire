@@ -1,11 +1,11 @@
-const CACHE="marina-empire-v20261126-onboarding1";
+const CACHE="marina-empire-v20261126-onboarding2";
 const CORE=[
  "./",
  "./index.html",
  "./mobile-home.html?v=20261111-home6",
  "./missions-mobile.html?v=20261125-missions13",
  "./map-mobile.html?v=20261124-map20",
- "./cabina-mobile.html?v=20261126-cabin47",
+ "./cabina-mobile.html?v=20261126-cabin48",
  "./marina-mobile.html?v=20261123-marina5",
  "./marina-mobile.html?v=20261125-marina6",
  "./marina-mobile.html?v=20261125-marina8",
@@ -17,7 +17,7 @@ const CORE=[
  "./manifest.webmanifest",
  "./app-icon.svg",
  "./local-save-context.js",
- "./player-tracker-v2.js?v=20261126-tracker4",
+ "./player-tracker-v2.js?v=20261126-tracker5",
  "./docking-ranking.html?v=20261125-cup1",
  "./mobile-map-lite-v2.js?v=20261125-engine27",
  "./cloud-sync-modern.js?v=20261111-cloud1",

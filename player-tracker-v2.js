@@ -8,6 +8,7 @@ const VISITOR_KEY="marina_empire_visitor_id_v2";
 const SESSION_KEY="marina_empire_session_id_v2";
 const PLAY_KEY="marina_empire_play_started_v2";
 let clientPromise=null,active=false,lastHeartbeat=0,playPending=false;
+const stages=new Set();
 
 function uuid(){try{return crypto.randomUUID()}catch(_){return "00000000-0000-4000-8000-"+Math.random().toString(16).slice(2).padEnd(12,"0").slice(0,12)}}
 function getId(storage,key){
@@ -30,8 +31,9 @@ function eraseAnalytics(){
  try{[VISITOR_KEY,ATTR,"marina_empire_acquisition_v1"].forEach(k=>localStorage.removeItem(k));
  for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k?.startsWith("marina_empire_reported_voyage_v1_"))localStorage.removeItem(k)}
  [SESSION_KEY,PLAY_KEY].forEach(k=>sessionStorage.removeItem(k));
+ for(let i=sessionStorage.length-1;i>=0;i--){const k=sessionStorage.key(i);if(k?.startsWith("me_stage_"))sessionStorage.removeItem(k)}
  }catch(_){}
- visitorId=sessionId=null;active=false;
+ visitorId=sessionId=null;active=false;stages.clear();
 }
 if(allowed()){initIds();captureAttribution()}else eraseAnalytics();
 function acquisition(){
@@ -75,7 +77,7 @@ async function startPlay(){
  playPending=true;
  const ok=await send("play_start");
  playPending=false;
- if(ok){try{sessionStorage.setItem(PLAY_KEY,"1")}catch(_){}}
+ if(ok&&allowed()){try{sessionStorage.setItem(PLAY_KEY,"1")}catch(_){}}
  return ok;
 }
 const completionPending=new Set();
@@ -89,7 +91,7 @@ async function completeVoyage(voyageId){
  completionPending.add(key);
  try{
   const ok=await send("mission_complete");
-  if(ok){try{localStorage.setItem(key,"1")}catch(_){}}
+  if(ok&&allowed()){try{localStorage.setItem(key,"1")}catch(_){}}
   return ok;
  }finally{completionPending.delete(key)}
 }
@@ -97,13 +99,12 @@ function heartbeat(){
  if(!allowed()||!active||document.hidden)return;
  const now=Date.now();if(now-lastHeartbeat<55000)return;lastHeartbeat=now;send("heartbeat");
 }
-const stages=new Set();
 async function stage(event,key="session"){
  if(!allowed())return false;
  const k=event+"|"+String(key);if(stages.has(k))return true;
  try{if(sessionStorage.getItem("me_stage_"+k)==="1")return true}catch(_){}
  stages.add(k);const ok=await send(event);
- if(ok){try{sessionStorage.setItem("me_stage_"+k,"1")}catch(_){}}else stages.delete(k);
+ if(ok&&allowed()){try{sessionStorage.setItem("me_stage_"+k,"1")}catch(_){}}else stages.delete(k);
  return ok;
 }
 window.MarinaEmpirePlayerTracker=Object.freeze({track:send,stage,startPlay,completeVoyage,get visitorId(){return visitorId},get sessionId(){return sessionId}});
@@ -115,10 +116,16 @@ function preferences(){
  box.querySelectorAll("[data-choice]").forEach(b=>b.onclick=()=>{try{localStorage.setItem(CONSENT,b.dataset.choice)}catch(_){}box.remove();if(allowed()){initIds();captureAttribution();send("page_view");}else eraseAnalytics()});
  document.body.appendChild(box);
 }
-const control=document.createElement("button");control.type="button";control.textContent="Privacy e statistiche";control.style.cssText="display:block;margin:8px auto;padding:6px;border:0;background:transparent;color:inherit;font:11px system-ui;text-decoration:underline";control.onclick=preferences;(document.querySelector("main")||document.body).appendChild(control);
+const control=document.createElement("button");control.id="meAnalyticsControl";control.type="button";control.textContent="Privacy e statistiche";control.style.cssText="display:block;margin:8px auto;padding:6px;border:0;background:transparent;color:inherit;font:11px system-ui;text-decoration:underline";control.onclick=preferences;(document.querySelector("main")||document.body).appendChild(control);
 if(!choice()&&/mobile-home\.html$/.test(location.pathname))preferences();
 if(allowed())send("page_view");
-["pointerdown","keydown","touchstart"].forEach(name=>window.addEventListener(name,startPlay,{once:true,passive:true}));
+// Consent controls are not gameplay. The first actual interaction starts a session.
+function gameplayInteraction(event){
+ if(event.target?.closest?.("#meAnalyticsChoice,#meAnalyticsControl"))return;
+ if(allowed())startPlay();
+}
+["pointerdown","keydown","touchstart"].forEach(name=>window.addEventListener(name,gameplayInteraction,{passive:true}));
+window.addEventListener("storage",event=>{if(event.key===CONSENT&&!allowed())eraseAnalytics()});
 setInterval(heartbeat,60000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)heartbeat()});
 })();
