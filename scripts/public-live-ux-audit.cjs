@@ -274,7 +274,7 @@ async function runScenario(browser,name,viewport,mobile){
     const cup=await pageAudit(page,name+' cup');
     assert.equal(cup.horizontalOverflow,false,name+': cup has horizontal overflow');
     assert.equal(cup.clipped.length,0,name+': cup has clipped controls');
-    await page.goto(LIVE+'marina-mobile.html?v=20261125-marina8#jobs',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.goto(LIVE+'marina-mobile.html?v=20261126-marina9#jobs',{waitUntil:'domcontentloaded',timeout:30000});
     await page.locator('#jobsPanel[data-loaded="true"]').waitFor({state:'visible',timeout:15000}).catch(async e=>{throw new Error(name+': Marina Live did not render; '+JSON.stringify({errors,save:await page.evaluate(()=>{const g=JSON.parse(localStorage.getItem('marina_empire_beta_test_session')||'{}');return {port:g.port,voyages:g.voyages,trip:!!g.trip,engine:!!window.MarinaEmpireMarinaLite}})}))});
     assert.equal(await page.locator('.jobCard').count(),3,name+': expected three local job cards');
     assert.ok(await page.locator('[data-job-open="dock"]').count(),name+': dock job blocked: '+await page.locator('#jobText').innerText());
@@ -294,6 +294,29 @@ async function runScenario(browser,name,viewport,mobile){
     const afterDaily=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins);
     assert.equal(afterDaily,beforeDaily+500);
     assert.equal(await page.locator('#dailyMissionBtn').isDisabled(),true);
+    if(name==='desktop'){
+      // An isolated test save only; no paid API or real accounts.
+      await page.evaluate(()=>{const k='marina_empire_beta_test_session',g=JSON.parse(localStorage.getItem(k));g.coins=30000000;localStorage.setItem(k,JSON.stringify(g));});
+      await page.goto(LIVE+'marina-mobile.html?v=20261126-marina9&porto=cervia#property',{waitUntil:'domcontentloaded',timeout:30000});
+      await page.locator('#buyMarina').waitFor({state:'visible',timeout:15000});
+      page.on('dialog',d=>d.accept());
+      await page.locator('#buyMarina').click();
+      await page.waitForFunction(()=>document.getElementById('buyMarina').hidden);
+      await page.locator('#buildPontoon').click();
+      assert.equal(await page.locator('#pontoons').innerText(),'2/30');
+      await page.locator('#upgradeMarina').click();
+      assert.equal(await page.locator('#level').innerText(),'Liv. 2');
+      assert.equal(await page.locator('#collectMarina').isDisabled(),true);
+      await page.evaluate(()=>{const k='marina_empire_beta_test_session',g=JSON.parse(localStorage.getItem(k)),r=g.marinas.cervia;r.lastReward-=86400001;r.berthLastReward=r.lastReward;r.incomeCursor=r.lastReward;r.incomeBank=0;localStorage.setItem(k,JSON.stringify(g));});
+      await page.goto(LIVE+'direction-mobile.html?v=20261126-direction2',{waitUntil:'domcontentloaded',timeout:30000});
+      await page.locator('#portfolioCollect:enabled').waitFor({state:'visible',timeout:15000});
+      const pre=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins);
+      await page.locator('#portfolioCollect').click();
+      const post=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins);
+      assert.ok(post>pre,'marina income credited to saved balance');assert.equal(await page.locator('#portfolioCollect').isDisabled(),true);
+      assert.equal(await page.locator('#revenueChart .barcol').count(),7);
+      assert.equal((await pageAudit(page,name+' direction')).horizontalOverflow,false);
+    }
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,

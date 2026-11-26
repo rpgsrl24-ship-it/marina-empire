@@ -13,7 +13,90 @@ function portName(id){return ports.find(p=>p.id===id)?.name||id||"Rimini"}
 function selectedId(game){let id=null;try{id=sessionStorage.getItem("marina_empire_selected_marina")}catch(_){};const current=String(game?.port||"");const arrivedAt=Number(game?.lastArrival?.at)||0;const selectedAt=Number(sessionStorage.getItem("marina_empire_selected_marina_at")||0);if(current&&arrivedAt&&arrivedAt>=selectedAt)id=current;id=id||game?.investmentMarina||game?.homeMarina||current||"rimini";return ports.some(p=>p.id===id)?id:"rimini"}
 function op(id,game){const raw=game?.marinaOperations?.[id]||{};const completed=Math.max(0,Math.floor(Number(raw.completed)||0));const level=completed>=20?5:completed>=10?4:completed>=5?3:completed>=2?2:1;const next=level===1?2:level===2?5:level===3?10:level===4?20:20;const label=["","Operatività Base","Marina Attiva","Marina Consolidata","Alta Operatività","Hub d’Eccellenza"][level];const service=["","Servizi Standard","Fuel Dock Prioritario","Assistenza Tecnica Prioritaria","Concierge VIP","Centro Superyacht"][level];return{completed,level,next,label,service}}
 function layout(id){const x=context();if(!x)return null;return x.c.readLayout(x.h,id)||null}
-function snapshot(){const game=read()||{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,port:"rimini",boat:"voyager",marinas:{}};const id=selectedId(game),p=portName(id),owned=!!game.marinas?.[id]&&Number.isFinite(Number(game.marinas[id]?.lastReward)),info=economy[id]||null,oper=op(id,game),lay=layout(id)||{},built=Math.max(1,Math.min(30,Number(lay.built??game.marinas?.[id]?.built)||1)),capacity=built*6,occupied=Array.isArray(lay.occupied)?lay.occupied.length:Math.round(capacity*.3),available=Math.max(0,capacity-occupied),level=owned?Math.max(1,Math.min(5,Number(game.marinas?.[id]?.level)||1)):1,baseIncome=owned&&info?Math.floor(info.income*(1+(level-1)*.08)*(1+(oper.level-1)*.03)):0,staff=owned&&info?Math.round(info.price*.0015)+Math.max(0,built-1)*4500:0,maintenance=owned&&info?Math.round(info.price*.001)+built*2200:0,utilities=owned&&info?Math.round(info.price*.0005)+built*1300:0,berth=owned&&info?Math.floor(built*6*Math.max(1200,Math.round(info.price/5000))*.70*(1+(level-1)*.08)):0,net=Math.max(0,baseIncome+berth-staff-maintenance-utilities),b=boats[game.boat]||boats.voyager;return{game,id,name:p,owned,info,oper,built,capacity,occupied,available,level,baseIncome,staff,maintenance,utilities,berth,net,boat:b}}
+// Marina investments are game-local virtual assets, never real port ownership.
+const DAY_MS=86400000,RESERVE=2000,MAX_PONTOONS=30,MAX_LEVEL=5;
+function isOwned(g,id){return Object.hasOwn(economy,id)&&Number.isFinite(Number(g?.marinas?.[id]?.lastReward))&&Number(g.marinas[id].lastReward)>0}
+function marinaFinance(g,id){
+ const info=Object.hasOwn(economy,id)?economy[id]:null,owned=isOwned(g,id),record=owned?g.marinas[id]:{},oper=op(id,g);
+ const lay=layout(id)||{},built=Math.max(1,Math.min(MAX_PONTOONS,Math.floor(Number(record.financeVersion===1?record.built:(record.built??lay.built))||1)));
+ const level=owned?Math.max(1,Math.min(MAX_LEVEL,Math.floor(Number(record.level)||1))):1,capacity=built*6;
+ // Occupancy is a simulated estimate, not a real berth booking feed.
+ const occupied=Math.round(capacity*.7),available=capacity-occupied;
+ const baseIncome=owned?Math.floor(info.income*(1+(level-1)*.08)*(1+(oper.level-1)*.03)):0;
+ const extra=built-1;
+ const staff=owned?Math.round(info.price*.0015)+extra*2200:0;
+ const maintenance=owned?Math.round(info.price*.001)+2200+extra*1100:0;
+ const utilities=owned?Math.round(info.price*.0005)+1300+extra*600:0;
+ const berth=owned?Math.floor(capacity*Math.max(1200,Math.round(info.price/5000))*.70*(1+(level-1)*.08)):0;
+ const net=Math.max(0,baseIncome+berth-staff-maintenance-utilities);
+ const pontoonCost=info?Math.round(info.price*.035/1000)*1000:0;
+ const upgradeCost=info?Math.round(info.price*.06*level/1000)*1000:0;
+ return {id,name:portName(id),owned,info,oper,built,capacity,occupied,available,level,baseIncome,staff,maintenance,utilities,berth,net,pontoonCost,upgradeCost};
+}
+function accrual(g,id,now=Date.now(),f=marinaFinance(g,id)){
+ if(!f.owned)return{due:0,bank:0,claimAt:0,cursor:0,clockMismatch:false,nextAt:0};
+ const r=g.marinas[id],modern=r.financeVersion===1,claimAt=modern?Number(r.lastReward):Math.max(Number(r.lastReward)||0,Number(r.berthLastReward)||0);
+ const cursor=modern?Math.max(claimAt,Number(r.incomeCursor)||claimAt):claimAt;
+ const bank=modern?Math.max(0,Number(r.incomeBank)||0):0;
+ const rate=modern&&Number.isFinite(Number(r.incomeRate))?Math.max(0,Number(r.incomeRate)):f.net;
+ const clockMismatch=!Number.isFinite(now)||now<cursor||now<claimAt;
+ const end=clockMismatch?cursor:Math.max(cursor,Math.min(now,claimAt+7*DAY_MS));
+ const total=bank+Math.max(0,end-cursor)*rate/DAY_MS;
+ return{claimAt,cursor:end,bank:total,due:!clockMismatch&&now-claimAt>=DAY_MS?Math.floor(total):0,clockMismatch,nextAt:claimAt+DAY_MS};
+}
+function updateAccrual(g,id,now,f=marinaFinance(g,id)){
+ const a=accrual(g,id,now,f);if(a.clockMismatch)return false;
+ const r=g.marinas[id];r.financeVersion=1;r.built=f.built;r.level=f.level;r.lastReward=a.claimAt;r.berthLastReward=a.claimAt;r.incomeCursor=a.cursor;r.incomeBank=a.bank;r.incomeRate=f.net;return true;
+}
+function propertyState(g,id,now=Date.now()){
+ const f=marinaFinance(g,id),a=accrual(g,id,now,f),credits=Math.max(0,Number(g.coins)||0);
+ const reason=!f.info?"La base RPG non è acquistabile":g.trip?"Termina prima la missione e l'ormeggio":a.clockMismatch?"Controlla la data del dispositivo":"";
+ const affordable=cost=>!reason&&credits>=cost+RESERVE;
+ return{...f,...a,reason,canBuy:!!f.info&&!f.owned&&affordable(f.info.price),canBuild:f.owned&&f.built<MAX_PONTOONS&&affordable(f.pontoonCost),canUpgrade:f.owned&&f.level<MAX_LEVEL&&affordable(f.upgradeCost),canCollect:f.owned&&!reason&&a.due>0};
+}
+function portfolioSnapshot(game,now=Date.now()){
+ const g=game||read()||defaultGame(),items=ports.filter(p=>isOwned(g,p.id)).map(p=>propertyState(g,p.id,now));
+ return{items,owned:items.length,dailyNet:items.reduce((sum,p)=>sum+p.net,0),due:items.reduce((sum,p)=>sum+(p.canCollect?p.due:0),0),pontoonCount:items.reduce((sum,p)=>sum+p.built,0),berths:items.reduce((sum,p)=>sum+p.capacity,0)};
+}
+function snapshot(){
+ const game=read()||defaultGame(),id=selectedId(game),p=propertyState(game,id),boat=boats[game.boat]||boats.voyager;
+ return{game,...p,boat};
+}
+function financeLog(g,kind,id,amount,now){
+ const history=Array.isArray(g.economyHistory)?g.economyHistory:[];
+ g.economyHistory=history.concat([{kind,id,amount,at:now}]).slice(-300);
+}
+function propertyAction(action,id,now=Date.now()){
+ const x=context(),g=x?.c.readGame(x.h);if(!g)return{ok:false,message:"Salvataggio non disponibile"};
+ if(!Object.hasOwn(economy,id))return{ok:false,message:"Marina non acquistabile: la base RPG resta esclusa"};
+ const p=propertyState(g,id,now);
+ if(p.reason)return{ok:false,message:p.reason};
+ let cost=0,label="";
+ if(action==="buy"){if(p.owned)return{ok:false,message:"Marina già di tua proprietà"};cost=p.info.price;label="Marina acquistata"}
+ else if(action==="pontoon"){if(!p.owned||p.built>=MAX_PONTOONS)return{ok:false,message:"Acquista la marina o verifica il limite pontili"};cost=p.pontoonCost;label="Nuovo pontile costruito"}
+ else if(action==="upgrade"){if(!p.owned||p.level>=MAX_LEVEL)return{ok:false,message:"Acquista la marina o verifica il livello massimo"};cost=p.upgradeCost;label="Marina potenziata"}
+ else return{ok:false,message:"Operazione non valida"};
+ if(!Number.isSafeInteger(cost)||cost<=0||!Number.isSafeInteger(g.coins)||g.coins-cost<RESERVE)return{ok:false,message:"Crediti insufficienti: mantieni 2.000 crediti di riserva"};
+ g.marinas=asRecord(g.marinas);
+ if(action==="buy"){g.marinas[id]={lastReward:now,berthLastReward:now,level:1,built:1,financeVersion:1,incomeCursor:now,incomeBank:0,incomeRate:0}}
+ else{if(!updateAccrual(g,id,now,p))return{ok:false,message:"Controlla la data del dispositivo"};const r=g.marinas[id];if(action==="pontoon")r.built=p.built+1;else r.level=p.level+1;}
+ g.marinas[id].incomeRate=marinaFinance(g,id).net;
+ g.coins-=cost;financeLog(g,action==="buy"?"marina_buy":action==="pontoon"?"pontoon_build":"marina_upgrade",id,-cost,now);
+ if(!x.c.writeGame(x.h,g))return{ok:false,message:"Salvataggio non confermato: nessun investimento registrato"};
+ return{ok:true,cost,message:label+" · "+portName(id)+" · -"+cost.toLocaleString("it-IT")+" crediti"};
+}
+function collectMarina(id=null,now=Date.now()){
+ const x=context(),g=x?.c.readGame(x.h);if(!g)return{ok:false,message:"Salvataggio non disponibile"};
+ if(g.trip)return{ok:false,message:"Termina prima la missione"};
+ const items=(id===null?portfolioSnapshot(g,now).items:[propertyState(g,id,now)]).filter(p=>p.canCollect);
+ const total=items.reduce((sum,p)=>sum+p.due,0);
+ if(!total)return{ok:false,message:"Nessuna rendita disponibile: maturazione ogni 24 ore"};
+ if(!Number.isSafeInteger(g.coins+total)||!Number.isSafeInteger(Math.max(0,Number(g.earnings)||0)+total))return{ok:false,message:"Saldo non valido"};
+ for(const p of items){const r=g.marinas[p.id];r.financeVersion=1;r.built=p.built;r.level=p.level;r.lastReward=now;r.berthLastReward=now;r.incomeCursor=now;r.incomeBank=0;r.incomeRate=p.net;financeLog(g,"marina_income",p.id,p.due,now);}
+ g.coins+=total;g.earnings=Math.max(0,Number(g.earnings)||0)+total;
+ if(!x.c.writeGame(x.h,g))return{ok:false,message:"Salvataggio non confermato: riprova"};
+ return{ok:true,amount:total,message:"Rendite riscosse · +"+total.toLocaleString("it-IT")+" crediti"};
+}
 function setSelected(id){if(!ports.some(p=>p.id===id))return false;try{sessionStorage.setItem("marina_empire_selected_marina",id);sessionStorage.setItem("marina_empire_selected_marina_at",String(Date.now()))}catch(_){};const game=read();if(!game)return true;game.investmentMarina=id;write(game);return true}
 function prepareMarinaService(game){
  if(!game?.trip)return{ok:true,recovered:false};
@@ -132,10 +215,13 @@ function completeJob(id,choice,now=Date.now()){
  done.push(id);game.marinaDailyJobs={day:status.day,count:status.count+1,tutorial:status.tutorial,done};
  game.coins=Math.max(0,Number(game.coins)||0)+job.reward;game.prestige=Math.max(0,Number(game.prestige)||0)+job.prestige;
  game.guestTrialJobsUsed=Math.max(1,num(game.guestTrialJobsUsed));game.npcJobsCompleted=num(game.npcJobsCompleted)+1;
+ const ownPort=isOwned(game,status.port);
+ if(ownPort&&!updateAccrual(game,status.port,now))return{ok:false,message:"Controlla la data del dispositivo"};
  game.marinaOperations=asRecord(game.marinaOperations);const ops=asRecord(game.marinaOperations[status.port]);game.marinaOperations[status.port]={...ops,completed:num(ops.completed)+1};
+ if(ownPort)game.marinas[status.port].incomeRate=marinaFinance(game,status.port).net;
  game.lastNpcJob={id,type:job.title,reward:job.reward,cost:0,prestige:job.prestige,reputation:5,sector:"marina",port:status.port,at:now};
  if(!x.c.writeGame(x.h,game))return{ok:false,message:"Salvataggio incarico non confermato. Riprova."};
  return{ok:true,message:"Incarico completato · +"+job.reward+" crediti · +"+job.prestige+" prestigio",reward:job.reward,prestige:job.prestige};
 }
-window.MarinaEmpireMarinaLite={ports,snapshot,setSelected,refuel,repair,read,jobStatus,dailyJobCatalog,completeJob,dailyState,claimDaily};
+window.MarinaEmpireMarinaLite={ports,snapshot,setSelected,refuel,repair,read,jobStatus,dailyJobCatalog,completeJob,dailyState,claimDaily,propertyState,portfolioSnapshot,buyMarina:(id,now)=>propertyAction('buy',id,now),buildPontoon:(id,now)=>propertyAction('pontoon',id,now),upgradeMarina:(id,now)=>propertyAction('upgrade',id,now),collectMarina};
 })();
