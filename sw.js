@@ -1,4 +1,4 @@
-const CACHE="marina-empire-v20261126-crew1";
+const CACHE="marina-empire-v20261126-research1";
 const CORE=[
  "./",
  "./index.html",
@@ -14,6 +14,8 @@ const CORE=[
  "./profile-mobile.html?v=20261110-profile1",
  "./account-mobile.html",
  "./crew-mobile.html",
+ "./research-mobile.html?v=20261109-research1",
+ "./mobile-research-lite-v1.js?v=20261109-researchlite1",
  "./direction-mobile.html?v=20261126-direction3",
  "./activities-mobile.html?v=20261110-activities1",
  "./marketplace-mobile.html?v=20261110-market13",

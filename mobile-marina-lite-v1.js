@@ -16,7 +16,8 @@ function layout(id){const x=context();if(!x)return null;return x.c.readLayout(x.
 // Marina investments are game-local virtual assets, never real port ownership.
 const DAY_MS=86400000,RESERVE=2000,MAX_PONTOONS=30,MAX_LEVEL=5;
 function isOwned(g,id){return Object.hasOwn(economy,id)&&Number.isFinite(Number(g?.marinas?.[id]?.lastReward))&&Number(g.marinas[id].lastReward)>0}
-function marinaFinance(g,id){
+function marinaFinance(g,id,now=Date.now()){
+ const research=window.MarinaResearchBenefits?.effects(g,now)||{berth:1,cost:1};
  const info=Object.hasOwn(economy,id)?economy[id]:null,owned=isOwned(g,id),record=owned?g.marinas[id]:{},oper=op(id,g);
  const lay=layout(id)||{},built=Math.max(1,Math.min(MAX_PONTOONS,Math.floor(Number(record.financeVersion===1?record.built:(record.built??lay.built))||1)));
  const level=owned?Math.max(1,Math.min(MAX_LEVEL,Math.floor(Number(record.level)||1))):1,capacity=built*6;
@@ -24,16 +25,16 @@ function marinaFinance(g,id){
  const occupied=Math.round(capacity*.7),available=capacity-occupied;
  const baseIncome=owned?Math.floor(info.income*(1+(level-1)*.08)*(1+(oper.level-1)*.03)):0;
  const extra=built-1;
- const staff=owned?Math.round(info.price*.0015)+extra*2200:0;
- const maintenance=owned?Math.round(info.price*.001)+2200+extra*1100:0;
- const utilities=owned?Math.round(info.price*.0005)+1300+extra*600:0;
- const berth=owned?Math.floor(capacity*Math.max(1200,Math.round(info.price/5000))*.70*(1+(level-1)*.08)):0;
+ const staff=owned?Math.round((Math.round(info.price*.0015)+extra*2200)*research.cost):0;
+ const maintenance=owned?Math.round((Math.round(info.price*.001)+2200+extra*1100)*research.cost):0;
+ const utilities=owned?Math.round((Math.round(info.price*.0005)+1300+extra*600)*research.cost):0;
+ const berth=owned?Math.floor(capacity*Math.max(1200,Math.round(info.price/5000))*.70*(1+(level-1)*.08)*research.berth):0;
  const net=Math.max(0,baseIncome+berth-staff-maintenance-utilities);
  const pontoonCost=info?Math.round(info.price*.035/1000)*1000:0;
  const upgradeCost=info?Math.round(info.price*.06*level/1000)*1000:0;
- return {id,name:portName(id),owned,info,oper,built,capacity,occupied,available,level,baseIncome,staff,maintenance,utilities,berth,net,pontoonCost,upgradeCost};
+ return {id,name:portName(id),owned,info,oper,built,capacity,occupied,available,level,baseIncome,staff,maintenance,utilities,berth,net,pontoonCost,upgradeCost,research};
 }
-function accrual(g,id,now=Date.now(),f=marinaFinance(g,id)){
+function accrual(g,id,now=Date.now(),f=marinaFinance(g,id,now)){
  if(!f.owned)return{due:0,bank:0,claimAt:0,cursor:0,clockMismatch:false,nextAt:0};
  const r=g.marinas[id],modern=r.financeVersion===1,claimAt=modern?Number(r.lastReward):Math.max(Number(r.lastReward)||0,Number(r.berthLastReward)||0);
  const cursor=modern?Math.max(claimAt,Number(r.incomeCursor)||claimAt):claimAt;
@@ -41,15 +42,21 @@ function accrual(g,id,now=Date.now(),f=marinaFinance(g,id)){
  const rate=modern&&Number.isFinite(Number(r.incomeRate))?Math.max(0,Number(r.incomeRate)):f.net;
  const clockMismatch=!Number.isFinite(now)||now<cursor||now<claimAt;
  const end=clockMismatch?cursor:Math.max(cursor,Math.min(now,claimAt+7*DAY_MS));
- const total=bank+Math.max(0,end-cursor)*rate/DAY_MS;
+ // Calculate the unclaimed interval in segments, preserving already banked income.
+ let total=bank;
+ if(end>cursor){
+  const benefits=window.MarinaResearchBenefits;
+  if(benefits){const points=[cursor,...benefits.marinaTransitions(g,cursor,end),end];for(let i=0;i<points.length-1;i++)total+=(points[i+1]-points[i])*marinaFinance(g,id,points[i]).net/DAY_MS;}
+  else total+=(end-cursor)*rate/DAY_MS;
+ }
  return{claimAt,cursor:end,bank:total,due:!clockMismatch&&now-claimAt>=DAY_MS?Math.floor(total):0,clockMismatch,nextAt:claimAt+DAY_MS};
 }
-function updateAccrual(g,id,now,f=marinaFinance(g,id)){
+function updateAccrual(g,id,now,f=marinaFinance(g,id,now)){
  const a=accrual(g,id,now,f);if(a.clockMismatch)return false;
  const r=g.marinas[id];r.financeVersion=1;r.built=f.built;r.level=f.level;r.lastReward=a.claimAt;r.berthLastReward=a.claimAt;r.incomeCursor=a.cursor;r.incomeBank=a.bank;r.incomeRate=f.net;return true;
 }
 function propertyState(g,id,now=Date.now()){
- const f=marinaFinance(g,id),a=accrual(g,id,now,f),credits=Math.max(0,Number(g.coins)||0);
+ const f=marinaFinance(g,id,now),a=accrual(g,id,now,f),credits=Math.max(0,Number(g.coins)||0);
  const reason=!f.info?"La base RPG non è acquistabile":g.trip?"Termina prima la missione e l'ormeggio":a.clockMismatch?"Controlla la data del dispositivo":"";
  const affordable=cost=>!reason&&credits>=cost+RESERVE;
  return{...f,...a,reason,canBuy:!!f.info&&!f.owned&&affordable(f.info.price),canBuild:f.owned&&f.built<MAX_PONTOONS&&affordable(f.pontoonCost),canUpgrade:f.owned&&f.level<MAX_LEVEL&&affordable(f.upgradeCost),canCollect:f.owned&&!reason&&a.due>0};
@@ -80,7 +87,7 @@ function propertyAction(action,id,now=Date.now()){
  g.marinas=asRecord(g.marinas);
  if(action==="buy"){g.marinas[id]={lastReward:now,berthLastReward:now,level:1,built:1,financeVersion:1,incomeCursor:now,incomeBank:0,incomeRate:0}}
  else{if(!updateAccrual(g,id,now,p))return{ok:false,message:"Controlla la data del dispositivo"};const r=g.marinas[id];if(action==="pontoon")r.built=p.built+1;else r.level=p.level+1;}
- g.marinas[id].incomeRate=marinaFinance(g,id).net;
+ g.marinas[id].incomeRate=marinaFinance(g,id,now).net;
  g.coins-=cost;financeLog(g,action==="buy"?"marina_buy":action==="pontoon"?"pontoon_build":"marina_upgrade",id,-cost,now);
  if(!x.c.writeGame(x.h,g))return{ok:false,message:"Salvataggio non confermato: nessun investimento registrato"};
  return{ok:true,cost,message:label+" · "+portName(id)+" · -"+cost.toLocaleString("it-IT")+" crediti"};
@@ -218,7 +225,7 @@ function completeJob(id,choice,now=Date.now()){
  const ownPort=isOwned(game,status.port);
  if(ownPort&&!updateAccrual(game,status.port,now))return{ok:false,message:"Controlla la data del dispositivo"};
  game.marinaOperations=asRecord(game.marinaOperations);const ops=asRecord(game.marinaOperations[status.port]);game.marinaOperations[status.port]={...ops,completed:num(ops.completed)+1};
- if(ownPort)game.marinas[status.port].incomeRate=marinaFinance(game,status.port).net;
+ if(ownPort)game.marinas[status.port].incomeRate=marinaFinance(game,status.port,now).net;
  game.lastNpcJob={id,type:job.title,reward:job.reward,cost:0,prestige:job.prestige,reputation:5,sector:"marina",port:status.port,at:now};
  if(!x.c.writeGame(x.h,game))return{ok:false,message:"Salvataggio incarico non confermato. Riprova."};
  return{ok:true,message:"Incarico completato · +"+job.reward+" crediti · +"+job.prestige+" prestigio",reward:job.reward,prestige:job.prestige};

@@ -14,7 +14,6 @@ function ensure(g){if(!g.research||typeof g.research!=="object"||Array.isArray(g
 function settle(g){
  const all=ensure(g);let changed=false;
  for(const p of PROJECTS){const r=all[p.id];if(r?.status==="active"&&Number(r.completesAt)>0&&Number(r.completesAt)<=Date.now()){r.status="complete";r.completedAt=Number(r.completesAt);changed=true}}
- if(changed)write(g);
  return changed;
 }
 function status(g,p){
@@ -30,17 +29,17 @@ function status(g,p){
  return{state:unlocked?"available":"locked",progress:0,remaining:0};
 }
 function snapshot(){
- const g=read()||{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,research:{}};
- if(read())settle(g);
+ const x=context(),saved=x?.c.readGame(x.h),g=saved||{name:"Comandante",coins:10000,prestige:0,fuel:300,condition:100,research:{}};
+ if(saved&&settle(g))x.c.writeGame(x.h,g);
  const projects=PROJECTS.map(p=>({...p,...status(g,p)}));
  const complete=projects.filter(p=>p.state==="complete").length,active=projects.find(p=>p.state==="active")||null;
  const level=Math.max(1,Math.min(5,1+complete));
  const labProgress=active?active.progress:Math.min(100,complete/PROJECTS.length*100);
- return{game:g,projects,complete,active,level,labProgress};
+ return{game:g,projects,complete,active,level,labProgress,effects:window.MarinaResearchBenefits?.effects(g)||{fuel:1,wear:1,berth:1,cost:1}};
 }
 const LIQUIDITY_RESERVE=2000;
 function start(id){
- const g=read();if(!g)return{ok:false,message:"Salvataggio non disponibile"};
+ const x=context(),g=x?.c.readGame(x.h);if(!g)return{ok:false,message:"Salvataggio non disponibile"};
  settle(g);
  const p=PROJECTS.find(x=>x.id===id);if(!p)return{ok:false,message:"Ricerca non valida"};
  const s=status(g,p);if(s.state==="complete")return{ok:false,message:"Ricerca già completata"};
@@ -52,7 +51,7 @@ function start(id){
  if((Number(g.coins)||0)-p.cost<LIQUIDITY_RESERVE)return{ok:false,message:"Mantieni almeno 2.000 crediti di riserva per missioni e servizi"};
  g.coins-=p.cost;
  all[p.id]={status:"active",startedAt:Date.now(),completesAt:Date.now()+p.duration,cost:p.cost};
- if(!write(g))return{ok:false,message:"Avvio ricerca non salvato"};
+ if(!x.c.writeGame(x.h,g))return{ok:false,message:"Avvio ricerca non salvato"};
  return{ok:true,message:"Ricerca avviata: "+p.name};
 }
 function formatDuration(ms){const m=Math.max(0,Math.ceil(ms/60000)),h=Math.floor(m/60),min=m%60;return h? h+" h "+String(min).padStart(2,"0")+" min":m+" min"}

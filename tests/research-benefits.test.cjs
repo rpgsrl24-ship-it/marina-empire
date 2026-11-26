@@ -1,0 +1,40 @@
+'use strict';
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const DAY=86400000,N=Date.UTC(2026,10,26,12),copy=x=>JSON.parse(JSON.stringify(x));let now=N;
+let g={name:'Research QA',coins:30000000,prestige:1000,fuel:400,condition:100,port:'rimini',boat:'voyager',owned:['voyager'],completed:['INTRO_RIMINI_CERVIA'],voyages:4,trip:null,marinas:{},research:{},voyageSerial:4,settledVoyages:[]};
+const h={accountId:null},store={capture:()=>h,select:()=>true,readGame:()=>copy(g),writeGame:(_,v)=>{g=copy(v);return true},readLayout:()=>null};
+class Clock extends Date{static now(){return now}}
+const ctx={window:{},Date:Clock,Math,JSON,console,sessionStorage:{getItem:()=>null,setItem(){},removeItem(){}}};
+vm.runInNewContext(fs.readFileSync('local-save-context.js','utf8'),ctx);ctx.window.MarinaLocalSaveContext=store;
+for(const file of ['mobile-map-lite-v2.js','mobile-marina-lite-v1.js','mobile-research-lite-v1.js'])vm.runInNewContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
+const {MarinaResearchBenefits:b,MarinaEmpireMapLite:nav,MarinaEmpireMarinaLite:marina,MarinaEmpireResearchLite:lab}=ctx.window;
+const initial=copy(g),base=nav.missionCatalog().find(m=>m.kind==='transfer'&&m.dest==='ancona'),preview=nav.preview('ancona');
+assert(base.ready);assert.equal(b.effects(g).fuel,1);assert(lab.start('efficient_engines').ok);assert.equal(g.coins,initial.coins-18000);
+assert.equal(b.effects(g).fuel,1);now+=2700000;assert.equal(b.effects(g).fuel,.9);assert.equal(g.research.efficient_engines.status,'active','Benefit works without reopening Research');
+const efficient=nav.missionCatalog().find(m=>m.id===base.id);
+assert(efficient.fuel<base.fuel);assert.equal(efficient.researchFuelMult,.9);assert(nav.preview('ancona').fuel<preview.fuel);
+assert.equal(lab.snapshot().effects.fuel,.9);assert.equal(g.research.efficient_engines.status,'complete');
+function finish(withResearch){
+ g=copy(initial);now=N;g.research=withResearch?{efficient_engines:{status:'complete',completedAt:N-1},reinforced_hull:{status:'complete',completedAt:N-1}}:{};
+ const m=nav.missionCatalog().find(m=>m.id===base.id);assert(nav.startMission(m.id,m.dest).ok);
+ assert.equal(g.trip.mission.researchFuelMult,withResearch?.9:1);assert.equal(g.trip.mission.researchWearMult,withResearch?.8:1);
+ now+=700;nav.pulse();const fuelUsed=400-g.fuel;
+ if(!withResearch)g.research.reinforced_hull={status:'complete',completedAt:now};
+ Object.assign(g.trip,{dockingReady:true,dockingDepth:84,dockingOffset:0,dockingHeading:0,enginePort:0,engineStarboard:0,bowThruster:0,dockingSurge:0,dockingSway:0,dockingYawRate:0,weatherWear:10,eventWear:0,throttleWear:0});
+ assert(nav.completeDocking().ok);return{fuelUsed,wear:100-g.condition,reward:g.lastArrival.reward};
+}
+const standard=finish(false),advanced=finish(true);assert(advanced.fuelUsed<standard.fuelUsed);assert(Math.abs(advanced.wear-standard.wear*.8)<1e-8);assert.equal(advanced.reward,standard.reward);
+g=copy(initial);now=N;assert(marina.buyMarina('cervia',N).ok);const f0=marina.propertyState(g,'cervia',N);
+g.research.smart_pontoon={status:'active',startedAt:N,completesAt:N+DAY/4};
+g.research.sustainable_energy={status:'active',startedAt:N,completesAt:N+DAY/2};
+g.research.advanced_solar={status:'active',startedAt:N,completesAt:N+DAY*3/4};
+const f1=marina.propertyState(g,'cervia',N+DAY/4),f2=marina.propertyState(g,'cervia',N+DAY/2),f3=marina.propertyState(g,'cervia',N+DAY);
+assert.equal(f1.berth,Math.floor(f0.berth*1.2));assert.equal(f1.capacity,f0.capacity);assert.equal(f2.staff,Math.round(f0.staff*.85));assert.equal(f3.staff,Math.round(f0.staff*.75));assert.equal(f3.maintenance,Math.round(f0.maintenance*.75));assert.equal(f3.utilities,Math.round(f0.utilities*.75));assert(f3.net>f2.net);
+assert.equal(f3.due,Math.floor((f0.net+f1.net+f2.net+f3.net)/4),'Income changes only after each timer');
+const cash=g.coins;assert(marina.collectMarina('cervia',N+DAY).ok);assert.equal(g.coins,cash+f3.due);assert.equal(marina.collectMarina('cervia',N+DAY).ok,false);
+assert.equal(marina.propertyState(g,'cervia',N+2*DAY).due,f3.net);
+assert.equal(marina.propertyState(g,'cervia',N+10*DAY).due,7*f3.net);
+assert.equal(b.effects({research:{advanced_solar:{status:'active',completesAt:now+1}}}).cost,1);
+assert.equal(b.effects({research:{advanced_solar:{status:'complete'}}}).cost,.75);
+for(const p of ['research-mobile.html','marina-mobile.html','missions-mobile.html'])for(const m of fs.readFileSync(p,'utf8').matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi))if(m[1].trim())new vm.Script(m[1],{filename:p});
+console.log('PASS: real fuel and wear, frozen voyage benefits, automatic completion, proration and marina cost discounts.');

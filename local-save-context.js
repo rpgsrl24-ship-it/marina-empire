@@ -141,3 +141,22 @@
   }
   return Object.freeze({select,capture,isCurrent,readGame,writeGame,layoutKey,readLayout,writeLayout,resetLayout,hasExternalChange});
 });
+
+// Pure research helpers shared by the modern local-save engines, with no storage side effects.
+if(typeof window!=="undefined")window.MarinaResearchBenefits=(()=>{
+ const ids=["efficient_engines","reinforced_hull","smart_pontoon","sustainable_energy","advanced_solar"];
+ function completedAt(g,id){
+  if(!ids.includes(id))return null;
+  const r=g?.research?.[id];if(!r||!["active","complete"].includes(r.status))return null;
+  const t=Number(r.status==="complete"?(r.completedAt||r.completesAt):r.completesAt);
+  if(Number.isFinite(t)&&t>0)return t;
+  return r.status==="complete"?0:null; // Preserve older undated completed research.
+ }
+ function complete(g,id,now=Date.now()){const t=completedAt(g,id);return t!==null&&Number.isFinite(now)&&t<=now}
+ function effects(g,now=Date.now()){
+  const engines=complete(g,"efficient_engines",now),hull=complete(g,"reinforced_hull",now),pontoon=complete(g,"smart_pontoon",now),energy=complete(g,"sustainable_energy",now),solar=complete(g,"advanced_solar",now);
+  return{engines,hull,pontoon,energy,solar,fuel:engines?.9:1,wear:hull?.8:1,berth:pontoon?1.2:1,cost:solar?.75:energy?.85:1};
+ }
+ function marinaTransitions(g,from,to){return [...new Set(["smart_pontoon","sustainable_energy","advanced_solar"].map(id=>completedAt(g,id)).filter(t=>t!==null&&t>from&&t<to))].sort((a,b)=>a-b)}
+ return Object.freeze({completedAt,complete,effects,marinaTransitions});
+})();

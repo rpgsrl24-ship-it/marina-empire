@@ -333,6 +333,18 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(await page.locator('#payroll').innerText(),'210');
     assert.equal((await pageAudit(page,name+' crew')).horizontalOverflow,false);
     await page.screenshot({path:path.join(OUT,name+'-crew.png'),fullPage:true,animations:'disabled'});
+    // Timed research in an isolated local save.
+    await page.evaluate(()=>{const k='marina_empire_beta_test_session',g=JSON.parse(localStorage.getItem(k));g.coins=Math.max(g.coins,100000);g.research={};localStorage.setItem(k,JSON.stringify(g))});
+    await page.goto(LIVE+'research-mobile.html?v=20261109-research1',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('[data-start="efficient_engines"]:enabled').waitFor({state:'visible',timeout:15000});
+    await page.locator('[data-start="efficient_engines"]').click();
+    assert.equal(await page.locator('#effectFuel').innerText(),'0%');
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).research.efficient_engines.status),'active');
+    await page.evaluate(()=>{const k='marina_empire_beta_test_session',g=JSON.parse(localStorage.getItem(k));g.research.efficient_engines.completesAt=Date.now()-1;localStorage.setItem(k,JSON.stringify(g))});
+    await page.reload({waitUntil:'domcontentloaded'});
+    assert.equal(await page.locator('#effectFuel').innerText(),'-10%');
+    assert.equal((await pageAudit(page,name+' research')).horizontalOverflow,false);
+    await page.screenshot({path:path.join(OUT,name+'-research.png'),fullPage:true,animations:'disabled'});
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,

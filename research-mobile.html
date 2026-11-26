@@ -8,11 +8,12 @@
 .infoPanel{display:none;margin:0 8px 10px;padding:12px;border:1px solid #a7d2e4;border-radius:18px;background:#fff}.infoPanel.on{display:block}.infoPanel h3{margin:0 0 7px}.infoPanel p{font-size:9px;color:#57707e}.toast{position:fixed;z-index:50;left:50%;bottom:86px;transform:translateX(-50%);max-width:88%;padding:10px 14px;border-radius:999px;background:#082e4be8;color:white;font-size:9px;font-weight:800;box-shadow:0 8px 25px #001f3366}.hide{display:none!important}
 .bottom{position:fixed;z-index:30;left:6px;right:6px;bottom:6px;max-width:608px;margin:auto;display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:5px;border:1px solid #58c1eb;border-radius:18px;background:#f8fcfef5;box-shadow:0 8px 26px #00395855;backdrop-filter:blur(12px)}.bottom a{min-width:0;min-height:58px;border-radius:12px;color:#0a456f;font-size:5px;font-weight:950;text-decoration:none;text-align:center;padding:6px 1px}.bottom a b{display:block;margin-bottom:3px;font-size:18px}.bottom a.on{background:linear-gradient(180deg,#159df3,#0869da);color:#fff}
 @media(max-width:420px){.lab{grid-template-columns:1fr}.labpic{min-height:140px}.project{grid-template-columns:65px 1fr}.project .action{grid-column:1/-1;width:100%}.bottom a{font-size:4.7px}}
+#researchEffects{margin:10px 8px;padding:12px;border:1px solid #b5d8e7;border-radius:15px;background:#fff}#researchEffects h2{font-size:16px;margin:0 0 8px}.effectGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.effectGrid div{border:1px solid #c6e0e9;border-radius:9px;padding:8px;background:#f3faff}.effectGrid small{display:block;font-size:10px}.effectGrid b{display:block;font-size:17px;margin-top:4px;color:#075e91}#researchEffects p{font-size:11px;line-height:1.5;margin:8px 0 0}
 </style></head><body><main class="app">
 <header class="head"><div class="top"><a class="round" href="./mobile-home.html?v=20261111-home6">☰</a><div class="brand"><b>⚓ MARINA EMPIRE</b><small>IL GESTIONALE NAUTICO ONLINE</small></div><div class="round">👨‍✈️</div></div><div class="hud"><div><span>🪙 CREDITI</span><b id="coins">—</b></div><div><span>⭐ PRESTIGIO</span><b id="prestige">—</b></div><div><span>⛽ CARBURANTE</span><b id="fuel">—</b></div></div><div class="hero"><i>⚗️</i><div><h1>Ricerca e Sviluppo</h1><p>Sblocca tecnologie, migliora le tue navi e il tuo Marina.</p></div></div></header>
 <nav class="tabs"><button class="on" data-cat="technology">⚙️ Tecnologie</button><button data-cat="ships">🛥️ Navi Avanzate</button><button data-cat="marina">⚓ Marina</button><button data-cat="services">🛠️ Servizi</button><button data-cat="specialization">🎓 Specializzazioni</button></nav>
 <section class="lab"><div class="labpic"></div><article class="labcard"><h3>⚗️ Centro Ricerca</h3><small>Sblocca tecnologie e upgrade per la tua flotta e il tuo Marina.</small><div class="bar"><i id="labBar" style="width:0%"></i></div><div class="labmeta"><span id="labLevel">Liv. 1</span><span id="labPct">0%</span></div></article></section>
-<section class="section"><h2>Progetti di Ricerca Disponibili</h2><div id="projects" class="projects"></div></section>
+<section id="researchEffects"><h2>Benefici effettivi attivi</h2><div class="effectGrid"><div><small>⛽ Consumo carburante</small><b id="effectFuel">0%</b></div><div><small>🔧 Usura in navigazione</small><b id="effectWear">0%</b></div><div><small>⚓ Entrate ormeggi</small><b id="effectBerth">0%</b></div><div><small>🏛️ Costi marina</small><b id="effectCost">0%</b></div></div><p>I benefici si attivano al termine della ricerca, anche senza riaprire questa pagina. Navigazione: dalla prossima partenza. Marine: ricavi e costi dal completamento. Il solare avanzato porta la riduzione totale al 25%.</p></section><section class="section"><h2>Progetti di Ricerca Disponibili</h2><div id="projects" class="projects"></div></section>
 <section class="reco"><i>💡</i><div><small>PROSSIMA TECNOLOGIA CONSIGLIATA</small><strong id="recommended">—</strong><small id="recommendedBenefit">—</small></div><button id="recommendedAction">AVVIA RICERCA</button></section>
 <section id="info" class="infoPanel"><h3 id="infoTitle">Ricerca</h3><p id="infoText"></p></section>
 </main><div id="toast" class="toast hide"></div>
@@ -25,23 +26,24 @@ function toastMsg(t){toast.textContent=t;toast.classList.remove("hide");clearTim
 function render(){
  const api=window.MarinaEmpireResearchLite;if(!api)return;const s=api.snapshot(),g=s.game;
  coins.textContent=fmt(g.coins);prestige.textContent=fmt(g.prestige);const tanks={voyager:400,open:300,yacht:550,yacht14:700,yacht20:1100,yacht30:1700,luna:900};const tank=tanks[g.boat]||400;fuel.textContent=Math.max(0,Math.min(100,Math.round((Number(g.fuel)||0)/tank*100)))+"%";
+ const effects=s.effects,pct=v=>Math.round((v-1)*100);for(const [id,value] of Object.entries({effectFuel:pct(effects.fuel),effectWear:pct(effects.wear),effectBerth:pct(effects.berth),effectCost:pct(effects.cost)}))document.getElementById(id).textContent=(value>0?"+":"")+value+"%";
  labBar.style.width=Math.round(s.labProgress)+"%";labPct.textContent=Math.round(s.labProgress)+"%";labLevel.textContent="Liv. "+s.level;
  const filtered=s.projects.filter(p=>p.category===cat),names=Object.fromEntries(s.projects.map(x=>[x.id,x.name]));
  projects.innerHTML=filtered.map(p=>{
-  const affordable=(Number(g.coins)||0)>=Number(p.cost||0);
-  const missing=Math.max(0,Number(p.cost||0)-(Number(g.coins)||0));
+  const affordable=(Number(g.coins)||0)>=Number(p.cost||0)+2000;
+  const missing=Math.max(0,Number(p.cost||0)+2000-(Number(g.coins)||0));
   const reqNames=(p.requires||[]).map(id=>names[id]||id);
   const status=p.state==="complete"?"✅ Completata":p.state==="active"?"⏱ "+api.formatDuration(p.remaining):p.state==="locked"?"🔒 Richiede: "+(reqNames.join(", ")||"ricerca precedente"):affordable?"✅ Disponibile":"🪙 Mancano "+fmt(missing)+" crediti";
   const cls=p.state==="available"&&!affordable?"locked":p.state;
   const btn=p.state==="complete"?"COMPLETATA":p.state==="active"?"IN CORSO":p.state==="locked"?"BLOCCATA":affordable?"AVVIA":"CREDITI INSUFFICIENTI";
-  const disabled=p.state!=="available"||!affordable;
+  const disabled=p.state!=="available"||!affordable||!!s.active;
   const details=p.benefit+" · "+fmt(p.cost)+" crediti"+(reqNames.length?" · Richiede: "+reqNames.join(", "):"");
   return '<article class="project"><div class="pic">'+p.icon+'</div><div><h3>'+p.name+'</h3><p>'+p.desc+'</p><div class="state '+cls+'">'+status+'</div><div class="progress"><i style="width:'+p.progress+'%"></i></div><p>'+details+'</p></div><button class="action '+(p.state==="available"&&affordable?"gold":"")+'" data-start="'+p.id+'" '+(disabled?"disabled":"")+'>'+btn+'</button></article>';
  }).join("")||'<article class="project"><div class="pic">⚗️</div><div><h3>Nessun progetto in questa categoria</h3><p>Completa le ricerche precedenti per sbloccare nuovi progetti.</p></div></article>';
- const next=s.projects.find(p=>p.state==="available")||s.projects.find(p=>p.state==="active")||s.projects[s.projects.length-1];
- const nextAffordable=next?.state==="available"&&(Number(g.coins)||0)>=Number(next.cost||0);
+ const next=s.projects.find(p=>p.state==="active")||s.projects.find(p=>p.state==="available")||s.projects[s.projects.length-1];
+ const nextAffordable=next?.state==="available"&&(Number(g.coins)||0)>=Number(next.cost||0)+2000;
  recommended.textContent=next?.name||"Centro Ricerca";
- recommendedBenefit.textContent=next?.state==="available"&&!nextAffordable?"Servono "+fmt(Math.max(0,Number(next.cost||0)-(Number(g.coins)||0)))+" crediti · "+(next?.benefit||""):next?.benefit||"Tutte le ricerche completate";
+ recommendedBenefit.textContent=next?.state==="available"&&!nextAffordable?"Servono "+fmt(Math.max(0,Number(next.cost||0)+2000-(Number(g.coins)||0)))+" crediti · "+(next?.benefit||""):next?.benefit||"Tutte le ricerche completate";
  recommendedAction.textContent=next?.state==="available"?(nextAffordable?"AVVIA RICERCA":"CREDITI INSUFFICIENTI"):next?.state==="active"?"IN CORSO":"COMPLETATO";
  recommendedAction.disabled=next?.state!=="available"||!nextAffordable;recommendedAction.dataset.id=next?.id||"";
  document.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>{const r=api.start(b.dataset.start);toastMsg(r.message);render()});
