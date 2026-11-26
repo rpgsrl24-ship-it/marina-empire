@@ -817,7 +817,7 @@ body.navigationMode .actions{display:none!important}body.navigationMode #notice{
 </style></head><body><main class="app">
 <header class="head"><div class="brand"><a href="./mobile-home.html?v=20261111-home6" aria-label="Home">☰</a><strong>⚓ MARINA EMPIRE</strong><a href="./map-mobile.html?v=20261119-map17" aria-label="Mappa">🗺️</a></div><div class="hud"><div><small>🪙 CREDITI</small><b id="coins">—</b></div><div><small>⭐ PRESTIGIO</small><b id="prestige">—</b></div><div><small>⛽ CARBURANTE</small><b id="fuel">—</b></div><div><small>🔧 STATO</small><b id="condition">—</b></div></div></header>
 <div class="dockPreviewBanner" id="dockPreviewBanner" hidden>ALLENAMENTO ORMEGGIO · nessuna modifica alla tua partita · v46</div>
-<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261125-cabin46&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
+<a class="dockPreviewEntry" id="dockPreviewEntry" href="./cabina-mobile.html?v=20261126-cabin47&amp;anteprima=ormeggio" hidden>⚓ PROVA ORMEGGIO · senza missione</a>
 <div class="helm cockpitOne">
   <div class="photo cockpitStage" id="window">
     <img class="photoImage" src="./assets/marina-empire-plancia-approvata.webp" alt="Postazione di comando interattiva Marina Empire">
@@ -998,8 +998,8 @@ body.navigationMode .actions{display:none!important}body.navigationMode #notice{
   <button id="dockNow" class="dockNow" type="button">⚓ COMPLETA ORMEGGIO</button>
   <div class="dockStatus" id="dockStatus">Avvicinamento al posto barca…</div>
 </section>
-<section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><a href="./missions-mobile.html?v=20261125-missions13">Scegli una nuova missione →</a></section>
-</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261125-cabin46"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261125-missions13"><b>🎯</b>MISSIONI</a></nav>
+<section id="arrival" class="arrival"><b id="arrivalTitle">⚓ ARRIVO COMPLETATO</b><p id="arrivalReward"></p><p id="arrivalAccount" hidden><a href="./account-mobile.html?from=academy">Salva i tuoi progressi: crea un account gratuito →</a></p><a href="./missions-mobile.html?v=20261125-missions13">Scegli una nuova missione →</a></section>
+</main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./map-mobile.html?v=20261119-map17"><b>🗺️</b>MAPPA</a><a class="on" href="./cabina-mobile.html?v=20261126-cabin47"><b>🛥️</b>CABINA</a><a href="./missions-mobile.html?v=20261125-missions13"><b>🎯</b>MISSIONI</a></nav>
 <script src="./local-save-context.js"></script><script>
 window.MarinaDockPreview=new URLSearchParams(location.search).get("anteprima")==="ormeggio";
 if(window.MarinaDockPreview){
@@ -1007,7 +1007,7 @@ if(window.MarinaDockPreview){
   let demo={name:"Allenamento",coins:10000,prestige:0,fuel:770,condition:100,port:"rimini",boat:"yacht20",owned:["yacht20"],completed:[],reservations:[],voyages:0,voyageSerial:1,setupComplete:true,trip:{id:"DEMO_DOCKING",voyageId:1,dockingVersion:1,origin:"rimini",dest:"cervia",legs:["rimini","cervia"],legIndex:0,legSeconds:20,sec:20,until:now,progressBase:.97,startedAt:now,lastProgressAt:now,lastFuelAt:now,dockingReady:true,dockingDepth:0,dockingOffset:-8,dockingHeading:12,dockingSurge:0,dockingSway:0,dockingYawRate:0,dockingWind:0,dockingCurrent:0,enginePort:0,engineStarboard:0,bowThruster:0,helmAngle:0,dockingLastAt:now,dockingStartedAt:now,weather:"calm",weatherWear:0,throttleMode:"eco",mission:{id:"DEMO_DOCKING",name:"Allenamento ormeggio",dest:"cervia",boat:"yacht20",reward:0,prestige:0,cost:0,fuel:0}}};
   window.MarinaLocalSaveContext=Object.freeze({capture:()=>handle,select:()=>true,isCurrent:h=>h===handle,readGame:h=>h===handle?copy(demo):null,writeGame:(h,g)=>{if(h!==handle)return false;demo=copy(g);return true},layoutKey:()=>null,readLayout:()=>null,writeLayout:()=>false,resetLayout:()=>false,hasExternalChange:()=>false});
 }
-</script><script src="./mobile-map-lite-v2.js?v=20261125-engine27"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script>if(!window.MarinaDockPreview){const tracker=document.createElement("script");tracker.src="./player-tracker-v2.js?v=20261119-tracker3";document.head.appendChild(tracker);}</script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</script><script src="./mobile-map-lite-v2.js?v=20261125-engine27"></script><script src="./mobile-marina-lite-v1.js?v=20261123-marinalite3"></script><script>if(!window.MarinaDockPreview){const tracker=document.createElement("script");tracker.src="./player-tracker-v2.js?v=20261126-tracker4";document.head.appendChild(tracker);}</script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 "use strict";
 const $=id=>document.getElementById(id),fmt=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString("it-IT");
@@ -1227,6 +1227,7 @@ function render(){
   if(!t.dockingReady)showVoyageEvent(t,s.prestige);else hideVoyageEvent();
   note(t.eventResolved&&t.eventResult?t.eventResult+" Continua verso "+t.destinationName+".":"Navigazione in corso. Segui GPS e VHF: durante la rotta possono comparire decisioni operative.");
   window.MarinaEmpirePlayerTracker?.startPlay?.();
+  if(!window.MarinaDockPreview){const tracker=window.MarinaEmpirePlayerTracker;tracker?.stage?.("mission_started",t.voyageId);tracker?.stage?.(t.dockingReady?"docking_reached":"navigation_reached",t.voyageId);}
  }else{
   document.body.classList.remove("dockingMode");
   hideVoyageEvent();
@@ -1250,6 +1251,7 @@ function render(){
    const orientationText=s.lastArrival.dockingOrientation?"<br>Ormeggio di "+(s.lastArrival.dockingOrientation==="stern"?"poppa":"prua"):"";
    $("arrivalReward").innerHTML=(window.MarinaDockPreview?"<strong>Allenamento completato</strong><br>Nessun credito o progresso della partita reale modificato.":"<strong>Missione completata</strong><br>+"+fmt(s.lastArrival.reward)+" crediti · +"+fmt(s.lastArrival.prestige)+" prestigio"+(s.lastArrival.eventResult?"<br><small>"+s.lastArrival.eventResult+(evBonus||evPrestige?" · bonus evento incluso":"")+"</small>":""))+orientationText+timeText+bonusText+objectiveText+weeklyText;
    window.MarinaEmpirePlayerTracker?.completeVoyage?.(s.lastArrival.voyageId);
+   $("arrivalAccount").hidden=!!window.MarinaDockPreview||!!window.MarinaLocalSaveContext?.capture?.()?.accountId;
   }
   if(!$("notice").dataset.manual)note("Yacht in porto: puoi fare il pieno o la manutenzione utilizzando i pulsanti qui sotto.");
  }

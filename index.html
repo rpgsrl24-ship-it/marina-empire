@@ -38,7 +38,10 @@
  };
  const creditReturn=q.get("credit_purchase")==="success";
  const target=creditReturn?"./marketplace-mobile.html?v=20261110-market13&credit_purchase=success":(routes[view]||"./mobile-home.html?v=20261111-home6");
- location.replace(target+location.hash);
+ const next=new URL(target,location.href);
+ for(const key of ["utm_source","utm_medium","utm_campaign"]){const value=q.get(key);if(value&&/^[a-zA-Z0-9_. -]{1,80}$/.test(value))next.searchParams.set(key,value);}
+ if(!next.searchParams.has("utm_source")&&document.referrer){try{const u=new URL(document.referrer);if(u.origin!==location.origin)next.searchParams.set("utm_source",u.hostname.slice(0,80));}catch(_){}}
+ next.hash=location.hash;location.replace(next.href);
 }catch(_){location.replace("./mobile-home.html?v=20261111-home6")}})();
 </script>
 <noscript><meta http-equiv="refresh" content="0;url=./mobile-home.html?v=20261111-home6"></noscript>
