@@ -40,7 +40,7 @@ h1{margin:10px 0 7px;font:800 clamp(30px,9vw,58px)/.98 Georgia,serif;color:#f3d5
   </section>
 
   <section class="card missions">
-    <b>MISSIONI EVENTO · GIOCABILI</b>
+    <b>MISSIONI EVENTO · GIOCABILI</b><p id="waterWorldNote" style="font-size:12px;line-height:1.5"></p>
     <div class="mission"><div class="ico">🏄</div><div><strong>SUP Experience</strong><small>Prepara tavole, pagaie e briefing per gli ospiti dello yacht.</small></div><div class="reward">Costo 120 · Premio 650 · +10 prestigio</div><button type="button" data-water-job="sup">AVVIA · 2 MIN</button></div>
     <div class="mission"><div class="ico">⚡</div><div><strong>E-Foil Session</strong><small>Organizza sicurezza, batterie e transfer per una sessione premium.</small></div><div class="reward">Costo 250 · Premio 1.200 · +18 prestigio</div><button type="button" data-water-job="efoil">AVVIA · 4 MIN</button></div>
     <div class="mission"><div class="ico">🤿</div><div><strong>Water Toys Concierge</strong><small>Coordina una richiesta completa di toys per un charter VIP.</small></div><div class="reward">Costo 420 · Premio 1.800 · +28 prestigio</div><button type="button" data-water-job="concierge">AVVIA · 6 MIN</button></div>
@@ -56,108 +56,30 @@ h1{margin:10px 0 7px;font:800 clamp(30px,9vw,58px)/.98 Georgia,serif;color:#f3d5
     <p>Marina Empire è sviluppato da RPG Yacht. Se vuoi scoprire water toys, SUP, e-foil e soluzioni dedicate a yacht e charter, puoi visitare la vetrina reale RPG Yacht.</p>
     <div class="cta">
       <a class="primary" href="./marketplace-mobile.html?v=20261110-market13">🛒 VAI AL MERCATO EVENTO</a>
-      <a class="secondary" href="https://www.rpgyacht.com/" target="_blank" rel="noopener">SCOPRI RPG YACHT</a>
+      <a class="secondary" href="https://www.rpgyacht.com/" target="_blank" rel="noopener">SCOPRI RPG YACHT</a><a class="secondary" href="https://www.floatmarine.it/" target="_blank" rel="noopener">SCOPRI FLOAT MARINE</a>
       <a class="secondary" href="./mobile-home.html?v=20261111-home6">CONTINUA A GIOCARE</a>
     </div>
     <div class="note">Area promozionale integrata nel mondo di Marina Empire. I contenuti del gioco non rappresentano prezzi o disponibilità commerciali in tempo reale.</div>
   </section>
 </main>
-<script src="./local-save-context.js"></script>
-<script>
-"use strict";
-(()=>{
- const jobs={
-  sup:{id:"sup",icon:"🏄",name:"SUP Experience",cost:120,reward:650,prestige:10,duration:120000},
-  efoil:{id:"efoil",icon:"⚡",name:"E-Foil Session",cost:250,reward:1200,prestige:18,duration:240000},
-  concierge:{id:"concierge",icon:"🤿",name:"Water Toys Concierge",cost:420,reward:1800,prestige:28,duration:360000}
- };
- const balance=document.getElementById("waterEventBalance"),body=document.getElementById("waterEventBody");
- let handle=null,game=null,timer=null;
- const fmt=n=>Math.max(0,Math.floor(Number(n)||0)).toLocaleString("it-IT");
- const esc=s=>String(s||"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
- function ensureContext(){
-  const ctx=window.MarinaLocalSaveContext;if(!ctx)return false;
-  handle=ctx.capture();
-  if(handle)return true;
-  try{
-   const raw=localStorage.getItem("sb-zrdetqvnjmqkfyajxjgp-auth-token"),session=raw?JSON.parse(raw):null,user=session&&session.user;
-   if(user&&user.id&&user.email_confirmed_at&&!user.is_anonymous)ctx.select(user.id);else ctx.select(null);
-   handle=ctx.capture();
-  }catch(_){handle=null}
-  return !!handle;
- }
- function read(){
-  if(!ensureContext())return null;
-  game=window.MarinaLocalSaveContext.readGame(handle);
-  return game;
- }
- function write(next){
-  if(!handle||!window.MarinaLocalSaveContext.writeGame(handle,next))return false;
-  game=next;return true;
- }
- function slot(){return Math.floor(Date.now()/900000)}
- function recordKey(id){return slot()+":"+id}
- function active(){return game&&game.waterToysActivity&&typeof game.waterToysActivity==="object"?game.waterToysActivity:null}
- function history(){return game&&game.waterToysHistory&&typeof game.waterToysHistory==="object"&&!Array.isArray(game.waterToysHistory)?game.waterToysHistory:{}}
- function refreshButtons(){
-  const a=active(),h=history();
-  document.querySelectorAll("[data-water-job]").forEach(btn=>{
-   const j=jobs[btn.dataset.waterJob],done=!!h[recordKey(j.id)],poor=!game||Number(game.coins)<j.cost;
-   btn.disabled=!!a||done;
-   btn.dataset.blockedReason=done?"Attività già completata in questo evento.":a?"Completa prima l’attività in corso.":poor?("Servono "+fmt(j.cost)+" crediti per avviare questa attività."):!game?.setupComplete?"Configura prima il comandante dalla Home.":"";
-   btn.textContent=done?"COMPLETATO":a?"ATTIVITÀ IN CORSO":poor?"CREDITI INSUFFICIENTI":!game?.setupComplete?"CONFIGURA PRIMA IL GIOCO":"AVVIA · "+Math.round(j.duration/60000)+" MIN";
-  });
- }
- function render(){
-  if(!read()){
-   balance.textContent="Nessuna partita attiva";
-   body.innerHTML='Apri Marina Empire, crea o carica la tua partita e poi torna qui per partecipare all’evento.';
-   refreshButtons();return;
-  }
-  balance.textContent=esc(game.name)+" · "+fmt(game.coins)+" crediti · "+fmt(game.prestige)+" prestigio";
-  const a=active();
-  if(!a){
-   body.innerHTML='<strong>Scegli un incarico.</strong> Il costo viene scalato alla partenza. Al termine torna qui e riscuoti la ricompensa.';
-   refreshButtons();return;
-  }
-  const j=jobs[a.id]||{name:a.name||"Attività Water Toys",icon:"🌊",duration:Math.max(1,Number(a.until)-Number(a.startedAt))};
-  const left=Math.max(0,Number(a.until)-Date.now()),total=Math.max(1,Number(a.until)-Number(a.startedAt)),pct=Math.max(0,Math.min(100,100-left/total*100));
-  const mm=Math.floor(left/60000),ss=Math.floor((left%60000)/1000);
-  body.innerHTML='<div class="activeJob"><h3>'+j.icon+' '+esc(j.name)+'</h3><p>'+(left>0?'Operazione in corso · '+mm+':'+String(ss).padStart(2,"0")+' rimanenti':'Operazione completata · premio pronto')+'</p><div class="bar"><span style="width:'+pct+'%"></span></div><p>Premio: <b>+'+fmt(a.reward)+' crediti</b> · +'+fmt(a.prestige)+' prestigio</p><button class="claim" type="button" id="waterClaim" '+(left>0?'disabled':'')+'>RISCUOTI PREMIO</button></div>';
-  document.getElementById("waterClaim")?.addEventListener("click",claim);
-  refreshButtons();
- }
- function start(id){
-  if(!read())return render();
-  const j=jobs[id],h=history();
-  if(!j||active()||h[recordKey(id)]||!game.setupComplete||Number(game.coins)<j.cost)return render();
-  const now=Date.now(),next={...game};
-  next.coins=Math.max(0,Number(next.coins)-j.cost);
-  next.waterToysActivity={id:j.id,name:j.name,startedAt:now,until:now+j.duration,cost:j.cost,reward:j.reward,prestige:j.prestige,slot:slot()};
-  next.waterToysStarted=Math.max(0,Math.floor(Number(next.waterToysStarted)||0))+1;
-  if(!write(next)){body.textContent="Salvataggio non riuscito. Riapri il gioco e riprova.";return}
-  render();
- }
- function claim(){
-  if(!read())return render();
-  const a=active();if(!a||Date.now()<Number(a.until))return render();
-  const next={...game},h=history(),key=(Number.isFinite(Number(a.slot))?Number(a.slot):slot())+":"+a.id;
-  if(h[key]){next.waterToysActivity=null;write(next);return render()}
-  next.coins=Math.max(0,Number(next.coins))+Math.max(0,Number(a.reward)||0);
-  next.prestige=Math.max(0,Number(next.prestige))+Math.max(0,Number(a.prestige)||0);
-  next.earnings=Math.max(0,Number(next.earnings)||0)+Math.max(0,Number(a.reward)||0);
-  next.waterToysCompleted=Math.max(0,Math.floor(Number(next.waterToysCompleted)||0))+1;
-  next.waterToysHistory={...h,[key]:{id:a.id,at:Date.now(),reward:a.reward,prestige:a.prestige}};
-  next.lastWaterToysEvent={id:a.id,name:a.name,reward:a.reward,prestige:a.prestige,at:Date.now()};
-  next.waterToysActivity=null;
-  if(!write(next)){body.textContent="Premio non registrato: salvataggio cambiato. Rientra nel gioco e riapri l’evento.";return}
-  render();
- }
- document.addEventListener("click",e=>{const btn=e.target.closest("[data-water-job]");if(!btn)return;const reason=btn.dataset.blockedReason||"";if(reason){body.innerHTML="<strong>Attività non disponibile.</strong> "+esc(reason);return}start(btn.dataset.waterJob)});
- render();
- timer=setInterval(render,1000);
- window.addEventListener("beforeunload",()=>clearInterval(timer));
+<script src="./local-save-context.js"></script><script>
+(()=>{"use strict";
+const ctx=window.MarinaLocalSaveContext,api=window.MarinaWorldLive,$=id=>document.getElementById(id),fmt=n=>Math.round(Number(n)||0).toLocaleString("it-IT");
+const body=$("waterEventBody"),balance=$("waterEventBalance");let message="";
+function read(){let h=ctx.capture();if(!h){ctx.select(null);h=ctx.capture()}return{h,g:h&&ctx.readGame(h)}}
+function perform(action,id){const {h,g}=read();if(!g){message="Apri prima la partita.";return render()}const r=action==="start"?api.startWater(g,id):api.claimWater(g);
+ message=r.ok?(ctx.writeGame(h,g)?r.message:"Salvataggio non riuscito: riprova."):r.message;render()}
+function render(){
+ const {g}=read(),s=api.waterCatalog(g),a=s.active,e=s.event;
+ balance.textContent=g?fmt(g.coins)+" crediti · "+fmt(g.prestige)+" prestigio":"Nessuna partita attiva";
+ $("waterWorldNote").textContent=e.id==="toy_weekend"?"Evento attivo: +22% sui premi.":"Attività disponibili tutto l'anno; sabato e domenica UTC premio maggiorato del 22%.";
+ document.querySelectorAll("[data-water-job]").forEach(b=>{const j=s.jobs.find(x=>x.id===b.dataset.waterJob);b.disabled=!j.available;b.textContent=j.done?"COMPLETATO OGGI":a?"ATTIVITÀ IN CORSO":j.available?"AVVIA · "+j.duration/60000+" MIN":"NON DISPONIBILE";b.closest(".mission").querySelector(".reward").textContent="Costo "+fmt(j.cost)+" · Premio "+fmt(j.reward+j.eventBonus)+(j.eventBonus?" (bonus incluso)":"")+" · +"+j.prestige+" prestigio"});
+ if(a){const left=Math.max(0,Number(a.until)-Date.now()),total=Math.max(1,Number(a.until)-Number(a.startedAt)),pct=Math.max(0,Math.min(100,100-left/total*100));
+ let job=$("waterActive");if(!job){body.replaceChildren();job=document.createElement("div");job.id="waterActive";job.className="activeJob";job.innerHTML='<h3 id="waterActiveName"></h3><p id="waterTime"></p><div class="bar"><span id="waterProgress"></span></div><p id="waterReward"></p><button class="claim" id="waterClaim" type="button">RISCUOTI PREMIO</button><p id="waterMessage" role="status"></p>';body.append(job);$("waterClaim").onclick=()=>perform("claim")}
+ $("waterActiveName").textContent=a.name||"Attività Water Toys";$("waterTime").textContent=left>0?"Operazione in corso · "+Math.ceil(left/1000)+" s":"Operazione completata · premio pronto";$("waterProgress").style.width=pct+"%";$("waterReward").textContent="Premio: +"+fmt(a.reward)+" crediti · +"+fmt(a.prestige)+" prestigio";$("waterClaim").disabled=left>0||!!g.trip;$("waterMessage").textContent=message;
+ }else{body.textContent=(message?message+" · ":"")+(s.reason||"Scegli un incarico. Uno per tipo al giorno; riserva minima 2.000 crediti.");}
+}
+document.querySelectorAll("[data-water-job]").forEach(b=>b.onclick=()=>perform("start",b.dataset.waterJob));
+render();setInterval(render,1000);
 })();
-</script>
-<script src="./mobile-standalone-premium-v1.js?v=20261109-standalone1"></script></body>
-</html>
+</script><script src="./player-tracker-v2.js?v=20261126-tracker5"></script></body></html>

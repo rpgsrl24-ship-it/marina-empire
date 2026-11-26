@@ -30,7 +30,7 @@ button.service:target{outline:3px solid #ffd65c;outline-offset:3px;box-shadow:0 
 <a class="service" href="./marketplace-mobile.html?v=20261110-market13"><img src="./anteprima/assets/render-2026/marine.jpg" alt=""><b>🛒 Market</b></a>
 </section>
 <section class="income"><div><small>ENTRATE MARINA STIMATE / GIORNO</small><strong id="netIncome">—</strong></div><div>📈</div></section>
-<section id="jobsPanel" class="panel on"><div class="jobsHead"><h3>📻 Marina Live · Incarichi giornalieri</h3><b id="jobsCount">0 / 3</b></div><p id="jobText" role="status">Caricamento incarichi…</p><div id="jobList" class="jobList"></div><p class="jobFoot">Massimo 3 incarichi al giorno in tutte le marine. Nuovi incarichi a mezzanotte locale.</p></section>
+<section id="jobsPanel" class="panel on"><div class="jobsHead"><h3>📻 Marina Live · Incarichi giornalieri</h3><b id="jobsCount">0 / 3</b></div><p id="jobText" role="status">Caricamento incarichi…</p><p id="marinaWorldNote" class="jobFoot"></p><div id="jobList" class="jobList"></div><p class="jobFoot">Massimo 3 incarichi al giorno in tutte le marine. Nuovi incarichi a mezzanotte locale.</p></section>
 <section id="propertyPanel" class="panel on"><h3>🏛️ Proprietà e sviluppo Marina</h3><p class="propertyIntro" id="propertyIntro">—</p><div class="row"><span>Valore acquisto marina</span><b id="propertyPrice">—</b></div><div class="row"><span>Utile giornaliero stimato</span><b id="propertyNet">—</b></div><div class="row"><span>Rendita disponibile</span><b id="propertyDue">—</b></div><p class="propertyNote" id="researchMarinaBenefit"></p><div class="propertyButtons"><button type="button" class="btn gold" id="buyMarina">ACQUISTA MARINA</button><button type="button" class="btn" id="collectMarina">RISCUOTI RENDITA</button><button type="button" class="btn" id="buildPontoon">COSTRUISCI PONTILE</button><button type="button" class="btn" id="upgradeMarina">POTENZIA MARINA</button></div><p class="propertyNote" id="propertyNote" role="status"></p><p class="propertyNote">Valori virtuali: 6 posti per pontile, occupazione simulata al 70%. Rendite ogni 24 ore, massimo 7 giorni maturabili. Riserva minima: 2.000 crediti.</p></section><section id="overview" class="panel on"><h3>Panoramica</h3><div class="row"><span>Entrate base</span><b id="baseIncome">—</b></div><div class="row"><span>Entrate ormeggi</span><b id="berthIncome">—</b></div><div class="row"><span>Personale</span><b id="staffCost">—</b></div><div class="row"><span>Manutenzione</span><b id="maintCost">—</b></div><div class="row"><span>Utenze</span><b id="utilCost">—</b></div></section>
 <section id="pontoonsPanel" class="panel"><h3>🛥 Pontili</h3><p id="pontoonText"></p></section>
 <section id="servicesPanel" class="panel"><h3>🛠 Servizi</h3><p>Rifornimento, manutenzione e servizi operativi sono disponibili quando il tuo yacht si trova nella marina selezionata.</p><button class="btn" id="goMap">APRI MAPPA</button></section>
@@ -135,6 +135,7 @@ for(const [id,method] of Object.entries(propertyActions)){document.getElementByI
  const r=api[method](s.id);toastMsg(r.message);render();
 };}
 function renderJobs(api,s,g){
+ const world=window.MarinaWorldLive?.current();document.getElementById("marinaWorldNote").textContent=world?world.title+" · "+world.bonus+" (incarichi idonei, dopo il tutorial).":"";
  const js=api.dailyJobCatalog?.(g,Date.now(),s.id)||{available:false,message:"Incarichi non disponibili",count:0,limit:3,jobs:[]};
  document.getElementById("jobsCount").textContent=js.count+" / "+js.limit;
  jobText.textContent=js.message||"Incarichi Marina Live";
@@ -142,7 +143,7 @@ function renderJobs(api,s,g){
  (js.jobs||[]).forEach(j=>{
    const card=document.createElement("article");card.className="jobCard";
    const title=document.createElement("h4");title.textContent=j.title;
-   const reward=document.createElement("div");reward.className="jobReward";reward.textContent="+"+fmt(j.reward)+" crediti · +"+fmt(j.prestige)+" prestigio";
+   const reward=document.createElement("div");reward.className="jobReward";reward.textContent="+"+fmt(j.reward)+" crediti · +"+fmt(j.prestige)+" prestigio"+(j.eventBonus?" · bonus mondo +"+fmt(j.eventBonus)+" incluso":"");
    card.append(title,reward);
    if(j.completed){const done=document.createElement("p");done.className="jobDone";done.textContent="✓ INCARICO COMPLETATO";card.append(done)}
    else if(j.available){

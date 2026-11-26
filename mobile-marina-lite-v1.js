@@ -203,7 +203,8 @@ function dailyJobCatalog(game,now=Date.now(),id=game?.port||"rimini"){
  const jobs=[0,1,2].map((_,i)=>{
    const t=jobTemplates[(first+i)%jobTemplates.length],jobId=day+"|"+id+"|"+t.key;
    const completed=done.includes(jobId)||(legacyToday&&t.key==="dock"&&legacy?.port===id);
-   return {id:jobId,key:t.key,title:t.title,request:t.request,options:t.options.slice(),reward:t.reward,prestige:t.prestige,completed,available:!reason&&!completed};
+   const eventBonus=!tutorial?(window.MarinaWorldLive?.bonus(t.reward,t.key,'job',now)?.amount||0):0;
+   return {id:jobId,key:t.key,title:t.title,request:t.request,options:t.options.slice(),reward:t.reward+eventBonus,eventBonus,prestige:t.prestige,completed,available:!reason&&!completed};
  });
  return {day,port:id,limit:JOB_LIMIT,count:used,tutorial,jobs,available:jobs.some(j=>j.available),message:reason||"Scegli un incarico di "+portName(id)+". Risolvi la richiesta per ottenere il premio.",clockMismatch};
 }
@@ -226,7 +227,7 @@ function completeJob(id,choice,now=Date.now()){
  if(ownPort&&!updateAccrual(game,status.port,now))return{ok:false,message:"Controlla la data del dispositivo"};
  game.marinaOperations=asRecord(game.marinaOperations);const ops=asRecord(game.marinaOperations[status.port]);game.marinaOperations[status.port]={...ops,completed:num(ops.completed)+1};
  if(ownPort)game.marinas[status.port].incomeRate=marinaFinance(game,status.port,now).net;
- game.lastNpcJob={id,type:job.title,reward:job.reward,cost:0,prestige:job.prestige,reputation:5,sector:"marina",port:status.port,at:now};
+ game.lastNpcJob={id,type:job.title,reward:job.reward,eventBonus:job.eventBonus||0,cost:0,prestige:job.prestige,reputation:5,sector:"marina",port:status.port,at:now};
  if(!x.c.writeGame(x.h,game))return{ok:false,message:"Salvataggio incarico non confermato. Riprova."};
  return{ok:true,message:"Incarico completato · +"+job.reward+" crediti · +"+job.prestige+" prestigio",reward:job.reward,prestige:job.prestige};
 }

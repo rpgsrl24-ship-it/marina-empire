@@ -345,6 +345,21 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(await page.locator('#effectFuel').innerText(),'-10%');
     assert.equal((await pageAudit(page,name+' research')).horizontalOverflow,false);
     await page.screenshot({path:path.join(OUT,name+'-research.png'),fullPage:true,animations:'disabled'});
+    await page.goto(LIVE+'mobile-home.html?v=20261111-home6',{waitUntil:'domcontentloaded',timeout:30000});
+    const eventTitle=await page.locator('#worldTitle').innerText();assert.notEqual(eventTitle,'Evento del giorno');
+    await page.locator('#worldCard a').click();await page.waitForURL(/evento-mondo\.html/);
+    assert.equal(await page.locator('#title').innerText(),eventTitle);
+    assert.equal((await pageAudit(page,name+' world event')).horizontalOverflow,false);
+    await page.goto(LIVE+'weekend-water-toys.html',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('[data-water-job="sup"]:enabled').waitFor({state:'visible',timeout:15000});
+    const preWater=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins);
+    await page.locator('[data-water-job="sup"]').click();assert.equal(await page.locator('#waterClaim').isDisabled(),true);
+    const activity=await page.evaluate(()=>{const k='marina_empire_beta_test_session',g=JSON.parse(localStorage.getItem(k));g.waterToysActivity.until=Date.now()-1;localStorage.setItem(k,JSON.stringify(g));return g.waterToysActivity});
+    await page.locator('#waterClaim:enabled').waitFor({state:'visible',timeout:15000});
+    await page.locator('#waterClaim').click();
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins),preWater-120+activity.reward);
+    assert.equal(await page.locator('[data-water-job="sup"]').innerText(),'COMPLETATO OGGI');
+    assert.equal((await pageAudit(page,name+' water toys')).horizontalOverflow,false);
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,

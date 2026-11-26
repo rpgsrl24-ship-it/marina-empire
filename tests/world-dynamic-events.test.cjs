@@ -1,0 +1,31 @@
+'use strict';
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const DAY=86400000,N=Date.UTC(2026,10,28,12),copy=x=>JSON.parse(JSON.stringify(x));let now=N;
+let g={name:'World QA',coins:20000,prestige:1000,fuel:400,condition:100,port:'cervia',boat:'voyager',owned:['voyager'],completed:['INTRO_RIMINI_CERVIA'],voyages:4,trip:null,setupComplete:true,voyageSerial:4,settledVoyages:[],marinas:{}};
+const h={accountId:null},store={capture:()=>h,select:()=>true,readGame:()=>copy(g),writeGame:(_,v)=>{g=copy(v);return true},readLayout:()=>null};
+class Clock extends Date{static now(){return now}}
+const ctx={window:{},Date:Clock,Math,JSON,console,sessionStorage:{getItem:()=>null,setItem(){},removeItem(){}}};
+vm.runInNewContext(fs.readFileSync('local-save-context.js','utf8'),ctx);ctx.window.MarinaLocalSaveContext=store;
+for(const file of ['mobile-map-lite-v2.js','mobile-marina-lite-v1.js'])vm.runInNewContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
+const {MarinaWorldLive:w,MarinaEmpireMapLite:nav,MarinaEmpireMarinaLite:marina}=ctx.window;
+assert.equal(w.current(N).id,'toy_weekend');assert.equal(w.current(N+DAY).id,'toy_weekend');assert.notEqual(w.current(N+2*DAY).id,'toy_weekend');
+assert.equal(new Set(Array.from({length:56},(_,i)=>w.current(N+i*DAY).id)).size,9);
+assert.equal(w.bonus(650,'sup','water',N).amount,143);assert.equal(w.bonus(650,'sup','water',N+2*DAY).amount,0);
+assert.equal(w.bonus(500,'academy','mission',N).amount,0);
+const m=nav.missionCatalog().find(m=>m.kind==='recovery'&&m.ready);assert(m&&m.worldBonus>0);assert(nav.startMission(m.id,m.dest).ok);const frozen=g.trip.mission.worldBonus;
+now+=2*DAY;Object.assign(g.trip,{dockingReady:true,dockingDepth:84,dockingOffset:0,dockingHeading:0,enginePort:0,engineStarboard:0,bowThruster:0,dockingSurge:0,dockingSway:0,dockingYawRate:0});
+assert(nav.completeDocking().ok);assert.equal(g.lastArrival.worldBonus,frozen);assert.equal(nav.completeDocking().ok,false);
+now=N+DAY/4;const before=g.coins;
+assert(w.startWater(g,'sup',now).ok);assert.equal(g.coins,before-120);assert.equal(g.waterToysActivity.reward,793);assert.equal(w.claimWater(g,now+119999).ok,false);assert.equal(w.startWater(g,'efoil',now).ok,false);
+assert(w.claimWater(g,now+120000).ok);assert.equal(g.coins,before-120+793);assert.equal(w.claimWater(g,now+120000).ok,false);assert.equal(w.startWater(g,'sup',now+120000).ok,false);
+assert(w.startWater(g,'sup',now+DAY).ok);assert(w.claimWater(g,now+DAY+120000).ok);assert.equal(g.waterToysCompleted,2);
+g.trip={id:'ACTIVE'};assert.equal(w.startWater(g,'concierge',now+DAY).ok,false);g.trip=null;
+g.coins=2119;assert.equal(w.startWater(g,'sup',now+2*DAY).ok,false);
+g.coins=20000;g.guestTrialJobsUsed=1;delete g.marinaDailyJobs;
+let match;
+for(let i=0;i<100;i++){now=N+(i+3)*DAY;const cat=marina.dailyJobCatalog(g,now,g.port);const job=cat.jobs.find(j=>j.eventBonus>0&&j.available);if(job){match=job;break}}
+assert(match,'At least one eligible local event job');const old=g.coins,correct={dock:0,pontoon:1,service:2,welcome:0,sup:1,weather:2}[match.key];
+assert(marina.completeJob(match.id,correct,now).ok);assert.equal(g.coins,old+match.reward);assert.equal(g.lastNpcJob.eventBonus,match.eventBonus);
+assert.equal(marina.completeJob(match.id,correct,now).ok,false);
+for(const p of ['mobile-home.html','evento-mondo.html','weekend-water-toys.html','activities-mobile.html','marina-mobile.html','missions-mobile.html','cabina-mobile.html'])for(const m of fs.readFileSync(p,'utf8').matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi))if(m[1].trim())new vm.Script(m[1],{filename:p});
+console.log('PASS: daily event rotation, weekend bonus, frozen voyages, Water Toys limits and local job rewards.');

@@ -160,3 +160,62 @@ if(typeof window!=="undefined")window.MarinaResearchBenefits=(()=>{
  function marinaTransitions(g,from,to){return [...new Set(["smart_pontoon","sustainable_energy","advanced_solar"].map(id=>completedAt(g,id)).filter(t=>t!==null&&t>from&&t<to))].sort((a,b)=>a-b)}
  return Object.freeze({completedAt,complete,effects,marinaTransitions});
 })();
+
+/* Modern world calendar: shared pure simulation logic. */
+if(typeof window!=="undefined")window.MarinaWorldLive=(()=>{
+ const DAY=86400000,missions="./missions-mobile.html?v=20261125-missions13&tipo=special",marina="./marina-mobile.html?v=20261126-marina9#jobs",water="./weekend-water-toys.html";
+ const defs=[
+ ["charter_boom","🛥️","Boom charter","Aumentano le richieste di charter e accoglienza.","Charter e accoglienza +18%",.18,["charter"],["welcome"],missions,"VAI AI CONTRATTI"],
+ ["yard_rush","🔧","Cantiere sotto pressione","Crescono gli incarichi tecnici e di consegna.","Consegne e assistenza tecnica +20%",.20,["cargo"],["pontoon","service"],marina,"APRI MARINA LIVE"],
+ ["owner_selloff","💼","Vendite armatori","Gli armatori richiedono trasferimenti di imbarcazioni.","Trasferimenti +10%",.10,["transfer"],[],"./missions-mobile.html?v=20261125-missions13","CERCA TRASFERIMENTI"],
+ ["fuel_pressure","⛽","Pressione sui rifornimenti","Il porto richiede supporto per ormeggi e servizi.","Incarichi ormeggi e servizi +12%",.12,[],["dock","service"],marina,"APRI MARINA LIVE"],
+ ["quiet_harbor","⚓","Porto tranquillo","Una giornata dedicata alla cura della marina.","Controlli pontili e meteo +10%",.10,[],["pontoon","weather"],marina,"APRI MARINA LIVE"],
+ ["vip_arrivals","✨","Arrivi VIP","Ospiti premium richiedono charter e accoglienza.","Charter e accoglienza +25%",.25,["charter"],["welcome"],missions,"VAI AI CONTRATTI"],
+ ["regatta_day","⛵","Giornata di regata","La regata richiede trasferimenti e assistenza.","Trasferimenti e ormeggi +15%",.15,["transfer"],["dock"],marina,"APRI MARINA LIVE"],
+ ["superyacht_week","🛳️","Superyacht · giornata premium","Nuovi incarichi per ospiti e servizi premium.","Charter e accoglienza +28%",.28,["charter"],["welcome"],missions,"VAI AI CONTRATTI"],
+ ["toy_weekend","🌊","Weekend Water Toys","SUP, eFoil e recuperi water toys sono protagonisti.","Attività Water Toys e recuperi +22%",.22,["recovery"],["sup"],water,"APRI WATER TOYS"]];
+ const day=now=>Math.floor(now/DAY);
+ function current(now=Date.now()){
+  const slot=day(now),weekday=new Date(slot*DAY).getUTCDay();
+  const [id,icon,title,detail,bonus,rate,kinds,jobs,href,action]=defs[weekday===0||weekday===6?8:((slot%8)+8)%8];
+  return {id,icon,title,detail,bonus,rate,kinds:kinds.slice(),jobs:jobs.slice(),href,action,slot,endsAt:(slot+1)*DAY};
+ }
+ function bonus(base,kind,type,now=Date.now()){
+  const e=current(now),eligible=type==="mission"?e.kinds.includes(kind):type==="job"?e.jobs.includes(kind):type==="water"&&e.id==="toy_weekend";
+  return {id:e.id,title:e.title,slot:e.slot,amount:eligible?Math.floor(Math.max(0,Number(base)||0)*e.rate+1e-9):0};
+ }
+ const jobs=[{id:"sup",icon:"🏄",name:"SUP Experience",cost:120,reward:650,prestige:10,duration:120000},{id:"efoil",icon:"⚡",name:"E-Foil Session",cost:250,reward:1200,prestige:18,duration:240000},{id:"concierge",icon:"🤿",name:"Water Toys Concierge",cost:420,reward:1800,prestige:28,duration:360000}];
+ const record=v=>v&&typeof v==="object"&&!Array.isArray(v)?v:{};
+ function done(g,id,slot){
+  const h=record(g?.waterToysHistory);
+  if(h["day:"+slot+":"+id])return true;
+  return Object.entries(h).some(([key,r])=>r?.id===id&&!key.startsWith("day:")&&(day(Number(r.at))===slot||/^\d+:/.test(key)&&Math.floor(Number(key.split(":")[0])/96)===slot));
+ }
+ function waterCatalog(g,now=Date.now()){
+  const event=current(now),active=g?.waterToysActivity||null,reason=!g?.setupComplete?"Apri prima la partita dalla Home.":g.trip?"Completa prima la navigazione e l'ormeggio.":!(Number(g.voyages)>=1)?"Completa prima la missione Academy.":"";
+  return {event,active,reason,jobs:jobs.map(j=>{const completed=done(g,j.id,event.slot),b=bonus(j.reward,j.id,"water",now);return {...j,eventBonus:b.amount,done:completed,available:!reason&&!active&&!completed&&Number(g.coins)>=j.cost+2000}})};
+ }
+ function startWater(g,id,now=Date.now()){
+  const s=waterCatalog(g,now),j=s.jobs.find(x=>x.id===id);
+  if(!j?.available)return{ok:false,message:s.reason||"Attività non disponibile o crediti insufficienti (riserva 2.000)."};
+  g.coins-=j.cost;g.waterToysActivity={id:j.id,name:j.name,startedAt:now,until:now+j.duration,cost:j.cost,reward:j.reward+j.eventBonus,prestige:j.prestige,daySlot:s.event.slot,eventId:s.event.id,eventBonus:j.eventBonus};
+  g.waterToysStarted=Math.max(0,Math.floor(Number(g.waterToysStarted)||0))+1;
+  return{ok:true,message:"Attività avviata"};
+ }
+ function claimWater(g,now=Date.now()){
+  const a=g?.waterToysActivity,j=jobs.find(x=>x.id===a?.id);
+  if(!a||!j||!Number.isFinite(Number(a.until))||now<Number(a.until)||g.trip)return{ok:false,message:g?.trip?"Completa prima l'ormeggio.":"Attività non ancora completata."};
+  const slot=Number.isInteger(a.daySlot)?a.daySlot:day(Number(a.startedAt)||now),key="day:"+slot+":"+j.id;
+  if(done(g,j.id,slot)){g.waterToysActivity=null;return{ok:true,message:"Premio già riscosso",amount:0}}
+  const extra=a.eventId==="toy_weekend"?Math.max(0,Math.min(Math.floor(j.reward*.22),Number(a.eventBonus)||0)):0,reward=j.reward+extra;
+  if(!Number.isSafeInteger(g.coins+reward))return{ok:false,message:"Saldo non valido"};
+  g.coins+=reward;g.prestige=Math.max(0,Number(g.prestige)||0)+j.prestige;g.earnings=Math.max(0,Number(g.earnings)||0)+reward;
+  g.waterToysCompleted=Math.max(0,Math.floor(Number(g.waterToysCompleted)||0))+1;
+  const h=record(g.waterToysHistory);h[key]={id:j.id,at:now,reward,prestige:j.prestige,eventBonus:extra};
+  g.waterToysHistory=Object.fromEntries(Object.entries(h).slice(-120));g.lastWaterToysEvent={id:j.id,name:j.name,reward,prestige:j.prestige,at:now};
+  g.economyHistory=(Array.isArray(g.economyHistory)?g.economyHistory:[]).concat([{kind:"business_income",id:"water_toys",amount:reward,at:now}]).slice(-300);
+  g.waterToysActivity=null;
+  return{ok:true,amount:reward,message:"Premio riscosso · +"+reward.toLocaleString("it-IT")+" crediti"};
+ }
+ return Object.freeze({current,bonus,waterCatalog,startWater,claimWater});
+})();
