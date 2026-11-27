@@ -95,7 +95,7 @@ async function runScenario(browser,name,viewport,mobile){
   await blockPrivateAndPaid(context);
   const page=await context.newPage();
   const errors=[],badResponses=[];
-  page.on('pageerror',e=>errors.push(e.message));
+  page.on('pageerror',e=>errors.push(page.url()+' · '+e.message));
   page.on('response',r=>{
     try{
       const u=new URL(r.url());
@@ -390,6 +390,22 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(await page.locator('#realStores a[target="_blank"]').count(),3);
     assert.equal((await pageAudit(page,name+' market')).horizontalOverflow,false);
     await page.screenshot({path:path.join(OUT,name+'-market.png'),fullPage:true,animations:'disabled'});
+    // Public guest paths only; authenticated chat is tested with a fake client in regression tests.
+    await page.goto(LIVE+'community-mobile.html?v=20261110-community3',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('#chatGate').waitFor({state:'visible',timeout:15000});
+    assert.equal(await page.locator('#chatSend').isDisabled(),true);
+    assert.equal(await page.locator('#chatBody').isDisabled(),true);
+    assert.match(await page.locator('#chatStatus').innerText(),/email confermata/);
+    assert.equal(await page.locator('.chatMessage').count(),0);
+    assert.equal((await pageAudit(page,name+' community')).horizontalOverflow,false);
+    await page.locator('#communityEvents a[href*="alliance-mobile"]').click();
+    await page.waitForURL(/alliance-mobile\.html/);
+    assert.match(await page.locator('.status').innerText(),/non ancora attivi/);
+    assert.equal((await pageAudit(page,name+' alliance')).horizontalOverflow,false);
+    await page.goto(LIVE+'ranking-mobile.html?v=20261110-ranking1',{waitUntil:'domcontentloaded',timeout:30000});
+    assert.equal(await page.locator('#list .row').count(),0);
+    assert.equal((await pageAudit(page,name+' rankings')).horizontalOverflow,false);
+    await page.screenshot({path:path.join(OUT,name+'-ranking.png'),fullPage:true,animations:'disabled'});
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,

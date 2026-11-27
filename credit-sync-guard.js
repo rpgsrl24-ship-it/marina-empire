@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-const URL="https://zrdetqvnjmqkfyajxjgp.supabase.co";
+const SUPABASE_URL="https://zrdetqvnjmqkfyajxjgp.supabase.co";
 const KEY="sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw";
 let clientPromise=null,claimBusy=false;
 
@@ -32,7 +32,7 @@ function loadSupabase(){
 async function getClient(){
  const lib=await loadSupabase();
  if(!window.__meCreditGuardClient){
-  window.__meCreditGuardClient=lib.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  window.__meCreditGuardClient=lib.createClient(SUPABASE_URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  }
  return window.__meCreditGuardClient;
 }

@@ -7,17 +7,32 @@
 <header class="head"><div class="top"><a class="round" href="./mobile-home.html?v=20261111-home6">←</a><div class="brand"><b>⚓ MARINA EMPIRE</b><small>IL GESTIONALE NAUTICO ONLINE</small></div><a class="round" href="./community-mobile.html?v=20261110-community3">?</a></div><div class="hero"><i>🏆</i><div><h1>Classifica</h1><p>I migliori comandanti di Marina Empire.</p></div></div></header>
 <section class="card"><a href="./docking-ranking.html?v=20261125-cup1" style="display:block;padding:10px;border-radius:10px;background:#0b527c;color:#fff3cc;font-weight:850;text-decoration:none;text-align:center">🏆 COPPA ORMEGGIO · CLASSIFICA BETA →</a></section><nav class="tabs"><button class="on" data-mode="absolute">🏆 Generale</button><button data-mode="weekly">📅 Settimanale</button><button data-mode="monthly">🗓️ Mensile</button></nav>
 <section class="card"><div id="podium" class="podium"><div class="pod"><b>🥈</b><strong>—</strong><span>—</span></div><div class="pod one"><b>🥇</b><strong>Caricamento…</strong><span>—</span></div><div class="pod"><b>🥉</b><strong>—</strong><span>—</span></div></div></section>
-<section class="card"><div id="list" class="list"><div class="status">Caricamento classifica reale…</div></div><p id="status" class="status">Solo dati pubblici di gioco. Nessuna email o informazione privata viene mostrata.</p></section>
+<section class="card"><div id="list" class="list"><div class="status">Caricamento classifica reale…</div></div><a href="./account-mobile.html" style="display:block;padding:10px;background:#edf7fc;border-radius:9px;font-size:12px;text-align:center;color:#105c85;font-weight:850;text-decoration:none">ACCEDI / REGISTRATI</a><p id="status" class="status">Solo dati pubblici di gioco. Nessuna email o informazione privata viene mostrata.</p></section>
 </main><nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./missions-mobile.html?v=20261111-missions9"><b>◉</b>MISSIONI</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a href="./marina-mobile.html?v=20261111-marina4"><b>⚓</b>MARINA</a><a href="./alliance-mobile.html?v=20261110-alliance1"><b>👥</b>ALLEANZA</a><a class="on" href="./ranking-mobile.html?v=20261110-ranking1"><b>🏆</b>CLASSIFICA</a></nav>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./local-save-context.js"></script><script>
-const URL="https://zrdetqvnjmqkfyajxjgp.supabase.co",KEY="sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw";let mode="absolute",client=null;
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script><script src="./local-save-context.js"></script><script>
+const SUPABASE_URL="https://zrdetqvnjmqkfyajxjgp.supabase.co",KEY="sb_publishable_WwvgUezd01X1Irx-bSaM1A_6BYedCzw";let mode="absolute",client=null;
 const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 function render(rows){const top=rows.slice(0,3);const order=[top[1],top[0],top[2]];podium.innerHTML=order.map((r,i)=>'<div class="pod '+(i===1?"one":"")+'"><b>'+(i===1?"🥇":i===0?"🥈":"🥉")+'</b><strong>'+esc(r?.captain_name||"—")+'</strong><span>'+(r?Number(mode==="absolute"?r.empire_score:r.season_points||0).toLocaleString("it-IT"):"—")+'</span></div>').join("");
 list.innerHTML=rows.length?rows.map(r=>'<div class="row '+(r.is_me?"me":"")+'"><div class="rank">#'+esc(r.rank_position)+'</div><div><div class="name">'+esc(r.captain_name||"Comandante")+'</div><div class="meta">'+esc(r.empire_tier||"")+' · '+Number(mode==="absolute"?r.voyages:r.voyages_delta||0)+' viaggi</div></div><div class="score">'+Number(mode==="absolute"?r.empire_score:r.season_points||0).toLocaleString("it-IT")+'</div></div>').join(""):'<div class="status">Nessun giocatore classificato.</div>'}
-function guestRows(){const base=[["SeaWolf",2840,21],["BlueRunner",2410,18],["Adriatica",2190,16],["CaptainSara",1820,14],["LucaNautico",1640,12]];return base.map((x,i)=>({rank_position:i+1,captain_name:x[0],empire_tier:i<1?"Comandante d'Oro":"Comandante",empire_score:x[1],season_points:Math.round(x[1]*(mode==="weekly"?.18:mode==="monthly"?.42:1)),voyages:x[2],voyages_delta:Math.max(1,Math.round(x[2]*(mode==="weekly"?.2:mode==="monthly"?.45:1))),is_me:false}))}
-function renderGuest(note){render(guestRows());status.textContent=note||"Anteprima pubblica. Accedi con un account registrato per la classifica reale."}
-async function loadReal(){if(!window.supabase?.createClient)return;try{client=client||window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});const auth=await Promise.race([client.auth.getUser(),new Promise((_,rej)=>setTimeout(()=>rej(new Error("auth-timeout")),3000))]);if(!auth?.data?.user)return;let res;if(mode==="absolute")res=await client.rpc("me_leaderboard_top",{p_limit:25});else{await client.rpc("me_season_sync",{p_type:mode});res=await client.rpc("me_season_leaderboard",{p_type:mode,p_limit:25})}if(res.error)throw res.error;render(res.data||[]);status.textContent="Classifica reale aggiornata."}catch(e){status.textContent="Anteprima pubblica temporanea. La classifica reale non è disponibile in questo momento."}}
-function refresh(){renderGuest();loadReal()}
+let loadRevision=0;
+function renderGuest(note){render([]);status.textContent=note||"Accedi con un account verificato per consultare la classifica reale."}
+async function loadReal(){
+ const revision=++loadRevision,selected=mode;
+ const h=window.MarinaLocalSaveContext?.capture?.();if(!h?.accountId){renderGuest();return}
+ if(!window.supabase?.createClient){renderGuest("Servizio classifica non disponibile.");return}
+ try{client=client||window.supabase.createClient(SUPABASE_URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+ const auth=await client.auth.getUser(),u=auth?.data?.user;
+ if(revision!==loadRevision)return;
+ if(auth.error||!u?.email_confirmed_at||u.is_anonymous||u.id!==h.accountId){renderGuest();return}
+ let res;
+ if(selected==="absolute")res=await client.rpc("me_leaderboard_top",{p_limit:25});
+ else{res=await client.rpc("me_season_leaderboard",{p_type:selected,p_limit:25});}
+ if(revision!==loadRevision)return;
+ if(res.error)throw res.error;
+ render(res.data||[]);status.textContent=(res.data||[]).length?"Classifica reale aggiornata.":"Non ci sono ancora risultati classificati in questa categoria.";
+ }catch(_){if(revision===loadRevision)renderGuest("Classifica reale temporaneamente non disponibile.")}
+}
+function refresh(){renderGuest("Caricamento classifica…");loadReal()}
 document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mode;document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("on",x===b));refresh()}));
-renderGuest();setTimeout(loadReal,0);
+refresh();
 </script></body></html>

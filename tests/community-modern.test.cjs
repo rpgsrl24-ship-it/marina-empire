@@ -1,0 +1,23 @@
+'use strict';
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+(async()=>{
+const box={window:{},console};vm.runInNewContext(fs.readFileSync('community-modern-v1.js','utf8'),box);
+const c=box.window.MarinaCommunity;
+assert.equal(c.roomFor('marina','rimini'),'marina-rimini');assert.equal(c.roomFor('marina','bogus'),'global');
+assert.equal(c.messageText('  hello  '),'hello');assert.equal(Array.from(c.messageText('🙂'.repeat(260))).length,240);
+assert.equal(c.verified({id:'a',email_confirmed_at:'yes',is_anonymous:false},'b'),false);assert.equal(c.verified({id:'a',email_confirmed_at:'yes',is_anonymous:true},'a'),false);
+let handle={accountId:null},user={id:'a',email_confirmed_at:'yes',is_anonymous:false},writes=[],authCalls=0,reads=0;
+const client={auth:{getUser:async()=>{authCalls++;return{data:{user}}}},from(table){return {insert:async payload=>{writes.push({table,payload});return{error:null}},select(cols){assert.equal(table,'me_community_messages');assert(!cols.includes('user_id'));reads++;return{eq(){return this},order(){return this},limit:async()=>({data:[{id:2,body:'second'},{id:1,body:'first'}]})}}}}};
+const svc=c.service(client,()=>handle);
+await assert.rejects(svc.list('global'));await assert.rejects(svc.send('global','test'));assert.equal(authCalls,0);assert.equal(writes.length,0);assert.equal(reads,0);
+handle={accountId:'a'};assert.equal((await svc.list('global'))[0].id,1);
+await svc.send('marina-rimini','hello');assert.equal(writes[0].table,'me_community_messages');assert.equal(writes[0].payload.body,'hello');assert.equal(writes[0].payload.user_id,undefined);assert.equal(writes[0].payload.captain_name,undefined);
+await assert.rejects(svc.send('arbitrary-room','test'));await assert.rejects(svc.send('global','  '));
+await svc.report({captain_name:'Virtual captain',body:'example'},'global',c.reasons[0]);assert.equal(writes[1].table,'me_chat_reports');assert.equal(writes[1].payload.status,'pending');assert.equal(writes[1].payload.reporter_id,undefined);
+user={id:'a',email_confirmed_at:null};await assert.rejects(svc.send('global','blocked'));assert.equal(writes.length,2);
+const guard=fs.readFileSync('credit-sync-guard.js','utf8'),sandbox={window:{},location:{href:'https://example.test/marketplace-mobile.html'},URL,console};vm.runInNewContext(guard,sandbox);assert.equal(typeof sandbox.window.meCreditCheckoutReady,'function');assert.equal(typeof sandbox.window.meClaimPurchasedCreditsAfterReturn,'function');
+const community=fs.readFileSync('community-mobile.html','utf8'),ranking=fs.readFileSync('ranking-mobile.html','utf8');
+assert(!community.includes('LucaNautico'));assert(!community.includes('CaptainSara'));assert(!ranking.includes('guestRows'));assert(!ranking.includes('SeaWolf'));
+for(const m of ranking.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi))if(m[1].trim())new vm.Script(m[1],{filename:'ranking-mobile.html'});
+console.log('PASS: verified community account, room validation, read and send, reports, guest denial, safe identity and credit URL fix.');
+})().catch(e=>{console.error(e);process.exitCode=1});
