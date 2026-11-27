@@ -15,38 +15,38 @@
 .banners{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}.banner{min-height:107px;padding:12px;border-radius:15px;color:#fff;display:flex;align-items:flex-end;background:linear-gradient(90deg,#002d52b5,#002d523b),url("./anteprima/assets/render-2026/charter.jpg") center/cover}.banner:nth-child(2){background-image:linear-gradient(90deg,#002d52b5,#002d523b),url("./anteprima/assets/render-2026/marine.jpg")}.banner strong{font-size:18px;display:block}.banner small{font-size:7px}
 .bottom{position:fixed;left:7px;right:7px;bottom:7px;max-width:606px;margin:auto;z-index:99;display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:5px;border-radius:16px;background:#06243af5;border:1px solid #58c1eb;box-shadow:0 8px 24px #0008}.bottom a{min-height:53px;border-radius:10px;color:#fff;font-size:5.8px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center}.bottom a b{font-size:18px;margin-bottom:3px}.bottom .active{background:linear-gradient(180deg,#1ccaff,#0768f3);box-shadow:0 0 12px #4addff}
 @media(max-width:430px){.tabs{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(2,1fr);border-radius:15px}.stats div:nth-child(2){border-right:0}.grid3{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}.banners{grid-template-columns:1fr}.title h1{font-size:28px}}
+/* Keep controls readable on phones and wide desktop screens. */
+.page{width:min(920px,100%)}.bottom{max-width:900px}.search{grid-template-columns:minmax(0,1fr) 52px}.search input{min-width:0}.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.tabs a,.tabs button{font-size:11px;text-align:center;padding:5px}.cat{font-size:10px;min-height:62px}.sec-h{gap:5px;flex-wrap:wrap}.sec-h span{font-size:10px}.marketNote{font-size:12px;line-height:1.5;color:#436276;margin:8px 3px}.marketStatus{font-size:12px;font-weight:800;min-height:18px;overflow-wrap:anywhere;margin:6px 3px;color:#164c69}.marketGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:8px 0}.marketGrid .card{min-width:0}.marketGrid .body{padding:11px}.marketGrid h3,.card h3{font-size:14px;line-height:1.3}.marketGrid p,.meta{font-size:11px;line-height:1.5;color:#4a697c;margin:6px 0}.tag{font-size:9px}.price{font-size:16px;overflow-wrap:anywhere}.marketButton,.favoriteButton,.creditBuy{display:block;width:100%;min-height:44px;padding:9px 6px;font-size:11px;font-weight:850;border-radius:9px;border:1px solid #1b75a6;background:#0869a0;color:white;text-align:center;margin-top:7px}.marketButton.gold,.creditBuy{background:#f7d58b;color:#17394b;border-color:#c8a04b}.favoriteButton{background:#f0f8fc;color:#0b557d;border-color:#b3d5e6}.favoriteButton[aria-pressed=true]{background:#fff3d4;color:#79571f}.marketButton:disabled,.favoriteButton:disabled{opacity:.5;cursor:not-allowed}.marketSub{font-size:14px;margin:12px 3px 5px}.saleRow{display:flex;gap:8px;justify-content:space-between;padding:9px;margin:6px 0;background:white;border:1px solid #c5dce7;border-radius:9px;font-size:12px}.storeCard .body{border-top:4px solid #136c94}.storeCard h3{font-size:17px}.creditState{font-size:11px}.emptyMarket{grid-column:1/-1;font-size:12px;color:#486c80;background:#fff;padding:12px;border-radius:10px}.marketGrid .card.hide,.card.hide{display:none}.bottom a{font-size:8px;min-width:0}.page{padding-bottom:95px}
+@media(max-width:430px){.marketGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.marketGrid .body{padding:8px}.storeCard{grid-column:1/-1}.marketGrid h3{font-size:13px}.marketButton,.favoriteButton{font-size:10px}.bottom a{font-size:7px}.brand b{font-size:19px}}
+@media(max-width:350px){.marketGrid{grid-template-columns:1fr}}
 </style></head><body>
 <main class="page">
 <section class="hero">
-<div class="top"><div class="avatar">👨‍✈️<span class="lvl" id="level">Lv. 1</span></div><div class="brand"><b>MARINA EMPIRE®</b><small>THE NAUTICAL BUSINESS GAME</small></div><div class="menu">☰</div></div>
+<div class="top"><div class="avatar">👨‍✈️<span class="lvl" id="level">Lv. 1</span></div><div class="brand"><b>MARINA EMPIRE®</b><small>THE NAUTICAL BUSINESS GAME</small></div><a class="menu" href="./mobile-home.html?v=20261111-home6" aria-label="Torna alla Home">⌂</a></div>
 <div class="stats"><div>🪙 <b id="coins">10.000</b></div><div>⭐ <b id="prestige">0</b></div><div>⛽ <b id="fuel">100%</b></div><div>🛠 <b id="condition">100%</b></div></div>
-<div class="title"><h1>🛒 Marketplace</h1><p>Compra · Vendi · Scambia · Equipaggia la tua flotta</p></div>
-<div class="tabs"><a class="active" href="./marketplace-mobile.html">🛒 Marketplace</a><a href="./marketplace-mobile.html?v=20261110-market13#marketMine">🏷 I miei annunci</a><a class="sell" href="./marketplace-mobile.html?v=20261110-market13#marketSell">＋ Vendi</a><button type="button" disabled title="Preferiti in preparazione">♡ Preferiti · presto</button></div>
+<div class="title"><h1>🛒 Marketplace</h1><p>Compra e vendi nella simulazione · scopri i negozi nautici reali</p></div>
+<div class="tabs"><a class="active" href="#virtualMarket">🛒 Mercato virtuale</a><a href="#marketMine">🏷 I miei annunci</a><a class="sell" href="#marketSell">＋ Vendi</a><button type="button" id="favoriteFilter" aria-pressed="false">♡ Preferiti</button></div>
 </section>
 <section class="main">
 <div class="search"><input id="search" placeholder="Cerca barche, accessori, water toys…"><button id="clearFilter" type="button" title="Azzera filtri">↺</button></div>
 <div class="cats"><button class="cat" data-filter="imbarcazioni"><b>🛥️</b>IMBARCAZIONI</button><button class="cat" data-filter="pwc"><b>🚤</b>PWC</button><button class="cat" data-filter="efoil"><b>🏄</b>EFOIL</button><button class="cat" data-filter="water"><b>🛟</b>WATER TOYS</button><button class="cat" data-filter="accessori"><b>⚙️</b>ACCESSORI</button><button class="cat" data-filter="posti"><b>⚓</b>POSTI BARCA</button><button class="cat" data-filter="offerte"><b>🏷️</b>OFFERTE</button></div>
-<section class="sec"><div class="sec-h"><strong>⭐ In evidenza · PREZZI REALI €</strong><span>Acquisti fuori dal gioco ›</span></div><div class="grid3">
-<article class="card" data-cat="water offerte"><div class="img"></div><div class="body"><span class="tag">RPG Yacht</span><h3>Piattaforma YachtBeach 4 × 3 m con piscina</h3><div class="price">€ 3.000</div><div class="meta">Nuovo</div></div></article>
-<article class="card" data-cat="efoil offerte"><div class="img"></div><div class="body"><span class="tag used">Usato</span><h3>eFoil – Ottime condizioni</h3><div class="price">€ 4.990</div><div class="meta">Usato</div></div></article>
-<article class="card" data-cat="water offerte"><div class="img"></div><div class="body"><span class="tag">RPG Yacht</span><h3>Seabob F5 S</h3><div class="price">€ 11.900</div><div class="meta">Nuovo</div></div></article>
+<section id="virtualMarket" class="sec"><div class="sec-h"><strong>🛥️ Mercato imbarcazioni virtuale</strong><span>SOLO CREDITI</span></div><p class="marketNote">Acquista i modelli della flotta al listino del gioco. Nessun pagamento reale, nessun trasferimento fra giocatori. Mantieni 2.000 crediti di riserva.</p><div id="marketStatus" class="marketStatus" role="status" aria-live="polite"></div><div class="marketGrid" id="boatOffers"></div></section>
+<section class="sec" id="realStores"><div class="sec-h"><strong>⭐ In evidenza · PREZZI REALI €</strong><span>VAI AI SITI UFFICIALI</span></div><p class="marketNote">Vetrine commerciali RPG S.r.l. Prezzi, disponibilità e condizioni si verificano esclusivamente nei rispettivi negozi. I crediti di gioco non sono utilizzabili per comprare prodotti reali.</p><div class="marketGrid">
+<article class="card storeCard" data-cat="imbarcazioni pwc efoil water accessori offerte" data-favorite-id="store-rpg"><div class="body"><span class="tag">NEGOZIO REALE</span><h3>RPG Yacht</h3><p>Imbarcazioni, eFoil, Seabob e water toys elettronici, SUP RPG personalizzati, noleggio e accessori come Silwy.</p><a class="marketButton" href="https://www.rpgyacht.com/" target="_blank" rel="noopener noreferrer">VISITA RPG YACHT ↗</a><button class="favoriteButton" type="button" data-favorite="store-rpg">♡ PREFERITO</button></div></article>
+<article class="card storeCard" data-cat="water pwc accessori offerte" data-favorite-id="store-float"><div class="body"><span class="tag">NEGOZIO REALE</span><h3>Float Marine</h3><p>YachtBeach e Spinera: piattaforme, piscine gonfiabili, SUP, kayak e attrezzature per il mare.</p><a class="marketButton" href="https://www.floatmarine.it/" target="_blank" rel="noopener noreferrer">VISITA FLOAT MARINE ↗</a><button class="favoriteButton" type="button" data-favorite="store-float">♡ PREFERITO</button></div></article>
+<article class="card storeCard" data-cat="accessori offerte" data-favorite-id="store-fix"><div class="body"><span class="tag">NEGOZIO REALE</span><h3>Fix Parabordi</h3><p>Fender Mate: accessori per fissare, regolare e gestire i parabordi.</p><a class="marketButton" href="https://www.fixparabordi.it/" target="_blank" rel="noopener noreferrer">VISITA FIX PARABORDI ↗</a><button class="favoriteButton" type="button" data-favorite="store-fix">♡ PREFERITO</button></div></article>
 </div></section>
 <section class="sec" id="creditMarket"><div class="sec-h"><strong>🪙 Oggetti in CREDITI</strong><span>Solo valuta di gioco · nessun pagamento reale</span></div><div class="grid3">
 <article class="card credit-card" data-cat="accessori" data-credit-id="captain_badge" data-credit-cost="2500"><div class="img"></div><div class="body"><span class="tag">DIGITALE</span><h3>Badge Capitano Argento</h3><div class="price">🪙 2.500</div><div class="meta">Collezionabile profilo · acquisto unico</div><span class="creditState" data-credit-state="captain_badge"></span><button class="creditBuy" data-credit-buy="captain_badge">ACQUISTA IN CREDITI</button></div></article>
 <article class="card credit-card" data-cat="accessori offerte" data-credit-id="marina_frame" data-credit-cost="3500"><div class="img"></div><div class="body"><span class="tag">DIGITALE</span><h3>Cornice Profilo Marina Blu</h3><div class="price">🪙 3.500</div><div class="meta">Collezionabile profilo · acquisto unico</div><span class="creditState" data-credit-state="marina_frame"></span><button class="creditBuy" data-credit-buy="marina_frame">ACQUISTA IN CREDITI</button></div></article>
 <article class="card credit-card" data-cat="offerte" data-credit-id="founder_flag" data-credit-cost="5000"><div class="img"></div><div class="body"><span class="tag">LIMITATO</span><h3>Bandiera Marina Empire</h3><div class="price">🪙 5.000</div><div class="meta">Collezionabile digitale · acquisto unico</div><span class="creditState" data-credit-state="founder_flag"></span><button class="creditBuy" data-credit-buy="founder_flag">ACQUISTA IN CREDITI</button></div></article>
 </div></section>
-<section class="sec"><div class="sec-h"><strong>📍 Annunci reali vicino alla tua marina</strong><span>Rimini – Darsena ›</span></div><div class="grid4">
-<article class="card" data-cat="imbarcazioni"><div class="img"></div><div class="body"><h3>Prestige 42</h3><div class="price">€ 320.000</div><div class="meta">📍 Rimini (RN)</div></div></article>
-<article class="card" data-cat="pwc"><div class="img"></div><div class="body"><h3>PWC GTX 300</h3><div class="price">€ 15.900</div><div class="meta">📍 Rimini (RN)</div></div></article>
-<article class="card" data-cat="accessori"><div class="img"></div><div class="body"><h3>Passerella inox</h3><div class="price">€ 1.450</div><div class="meta">📍 Rimini (RN)</div></div></article>
-<article class="card" data-cat="accessori"><div class="img"></div><div class="body"><h3>Bicchieri Silwy (set 4)</h3><div class="price">€ 59,90</div><div class="meta">📍 Rimini (RN)</div></div></article>
-</div></section>
-<section id="marketMine" class="sec"><div class="sec-h"><strong>🏷 I miei annunci</strong><span>Area nuova in preparazione</span></div><p style="margin:8px;font-size:9px;color:#617784">Gli annunci personali saranno gestiti direttamente da questa pagina, senza tornare alla vecchia interfaccia.</p></section><section id="marketSell" class="sec"><div class="sec-h"><strong>＋ Vendi</strong><span>Pubblicazione annunci</span></div><p style="margin:8px;font-size:9px;color:#617784">La vendita sarà integrata qui. Nessun collegamento alla pagina legacy viene più utilizzato.</p></section><div class="banners"><a class="banner" href="./weekend-water-toys.html"><div><strong>Weekend Water Toys</strong><small>Le migliori offerte per il tuo divertimento in mare</small></div></a><a class="banner" href="./evento-mondo.html"><div><strong>Eventi dal mondo</strong><small>Fiere, regate, novità e lanci dal settore nautico</small></div></a></div>
+<section id="marketMine" class="sec"><div class="sec-h"><strong>🏷 I miei annunci virtuali</strong><span>GESTISCI</span></div><p class="marketNote">Gli annunci sono salvati nella tua partita. Puoi ritirarli gratuitamente oppure vendere a un broker simulato. Non sono visibili ad altri utenti.</p><div id="myBoatListings" class="marketGrid"></div><h3 class="marketSub">Ultime vendite virtuali</h3><div id="boatSales"></div></section>
+<section id="marketSell" class="sec"><div class="sec-h"><strong>＋ Vendi una barca della flotta</strong><span>VALUTAZIONE VIRTUALE</span></div><p class="marketNote">Valutazione dal 45% al 70% del listino in base allo stato della barca. L'Academy è protetta; per vendere la barca attiva selezionane un'altra. Con la vendita lasci anche equipaggio e stato di quella barca. Non si ricevono euro.</p><div id="sellBoatList" class="marketGrid"></div></section><div class="banners"><a class="banner" href="./weekend-water-toys.html"><div><strong>Weekend Water Toys</strong><small>Incarichi virtuali e vetrine nautiche</small></div></a><a class="banner" href="./evento-mondo.html"><div><strong>Eventi dal mondo</strong><small>Eventi e bonus della simulazione</small></div></a></div>
 </section>
 <nav class="bottom"><a href="./mobile-home.html?v=20261111-home6"><b>⌂</b>HOME</a><a href="./marina-mobile.html?v=20261123-marina5"><b>⚓</b>MARINE</a><a href="./missions-mobile.html?v=20261111-missions9"><b>🎯</b>MISSIONI</a><a class="active" href="./marketplace-mobile.html"><b>🛒</b>MARKET</a><a href="./fleet-mobile.html?v=20261109-fleet1"><b>🛥️</b>FLOTTA</a><a href="./community-mobile.html?v=20261110-community3"><b>👥</b>COMMUNITY</a><a href="./profile-mobile.html?v=20261110-profile1"><b>👤</b>PROFILO</a></nav>
 </main>
-<script src="./local-save-context.js"></script><script src="./credit-sync-guard.js?v=20261110-guard1"></script><script src="./credit-purchase-rc.js?v=20261110-credit1"></script>
+<script src="./local-save-context.js"></script><script src="./mobile-fleet-lite-v1.js?v=20261109-fleetlite1"></script><script src="./credit-sync-guard.js?v=20261110-guard1"></script><script src="./credit-purchase-rc.js?v=20261110-credit1"></script>
 <script>
 (()=>{try{
  const ctx=window.MarinaLocalSaveContext;let h=ctx&&ctx.capture(),g=h&&ctx.readGame(h);
@@ -61,21 +61,23 @@
  window.__marketCtx={ctx,h};
 }catch(_){}})();
 
-const cards=[...document.querySelectorAll(".card[data-cat]")],cats=[...document.querySelectorAll(".cat[data-filter]")];
-let activeFilter="";
+const cats=[...document.querySelectorAll(".cat[data-filter]")];
+let activeFilter="",onlyFavorites=false;
 function applyMarketFilter(){
  const q=(search.value||"").trim().toLowerCase();
- cards.forEach(card=>{
+ const favorites=window.MarinaEmpireFleetLite?.marketSnapshot?.().favorites||[];
+ document.querySelectorAll(".card[data-cat]").forEach(card=>{
    const cat=card.dataset.cat||"",txt=card.innerText.toLowerCase();
    const okCat=!activeFilter||cat.split(/\s+/).includes(activeFilter);
    const okText=!q||txt.includes(q);
-   card.classList.toggle("hide",!(okCat&&okText));
+   card.classList.toggle("hide",!(okCat&&okText&&(!onlyFavorites||favorites.includes(card.dataset.favoriteId||card.dataset.creditId))));
  });
  cats.forEach(b=>b.classList.toggle("on",b.dataset.filter===activeFilter));
 }
 search.addEventListener("input",applyMarketFilter);
 cats.forEach(b=>b.addEventListener("click",()=>{activeFilter=activeFilter===b.dataset.filter?"":b.dataset.filter;applyMarketFilter()}));
-clearFilter.addEventListener("click",()=>{activeFilter="";search.value="";applyMarketFilter()});
+clearFilter.addEventListener("click",()=>{activeFilter="";onlyFavorites=false;document.getElementById("favoriteFilter").setAttribute("aria-pressed","false");search.value="";applyMarketFilter()});
+document.getElementById("favoriteFilter").onclick=()=>{onlyFavorites=!onlyFavorites;document.getElementById("favoriteFilter").setAttribute("aria-pressed",String(onlyFavorites));applyMarketFilter();};
 
 function marketGame(){const x=window.__marketCtx;return x?.ctx&&x.h?x.ctx.readGame(x.h):null}
 function marketWrite(game){const x=window.__marketCtx;return !!(x?.ctx&&x.h&&x.ctx.writeGame(x.h,game))}
@@ -101,4 +103,45 @@ document.querySelectorAll("[data-credit-buy]").forEach(b=>b.addEventListener("cl
  refreshCreditMarket();
 }));
 refreshCreditMarket();
-</script><script src="./player-tracker-v2.js?v=20261115-tracker1"></script></body></html>
+const marketApi=window.MarinaEmpireFleetLite,$=id=>document.getElementById(id),money=n=>Math.round(Number(n)||0).toLocaleString("it-IT");
+const node=(tag,txt,cls)=>{const n=document.createElement(tag);if(txt!=null)n.textContent=txt;if(cls)n.className=cls;return n};
+function actionButton(txt,action,id,disabled=false,gold=false){const b=node("button",txt,"marketButton"+(gold?" gold":""));b.type="button";b.dataset.marketAction=action;b.dataset.boat=id;b.disabled=disabled;return b}
+function cardFor(b,mode){
+ const card=node("article",null,"card");card.dataset.cat="imbarcazioni";card.dataset.favoriteId=b.id;
+ const content=node("div",null,"body"),title=node("h3",b.name),info=node("p",b.type+(b.isOwned?" · "+b.portName+" · stato "+Math.round(b.condition)+"%":""));
+ content.append(title,info);
+ if(mode==="buy"){
+  content.append(node("div",b.isOwned?"IN FLOTTA":money(b.price)+" cr","price"));
+  if(!b.isOwned)content.append(actionButton(b.canBuy?"ACQUISTA IN CREDITI":"NON ACQUISTABILE","buy",b.id,!b.canBuy,true));
+  const f=node("button","♡ PREFERITO","favoriteButton");f.type="button";f.dataset.favorite=b.id;content.append(f);
+ }else if(mode==="list"){
+  content.append(node("div",money(b.quote)+" cr","price"),node("p",b.sellReason||"Offerta broker simulato · prezzo stimato"));
+  content.append(actionButton("PUBBLICA ANNUNCIO","list",b.id,!!b.sellReason,true));
+ }else{
+  content.append(node("div",money(Math.min(b.quote,Number(b.listing.quote)||0))+" cr","price"),node("p",b.sellReason||"Offerta NPC pronta · non è una vendita reale"));
+  content.append(actionButton("ACCETTA OFFERTA","sell",b.id,!!b.sellReason,true),actionButton("RITIRA ANNUNCIO","cancel",b.id));
+ }
+ card.append(content);return card;
+}
+function renderMarket(message=""){
+ const s=marketApi?.marketSnapshot();if(!s)return;
+ $("marketStatus").textContent=message;
+ $("boatOffers").replaceChildren(...s.boats.map(b=>cardFor(b,"buy")));
+ const listed=s.boats.filter(b=>b.isOwned&&b.listing),sellable=s.boats.filter(b=>b.isOwned&&b.price>0&&!b.listing);
+ $("myBoatListings").replaceChildren(...(listed.length?listed.map(b=>cardFor(b,"mine")):[node("p","Nessun annuncio attivo nella tua partita.","emptyMarket")]));
+ $("sellBoatList").replaceChildren(...(sellable.length?sellable.map(b=>cardFor(b,"list")):[node("p","Acquista una seconda barca dalla flotta per iniziare a vendere.","emptyMarket")]));
+ $("boatSales").replaceChildren(...(s.history.length?s.history.map(r=>{const row=node("div",null,"saleRow");row.append(node("span",String(r.name||"Imbarcazione")),node("strong","+"+money(r.amount)+" cr"));return row}):[node("p","Nessuna vendita registrata.","emptyMarket")]));
+ document.querySelectorAll("[data-favorite]").forEach(b=>{const on=s.favorites.includes(b.dataset.favorite);b.textContent=on?"♥ SALVATO":"♡ PREFERITO";b.setAttribute("aria-pressed",String(on));});
+ refreshCreditMarket();applyMarketFilter();
+}
+document.addEventListener("click",e=>{
+ const favorite=e.target.closest("[data-favorite]"),b=e.target.closest("[data-market-action]");if(!favorite&&!b)return;
+ const action=favorite?"favorite":b.dataset.marketAction,id=favorite?favorite.dataset.favorite:b.dataset.boat;
+ if(b?.disabled)return;
+ if(action==="buy"||action==="sell"){const s=marketApi.marketSnapshot(),boat=s.boats.find(v=>v.id===id);
+ if(!boat)return;const prompt=action==="buy"?"Acquistare "+boat.name+" per "+money(boat.price)+" crediti?":"Vendere "+boat.name+" al broker simulato? La barca e il suo equipaggio usciranno dalla flotta.";
+ if(!confirm(prompt))return;}
+ const r=marketApi.marketAction(action,id);renderMarket(r.message);
+});
+renderMarket();window.addEventListener("pageshow",()=>renderMarket());document.addEventListener("visibilitychange",()=>{if(!document.hidden)renderMarket()});
+</script><script src="./player-tracker-v2.js?v=20261126-tracker5"></script></body></html>

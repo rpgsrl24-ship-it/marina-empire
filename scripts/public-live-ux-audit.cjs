@@ -371,6 +371,25 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal(await page.locator('[data-claim="navigation"]').innerText(),'PREMIO RISCOSSO');
     assert.equal((await pageAudit(page,name+' Academy')).horizontalOverflow,false);
     await page.screenshot({path:path.join(OUT,name+'-academy.png'),fullPage:true,animations:'disabled'});
+    // Virtual brokerage only: seed a local QA balance; never visit paid storefronts.
+    await page.evaluate(()=>{const k='marina_empire_beta_test_session',g=JSON.parse(localStorage.getItem(k));g.coins=Math.max(g.coins,100000);localStorage.setItem(k,JSON.stringify(g))});
+    await page.goto(LIVE+'marketplace-mobile.html?v=20261110-market13',{waitUntil:'domcontentloaded',timeout:30000});
+    await page.locator('[data-market-action="buy"][data-boat="open"]:enabled').waitFor({state:'visible',timeout:15000});
+    const beforeMarket=await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins);
+    await page.locator('[data-market-action="buy"][data-boat="open"]').click();
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins),beforeMarket-80000);
+    await page.locator('[data-market-action="list"][data-boat="open"]').click();
+    await page.locator('[data-market-action="cancel"][data-boat="open"]').click();
+    await page.locator('[data-market-action="list"][data-boat="open"]').click();
+    await page.locator('[data-market-action="sell"][data-boat="open"]').click();
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('marina_empire_beta_test_session')).coins),beforeMarket-80000+56000);
+    assert.equal(await page.locator('[data-market-action="sell"][data-boat="open"]').count(),0);
+    await page.locator('[data-favorite="store-float"]').click();
+    await page.reload({waitUntil:'domcontentloaded'});
+    assert.equal(await page.locator('[data-favorite="store-float"]').getAttribute('aria-pressed'),'true');
+    assert.equal(await page.locator('#realStores a[target="_blank"]').count(),3);
+    assert.equal((await pageAudit(page,name+' market')).horizontalOverflow,false);
+    await page.screenshot({path:path.join(OUT,name+'-market.png'),fullPage:true,animations:'disabled'});
     console.log('LIVE_AUDIT '+JSON.stringify({
       scenario:name,viewport,firstMission:firstText.slice(0,140),
       route:active.route,destination:active.destination,mission:active.mission,
