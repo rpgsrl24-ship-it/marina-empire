@@ -404,6 +404,7 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal((await pageAudit(page,name+' alliance')).horizontalOverflow,false);
     await page.goto(LIVE+'ranking-mobile.html?v=20261110-ranking1',{waitUntil:'domcontentloaded',timeout:30000});
     assert.equal(await page.locator('#list .row').count(),0);
+    assert.match(await page.locator('#status').innerText(),/account verificato/);
     assert.equal((await pageAudit(page,name+' rankings')).horizontalOverflow,false);
     await page.screenshot({path:path.join(OUT,name+'-ranking.png'),fullPage:true,animations:'disabled'});
     console.log('LIVE_AUDIT '+JSON.stringify({

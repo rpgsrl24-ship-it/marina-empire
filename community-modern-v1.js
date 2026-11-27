@@ -60,7 +60,7 @@ async function load(){
  if(!svc||!enabled||loading||document.hidden)return;loading=true;const token=generation,target=room;
  $("chatRefresh").disabled=true;
  try{const data=await svc.list(target);if(token===generation&&enabled){rows=data;render();setStatus("Stanza aggiornata · "+rows.length+" ultimi messaggi");}}
- catch(_){if(token===generation){rows=[];render();setStatus("Chat non disponibile o sessione scaduta. Riprova o accedi di nuovo.");}}
+ catch(e){if(token===generation){rows=[];if(e?.message==="access_required")setEnabled(false);render();setStatus("Chat non disponibile o sessione scaduta. Riprova o accedi di nuovo.");}}
  finally{loading=false;$("chatRefresh").disabled=!enabled;if(token!==generation&&enabled)load()}
 }
 function sdk(){

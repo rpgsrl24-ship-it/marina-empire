@@ -15,7 +15,7 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"
 function render(rows){const top=rows.slice(0,3);const order=[top[1],top[0],top[2]];podium.innerHTML=order.map((r,i)=>'<div class="pod '+(i===1?"one":"")+'"><b>'+(i===1?"🥇":i===0?"🥈":"🥉")+'</b><strong>'+esc(r?.captain_name||"—")+'</strong><span>'+(r?Number(mode==="absolute"?r.empire_score:r.season_points||0).toLocaleString("it-IT"):"—")+'</span></div>').join("");
 list.innerHTML=rows.length?rows.map(r=>'<div class="row '+(r.is_me?"me":"")+'"><div class="rank">#'+esc(r.rank_position)+'</div><div><div class="name">'+esc(r.captain_name||"Comandante")+'</div><div class="meta">'+esc(r.empire_tier||"")+' · '+Number(mode==="absolute"?r.voyages:r.voyages_delta||0)+' viaggi</div></div><div class="score">'+Number(mode==="absolute"?r.empire_score:r.season_points||0).toLocaleString("it-IT")+'</div></div>').join(""):'<div class="status">Nessun giocatore classificato.</div>'}
 let loadRevision=0;
-function renderGuest(note){render([]);status.textContent=note||"Accedi con un account verificato per consultare la classifica reale."}
+function renderGuest(note){render([]);document.getElementById("status").textContent=note||"Accedi con un account verificato per consultare la classifica reale."}
 async function loadReal(){
  const revision=++loadRevision,selected=mode;
  const h=window.MarinaLocalSaveContext?.capture?.();if(!h?.accountId){renderGuest();return}
@@ -26,10 +26,11 @@ async function loadReal(){
  if(auth.error||!u?.email_confirmed_at||u.is_anonymous||u.id!==h.accountId){renderGuest();return}
  let res;
  if(selected==="absolute")res=await client.rpc("me_leaderboard_top",{p_limit:25});
- else{res=await client.rpc("me_season_leaderboard",{p_type:selected,p_limit:25});}
+ else{const sync=await client.rpc("me_season_sync",{p_type:selected});if(sync.error)throw sync.error;if(revision!==loadRevision)return;res=await client.rpc("me_season_leaderboard",{p_type:selected,p_limit:25});}
  if(revision!==loadRevision)return;
+ if(window.MarinaLocalSaveContext?.capture?.()?.accountId!==h.accountId){renderGuest();return}
  if(res.error)throw res.error;
- render(res.data||[]);status.textContent=(res.data||[]).length?"Classifica reale aggiornata.":"Non ci sono ancora risultati classificati in questa categoria.";
+ render(res.data||[]);document.getElementById("status").textContent=(res.data||[]).length?"Classifica reale aggiornata.":"Non ci sono ancora risultati classificati in questa categoria.";
  }catch(_){if(revision===loadRevision)renderGuest("Classifica reale temporaneamente non disponibile.")}
 }
 function refresh(){renderGuest("Caricamento classifica…");loadReal()}
