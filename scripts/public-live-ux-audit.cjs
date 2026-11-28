@@ -388,6 +388,9 @@ async function runScenario(browser,name,viewport,mobile){
     await page.reload({waitUntil:'domcontentloaded'});
     assert.equal(await page.locator('[data-favorite="store-float"]').getAttribute('aria-pressed'),'true');
     assert.equal(await page.locator('#realStores a[target="_blank"]').count(),3);
+    assert.equal(await page.locator('[data-me-credit-product]').count(),5);
+    for(const button of await page.locator('[data-me-credit-product]').all())assert.equal(await button.isDisabled(),true,'Guest must not open checkout');
+    assert.equal(await page.locator('#commercialPartners a[href*="pubblicita.html"]').count(),1);
     assert.equal((await pageAudit(page,name+' market')).horizontalOverflow,false);
     await page.screenshot({path:path.join(OUT,name+'-market.png'),fullPage:true,animations:'disabled'});
     // Public guest paths only; authenticated chat is tested with a fake client in regression tests.
@@ -400,7 +403,10 @@ async function runScenario(browser,name,viewport,mobile){
     assert.equal((await pageAudit(page,name+' community')).horizontalOverflow,false);
     await page.locator('#communityEvents a[href*="alliance-mobile"]').click();
     await page.waitForURL(/alliance-mobile\.html/);
-    assert.match(await page.locator('.status').innerText(),/non ancora attivi/);
+    assert.match(await page.locator('#clubStatus').innerText(),/email confermata/);
+    assert.equal(await page.locator('#clubGate').isVisible(),true);
+    assert.equal(await page.locator('#clubCreateButton').isDisabled(),true);
+    assert.equal(await page.locator('#clubCheckin').isDisabled(),true);
     assert.equal((await pageAudit(page,name+' alliance')).horizontalOverflow,false);
     await page.goto(LIVE+'ranking-mobile.html?v=20261110-ranking1',{waitUntil:'domcontentloaded',timeout:30000});
     assert.equal(await page.locator('#list .row').count(),0);

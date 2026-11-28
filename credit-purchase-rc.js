@@ -28,7 +28,7 @@ function getClient(){
 async function currentUser(){
   const c=getClient();
   const {data,error}=await c.auth.getUser();
-  if(error||!data?.user?.id||!data.user.email_confirmed_at)return null;
+  if(error||!data?.user?.id||!data.user.email_confirmed_at||data.user.is_anonymous||window.MarinaLocalSaveContext?.capture?.()?.accountId!==data.user.id)return null;
   return data.user;
 }
 async function walletBalance(){
@@ -46,30 +46,25 @@ function setStatus(message,isError=false){
   el.dataset.error=isError?"1":"0";
 }
 async function startCheckout(productId){
-  if(busy)return;
+  if(busy||!CONFIG.packages.some(p=>p.productId===Number(productId)))return;
   if(!CONFIG.enabled){setStatus("Acquisti in attivazione finale. Nessun addebito viene avviato.",true);return;}
-  const user=await currentUser();
-  if(!user){setStatus("Per acquistare crediti devi prima accedere con un account Marina Empire verificato.",true);document.querySelector('[data-tab="profile"]')?.click();return;}
-  if(typeof window.meCreditCheckoutReady!=="function"){
-    setStatus("Controllo sicurezza partita non disponibile. Acquisto bloccato.",true);return;
-  }
-  setStatus("Verifica della partita online prima del checkout…");
-  const ready=await window.meCreditCheckoutReady();
-  if(!ready){setStatus("Sincronizza la partita online prima di acquistare crediti.",true);return;}
-  busy=true;
-  document.querySelectorAll("[data-me-credit-product]").forEach(b=>b.disabled=true);
-  setStatus("Preparazione del checkout sicuro RPG Yacht…");
+  busy=true;document.querySelectorAll("[data-me-credit-product]").forEach(b=>b.disabled=true);
+  let navigating=false;
   try{
-    const c=getClient();
-    const {data,error}=await c.functions.invoke("marina-direct-checkout",{body:{product_id:Number(productId)}});
-    if(error||!data?.checkout_url)throw new Error("checkout_unavailable");
-    window.location.assign(data.checkout_url);
-  }catch(e){
-    console.warn("Marina Empire checkout",e);
-    setStatus("Checkout temporaneamente non disponibile. Riprova tra poco.",true);
-    busy=false;
-    syncButtons();
-  }
+    const user=await currentUser();
+    if(!user){setStatus("Accedi con un account Marina Empire verificato.",true);return;}
+    if(typeof window.meCreditCheckoutReady!=="function"){setStatus("Controllo sicurezza partita non disponibile. Acquisto bloccato.",true);return;}
+    setStatus("Verifica della partita online prima del checkout…");
+    if(!await window.meCreditCheckoutReady()){setStatus("Sincronizza la partita online prima di acquistare crediti.",true);return;}
+    if(window.MarinaLocalSaveContext?.capture?.()?.accountId!==user.id){setStatus("Account cambiato. Acquisto bloccato.",true);return;}
+    setStatus("Preparazione del checkout sicuro RPG Yacht…");
+    const {data,error}=await getClient().functions.invoke("marina-direct-checkout",{body:{product_id:Number(productId)}});
+    if(error||!data?.checkout_url)throw Error("checkout_unavailable");
+    const dest=new window.URL(data.checkout_url);
+    if(dest.protocol!=="https:"||!["rpgyacht.com","www.rpgyacht.com"].includes(dest.hostname)||dest.username||dest.password)throw Error("checkout_unavailable");
+    window.location.assign(data.checkout_url);navigating=true;
+  }catch(e){console.warn("Marina Empire checkout",e);setStatus("Checkout temporaneamente non disponibile. Riprova.",true);}
+  finally{if(!navigating){busy=false;syncButtons();}}
 }
 async function syncButtons(){
   const buttons=[...document.querySelectorAll("[data-me-credit-product]")];
@@ -103,7 +98,7 @@ function bind(){
   const url=new URL(window.location.href);
   if(url.searchParams.get("credit_purchase")==="success"){
     setStatus("Ordine ricevuto. Sto verificando l'accredito automatico nella partita.");
-    document.querySelector('[data-tab="credits"]')?.click();
+    document.getElementById("creditShop")?.scrollIntoView({block:"start"});
   }
   syncButtons();
   window.addEventListener("focus",()=>syncButtons());
